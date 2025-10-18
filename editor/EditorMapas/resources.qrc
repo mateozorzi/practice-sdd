@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/mapas">
+        <file>imagenes/liberty_city.png</file>
+        <file>imagenes/vice_city.png</file>
+        <file>imagenes/san_andreas.png</file>
+    </qresource>
+</RCC>
