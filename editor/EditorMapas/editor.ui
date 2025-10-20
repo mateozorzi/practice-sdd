@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Editor</class>
  <widget class="QMainWindow" name="Editor">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -20,25 +23,42 @@
    <string>Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <widget class="QTextEdit" name="Tituloventana">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>50</y>
-      <width>181</width>
-      <height>41</height>
+      <x>160</x>
+      <y>40</y>
+      <width>561</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Ubuntu</family>
-      <pointsize>20</pointsize>
+      <pointsize>44</pointsize>
       <italic>true</italic>
       <bold>true</bold>
      </font>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-color: rgb(245, 194, 17);
+color: rgb(245, 194, 17);
+background-color: rgb(224, 27, 36);</string>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
     <property name="markdown">
-     <string>***Circuit Select***
+     <string>***Seleccionar Circuito***
 
 </string>
     </property>
@@ -49,28 +69,28 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:20pt; font-weight:700; font-style:italic;&quot;&gt;
-&lt;p style=&quot; margin-top:13px; margin-bottom:13px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Circuit Select&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:44pt; font-weight:700; font-style:italic;&quot;&gt;
+&lt;p style=&quot; margin-top:29px; margin-bottom:29px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Seleccionar Circuito&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="mapa1">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>490</y>
+      <x>90</x>
+      <y>460</y>
       <width>94</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>Libery City</string>
+     <string>Liberty City</string>
     </property>
    </widget>
    <widget class="QPushButton" name="mapa2">
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>490</y>
+      <y>460</y>
       <width>94</width>
       <height>26</height>
      </rect>
@@ -83,7 +103,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>490</y>
+      <y>460</y>
       <width>94</width>
       <height>26</height>
      </rect>
@@ -95,21 +115,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QPushButton" name="botonSalir">
     <property name="geometry">
      <rect>
-      <x>760</x>
-      <y>20</y>
+      <x>750</x>
+      <y>70</y>
       <width>94</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Salir</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>170</y>
+      <x>20</x>
+      <y>150</y>
       <width>231</width>
       <height>301</height>
      </rect>
@@ -121,8 +141,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>170</y>
+      <x>320</x>
+      <y>150</y>
       <width>231</width>
       <height>301</height>
      </rect>
@@ -135,15 +155,43 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>170</y>
+      <y>150</y>
       <width>231</width>
       <height>301</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/vice_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-3</y>
+      <width>881</width>
+      <height>561</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-image: url(:/images/imagenes/fondo.png);</string>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <zorder>label_4</zorder>
+   <zorder>Tituloventana</zorder>
+   <zorder>mapa1</zorder>
+   <zorder>mapa2</zorder>
+   <zorder>mapa3</zorder>
+   <zorder>botonSalir</zorder>
+   <zorder>label</zorder>
+   <zorder>label_2</zorder>
+   <zorder>label_3</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

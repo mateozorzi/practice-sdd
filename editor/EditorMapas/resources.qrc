@@ -4,4 +4,12 @@
         <file>imagenes/vice_city.png</file>
         <file>imagenes/san_andreas.png</file>
     </qresource>
+    <qresource prefix="/images">
+        <file>imagenes/fondo.png</file>
+    </qresource>
+    <qresource prefix="/circuitos">
+        <file>imagenes/circuito_vice_city.png</file>
+        <file>imagenes/circuito_san_andreas.png</file>
+        <file>imagenes/circuito_liberty_city.png</file>
+    </qresource>
 </RCC>

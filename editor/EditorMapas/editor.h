@@ -18,13 +18,13 @@ public:
     ~Editor();
 
 private slots:
-    void accionmapa1();
-
     void on_mapa1_clicked();
 
     void on_mapa2_clicked();
 
     void on_mapa3_clicked();
+
+    void on_botonSalir_clicked();
 
 private:
     Ui::Editor *ui;

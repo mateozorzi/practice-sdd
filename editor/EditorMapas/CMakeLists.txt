@@ -20,10 +20,16 @@ set(PROJECT_SOURCES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
     qt_add_executable(EditorMapas
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         resources.qrc
+        creador.h creador.cpp creador.ui
+
+
+
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -45,6 +51,7 @@ else()
 endif()
 
 target_link_libraries(EditorMapas PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(EditorMapas PRIVATE Qt6::Widgets)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
