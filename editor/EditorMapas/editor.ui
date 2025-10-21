@@ -32,9 +32,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>240</x>
       <y>40</y>
-      <width>561</width>
+      <width>391</width>
       <height>91</height>
      </rect>
     </property>
@@ -58,7 +58,7 @@ background-color: rgb(224, 27, 36);</string>
      <number>1</number>
     </property>
     <property name="markdown">
-     <string>***Seleccionar Circuito***
+     <string>***Circuit Select***
 
 </string>
     </property>
@@ -70,7 +70,7 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:44pt; font-weight:700; font-style:italic;&quot;&gt;
-&lt;p style=&quot; margin-top:29px; margin-bottom:29px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Seleccionar Circuito&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:29px; margin-bottom:29px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Circuit Select&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="mapa1">
@@ -112,7 +112,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <string>Vice City</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="botonSalir">
+   <widget class="QPushButton" name="Exit">
     <property name="geometry">
      <rect>
       <x>750</x>
@@ -122,7 +122,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </rect>
     </property>
     <property name="text">
-     <string>Salir</string>
+     <string>Exit</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -188,7 +188,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <zorder>mapa1</zorder>
    <zorder>mapa2</zorder>
    <zorder>mapa3</zorder>
-   <zorder>botonSalir</zorder>
+   <zorder>Exit</zorder>
    <zorder>label</zorder>
    <zorder>label_2</zorder>
    <zorder>label_3</zorder>

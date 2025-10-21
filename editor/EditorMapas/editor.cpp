@@ -25,7 +25,7 @@ void Editor::on_mapa1_clicked()
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // Conectar la señal "cerrado" de Creador a un slot lambda que muestre Editor
-    connect(c, &Creador::cerrado, this, [this]() {
+    connect(c, &Creador::close_w, this, [this]() {
         this->show(); // cuando Creador se cierre, mostramos Editor
     });
 
@@ -43,8 +43,8 @@ void Editor::on_mapa2_clicked()
     Creador *c = new Creador(mapa);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
-    // Conectar la señal "cerrado" de Creador a un slot lambda que muestre Editor
-    connect(c, &Creador::cerrado, this, [this]() {
+    // Conectar la señal "close" de Creador a un slot lambda que muestre Editor
+    connect(c, &Creador::close_w, this, [this]() {
         this->show(); // cuando Creador se cierre, mostramos Editor
     });
 
@@ -63,7 +63,7 @@ void Editor::on_mapa3_clicked()
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // Conectar la señal "cerrado" de Creador a un slot lambda que muestre Editor
-    connect(c, &Creador::cerrado, this, [this]() {
+    connect(c, &Creador::close_w, this, [this]() {
         this->show(); // cuando Creador se cierre, mostramos Editor
     });
 
@@ -71,7 +71,9 @@ void Editor::on_mapa3_clicked()
 }
 
 
-void Editor::on_botonSalir_clicked()
+
+
+void Editor::on_Exit_clicked()
 {
     QApplication::quit();
 }

@@ -2,6 +2,7 @@
 #define CREADOR_H
 
 #include <QMainWindow>
+#include "coordinates.h"
 
 namespace Ui {
 class Creador;
@@ -13,17 +14,20 @@ class Creador : public QMainWindow
 
 public:
     Creador(const QString& path, QWidget *parent = nullptr);
-    void colocar_fondo(const QString& path);
+    void set_background(const QString& path);
+    void handle_checkpoints(QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
     ~Creador();
 
 private:
     Ui::Creador *ui;
-    QString mapa;
+    QString map;
+    Coordinates checkpoints;
 
 signals:
-    void cerrado();
+    void close_w();
 private slots:
-    void on_pushButton_clicked();
+    void on_Exit_clicked();
 };
 
 #endif // CREADOR_H
