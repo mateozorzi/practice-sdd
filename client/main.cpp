@@ -1,10 +1,12 @@
-#include "../common/foo.h"
+#include "../common/constants.h"
 
 #include <iostream>
 #include <exception>
 
 #include <SDL2pp/SDL2pp.hh>
 #include <SDL2/SDL_ttf.h>
+
+#include "client_protocol.h"
 
 using namespace SDL2pp;
 
@@ -28,6 +30,10 @@ int main() try {
 	SDL_Event event;
 	std::string current_event = "Esperando evento...";
 
+	// Creo conexion a servidor
+	ClientProtocol client("192.0.0.1", "8080");
+
+	// Loop para leer event keys del teclado
 	while (running) {
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -36,18 +42,22 @@ int main() try {
 					break;
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym) {
-						case SDLK_w:
-							current_event = "Avanzar";
-							break;
-						case SDLK_s:
-							current_event = "Frenar";
-							break;
-						case SDLK_a:
-							current_event = "Girando a la izquierda";
-							break;
-						case SDLK_d:
-							current_event = "Girando a la derecha";
-							break;
+				case SDLK_w:
+						current_event = "Avanzar";
+						client.send_car_movement(CarMovement::ACCELERATE);
+						break;
+					case SDLK_s:
+						current_event = "Frenar";
+						client.send_car_movement(CarMovement::BRAKE);
+						break;
+					case SDLK_a:
+						current_event = "Girando a la izquierda";
+						client.send_car_movement(CarMovement::TURN_LEFT);
+						break;
+					case SDLK_d:
+						current_event = "Girando a la derecha";
+						client.send_car_movement(CarMovement::TURN_RIGHT);
+						break;
 						default:
 							current_event = "Tecla no manejada";
 							break;
