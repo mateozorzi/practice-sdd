@@ -6,6 +6,7 @@
     </qresource>
     <qresource prefix="/images">
         <file>imagenes/fondo.png</file>
+        <file>imagenes/bandera.jpg</file>
     </qresource>
     <qresource prefix="/circuitos">
         <file>imagenes/circuito_vice_city.png</file>

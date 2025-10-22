@@ -12,7 +12,9 @@ target_sources(taller_common
     common_protocol.h
     foo.h
     liberror.h
+    queue.h
     resolver.h
     resolvererror.h
     socket.h
+    thread.h
     )
