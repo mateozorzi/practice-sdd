@@ -29,36 +29,76 @@ int main() try {
 	sprite_cars.SetColorKey(true, color_key);
 	Texture sprites(renderer, sprite_cars);
 
+	// Posición del vehiculo
 	int pos_x = 300;
 	int pos_y = 200;
+
+	// Sprite del vehiculo
+	int car_x = 128;
+	int car_y = 32;
+
+	// Estado de WASD
+	bool key_w = false;
+	bool key_a = false;
+	bool key_s = false;
+	bool key_d = false;
 
 	while (true) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
 				return 0;
-			} else if (event.type == SDL_KEYDOWN) {
+			}
+			if (event.type == SDL_KEYDOWN) {
 				switch (event.key.keysym.sym) {
 					case SDLK_ESCAPE: case SDLK_q:
 						return 0;
-					case SDLK_w: pos_y -= 1; break;
-					case SDLK_s: pos_y += 1; break;
-					case SDLK_a: pos_x -= 1; break;
-					case SDLK_d: pos_x += 1; break;
+					case SDLK_w: key_w = true; break;
+					case SDLK_s: key_s = true; break;
+					case SDLK_a: key_a = true; break;
+					case SDLK_d: key_d = true; break;
+				}
+			} else if (event.type == SDL_KEYUP) {
+				switch (event.key.keysym.sym) {
+					case SDLK_w: key_w = false; break;
+					case SDLK_s: key_s = false; break;
+					case SDLK_a: key_a = false; break;
+					case SDLK_d: key_d = false; break;
 				}
 			}
+		}
+
+		if (key_w) {
+			pos_y -= 2;
+			car_y = 32; // sprite arriba
+		}
+		if (key_s) {
+			pos_y += 2;
+			car_y = 0; // sprite abajo
+		}
+		if (key_a) {
+			pos_x -= 2;
+			car_x = 96;  // sprite izquierda
+		}
+		if (key_d) {
+			pos_x += 2;
+			car_x = 160; // sprite derecha
+		}
+
+		if (!key_a && !key_d) {
+			car_x = 128;
 		}
 
 		renderer.Clear();
 
 		renderer.Copy(sprites,
-			Rect(128, 32, 32, 32),
+			Rect(car_x, car_y, 32, 32),
 			Rect(pos_x, pos_y, 50, 50)
 			);
 
 		renderer.Present();
 
-		SDL_Delay(100);
+		SDL_Delay(10);
 	}
 } catch (std::exception& e) {
 	// If case of error, print it and exit with error
