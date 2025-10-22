@@ -50,6 +50,11 @@ target_include_directories(taller_common PUBLIC .)
 # sudo apt-get install libopus-dev libopusfile-dev libxmp-dev libfluidsynth-dev fluidsynth libwavpack1 libwavpack-dev libfreetype-dev wavpack
 #
 
+# Enable SDL2pp with Image, TTF and Mixer support
+set(SDL2PP_WITH_IMAGE YES)
+set(SDL2PP_WITH_TTF YES)
+set(SDL2PP_WITH_MIXER YES)
+
 # Install libSDL2 and libSDL2pp (for client or editor)
 # HEY!! TODO XXX: add more dependendies (either for client, server or editor)
 if(TALLER_CLIENT OR TALLER_EDITOR)
@@ -117,8 +122,11 @@ if(TALLER_CLIENT)
     # add libSDL2pp's headers
     target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR})
 
+    # Define DATA_PATH for the client
+    target_compile_definitions(taller_client PRIVATE DATA_PATH="${PROJECT_SOURCE_DIR}/client/cars")
+
     # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_ttf::SDL2_ttf)
+    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
 endif()
 
 if(TALLER_SERVER)
