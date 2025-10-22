@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "coordinates.h"
+#include "messages.h"
 #include <QGraphicsScene>
 
 #define NONE 0
@@ -26,14 +27,16 @@ public:
 
 private:
     Ui::Creador *ui;
-    //QGraphicsScene* scene;
+    QGraphicsScene* scene;
     QString map;
     Coordinates checkpoints;
     int mode;
+    Messages m;
 
     void add_checkpoint(QEvent *event);
     void delete_checkpoint(QEvent *event);
-    //void update_map(const QPoint& pos);
+    void update_counter();
+    void update_map(const QPoint& pos);
 
 signals:
     void close_w();

@@ -28,6 +28,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resources.qrc
         creador.h creador.cpp creador.ui
         coordinates.h coordinates.cpp
+        messages.h messages.cpp
 
 
 

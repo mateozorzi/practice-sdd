@@ -41,7 +41,7 @@ background-color: rgb(246, 211, 45);</string>
     <property name="geometry">
      <rect>
       <x>868</x>
-      <y>0</y>
+      <y>4</y>
       <width>212</width>
       <height>71</height>
      </rect>
@@ -75,7 +75,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>868</x>
-      <y>70</y>
+      <y>80</y>
       <width>221</width>
       <height>71</height>
      </rect>
@@ -219,7 +219,7 @@ QPushButton:checked{
     <property name="geometry">
      <rect>
       <x>868</x>
-      <y>140</y>
+      <y>150</y>
       <width>221</width>
       <height>151</height>
      </rect>
@@ -231,17 +231,23 @@ QPushButton:checked{
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="labelmap">
+   <widget class="QGraphicsView" name="labelmap">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>868</width>
-      <height>874</height>
+      <x>4</x>
+      <y>4</y>
+      <width>870</width>
+      <height>876</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="styleSheet">
+     <string notr="true">border-color: rgb(129, 61, 156);</string>
+    </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
     </property>
    </widget>
   </widget>

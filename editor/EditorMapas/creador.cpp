@@ -1,6 +1,7 @@
 #include "creador.h"
 #include "ui_creador.h"
 #include "coordinates.h"
+#include "messages.h"
 #include <QMouseEvent>
 #include <QMessageBox>
 #include <QGraphicsScene>
@@ -18,9 +19,16 @@ Creador::Creador(const QString& path, QWidget *parent)
     , map(path)
     , checkpoints(Coordinates())
     , mode(ADD)
+    , m(Messages())
 {
     ui->setupUi(this);
+
+    scene = new QGraphicsScene(this);
+    ui->labelmap->setScene(scene);
+
     set_background(map);
+    ui->n_checkpoints->display(0);
+
 
     ui->labelmap->installEventFilter(this);
 
@@ -34,80 +42,81 @@ Creador::Creador(const QString& path, QWidget *parent)
 }
 
 void Creador::set_background(const QString& path){
-    QPixmap map(path);
-    if(!map.isNull()) {
-        // Escalar la imagen al tamaño del label
-        ui->labelmap->setPixmap(map.scaled(
-            ui->labelmap->size(),
-            Qt::KeepAspectRatio,  // mantiene proporción
-            Qt::SmoothTransformation
-            ));
+    QPixmap mapPixmap(path);
+    if(!mapPixmap.isNull()) {
+        scene->clear();
+        ui->labelmap->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+        scene->addPixmap(mapPixmap);
+        scene->setSceneRect(mapPixmap.rect());
     }
 }
 
-//void Creador::update_map(const QPoint& pos){
-//
-//    if (mode == ADD){
-//        // Agregar el checkpoint centrado en pos
-//        int radio = 2;
-//        scene->addEllipse(pos.x()-radio, pos.y()-radio,
-//                          2*radio, 2*radio, QPen(Qt::red), QBrush(Qt::yellow));
-//    }else if (mode == REMOVE){
-//        // Recorrer todos los items de la escena
-//        QList<QGraphicsItem*> items = scene->items();
-//        for (QGraphicsItem* item : items) {
-//            if (auto ellipse = dynamic_cast<QGraphicsEllipseItem*>(item)) {
-//                QRectF rect = ellipse->rect();
-//                QPointF center = ellipse->pos() + QPointF(rect.width()/2, rect.height()/2);
-//
-//                // Comparamos exacto con pos
-//                if (center == pos) {
-//                    scene->removeItem(item);
-//                    delete item;
-//                    break; // eliminamos solo uno
-//                }
-//            }
-//        }
-//    }
-//}
+void Creador::update_counter() {
+    int count = 0;
+    for (QGraphicsItem* item : scene->items()) {
+        if (dynamic_cast<QGraphicsEllipseItem*>(item)) {
+            count++;
+        }
+    }
+    ui->n_checkpoints->display(count);
+}
+
+
+void Creador::update_map(const QPoint& pos){
+    int radio = 4;
+    if (mode == ADD){
+        QGraphicsEllipseItem* ellipse = scene->addEllipse(-radio, -radio, 2*radio, 2*radio,
+                                                          QPen(Qt::red), QBrush(Qt::yellow));
+        ellipse->setPos(pos);
+
+    }else if (mode == REMOVE){
+        QPointF clickPos = pos;
+        for (QGraphicsItem* item : scene->items()) {
+            if (auto ellipse = dynamic_cast<QGraphicsEllipseItem*>(item)) {
+                QPointF center = ellipse->pos();
+                qreal dist = QLineF(clickPos, center).length();
+                if (dist <= radio) {
+                    scene->removeItem(item);
+                    delete item;
+                    break;
+                }
+            }
+        }
+    }
+
+    update_counter();
+}
 
 void Creador::add_checkpoint(QEvent *event){
     QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
-    QPoint pos = mouseEvent->pos();
+    QPointF scenePos = ui->labelmap->mapToScene(mouseEvent->pos());
+    QPoint pos = scenePos.toPoint();
+
 
     if(checkpoints.add_checkpoint(pos)){
-        QMessageBox::information(this, "Success",
-                                 QString("Checkpoint added in (%1, %2)")
-                                     .arg(pos.x()).arg(pos.y()));
+        update_map(pos);
+        m.checkpoint_message(this,"Success", "Checkpoint added in (%1, %2)", pos);
 
-        //update_map()
     }else{
-        QMessageBox::information(this, "Error",
-                                 QString("Can´t add checkpoint in (%1, %2)")
-                                     .arg(pos.x()).arg(pos.y()));
+        m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
     }
 }
 
 void Creador::delete_checkpoint(QEvent *event){
     QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
-    // Posición dentro del label
-    QPoint pos = mouseEvent->pos();
+    QPointF scenePos = ui->labelmap->mapToScene(mouseEvent->pos());
+    QPoint pos = scenePos.toPoint();
 
     QPoint del = checkpoints.delete_checkpoint(pos);
 
-    // Guardar coordenada
     if(del.x() != -1){
-        QMessageBox::information(this, "Success",
-                                 QString("Checkpoint delete in (%1, %2)")
-                                     .arg(pos.x()).arg(pos.y()));
+        update_map(del);
+        m.checkpoint_message(this, "Success", "Checkpoint delete in (%1, %2)", pos);
 
-        //update_map()
     }else{
-        QMessageBox::information(this, "Error",
-                                 QString("No checkpoint in (%1, %2)")
-                                     .arg(pos.x()).arg(pos.y()));
+        m.checkpoint_message(this, "Error", "No checkpoint in (%1, %2)", pos);
     }
 }
 
@@ -135,6 +144,8 @@ bool Creador::eventFilter(QObject *obj, QEvent *event)
 
 Creador::~Creador()
 {
+    qDeleteAll(scene->items()); // elimina los items
+    delete scene;               // elimina la escena
     delete ui;
 }
 
