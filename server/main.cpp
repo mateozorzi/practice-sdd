@@ -1,3 +1,5 @@
+#include "server.h"
+
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -25,8 +27,8 @@ int main(const int argc, const char* const argv[]) {
 
     try {
 
-        // Server server(port);
-        // server.run();
+        Server server(port);
+        server.run();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << SERVER_MAIN << "] " << e.what() << std::endl;
