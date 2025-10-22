@@ -31,7 +31,7 @@ int main() try {
 	std::string current_event = "Esperando evento...";
 
 	// Creo conexion a servidor
-	ClientProtocol client("192.0.0.1", "8080");
+	ClientProtocol client("127.0.0.1", "8080");
 
 	// Loop para leer event keys del teclado
 	while (running) {
