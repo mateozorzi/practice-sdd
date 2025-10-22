@@ -14,11 +14,11 @@ void Acceptor::run() {
 
         try {
 
-            Socket socket = acceptor_socket.accept();
-            // auto client = std::make_unique<ClientHandler>(std::move(socket), game_monitor);
-            // clients.push_back(std::move(client));
+            Socket client_socket = acceptor_socket.accept();
+            auto client = std::make_unique<ClientHandler>(std::move(client_socket));
+            clients.push_back(std::move(client));
             std::cout << CLIENT_CONNECTED << std::endl;
-            // reap();
+            reap();
         } catch (const std::exception& e) {
 
             if (!should_keep_running())
@@ -30,7 +30,7 @@ void Acceptor::run() {
 }
 
 
-/*
+
 void Acceptor::reap() {
 
     clients.remove_if([](const std::unique_ptr<ClientHandler>& client) {
@@ -40,7 +40,7 @@ void Acceptor::reap() {
         return false;
     });
 }
-*/
+
 
 
 void Acceptor::stop() {
@@ -52,7 +52,7 @@ void Acceptor::stop() {
         acceptor_socket.close();
     } catch (const LibError&) {}
 
-    // clients.clear();
+    clients.clear();
 }
 
 

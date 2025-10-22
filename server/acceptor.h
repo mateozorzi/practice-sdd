@@ -2,25 +2,28 @@
 #define ACCEPTOR_H
 
 
+#include <list>
+#include <memory>
 #include <string>
 
 #include "common/socket.h"
 #include "common/thread.h"
 
+#include "client_handler.h"
+
 
 constexpr std::string_view ACCEPTOR = "ACCEPTOR";
 constexpr std::string_view CLIENT_CONNECTED = "A client has connected successfully!";
 constexpr std::string_view EXCEPTION = "Exception";
-constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 
 class Acceptor final: public Thread {
 
 
     Socket acceptor_socket;
-    // std::list<std::unique_ptr<ClientHandler>> clients; (Only single client for now)
+    std::list<std::unique_ptr<ClientHandler>> clients;
 
-    // void reap(); (Only single client for now)
+    void reap();
 
 
 public:
