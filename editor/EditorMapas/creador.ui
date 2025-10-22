@@ -24,32 +24,17 @@
     <property name="geometry">
      <rect>
       <x>930</x>
-      <y>850</y>
+      <y>840</y>
       <width>94</width>
       <height>26</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(246, 211, 45);</string>
+    </property>
     <property name="text">
      <string>Exit</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelmap">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>868</width>
-      <height>874</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="textEdit">
@@ -89,9 +74,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QTextEdit" name="textEdit_2">
     <property name="geometry">
      <rect>
-      <x>870</x>
+      <x>868</x>
       <y>70</y>
-      <width>212</width>
+      <width>221</width>
       <height>71</height>
      </rect>
     </property>
@@ -120,29 +105,36 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>930</x>
-      <y>790</y>
+      <y>780</y>
       <width>94</width>
       <height>26</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(246, 211, 45);
+color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>Done</string>
     </property>
    </widget>
-   <widget class="QLCDNumber" name="lcdNumber">
+   <widget class="QLCDNumber" name="n_checkpoints">
     <property name="geometry">
      <rect>
-      <x>930</x>
+      <x>936</x>
       <y>380</y>
       <width>81</width>
       <height>51</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">border: 2px solid #F6D32D</string>
+    </property>
    </widget>
    <widget class="QTextEdit" name="textEdit_3">
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>902</x>
       <y>340</y>
       <width>151</width>
       <height>41</height>
@@ -152,6 +144,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <font>
       <pointsize>18</pointsize>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border: 2px solid #F6D32D</string>
     </property>
     <property name="markdown">
      <string>Checkpoints
@@ -170,6 +165,83 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </property>
     <property name="cursorWidth">
      <number>0</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="addButton">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>520</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	color: rgb(0, 0, 0);
+	background-color: rgb(246, 211, 45);
+}
+
+QPushButton:checked{
+	background-color: rgb(87, 227, 137);
+	color: rgb(0, 0, 0);
+}</string>
+    </property>
+    <property name="text">
+     <string>Add</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="removeButton">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>610</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	color: rgb(0, 0, 0);
+	background-color: rgb(246, 211, 45);
+}
+
+QPushButton:checked{
+	background-color: rgb(237, 51, 59);
+	color: rgb(0, 0, 0);
+}</string>
+    </property>
+    <property name="text">
+     <string>Remove</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="bandera">
+    <property name="geometry">
+     <rect>
+      <x>868</x>
+      <y>140</y>
+      <width>221</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">image: url(:/images/imagenes/bandera.jpg);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelmap">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>868</width>
+      <height>874</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

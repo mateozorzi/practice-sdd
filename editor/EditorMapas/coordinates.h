@@ -10,17 +10,18 @@ class Coordinates
 private:
     QVector<QPoint> checkpoints;
 
+    bool point_too_close(const QPoint& point);
+
+    bool is_a_checkpoint(const QPoint& point);
 
 
 public:
     Coordinates();
     ~Coordinates();
 
-    void add_checkpoint(const QPoint& point);
+    bool add_checkpoint(const QPoint& point);
 
-    bool is_a_checkpoint(const QPoint& point);
-
-    void delete_checkpoint(const QPoint& point);
+    QPoint delete_checkpoint(const QPoint& point);
 };
 
 #endif // COORDINATES_H

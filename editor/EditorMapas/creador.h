@@ -3,6 +3,11 @@
 
 #include <QMainWindow>
 #include "coordinates.h"
+#include <QGraphicsScene>
+
+#define NONE 0
+#define ADD 1
+#define REMOVE 2
 
 namespace Ui {
 class Creador;
@@ -21,13 +26,21 @@ public:
 
 private:
     Ui::Creador *ui;
+    //QGraphicsScene* scene;
     QString map;
     Coordinates checkpoints;
+    int mode;
+
+    void add_checkpoint(QEvent *event);
+    void delete_checkpoint(QEvent *event);
+    //void update_map(const QPoint& pos);
 
 signals:
     void close_w();
 private slots:
     void on_Exit_clicked();
+    void on_addButton_toggled(bool checked);
+    void on_removeButton_toggled(bool checked);
 };
 
 #endif // CREADOR_H
