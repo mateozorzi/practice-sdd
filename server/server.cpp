@@ -4,16 +4,14 @@
 #include <iostream>
 
 
-Server::Server(const std::string& port) {
-
-    (void)port; // For now, to avoid compiling errors!
-}
+Server::Server(const std::string& port): clients_acceptor(port) {}
 
 
 void Server::run() {
 
     try {
 
+        clients_acceptor.start();
         std::cout << SERVER_STARTED << std::endl;
 
         while (std::cin.get() != SERVER_CMD_EXIT) {}
@@ -29,7 +27,9 @@ void Server::run() {
 
 void Server::stop() {
 
-    // No threads to stop & join for now...
+    clients_acceptor.stop();
+
+    clients_acceptor.join();
 }
 
 

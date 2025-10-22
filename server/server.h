@@ -2,6 +2,8 @@
 #define SERVER_H
 
 
+#include "acceptor.h"
+
 #include <string>
 
 
@@ -11,13 +13,12 @@ constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
 constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
 
 constexpr std::string_view SERVER = "SERVER";
-constexpr std::string_view EXCEPTION = "EXCEPTION";
-constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "EXCEPTION_IN_DESTRUCTOR";
 
 
 
 class Server {
 
+    Acceptor clients_acceptor;
 
     void stop();
 
