@@ -4,6 +4,7 @@
 
 #include "common/socket.h"
 
+#include "receiver.h"
 #include "sender.h"
 
 #include <cstdint>
@@ -20,6 +21,7 @@ class ClientHandler {
     Socket client_socket;
     uint32_t client_id;
 
+    Receiver receiver;
     Sender sender;
 
     void stop();
