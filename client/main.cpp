@@ -24,14 +24,26 @@ int main() try {
 	// Create accelerated video renderer with default driver
 	Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
+	// Cargar imagen de fondo (circuito)
+	Surface background_surface(DATA_PATH "/circuito_liberty_city.png");
+	Texture background(renderer, background_surface);
+
+	// Obtener dimensiones del fondo
+	int bg_width = background_surface.GetWidth();
+	int bg_height = background_surface.GetHeight();
+
 	Surface sprite_cars(DATA_PATH "/Mobile - Grand Theft Auto 4 - Miscellaneous - Cars.png");
 	const Uint32 color_key = SDL_MapRGB(sprite_cars.Get()->format, 163, 163, 13);
 	sprite_cars.SetColorKey(true, color_key);
 	Texture sprites(renderer, sprite_cars);
 
-	// Posición del vehiculo
+	// Posición del vehiculo en el mundo
 	int pos_x = 300;
 	int pos_y = 200;
+
+	// Desplazamiento de la cámara
+	int camera_x = 0;
+	int camera_y = 0;
 
 	// Sprite del vehiculo
 	int car_x = 128;
@@ -89,11 +101,28 @@ int main() try {
 			car_x = 128;
 		}
 
+		// Actualizar camara siguiendo al auto
+		camera_x = pos_x - 120 + 20;
+		camera_y = pos_y - 90 + 20;
+
+		// Limitar de camara
+		if (camera_x < 0) camera_x = 0;
+		if (camera_y < 0) camera_y = 0;
+		if (camera_x > bg_width - 320) camera_x = bg_width - 320;
+		if (camera_y > bg_height - 240) camera_y = bg_height - 240;
+
 		renderer.Clear();
 
+		// Dibujar mapa
+		renderer.Copy(background,
+			Rect(camera_x, camera_y, 320, 240),
+			Rect(0, 0, 640, 480)
+			);
+
+		// Dibujar auto
 		renderer.Copy(sprites,
 			Rect(car_x, car_y, 32, 32),
-			Rect(pos_x, pos_y, 50, 50)
+			Rect(pos_x - camera_x, pos_y - camera_y, 50, 50)
 			);
 
 		renderer.Present();
