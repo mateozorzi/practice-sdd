@@ -12,6 +12,8 @@
 #include <QList>
 #include <cmath>
 
+#define RADIO 8
+
 
 Creador::Creador(const QString& path, QWidget *parent)
     : QMainWindow(parent)
@@ -63,9 +65,8 @@ void Creador::update_counter() {
 
 
 void Creador::update_map(const QPoint& pos){
-    int radio = 4;
     if (mode == ADD){
-        QGraphicsEllipseItem* ellipse = scene->addEllipse(-radio, -radio, 2*radio, 2*radio,
+        QGraphicsEllipseItem* ellipse = scene->addEllipse(-RADIO, -RADIO, 2*RADIO, 2*RADIO,
                                                           QPen(Qt::red), QBrush(Qt::yellow));
         ellipse->setPos(pos);
 
@@ -75,7 +76,7 @@ void Creador::update_map(const QPoint& pos){
             if (auto ellipse = dynamic_cast<QGraphicsEllipseItem*>(item)) {
                 QPointF center = ellipse->pos();
                 qreal dist = QLineF(clickPos, center).length();
-                if (dist <= radio) {
+                if (dist <= RADIO) {
                     scene->removeItem(item);
                     delete item;
                     break;
@@ -144,8 +145,8 @@ bool Creador::eventFilter(QObject *obj, QEvent *event)
 
 Creador::~Creador()
 {
-    qDeleteAll(scene->items()); // elimina los items
-    delete scene;               // elimina la escena
+    qDeleteAll(scene->items());
+    delete scene;
     delete ui;
 }
 

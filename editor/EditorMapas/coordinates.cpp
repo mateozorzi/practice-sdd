@@ -3,6 +3,8 @@
 #include <QVector>
 #include <QPoint>
 
+#define DIST_MIN 30
+
 Coordinates::Coordinates(){}
 
 bool Coordinates::point_too_close(const QPoint& point){
@@ -18,7 +20,7 @@ bool Coordinates::point_too_close(const QPoint& point){
 
         distance = std::sqrt(d_x * d_x + d_y * d_y);
 
-        if (distance <= 4){
+        if (distance <= DIST_MIN){
             return true;
         }
     }
@@ -59,7 +61,7 @@ QPoint Coordinates::delete_checkpoint(const QPoint& point){
         int dy = point.y() - it->y();
         double distance = std::sqrt(dx * dx + dy * dy);
 
-        if (distance <= 4.0) {
+        if (distance <= DIST_MIN) {
             del = *it;
             checkpoints.erase(it);
             break;  // delete
