@@ -8,15 +8,21 @@
 
 ClientHandler::ClientHandler(Socket&& socket):
         client_socket(std::move(socket)),
-        client_id(1) {} // Should construct a sender and receiver thread
+        client_id(1),
+        sender(client_id) {
+
+    sender.start();
+} // Should construct a receiver thread
 
 
-bool ClientHandler::is_alive() const { return true; } // Shoukd change this later!
+bool ClientHandler::is_alive() const { return sender.is_alive(); } // Shoukd change this later!
 
 
 void ClientHandler::stop() {
 
-    // This method does nothing for now, it should have a sender and receiver thread later
+    sender.stop();
+
+    sender.join();
 }
 
 ClientHandler::~ClientHandler() {
