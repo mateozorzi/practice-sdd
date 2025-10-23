@@ -71,4 +71,8 @@ QPoint Coordinates::delete_checkpoint(const QPoint& point){
     return del;
 }
 
+int Coordinates::total_checkpoints(){
+    return (checkpoints.size());
+}
+
 Coordinates::~Coordinates(){}

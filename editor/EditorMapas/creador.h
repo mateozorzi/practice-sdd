@@ -37,6 +37,7 @@ private:
     void delete_checkpoint(QEvent *event);
     void update_counter();
     void update_map(const QPoint& pos);
+    void crear_csv();
 
 signals:
     void close_w();
@@ -44,6 +45,7 @@ private slots:
     void on_Exit_clicked();
     void on_addButton_toggled(bool checked);
     void on_removeButton_toggled(bool checked);
+    void on_Done_clicked();
 };
 
 #endif // CREADOR_H

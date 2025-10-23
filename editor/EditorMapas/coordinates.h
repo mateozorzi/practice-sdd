@@ -22,6 +22,8 @@ public:
     bool add_checkpoint(const QPoint& point);
 
     QPoint delete_checkpoint(const QPoint& point);
+
+    int total_checkpoints();
 };
 
 #endif // COORDINATES_H
