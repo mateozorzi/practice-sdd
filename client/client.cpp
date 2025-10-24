@@ -5,7 +5,10 @@
 using namespace SDL2pp;
 
 Client::Client(const std::string &hostname, const std::string &servname):
-    protocol(hostname, servname) {}
+    protocol(hostname, servname), sender(protocol), receiver(protocol) {
+    sender.start();
+    receiver.start();
+}
 
 void Client::run() {
 	// Initialize SDL library
@@ -14,14 +17,14 @@ void Client::run() {
 	// Create main window: 640x480 dimensions, resizable, "SDL2pp demo" title
 	Window window("SDL2pp demo",
 			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-			640, 480,
+			720, 480,
 			SDL_WINDOW_RESIZABLE);
 
 	// Create accelerated video renderer with default driver
 	Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	// Cargar imagen de fondo (circuito)
-	const Surface background_surface(DATA_PATH "/circuito_liberty_city.png");
+	const Surface background_surface(DATA_PATH "/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
 	Texture background(renderer, background_surface);
 
 	// Obtener dimensiones del fondo
@@ -112,7 +115,7 @@ void Client::run() {
 		// Dibujar mapa
 		renderer.Copy(background,
 			Rect(camera_x, camera_y, 320, 240),
-			Rect(0, 0, 640, 480)
+			Rect(0, 0, 720, 480)
 			);
 
 		// Dibujar auto
@@ -126,3 +129,15 @@ void Client::run() {
 		SDL_Delay(10);
 	}
 }
+
+Client::~Client() {
+	if (sender.is_alive()) {
+		sender.stop();
+		sender.join();
+	}
+	if (receiver.is_alive()) {
+		receiver.stop();
+		receiver.join();
+	}
+}
+
