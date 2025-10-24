@@ -2,8 +2,15 @@
 
 #include <QVector>
 #include <QPoint>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
+#include <QString>
 
-#define DIST_MIN 30
+#define MIN_DIST 30
+#define MIN_CHECKPOINTS 5
 
 Coordinates::Coordinates(){}
 
@@ -20,7 +27,7 @@ bool Coordinates::point_too_close(const QPoint& point){
 
         distance = std::sqrt(d_x * d_x + d_y * d_y);
 
-        if (distance <= DIST_MIN){
+        if (distance <= MIN_DIST){
             return true;
         }
     }
@@ -61,7 +68,7 @@ QPoint Coordinates::delete_checkpoint(const QPoint& point){
         int dy = point.y() - it->y();
         double distance = std::sqrt(dx * dx + dy * dy);
 
-        if (distance <= DIST_MIN) {
+        if (distance <= MIN_DIST) {
             del = *it;
             checkpoints.erase(it);
             break;  // delete
@@ -71,8 +78,45 @@ QPoint Coordinates::delete_checkpoint(const QPoint& point){
     return del;
 }
 
-int Coordinates::total_checkpoints(){
-    return (checkpoints.size());
+bool Coordinates::enough_checkpoints(){
+    return (checkpoints.size() >= MIN_CHECKPOINTS);
+}
+
+bool Coordinates::export_checkpoints(const QString& map){
+    QString path = QCoreApplication::applicationDirPath() + "/../../races";
+    QDir dir(path);
+
+    if (!dir.exists() && !dir.mkpath(".")) {
+        return false;
+    }
+
+    // Usar QFileInfo para obtener el nombre base sin extensión
+    QFileInfo fileInfo(map);
+    QString baseName = fileInfo.baseName();  // Esto devuelve el nombre sin extensión
+
+    QString race_name = baseName + ".csv";
+    QString path_race = dir.filePath(race_name);
+
+    int id = 1;
+    while (QFile::exists(path_race)) {
+        race_name = baseName + "_" + QString::number(id) + ".csv";
+        path_race = dir.filePath(race_name);
+        id++;
+    }
+    QFile archivo(path_race);
+    if (!archivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream out(&archivo);
+    out << "x,y\n";
+    for (const QPoint& point : checkpoints){
+        out << point.x() << "," << point.y() <<"\n";
+    }
+
+    archivo.close();
+
+    return true;
 }
 
 Coordinates::~Coordinates(){}

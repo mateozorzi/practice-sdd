@@ -180,53 +180,22 @@ void Creador::on_removeButton_toggled(bool checked)
     }
 }
 
-void Creador::crear_csv(){
-    QString path = QCoreApplication::applicationDirPath() + "/../../races";
-    QDir dir(path);
-
-    if (!dir.exists() && !dir.mkpath(".")) {
-        m.message_no_args(this, "Error", "No se pudo crear la carpeta 'races'");
-        return;
-    }
-
-    // Usar QFileInfo para obtener el nombre base sin extensión
-    QFileInfo fileInfo(map);
-    QString baseName = fileInfo.baseName();  // Esto devuelve el nombre sin extensión
-
-    QString race_name = baseName + ".csv";
-    QString path_race = dir.filePath(race_name);
-
-    int id = 1;
-    while (QFile::exists(path_race)) {
-        race_name = baseName + "_" + QString::number(id) + ".csv";
-        path_race = dir.filePath(race_name);
-        id++;
-    }
-    m.message_no_args(this,path_race, race_name);
-    QFile archivo(path_race);
-    if (!archivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        m.message_no_args(this, "Error", "Can´t open file: " + archivo.errorString());
-        return;
-    }
-
-    QTextStream out(&archivo);
-    out << "Nombre de la carrera: " << baseName << "\n";
-    out << "ID de la carrera: " << id << "\n";
-
-    m.message_no_args(this, "Success", "Congratulations! Creation complete");
-}
 void Creador::on_Done_clicked()
 {
     //create csv with the checkpoints of the race
 
-    //a race must have at least 5 checkpoints
-    if (checkpoints.total_checkpoints() < MIN_CHECKPOINTS){
+    if (!checkpoints.enough_checkpoints()){
+        //no enough checkpoints added for a race
         m.message_no_args(this, "Error", "Not enough checkpoints.\n A race must have at least 5 checkpoints.");
-    }else{
-        crear_csv();
+    }
 
+    if (checkpoints.export_checkpoints(map)){
+        //file create succesfully
+        m.message_no_args(this, "Success", "Congratulations! Creation complete");
         emit close_w();
         this->close();
+    }else{
+        m.message_no_args(this, "Error", "An error has occured.\n The circuit has not been save.");
     }
 
 }
