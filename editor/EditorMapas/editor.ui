@@ -86,19 +86,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <string>Liberty City</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="mapa2">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>460</y>
-      <width>94</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>San Andreas</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="mapa3">
     <property name="geometry">
      <rect>
@@ -181,6 +168,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="mapa2">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>460</y>
+      <width>94</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>San Andreas</string>
     </property>
    </widget>
    <zorder>label_4</zorder>

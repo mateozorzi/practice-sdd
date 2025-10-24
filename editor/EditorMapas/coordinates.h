@@ -22,6 +22,10 @@ public:
     bool add_checkpoint(const QPoint& point);
 
     QPoint delete_checkpoint(const QPoint& point);
+
+    bool enough_checkpoints();
+
+    bool export_checkpoints(const QString& map);
 };
 
 #endif // COORDINATES_H

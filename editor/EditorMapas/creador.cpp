@@ -11,6 +11,10 @@
 #include <QBrush>
 #include <QList>
 #include <cmath>
+#include <QDir>
+
+#define RADIO 8
+#define MIN_CHECKPOINTS 5
 
 
 Creador::Creador(const QString& path, QWidget *parent)
@@ -63,9 +67,8 @@ void Creador::update_counter() {
 
 
 void Creador::update_map(const QPoint& pos){
-    int radio = 4;
     if (mode == ADD){
-        QGraphicsEllipseItem* ellipse = scene->addEllipse(-radio, -radio, 2*radio, 2*radio,
+        QGraphicsEllipseItem* ellipse = scene->addEllipse(-RADIO, -RADIO, 2*RADIO, 2*RADIO,
                                                           QPen(Qt::red), QBrush(Qt::yellow));
         ellipse->setPos(pos);
 
@@ -75,7 +78,7 @@ void Creador::update_map(const QPoint& pos){
             if (auto ellipse = dynamic_cast<QGraphicsEllipseItem*>(item)) {
                 QPointF center = ellipse->pos();
                 qreal dist = QLineF(clickPos, center).length();
-                if (dist <= radio) {
+                if (dist <= RADIO) {
                     scene->removeItem(item);
                     delete item;
                     break;
@@ -144,8 +147,8 @@ bool Creador::eventFilter(QObject *obj, QEvent *event)
 
 Creador::~Creador()
 {
-    qDeleteAll(scene->items()); // elimina los items
-    delete scene;               // elimina la escena
+    qDeleteAll(scene->items());
+    delete scene;
     delete ui;
 }
 
@@ -175,5 +178,25 @@ void Creador::on_removeButton_toggled(bool checked)
     } else {
         mode = NONE;
     }
+}
+
+void Creador::on_Done_clicked()
+{
+    //create csv with the checkpoints of the race
+
+    if (!checkpoints.enough_checkpoints()){
+        //no enough checkpoints added for a race
+        m.message_no_args(this, "Error", "Not enough checkpoints.\n A race must have at least 5 checkpoints.");
+    }
+
+    if (checkpoints.export_checkpoints(map)){
+        //file create succesfully
+        m.message_no_args(this, "Success", "Congratulations! Creation complete");
+        emit close_w();
+        this->close();
+    }else{
+        m.message_no_args(this, "Error", "An error has occured.\n The circuit has not been save.");
+    }
+
 }
 

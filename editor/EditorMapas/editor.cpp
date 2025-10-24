@@ -16,7 +16,7 @@ Editor::~Editor()
 
 void Editor::on_mapa1_clicked()
 {
-    QString mapa = ":/circuitos/imagenes/circuito_liberty_city.png";
+    QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png";
     //se usara el mapa de liberty city
     //se cierra la ventana de seleccion de circuito
     this->hide();
@@ -36,7 +36,7 @@ void Editor::on_mapa1_clicked()
 void Editor::on_mapa2_clicked()
 {
 //se usara el mapa de San Andreas
-    QString mapa = ":/circuitos/imagenes/circuito_san_andreas.png";
+    QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - San Andreas.png";
     //se cierra la ventana de seleccion de circuito
     this->hide();
     //se abre el form con el circuito de san andreas
@@ -55,7 +55,7 @@ void Editor::on_mapa2_clicked()
 void Editor::on_mapa3_clicked()
 {
 //se usara el mapa de Vice City
-    QString mapa = ":/circuitos/imagenes/circuito_vice_city.png";
+    QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Vice City.png";
     //se cierra la ventana de seleccion de circuito
     this->hide();
     //se abre el form con el circuito de vice city
