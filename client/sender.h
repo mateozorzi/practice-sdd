@@ -1,13 +1,23 @@
-//
-// Created by mksledesma on 10/24/25.
-//
+#ifndef SENDER_H
+#define SENDER_H
+#include "common/queue.h"
 
-#ifndef TALLER_TP_SENDER_H
-#define TALLER_TP_SENDER_H
+#include "client_protocol.h"
+#include "common/thread.h"
 
-
-class sender {
+struct Event {
+    // Forward Declaration
 };
 
+class Sender : public Thread {
+    ClientProtocol& protocol;
+    Queue<Event> events_queue;
+    std::mutex queue_mutex;
 
-#endif //TALLER_TP_SENDER_H
+public:
+    explicit Sender(ClientProtocol& protocol);
+    void add_event(Event event);
+    void run() override;
+};
+
+#endif //SENDER_H
