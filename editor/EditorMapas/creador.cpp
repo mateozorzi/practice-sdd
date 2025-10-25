@@ -22,7 +22,6 @@ Creador::Creador(const QString& path, QWidget *parent)
     , ui(new Ui::Creador)
     , map(path)
     , checkpoints(Coordinates())
-    , mode(ADD)
     , m(Messages())
 {
     ui->setupUi(this);
@@ -36,13 +35,6 @@ Creador::Creador(const QString& path, QWidget *parent)
 
     ui->labelmap->installEventFilter(this);
 
-
-    ui->addButton->setCheckable(true);
-    ui->removeButton->setCheckable(true);
-    connect(ui->addButton, &QPushButton::toggled, this, &Creador::on_addButton_toggled);
-    connect(ui->removeButton, &QPushButton::toggled, this, &Creador::on_removeButton_toggled);
-
-    ui->addButton->setChecked(true);
 }
 
 void Creador::set_background(const QString& path){
@@ -66,7 +58,7 @@ void Creador::update_counter() {
 }
 
 
-void Creador::update_map(const QPoint& pos){
+void Creador::update_map(const QPoint& pos, int mode){
     if (mode == ADD){
         QGraphicsEllipseItem* ellipse = scene->addEllipse(-RADIO, -RADIO, 2*RADIO, 2*RADIO,
                                                           QPen(Qt::red), QBrush(Qt::yellow));
@@ -90,44 +82,38 @@ void Creador::update_map(const QPoint& pos){
     update_counter();
 }
 
-void Creador::add_checkpoint(QEvent *event){
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+void Creador::add_checkpoint(QMouseEvent *event){
 
-    QPointF scenePos = ui->labelmap->mapToScene(mouseEvent->pos());
+    QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
 
     if(checkpoints.add_checkpoint(pos)){
-        update_map(pos);
-        m.checkpoint_message(this,"Success", "Checkpoint added in (%1, %2)", pos);
-
+        update_map(pos, ADD);
     }else{
         m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
     }
 }
 
-void Creador::delete_checkpoint(QEvent *event){
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+void Creador::delete_checkpoint(QMouseEvent *event){
 
-    QPointF scenePos = ui->labelmap->mapToScene(mouseEvent->pos());
+    QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
     QPoint del = checkpoints.delete_checkpoint(pos);
 
     if(del.x() != -1){
-        update_map(del);
-        m.checkpoint_message(this, "Success", "Checkpoint delete in (%1, %2)", pos);
-
+        update_map(del, REMOVE);
     }else{
         m.checkpoint_message(this, "Error", "No checkpoint in (%1, %2)", pos);
     }
 }
 
-void Creador::handle_checkpoints(QEvent *event){
-    //case, add button activate
-    if (mode == ADD){
+void Creador::handle_checkpoints(QMouseEvent *event){
+    //handle leftbutton or right button
+    if (event->button() == Qt::LeftButton){
         add_checkpoint(event);
-    }else if(mode == REMOVE){
+    }else if(event->button() == Qt::RightButton){
         delete_checkpoint(event);
     }
 
@@ -136,7 +122,8 @@ void Creador::handle_checkpoints(QEvent *event){
 bool Creador::eventFilter(QObject *obj, QEvent *event)
 {
     if(obj == ui->labelmap && event->type() == QEvent::MouseButtonPress){
-        this->handle_checkpoints(event);
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        this->handle_checkpoints(mouseEvent);
         return true; // evento manejado
     }
     return QMainWindow::eventFilter(obj, event);
@@ -157,27 +144,6 @@ void Creador::on_Exit_clicked()
 {
     emit close_w();
     this->close();
-}
-
-void Creador::on_addButton_toggled(bool checked)
-{
-    if (checked) {
-        ui->removeButton->setChecked(false);
-        mode = ADD;
-    } else {
-        mode = NONE;
-    }
-}
-
-
-void Creador::on_removeButton_toggled(bool checked)
-{
-    if (checked) {
-        ui->addButton->setChecked(false);
-        mode = REMOVE;
-    } else {
-        mode = NONE;
-    }
 }
 
 void Creador::on_Done_clicked()

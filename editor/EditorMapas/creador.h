@@ -21,7 +21,7 @@ class Creador : public QMainWindow
 public:
     Creador(const QString& path, QWidget *parent = nullptr);
     void set_background(const QString& path);
-    void handle_checkpoints(QEvent *event);
+    void handle_checkpoints(QMouseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event) override;
     ~Creador();
 
@@ -30,21 +30,18 @@ private:
     QGraphicsScene* scene;
     QString map;
     Coordinates checkpoints;
-    int mode;
     Messages m;
 
-    void add_checkpoint(QEvent *event);
-    void delete_checkpoint(QEvent *event);
+    void add_checkpoint(QMouseEvent *event);
+    void delete_checkpoint(QMouseEvent *event);
     void update_counter();
-    void update_map(const QPoint& pos);
+    void update_map(const QPoint& pos, int mode);
     void crear_csv();
 
 signals:
     void close_w();
 private slots:
     void on_Exit_clicked();
-    void on_addButton_toggled(bool checked);
-    void on_removeButton_toggled(bool checked);
     void on_Done_clicked();
 };
 

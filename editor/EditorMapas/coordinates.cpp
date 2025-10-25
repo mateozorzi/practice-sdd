@@ -15,7 +15,7 @@
 Coordinates::Coordinates(){}
 
 bool Coordinates::point_too_close(const QPoint& point){
-    //distance <= 4, too close
+    //distance <= 30, too close
     int distance = 0;
     for (const QPoint& p: checkpoints){
         distance = 0;
@@ -83,16 +83,15 @@ bool Coordinates::enough_checkpoints(){
 }
 
 bool Coordinates::export_checkpoints(const QString& map){
-    QString path = QCoreApplication::applicationDirPath() + "/../../races";
+    QString path = QCoreApplication::applicationDirPath() + "/../editor/races";
     QDir dir(path);
 
     if (!dir.exists() && !dir.mkpath(".")) {
         return false;
     }
 
-    // Usar QFileInfo para obtener el nombre base sin extensión
     QFileInfo fileInfo(map);
-    QString baseName = fileInfo.baseName();  // Esto devuelve el nombre sin extensión
+    QString baseName = fileInfo.baseName();
 
     QString race_name = baseName + ".csv";
     QString path_race = dir.filePath(race_name);
@@ -110,8 +109,10 @@ bool Coordinates::export_checkpoints(const QString& map){
 
     QTextStream out(&archivo);
     out << "x,y\n";
+    int id_checkpoint = 0;
     for (const QPoint& point : checkpoints){
-        out << point.x() << "," << point.y() <<"\n";
+        out << id_checkpoint << "," << point.x() << "," << point.y() <<"\n";
+        id_checkpoint++;
     }
 
     archivo.close();
