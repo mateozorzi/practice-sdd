@@ -57,6 +57,9 @@ background-color: rgb(224, 27, 36);</string>
     <property name="lineWidth">
      <number>1</number>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
     <property name="markdown">
      <string>***Circuit Select***
 
