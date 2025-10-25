@@ -9,7 +9,7 @@
 GameLoop::GameLoop(): command_queue() {}
 
 
-void GameLoop::broadcast(const GameMessage& msg) {
+void GameLoop::broadcast(const CarPositionDTO& msg) {
 
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -26,7 +26,7 @@ void GameLoop::broadcast(const GameMessage& msg) {
 void GameLoop::add_command(const GameCommand& cmd) { command_queue.push(cmd); }
 
 
-void GameLoop::register_client(Queue<GameMessage>* client_queue) {
+void GameLoop::register_client(Queue<CarPositionDTO>* client_queue) {
 
     std::lock_guard<std::mutex> lock(mtx);
 
@@ -34,7 +34,7 @@ void GameLoop::register_client(Queue<GameMessage>* client_queue) {
 }
 
 
-void GameLoop::unregister_client(Queue<GameMessage>* client_queue) {
+void GameLoop::unregister_client(Queue<CarPositionDTO>* client_queue) {
 
     std::lock_guard<std::mutex> lock(mtx);
 

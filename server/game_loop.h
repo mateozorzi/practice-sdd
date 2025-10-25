@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "common/car_position_dto.h"
 #include "common/constants.h"
 #include "common/queue.h"
 #include "common/thread.h"
@@ -15,14 +16,8 @@
 
 struct GameCommand {
 
-    int client_id;
+    uint32_t client_id;
     uint8_t command;
-};
-
-
-struct GameMessage {
-
-    std::string message;
 };
 
 
@@ -30,10 +25,10 @@ class GameLoop: public Thread {
 
 
     Queue<GameCommand> command_queue;
-    std::vector<Queue<GameMessage>*> client_queues;
+    std::vector<Queue<CarPositionDTO>*> client_queues;
     std::mutex mtx;
 
-    void broadcast(const GameMessage& msg);
+    void broadcast(const CarPositionDTO& msg);
 
 
 public:
@@ -43,8 +38,8 @@ public:
     GameLoop();
 
     void add_command(const GameCommand& cmd);
-    void register_client(Queue<GameMessage>* client_queue);
-    void unregister_client(Queue<GameMessage>* client_queue);
+    void register_client(Queue<CarPositionDTO>* client_queue);
+    void unregister_client(Queue<CarPositionDTO>* client_queue);
 
     void run() override;
     void stop() override;

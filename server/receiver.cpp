@@ -19,8 +19,8 @@ void Receiver::run() {
             const ClientRequest client_request = server_protocol.receive_client_request();
             if (client_request == ClientRequest::MOVE_CAR) {
 
-                server_protocol.send_car_position(CarPositionDTO{10, 10, 180});
-                std::cout << RECEIVER << "Move Car received" << std::endl;
+                GameCommand command{client_id, 0x03};
+                game_loop.add_command(command);
             }
         }
     } catch (const LibError&) {

@@ -6,7 +6,8 @@
 #include "common/liberror.h"
 
 
-Sender::Sender(const uint32_t client_id): client_id(client_id) {}
+Sender::Sender(ServerProtocol& server_protocol, const uint32_t client_id):
+    server_protocol(server_protocol), client_id(client_id) {}
 
 
 void Sender::run() {
@@ -15,14 +16,15 @@ void Sender::run() {
 
         while (should_keep_running()) {
 
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // SLEEP ONLY FOR NOW! We don't want a busy loop, we want to keep our CPU :)
-            std::cout << SENDER_ACTIVATED << std::endl;
-            /*try {
+            try {
+
+                const CarPositionDTO& car_position_dto = client_message_queue.pop();
+                server_protocol.send_car_position(car_position_dto);
 
             } catch (const ClosedQueue&) {
 
                 break;
-            } NO QUEUE FOR NOW! */
+            }
         }
     } catch (const LibError&) {
 
