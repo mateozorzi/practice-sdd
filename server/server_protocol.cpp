@@ -22,4 +22,14 @@ void ServerProtocol::send_car_position(const CarPositionDTO& car_position_dto) {
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
+
+    send_buffer();
+}
+
+
+ClientRequest ServerProtocol::receive_client_request() {
+
+    const uint8_t byte = recv_uint8();
+
+    return convert_byte_to_request(byte);
 }

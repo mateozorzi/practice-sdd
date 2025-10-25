@@ -22,6 +22,7 @@ class Acceptor final: public Thread {
 
     Socket acceptor_socket;
     std::list<std::unique_ptr<ClientHandler>> clients;
+    GameLoop& game_loop;
 
     void reap();
 
@@ -30,7 +31,7 @@ public:
     Acceptor(const Acceptor&) = delete;
     Acceptor& operator=(const Acceptor&) = delete;
 
-    explicit Acceptor(const std::string& port);
+    explicit Acceptor(const std::string& port, GameLoop& game_loop);
 
     void run() override;
     void stop() override;

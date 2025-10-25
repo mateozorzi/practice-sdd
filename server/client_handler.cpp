@@ -6,10 +6,12 @@
 #include "common/liberror.h"
 
 
-ClientHandler::ClientHandler(Socket&& socket):
+ClientHandler::ClientHandler(Socket&& socket, GameLoop& game_loop):
         client_socket(std::move(socket)),
+        server_protocol(client_socket),
+        game_loop(game_loop),
         client_id(1),
-        receiver(client_id),
+        receiver(server_protocol, game_loop, client_id),
         sender(client_id) {
 
     receiver.start();

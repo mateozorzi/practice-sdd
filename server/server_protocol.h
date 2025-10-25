@@ -21,6 +21,8 @@ public:
     using CommonProtocol::CommonProtocol;
 
     void send_car_position(const CarPositionDTO& car_position_dto);
+
+    ClientRequest receive_client_request();
 };
 
 

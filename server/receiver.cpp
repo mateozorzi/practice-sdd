@@ -6,7 +6,8 @@
 #include "common/liberror.h"
 
 
-Receiver::Receiver(const uint32_t client_id): client_id(client_id) {}
+Receiver::Receiver(ServerProtocol& server_protocol, GameLoop& game_loop,
+    const uint32_t client_id): server_protocol(server_protocol), game_loop(game_loop), client_id(client_id) {}
 
 
 void Receiver::run() {
@@ -15,8 +16,12 @@ void Receiver::run() {
 
         while (should_keep_running()) {
 
-            std::this_thread::sleep_for(std::chrono::seconds(3)); // SLEEP ONLY FOR NOW! We don't want a busy loop, we want to keep our CPU :)
-            std::cout << RECEIVER_ACTIVATED << std::endl;
+            const ClientRequest client_request = server_protocol.receive_client_request();
+            if (client_request == ClientRequest::MOVE_CAR) {
+
+                server_protocol.send_car_position(CarPositionDTO{10, 10, 180});
+                std::cout << RECEIVER << "Move Car received" << std::endl;
+            }
         }
     } catch (const LibError&) {
 

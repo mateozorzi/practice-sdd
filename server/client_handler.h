@@ -7,7 +7,6 @@
 #include "receiver.h"
 #include "sender.h"
 
-#include <cstdint>
 #include <string_view>
 
 
@@ -19,6 +18,8 @@ class ClientHandler {
 
 
     Socket client_socket;
+    ServerProtocol server_protocol;
+    GameLoop& game_loop;
     uint32_t client_id;
 
     Receiver receiver;
@@ -31,7 +32,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& socket);
+    explicit ClientHandler(Socket&& socket, GameLoop& game_loop);
 
     bool is_alive() const;
 
