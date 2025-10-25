@@ -1,5 +1,5 @@
 #include "editor.h"
-#include "./ui_editor.h"
+#include "ui_editor.h"
 #include "creador.h"
 
 Editor::Editor(QWidget *parent)
@@ -29,7 +29,7 @@ void Editor::on_mapa1_clicked()
         this->show(); // cuando Creador se cierre, mostramos Editor
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 
