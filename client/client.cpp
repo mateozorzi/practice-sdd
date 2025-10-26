@@ -64,10 +64,10 @@ void Client::run() {
 				switch (event.key.keysym.sym) {
 					case SDLK_ESCAPE: case SDLK_q:
 						return;
-					case SDLK_w: key_w = true; break;
-					case SDLK_s: key_s = true; break;
-					case SDLK_a: key_a = true; break;
-					case SDLK_d: key_d = true; break;
+					case SDLK_w: key_w = true; protocol.send_car_movement(CarMovement::ACCELERATE); break;
+					case SDLK_s: key_s = true; protocol.send_car_movement(CarMovement::BRAKE); break;
+					case SDLK_a: key_a = true; protocol.send_car_movement(CarMovement::TURN_LEFT); break;
+					case SDLK_d: key_d = true; protocol.send_car_movement(CarMovement::TURN_RIGHT); break;
 				}
 			} else if (event.type == SDL_KEYUP) {
 				switch (event.key.keysym.sym) {
