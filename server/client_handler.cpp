@@ -12,7 +12,7 @@ ClientHandler::ClientHandler(Socket&& socket, GameLoop& game_loop):
         game_loop(game_loop),
         client_id(1),
         receiver(server_protocol, game_loop, client_id),
-        sender(server_protocol, client_id) {
+        sender(server_protocol, game_loop, client_id) {
 
     receiver.start();
     sender.start();
