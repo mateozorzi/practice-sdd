@@ -22,6 +22,8 @@ class Receiver final: public Thread {
     GameLoop& game_loop;
     uint32_t client_id;
 
+    void handle_car_movement(const ClientRequest& client_request);
+
 
 public:
     Receiver(const Receiver&) = delete;

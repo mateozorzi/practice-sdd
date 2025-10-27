@@ -8,9 +8,9 @@
 struct CarPositionDTO {
 
 
-    const uint32_t x_position;
-    const uint32_t y_position;
-    const uint32_t angle;
+    uint32_t x_position;
+    uint32_t y_position;
+    uint32_t angle;
 
 
     explicit CarPositionDTO(uint32_t x_position = 0, uint32_t y_position = 0, uint32_t angle = 0);

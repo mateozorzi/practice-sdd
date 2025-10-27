@@ -12,6 +12,7 @@ class ServerProtocol final: public CommonProtocol {
 
 
     ClientRequest convert_byte_to_request(uint8_t byte) const;
+    CarMovement convert_byte_to_car_movement(uint8_t byte) const;
 
 
 public:
@@ -23,6 +24,7 @@ public:
     void send_car_position(const CarPositionDTO& car_position_dto);
 
     ClientRequest receive_client_request();
+    CarMovement receive_car_movement();
 };
 
 

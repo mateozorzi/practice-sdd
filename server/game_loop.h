@@ -13,11 +13,15 @@
 #include "common/queue.h"
 #include "common/thread.h"
 
+#include "client_request.h"
+#include "server_protocol.h"
+
 
 struct GameCommand {
 
     uint32_t client_id;
-    uint8_t command;
+    ClientRequest client_request;
+    CarMovement car_movement;
 };
 
 
@@ -28,6 +32,7 @@ class GameLoop: public Thread {
     std::vector<Queue<CarPositionDTO>*> client_queues;
     std::mutex mtx;
 
+    void handle_car_movement(GameCommand& game_command);
     void broadcast(const CarPositionDTO& msg);
 
 
