@@ -8,26 +8,14 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QString>
-
-#define MIN_DIST 30
-#define MIN_CHECKPOINTS 5
+#include "Constants.h"
 
 Coordinates::Coordinates(){}
 
-bool Coordinates::point_too_close(const QPoint& point){
-    //distance <= 30, too close
-    int distance = 0;
-    for (const QPoint& p: checkpoints){
-        distance = 0;
-        int d_x = 0;
-        int d_y = 0;
-
-        d_x = (point.x()-p.x());
-        d_y = (point.y()-p.y());
-
-        distance = std::sqrt(d_x * d_x + d_y * d_y);
-
-        if (distance <= MIN_DIST){
+bool Coordinates::point_too_close(const Checkpoint& checkpoint){
+    QPoint pos = checkpoint.get_click();
+    for (const Checkpoint& p: checkpoints){
+        if(p.contains(pos)){
             return true;
         }
     }
@@ -35,43 +23,39 @@ bool Coordinates::point_too_close(const QPoint& point){
     return false;
 }
 
-bool Coordinates::is_a_checkpoint(const QPoint& point){
+bool Coordinates::is_a_checkpoint(const Checkpoint& checkpoint){
     //looking for a checkpoint or
     //if is too close to another checkpoint
-    if (checkpoints.contains(point)){
+    if (checkpoints.contains(checkpoint)){
         return true;
     }
 
-    if (point_too_close(point)){
+    if (point_too_close(checkpoint)){
         return true;
     }
 
     return false;
 }
 
-bool Coordinates::add_checkpoint(const QPoint& point){
-    if (is_a_checkpoint(point)){
+bool Coordinates::add_checkpoint(const Checkpoint& checkpoint){
+    if (is_a_checkpoint(checkpoint)){
         //checkpoint already exists
         return false;
     }
 
-    checkpoints.append(point);
+    checkpoints.append(checkpoint);
     return true;
 }
 
 
 QPoint Coordinates::delete_checkpoint(const QPoint& point){
-    QPoint del(-1,-1);
-    //looking to delete a checkpoint
-    for (auto it = checkpoints.begin(); it != checkpoints.end(); ++it) {
-        int dx = point.x() - it->x();
-        int dy = point.y() - it->y();
-        double distance = std::sqrt(dx * dx + dy * dy);
+    QPoint del(-1, -1);
 
-        if (distance <= MIN_DIST) {
-            del = *it;
+    for (auto it = checkpoints.begin(); it != checkpoints.end(); ++it) {
+        if (it->contains(point)) {
+            del = it->get_click();
             checkpoints.erase(it);
-            break;  // delete
+            break;
         }
     }
 
@@ -83,7 +67,7 @@ bool Coordinates::enough_checkpoints(){
 }
 
 bool Coordinates::export_checkpoints(const QString& map){
-    QString path = QCoreApplication::applicationDirPath() + "/../editor/races";
+    QString path = QCoreApplication::applicationDirPath() + "/../server/races";
     QDir dir(path);
 
     if (!dir.exists() && !dir.mkpath(".")) {
@@ -108,16 +92,30 @@ bool Coordinates::export_checkpoints(const QString& map){
     }
 
     QTextStream out(&archivo);
-    out << "x,y\n";
+    out << "id, orientation, xCenter, yCenter, height, width\n";
     int id_checkpoint = 0;
-    for (const QPoint& point : checkpoints){
-        out << id_checkpoint << "," << point.x() << "," << point.y() <<"\n";
+    for (const Checkpoint& p : checkpoints){
+        char orientation = p.get_orientation();
+        QRect r= p.get_rect();
+        QPoint center = r.center();
+        int height = r.height();
+        int width = r.width();
+        out << id_checkpoint <<","<<orientation<< "," << center.x() << "," <<
+            center.y()<<","<< height<<","<<width<<"\n";
         id_checkpoint++;
     }
 
     archivo.close();
 
     return true;
+}
+
+bool Coordinates::is_empty(){
+    return checkpoints.empty();
+}
+
+Checkpoint Coordinates::last_checkpoint(){
+    return checkpoints.back();
 }
 
 Coordinates::~Coordinates(){}

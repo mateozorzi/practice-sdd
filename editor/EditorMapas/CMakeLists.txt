@@ -29,6 +29,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         creador.h creador.cpp creador.ui
         coordinates.h coordinates.cpp
         messages.h messages.cpp
+        checkpoint.h checkpoint.cpp
+        Constants.h
 
     )
 # Define target properties for Android with Qt 6 as:
