@@ -94,7 +94,7 @@ bool Creador::is_street(const QPoint& pos){
 
     qDebug() << "mask: "<< streetColor << ", pixel: "<<pixelColor;
 
-    int tolerance = 15; // tolerancia al color (opcional)
+    int tolerance = 30; // tolerancia al color (opcional)
     bool isStreet =
         std::abs(pixelColor.red() - streetColor.red()) < tolerance &&
         std::abs(pixelColor.green() - streetColor.green()) < tolerance &&
