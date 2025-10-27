@@ -4,7 +4,7 @@ file(GLOB QRC_FILES "EditorMapas/*.qrc")
 # Busca archivos .ui (si los tienes)
 file(GLOB UI_FILES "EditorMapas/*.ui")
 
-target_sources(taller_editor
+target_sources(game_editor
     PRIVATE
     # .cpp files
     EditorMapas/main.cpp
@@ -12,6 +12,7 @@ target_sources(taller_editor
     EditorMapas/creador.cpp
     EditorMapas/editor.cpp
     EditorMapas/messages.cpp
+    EditorMapas/checkpoint.cpp
     
     ${QRC_FILES}
     
@@ -23,4 +24,6 @@ target_sources(taller_editor
     EditorMapas/creador.h
     EditorMapas/editor.h
     EditorMapas/messages.h
+    EditorMapas/checkpoint.h
+    EditorMapas/Constants.h
 )

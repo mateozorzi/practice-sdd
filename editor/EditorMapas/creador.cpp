@@ -13,10 +13,8 @@
 #include <cmath>
 #include <QDir>
 #include <stdio.h>
-
-#define RADIO 8
-#define MIN_CHECKPOINTS 5
-
+#include "checkpoint.h"
+#include "Constants.h"
 
 Creador::Creador(const QString& path, const QString& path_mask, QWidget *parent)
     : QMainWindow(parent)
@@ -55,27 +53,67 @@ void Creador::set_background(const QString& path){
 void Creador::update_counter() {
     int count = 0;
     for (QGraphicsItem* item : scene->items()) {
-        if (dynamic_cast<QGraphicsEllipseItem*>(item)) {
+        if (dynamic_cast<QGraphicsRectItem*>(item)) {
             count++;
         }
     }
     ui->n_checkpoints->display(count);
 }
 
+Checkpoint Creador::calculate_checkpoint(const QPoint& pos){
+
+    int left = pos.x(), right = pos.x();
+    while (left > 0 && is_street(QPoint(left - 1, pos.y()))) left--;
+    while (right < mask_circuit.width() - 1 && is_street(QPoint(right + 1, pos.y()))) right++;
+    int horizontalLength = right - left;
+
+
+    int up = pos.y(), down = pos.y();
+    while (up > 0 && is_street(QPoint(pos.x(), up - 1))) up--;
+    while (down < mask_circuit.height() - 1 && is_street(QPoint(pos.x(), down + 1))) down++;
+    int verticalLength = down - up;
+
+    if(horizontalLength >= MAX_RECT && verticalLength >= MAX_RECT){
+        //intersection checkpoint
+        QRect rect(pos.x() - INTERSECTION_SIZE / 2,
+                   pos.y() - INTERSECTION_SIZE / 2,
+                   INTERSECTION_SIZE, INTERSECTION_SIZE);
+        return Checkpoint(INTERSECTION, pos, rect);
+
+    }else if (horizontalLength < verticalLength) {
+        // horizontal checkpoint
+        int height = 8;
+
+        QRect rect = QRect(left, pos.y() - height/2, horizontalLength, height);
+        return Checkpoint(HORIZONTAL, pos, rect);
+    } else {
+        // vertical checkpoint
+        int width = 8;
+
+        QRect rect = QRect(pos.x() - width/2, up, width, verticalLength);
+        return Checkpoint(VERTICAL, pos, rect);
+    }
+
+}
+
 
 void Creador::update_map(const QPoint& pos, int mode){
     if (mode == ADD){
-        QGraphicsEllipseItem* ellipse = scene->addEllipse(-RADIO, -RADIO, 2*RADIO, 2*RADIO,
-                                                          QPen(Qt::red), QBrush(Qt::yellow));
-        ellipse->setPos(pos);
+        Checkpoint checkpoint = calculate_checkpoint(pos);
+        if(checkpoints.add_checkpoint(checkpoint)){
+            scene->addRect(checkpoint.get_rect(),
+                                                QPen(Qt::red), QBrush(Qt::yellow));
+
+        }else{
+            m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
+        }
 
     }else if (mode == REMOVE){
         QPointF clickPos = pos;
+
         for (QGraphicsItem* item : scene->items()) {
-            if (auto ellipse = dynamic_cast<QGraphicsEllipseItem*>(item)) {
-                QPointF center = ellipse->pos();
-                qreal dist = QLineF(clickPos, center).length();
-                if (dist <= RADIO) {
+            if (auto rect = dynamic_cast<QGraphicsRectItem*>(item)) {
+                if(rect->contains(clickPos)){
                     scene->removeItem(item);
                     delete item;
                     break;
@@ -88,13 +126,11 @@ void Creador::update_map(const QPoint& pos, int mode){
 }
 
 bool Creador::is_street(const QPoint& pos){
-    QColor streetColor(255, 36, 250); //de liberty
+    QColor streetColor(255, 36, 250);
 
     QColor pixelColor = mask_circuit.pixelColor(pos);
 
-    qDebug() << "mask: "<< streetColor << ", pixel: "<<pixelColor;
-
-    int tolerance = 30; // tolerancia al color (opcional)
+    int tolerance = 30;
     bool isStreet =
         std::abs(pixelColor.red() - streetColor.red()) < tolerance &&
         std::abs(pixelColor.green() - streetColor.green()) < tolerance &&
@@ -112,7 +148,7 @@ void Creador::add_checkpoint(QMouseEvent *event){
     QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
-    if(is_street(pos) && checkpoints.add_checkpoint(pos)){
+    if(is_street(pos)){
         update_map(pos, ADD);
     }else{
         m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
@@ -148,7 +184,7 @@ bool Creador::eventFilter(QObject *obj, QEvent *event)
     if(obj == ui->labelmap && event->type() == QEvent::MouseButtonPress){
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         this->handle_checkpoints(mouseEvent);
-        return true; // evento manejado
+        return true;
     }
     return QMainWindow::eventFilter(obj, event);
 }
@@ -177,6 +213,7 @@ void Creador::on_Done_clicked()
     if (!checkpoints.enough_checkpoints()){
         //no enough checkpoints added for a race
         m.message_no_args(this, "Error", "Not enough checkpoints.\n A race must have at least 5 checkpoints.");
+        return;
     }
 
     if (checkpoints.export_checkpoints(map)){

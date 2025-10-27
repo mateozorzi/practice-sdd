@@ -19,7 +19,7 @@ project(taller_tp
 option(TALLER_TESTS "Enable / disable tests." ON)
 option(TALLER_CLIENT "Enable / disable client program." ON)
 option(TALLER_SERVER "Enable / disable server program." ON)
-option(TALLER_EDITOR "Enable / disable editor program." ON)
+option(GAME_EDITOR "Enable / disable editor program." ON)
 option(TALLER_MAKE_WARNINGS_AS_ERRORS "Enable / disable warnings as errors." ON)
 
 message(CMAKE_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}")
@@ -52,7 +52,7 @@ target_include_directories(taller_common PUBLIC .)
 
 # Install libSDL2 and libSDL2pp (for client or editor)
 # HEY!! TODO XXX: add more dependendies (either for client, server or editor)
-if(TALLER_CLIENT OR TALLER_EDITOR)
+if(TALLER_CLIENT OR GAME_EDITOR)
     include(FetchContent)
     FetchContent_Declare(
         SDL2
@@ -138,7 +138,7 @@ if(TALLER_SERVER)
     target_link_libraries(taller_server taller_common)
 endif()
 
-if(TALLER_EDITOR)
+if(GAME_EDITOR)
     set(CMAKE_AUTOUIC ON)
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_AUTORCC ON)
@@ -146,23 +146,23 @@ if(TALLER_EDITOR)
     find_package(Qt6 COMPONENTS Widgets REQUIRED)
     
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_editor)
+    add_executable(game_editor)
 
     # Make them depend on taller_common lib
-    add_dependencies(taller_editor taller_common SDL2pp::SDL2pp)
+    add_dependencies(game_editor taller_common SDL2pp::SDL2pp)
 	    
     # Add source files and enable warnings
     # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(editor EditorMapas)
 
-    set_project_warnings(taller_editor ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+    set_project_warnings(game_editor ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # add libSDL2pp's headers
-    target_include_directories(taller_editor PRIVATE ${libSDL2pp_SOURCE_DIR})
+    target_include_directories(game_editor PRIVATE ${libSDL2pp_SOURCE_DIR})
 	
 
     # Link the taller_common lib target
-    target_link_libraries(taller_editor taller_common Qt6::Widgets Qt6::Core)
+    target_link_libraries(game_editor taller_common Qt6::Widgets Qt6::Core)
 endif()
 
 

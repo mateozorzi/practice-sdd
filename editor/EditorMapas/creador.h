@@ -5,6 +5,7 @@
 #include "coordinates.h"
 #include "messages.h"
 #include <QGraphicsScene>
+#include "checkpoint.h"
 
 #define NONE 0
 #define ADD 1
@@ -40,6 +41,7 @@ private:
     void update_map(const QPoint& pos, int mode);
     void crear_csv();
     bool is_street(const QPoint& pos);
+    Checkpoint calculate_checkpoint(const QPoint& pos);
 
 signals:
     void close_w();
