@@ -22,9 +22,17 @@
   <property name="windowTitle">
    <string>Editor</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#centralwidget{
+	background-image: url(:/images/imagenes/fondo.png);
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="autoFillBackground">
     <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
    </property>
    <widget class="QTextEdit" name="Tituloventana">
     <property name="enabled">
@@ -33,10 +41,22 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>40</y>
+      <y>50</y>
       <width>391</width>
       <height>91</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>431</width>
+      <height>92</height>
+     </size>
     </property>
     <property name="font">
      <font>
@@ -76,125 +96,160 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot; margin-top:29px; margin-bottom:29px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Circuit Select&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="mapa1">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>460</y>
-      <width>94</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Liberty City</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="mapa3">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>460</y>
-      <width>94</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Vice City</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="Exit">
     <property name="geometry">
      <rect>
-      <x>750</x>
-      <y>70</y>
-      <width>94</width>
+      <x>766</x>
+      <y>66</y>
+      <width>80</width>
       <height>26</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>82</width>
+      <height>16777215</height>
+     </size>
     </property>
     <property name="text">
      <string>Exit</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>150</y>
-      <width>231</width>
-      <height>301</height>
+      <x>9</x>
+      <y>146</y>
+      <width>865</width>
+      <height>335</height>
      </rect>
     </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/liberty_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>25</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="img1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>300</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/liberty_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="img2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/san_andreas.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="img3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>300</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);</string>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/vice_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>150</y>
-      <width>231</width>
-      <height>301</height>
+      <x>9</x>
+      <y>492</y>
+      <width>861</width>
+      <height>60</height>
      </rect>
     </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/san_andreas.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>144</number>
+     </property>
+     <property name="leftMargin">
+      <number>60</number>
+     </property>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
+     <property name="rightMargin">
+      <number>60</number>
+     </property>
+     <property name="bottomMargin">
+      <number>26</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="mapa1">
+       <property name="text">
+        <string>Liberty City</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mapa2">
+       <property name="text">
+        <string>San Andreas</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="mapa3">
+       <property name="text">
+        <string>Vice City</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>620</x>
-      <y>150</y>
-      <width>231</width>
-      <height>301</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/vice_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>-3</y>
-      <width>881</width>
-      <height>561</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border-image: url(:/images/imagenes/fondo.png);</string>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="mapa2">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>460</y>
-      <width>94</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>San Andreas</string>
-    </property>
-   </widget>
-   <zorder>label_4</zorder>
    <zorder>Tituloventana</zorder>
    <zorder>mapa1</zorder>
    <zorder>mapa2</zorder>
    <zorder>mapa3</zorder>
    <zorder>Exit</zorder>
-   <zorder>label</zorder>
-   <zorder>label_2</zorder>
-   <zorder>label_3</zorder>
+   <zorder>img1</zorder>
+   <zorder>img2</zorder>
+   <zorder>img3</zorder>
+   <zorder></zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
