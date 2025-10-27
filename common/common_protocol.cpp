@@ -55,7 +55,7 @@ void CommonProtocol::send_buffer() {
 
 uint8_t CommonProtocol::recv_uint8() {
 
-    uint16_t value_to_recv = 0;
+    uint8_t value_to_recv = 0;
     socket.recvall(&value_to_recv, sizeof(value_to_recv));
 
     return value_to_recv;
