@@ -5,8 +5,8 @@
         <file>imagenes/san_andreas.png</file>
     </qresource>
     <qresource prefix="/images">
-        <file>imagenes/fondo.png</file>
         <file>imagenes/bandera.jpg</file>
+        <file>imagenes/fondo.png</file>
     </qresource>
     <qresource prefix="/circuitos">
         <file>imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Vice City.png</file>

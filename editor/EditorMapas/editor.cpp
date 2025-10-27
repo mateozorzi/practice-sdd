@@ -46,7 +46,7 @@ void Editor::on_mapa2_clicked()
         this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 
@@ -64,7 +64,7 @@ void Editor::on_mapa3_clicked()
         this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 
