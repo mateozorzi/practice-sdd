@@ -12,15 +12,17 @@
 #include <QList>
 #include <cmath>
 #include <QDir>
+#include <stdio.h>
 
 #define RADIO 8
 #define MIN_CHECKPOINTS 5
 
 
-Creador::Creador(const QString& path, QWidget *parent)
+Creador::Creador(const QString& path, const QString& path_mask, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Creador)
     , map(path)
+    , mask(path_mask)
     , checkpoints(Coordinates())
     , m(Messages())
 {
@@ -30,6 +32,9 @@ Creador::Creador(const QString& path, QWidget *parent)
     ui->labelmap->setScene(scene);
 
     set_background(map);
+
+    mask_circuit.load(mask);
+
     ui->n_checkpoints->display(0);
 
 
@@ -82,13 +87,32 @@ void Creador::update_map(const QPoint& pos, int mode){
     update_counter();
 }
 
+bool Creador::is_street(const QPoint& pos){
+    QColor streetColor(255, 36, 250); //de liberty
+
+    QColor pixelColor = mask_circuit.pixelColor(pos);
+
+    qDebug() << "mask: "<< streetColor << ", pixel: "<<pixelColor;
+
+    int tolerance = 15; // tolerancia al color (opcional)
+    bool isStreet =
+        std::abs(pixelColor.red() - streetColor.red()) < tolerance &&
+        std::abs(pixelColor.green() - streetColor.green()) < tolerance &&
+        std::abs(pixelColor.blue() - streetColor.blue()) < tolerance;
+
+    if (isStreet){
+        //street
+        return true;
+    }
+    return false;
+}
+
 void Creador::add_checkpoint(QMouseEvent *event){
 
     QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
-
-    if(checkpoints.add_checkpoint(pos)){
+    if(is_street(pos) && checkpoints.add_checkpoint(pos)){
         update_map(pos, ADD);
     }else{
         m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);

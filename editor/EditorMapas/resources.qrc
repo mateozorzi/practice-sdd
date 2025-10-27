@@ -13,4 +13,9 @@
         <file>imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - San Andreas.png</file>
         <file>imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png</file>
     </qresource>
+    <qresource prefix="/mask">
+        <file>imagenes/003_B_STREETS_vice_city.png</file>
+        <file>imagenes/002_B_STREETS_san_andreas.png</file>
+        <file>imagenes/001_B_STREETS_liberty_city.png</file>
+    </qresource>
 </RCC>
