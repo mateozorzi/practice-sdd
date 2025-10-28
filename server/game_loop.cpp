@@ -70,6 +70,8 @@ void GameLoop::unregister_client(Queue<CarPositionDTO>* client_queue) {
 
     std::lock_guard<std::mutex> lock(mtx);
 
+    client_queue->close();
+
     client_queues.erase(std::remove(client_queues.begin(), client_queues.end(), client_queue),
                         client_queues.end());
 }
@@ -105,8 +107,4 @@ void GameLoop::stop() {
     _keep_running = false;
 
     command_queue.close();
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    for (auto* q: client_queues) q->close();
 }

@@ -24,6 +24,11 @@ bool ClientHandler::is_alive() const { return receiver.is_alive() || sender.is_a
 
 void ClientHandler::stop() {
 
+    try {
+
+        server_protocol.stop();
+    } catch (const LibError&) {}
+
     receiver.stop();
     sender.stop();
 
