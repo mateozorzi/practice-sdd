@@ -1,6 +1,7 @@
 #include "client.h"
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
+#include "../common/movement_dto.h"
 
 using namespace SDL2pp;
 
@@ -77,17 +78,57 @@ void Client::run() {
 				switch (event.key.keysym.sym) {
 					case SDLK_ESCAPE: case SDLK_q:
 						return;
-					case SDLK_w: key_w = true; protocol.send_car_movement(CarMovement::ACCELERATE); break;
-					case SDLK_s: key_s = true; protocol.send_car_movement(CarMovement::BRAKE); break;
-					case SDLK_a: key_a = true; protocol.send_car_movement(CarMovement::TURN_LEFT); break;
-					case SDLK_d: key_d = true; protocol.send_car_movement(CarMovement::TURN_RIGHT); break;
+					case SDLK_w:
+						if (!key_w) {
+							key_w = true;
+							protocol.send_movement(MovementDTO(Direction::UP, true));
+						}
+						break;
+					case SDLK_s:
+						if (!key_s) {
+							key_s = true;
+							protocol.send_movement(MovementDTO(Direction::DOWN, true));
+						}
+						break;
+					case SDLK_a:
+						if (!key_a) {
+							key_a = true;
+							protocol.send_movement(MovementDTO(Direction::LEFT, true));
+						}
+						break;
+					case SDLK_d:
+						if (!key_d) {
+							key_d = true;
+							protocol.send_movement(MovementDTO(Direction::RIGHT, true));
+						}
+						break;
 				}
 			} else if (event.type == SDL_KEYUP) {
 				switch (event.key.keysym.sym) {
-					case SDLK_w: key_w = false; break;
-					case SDLK_s: key_s = false; break;
-					case SDLK_a: key_a = false; break;
-					case SDLK_d: key_d = false; break;
+					case SDLK_w:
+						if (key_w) {
+							key_w = false;
+							protocol.send_movement(MovementDTO(Direction::UP, false));
+						}
+						break;
+					case SDLK_s:
+						if (key_s) {
+							key_s = false;
+							protocol.send_movement(MovementDTO(Direction::DOWN, false));
+						}
+						break;
+					case SDLK_a:
+						if (key_a) {
+							key_a = false;
+							protocol.send_movement(MovementDTO(Direction::LEFT, false));
+						}
+						break;
+					case SDLK_d:
+						if (key_d) {
+							key_d = false;
+							protocol.send_movement(MovementDTO(Direction::RIGHT, false));
+						}
+						break;
 				}
 			}
 		}
