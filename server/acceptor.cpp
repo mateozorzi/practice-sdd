@@ -33,11 +33,16 @@ void Acceptor::run() {
 void Acceptor::reap() {
 
     clients.remove_if([](const std::unique_ptr<ClientHandler>& client) {
-        if (!client->is_alive())
+        if (!client->is_alive()) {
+
+            std::cout << "Reaping dead client..." << std::endl;
             return true;
+        }
 
         return false;
     });
+
+    std::cout << "Clients connected now: " << clients.size() << std::endl;
 }
 
 

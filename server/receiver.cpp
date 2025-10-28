@@ -40,6 +40,8 @@ void Receiver::run() {
             const ClientRequest client_request = server_protocol.receive_client_request();
             if (client_request == ClientRequest::MOVE_CAR)
                 handle_car_movement(client_request);
+            else if (client_request == ClientRequest::NO_REQUEST)
+                break;
         }
     } catch (const LibError&) {
 
@@ -54,6 +56,7 @@ void Receiver::stop() {
 
     if (_keep_running) {
 
+        _is_alive = false;
         _keep_running = false;
     }
 }

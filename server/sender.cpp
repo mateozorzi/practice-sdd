@@ -41,6 +41,7 @@ void Sender::stop() {
 
     if (_keep_running) {
 
+        _is_alive = false;
         _keep_running = false;
         game_loop.unregister_client(&client_message_queue);
     }
