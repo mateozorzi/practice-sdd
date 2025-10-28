@@ -3,6 +3,7 @@
 
 
 #include "acceptor.h"
+#include "game_loop.h"
 
 #include <string>
 
@@ -18,6 +19,7 @@ constexpr std::string_view SERVER = "SERVER";
 
 class Server {
 
+    GameLoop game_loop;
     Acceptor clients_acceptor;
 
     void stop();

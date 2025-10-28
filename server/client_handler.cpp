@@ -6,17 +6,29 @@
 #include "common/liberror.h"
 
 
-ClientHandler::ClientHandler(Socket&& socket):
+ClientHandler::ClientHandler(Socket&& socket, GameLoop& game_loop):
         client_socket(std::move(socket)),
-        client_id(1) {} // Should construct a sender and receiver thread
+        server_protocol(client_socket),
+        game_loop(game_loop),
+        client_id(1),
+        receiver(server_protocol, game_loop, client_id),
+        sender(server_protocol, game_loop, client_id) {
+
+    receiver.start();
+    sender.start();
+}
 
 
-bool ClientHandler::is_alive() const { return true; } // Shoukd change this later!
+bool ClientHandler::is_alive() const { return receiver.is_alive() || sender.is_alive(); } // Shoukd change this later!
 
 
 void ClientHandler::stop() {
 
-    // This method does nothing for now, it should have a sender and receiver thread later
+    receiver.stop();
+    sender.stop();
+
+    receiver.join();
+    sender.join();
 }
 
 ClientHandler::~ClientHandler() {

@@ -4,13 +4,14 @@
 #include <iostream>
 
 
-Server::Server(const std::string& port): clients_acceptor(port) {}
+Server::Server(const std::string& port): clients_acceptor(port, game_loop) {}
 
 
 void Server::run() {
 
     try {
 
+        game_loop.start();
         clients_acceptor.start();
         std::cout << SERVER_STARTED << std::endl;
 
@@ -27,8 +28,10 @@ void Server::run() {
 
 void Server::stop() {
 
+    game_loop.stop();
     clients_acceptor.stop();
 
+    game_loop.join();
     clients_acceptor.join();
 }
 

@@ -1,5 +1,5 @@
 #include "editor.h"
-#include "./ui_editor.h"
+#include "ui_editor.h"
 #include "creador.h"
 
 Editor::Editor(QWidget *parent)
@@ -16,58 +16,55 @@ Editor::~Editor()
 
 void Editor::on_mapa1_clicked()
 {
-    QString mapa = ":/circuitos/imagenes/circuito_liberty_city.png";
-    //se usara el mapa de liberty city
-    //se cierra la ventana de seleccion de circuito
+    QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png";
+    QString mask = ":/mask/imagenes/001_B_STREETS_liberty_city.png";
+    //liberty city map
     this->hide();
-    //se abre el form con el circuito de liberty city
-    Creador *c = new Creador(mapa);
+    Creador *c = new Creador(mapa, mask);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
-    // Conectar la señal "cerrado" de Creador a un slot lambda que muestre Editor
+    // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show(); // cuando Creador se cierre, mostramos Editor
+        this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 
 void Editor::on_mapa2_clicked()
 {
-//se usara el mapa de San Andreas
-    QString mapa = ":/circuitos/imagenes/circuito_san_andreas.png";
-    //se cierra la ventana de seleccion de circuito
+    QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - San Andreas.png";
+    QString mask = ":/mask/imagenes/002_B_STREETS_san_andreas.png";
+    //san andreas amp
     this->hide();
-    //se abre el form con el circuito de san andreas
-    Creador *c = new Creador(mapa);
+    Creador *c = new Creador(mapa, mask);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
-    // Conectar la señal "close" de Creador a un slot lambda que muestre Editor
+    // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show(); // cuando Creador se cierre, mostramos Editor
+        this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 
 void Editor::on_mapa3_clicked()
 {
-//se usara el mapa de Vice City
-    QString mapa = ":/circuitos/imagenes/circuito_vice_city.png";
-    //se cierra la ventana de seleccion de circuito
+    QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Vice City.png";
+    QString mask = ":/mask/imagenes/003_B_STREETS_vice_city.png";
+    //vice city map
     this->hide();
-    //se abre el form con el circuito de vice city
-    Creador *c = new Creador(mapa);
+    Creador *c = new Creador(mapa, mask);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
-    // Conectar la señal "cerrado" de Creador a un slot lambda que muestre Editor
+    // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show(); // cuando Creador se cierre, mostramos Editor
+        this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 

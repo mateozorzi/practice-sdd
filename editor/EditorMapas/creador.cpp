@@ -11,14 +11,17 @@
 #include <QBrush>
 #include <QList>
 #include <cmath>
+#include <QDir>
+#include <stdio.h>
+#include "checkpoint.h"
+#include "Constants.h"
 
-
-Creador::Creador(const QString& path, QWidget *parent)
+Creador::Creador(const QString& path, const QString& path_mask, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Creador)
     , map(path)
+    , mask(path_mask)
     , checkpoints(Coordinates())
-    , mode(ADD)
     , m(Messages())
 {
     ui->setupUi(this);
@@ -27,18 +30,14 @@ Creador::Creador(const QString& path, QWidget *parent)
     ui->labelmap->setScene(scene);
 
     set_background(map);
+
+    mask_circuit.load(mask);
+
     ui->n_checkpoints->display(0);
 
 
     ui->labelmap->installEventFilter(this);
 
-
-    ui->addButton->setCheckable(true);
-    ui->removeButton->setCheckable(true);
-    connect(ui->addButton, &QPushButton::toggled, this, &Creador::on_addButton_toggled);
-    connect(ui->removeButton, &QPushButton::toggled, this, &Creador::on_removeButton_toggled);
-
-    ui->addButton->setChecked(true);
 }
 
 void Creador::set_background(const QString& path){
@@ -54,28 +53,67 @@ void Creador::set_background(const QString& path){
 void Creador::update_counter() {
     int count = 0;
     for (QGraphicsItem* item : scene->items()) {
-        if (dynamic_cast<QGraphicsEllipseItem*>(item)) {
+        if (dynamic_cast<QGraphicsRectItem*>(item)) {
             count++;
         }
     }
     ui->n_checkpoints->display(count);
 }
 
+Checkpoint Creador::calculate_checkpoint(const QPoint& pos){
 
-void Creador::update_map(const QPoint& pos){
-    int radio = 4;
+    int left = pos.x(), right = pos.x();
+    while (left > 0 && is_street(QPoint(left - 1, pos.y()))) left--;
+    while (right < mask_circuit.width() - 1 && is_street(QPoint(right + 1, pos.y()))) right++;
+    int horizontalLength = right - left;
+
+
+    int up = pos.y(), down = pos.y();
+    while (up > 0 && is_street(QPoint(pos.x(), up - 1))) up--;
+    while (down < mask_circuit.height() - 1 && is_street(QPoint(pos.x(), down + 1))) down++;
+    int verticalLength = down - up;
+
+    if(horizontalLength >= MAX_RECT && verticalLength >= MAX_RECT){
+        //intersection checkpoint
+        QRect rect(pos.x() - INTERSECTION_SIZE / 2,
+                   pos.y() - INTERSECTION_SIZE / 2,
+                   INTERSECTION_SIZE, INTERSECTION_SIZE);
+        return Checkpoint(INTERSECTION, pos, rect);
+
+    }else if (horizontalLength < verticalLength) {
+        // horizontal checkpoint
+        int height = 8;
+
+        QRect rect = QRect(left, pos.y() - height/2, horizontalLength, height);
+        return Checkpoint(HORIZONTAL, pos, rect);
+    } else {
+        // vertical checkpoint
+        int width = 8;
+
+        QRect rect = QRect(pos.x() - width/2, up, width, verticalLength);
+        return Checkpoint(VERTICAL, pos, rect);
+    }
+
+}
+
+
+void Creador::update_map(const QPoint& pos, int mode){
     if (mode == ADD){
-        QGraphicsEllipseItem* ellipse = scene->addEllipse(-radio, -radio, 2*radio, 2*radio,
-                                                          QPen(Qt::red), QBrush(Qt::yellow));
-        ellipse->setPos(pos);
+        Checkpoint checkpoint = calculate_checkpoint(pos);
+        if(checkpoints.add_checkpoint(checkpoint)){
+            scene->addRect(checkpoint.get_rect(),
+                                                QPen(Qt::red), QBrush(Qt::yellow));
+
+        }else{
+            m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
+        }
 
     }else if (mode == REMOVE){
         QPointF clickPos = pos;
+
         for (QGraphicsItem* item : scene->items()) {
-            if (auto ellipse = dynamic_cast<QGraphicsEllipseItem*>(item)) {
-                QPointF center = ellipse->pos();
-                qreal dist = QLineF(clickPos, center).length();
-                if (dist <= radio) {
+            if (auto rect = dynamic_cast<QGraphicsRectItem*>(item)) {
+                if(rect->contains(clickPos)){
                     scene->removeItem(item);
                     delete item;
                     break;
@@ -87,44 +125,55 @@ void Creador::update_map(const QPoint& pos){
     update_counter();
 }
 
-void Creador::add_checkpoint(QEvent *event){
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+bool Creador::is_street(const QPoint& pos){
+    QColor streetColor(255, 36, 250);
 
-    QPointF scenePos = ui->labelmap->mapToScene(mouseEvent->pos());
+    QColor pixelColor = mask_circuit.pixelColor(pos);
+
+    int tolerance = 30;
+    bool isStreet =
+        std::abs(pixelColor.red() - streetColor.red()) < tolerance &&
+        std::abs(pixelColor.green() - streetColor.green()) < tolerance &&
+        std::abs(pixelColor.blue() - streetColor.blue()) < tolerance;
+
+    if (isStreet){
+        //street
+        return true;
+    }
+    return false;
+}
+
+void Creador::add_checkpoint(QMouseEvent *event){
+
+    QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
-
-    if(checkpoints.add_checkpoint(pos)){
-        update_map(pos);
-        m.checkpoint_message(this,"Success", "Checkpoint added in (%1, %2)", pos);
-
+    if(is_street(pos)){
+        update_map(pos, ADD);
     }else{
         m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
     }
 }
 
-void Creador::delete_checkpoint(QEvent *event){
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+void Creador::delete_checkpoint(QMouseEvent *event){
 
-    QPointF scenePos = ui->labelmap->mapToScene(mouseEvent->pos());
+    QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
     QPoint del = checkpoints.delete_checkpoint(pos);
 
     if(del.x() != -1){
-        update_map(del);
-        m.checkpoint_message(this, "Success", "Checkpoint delete in (%1, %2)", pos);
-
+        update_map(del, REMOVE);
     }else{
         m.checkpoint_message(this, "Error", "No checkpoint in (%1, %2)", pos);
     }
 }
 
-void Creador::handle_checkpoints(QEvent *event){
-    //case, add button activate
-    if (mode == ADD){
+void Creador::handle_checkpoints(QMouseEvent *event){
+    //handle leftbutton or right button
+    if (event->button() == Qt::LeftButton){
         add_checkpoint(event);
-    }else if(mode == REMOVE){
+    }else if(event->button() == Qt::RightButton){
         delete_checkpoint(event);
     }
 
@@ -133,8 +182,9 @@ void Creador::handle_checkpoints(QEvent *event){
 bool Creador::eventFilter(QObject *obj, QEvent *event)
 {
     if(obj == ui->labelmap && event->type() == QEvent::MouseButtonPress){
-        this->handle_checkpoints(event);
-        return true; // evento manejado
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        this->handle_checkpoints(mouseEvent);
+        return true;
     }
     return QMainWindow::eventFilter(obj, event);
 }
@@ -144,8 +194,8 @@ bool Creador::eventFilter(QObject *obj, QEvent *event)
 
 Creador::~Creador()
 {
-    qDeleteAll(scene->items()); // elimina los items
-    delete scene;               // elimina la escena
+    qDeleteAll(scene->items());
+    delete scene;
     delete ui;
 }
 
@@ -156,24 +206,24 @@ void Creador::on_Exit_clicked()
     this->close();
 }
 
-void Creador::on_addButton_toggled(bool checked)
+void Creador::on_Done_clicked()
 {
-    if (checked) {
-        ui->removeButton->setChecked(false);
-        mode = ADD;
-    } else {
-        mode = NONE;
-    }
-}
+    //create csv with the checkpoints of the race
 
-
-void Creador::on_removeButton_toggled(bool checked)
-{
-    if (checked) {
-        ui->addButton->setChecked(false);
-        mode = REMOVE;
-    } else {
-        mode = NONE;
+    if (!checkpoints.enough_checkpoints()){
+        //no enough checkpoints added for a race
+        m.message_no_args(this, "Error", "Not enough checkpoints.\n A race must have at least 5 checkpoints.");
+        return;
     }
+
+    if (checkpoints.export_checkpoints(map)){
+        //file create succesfully
+        m.message_no_args(this, "Success", "Congratulations! Creation complete");
+        emit close_w();
+        this->close();
+    }else{
+        m.message_no_args(this, "Error", "An error has occured.\n The circuit has not been save.");
+    }
+
 }
 

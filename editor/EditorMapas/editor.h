@@ -25,7 +25,6 @@ private slots:
     void on_mapa3_clicked();
 
     void on_Exit_clicked();
-
 private:
     Ui::Editor *ui;
 };

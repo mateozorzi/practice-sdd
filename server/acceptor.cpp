@@ -5,7 +5,7 @@
 #include "common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port): acceptor_socket(port.c_str()) {}
+Acceptor::Acceptor(const std::string& port, GameLoop& game_loop): acceptor_socket(port.c_str()), game_loop(game_loop) {}
 
 
 void Acceptor::run() {
@@ -15,7 +15,7 @@ void Acceptor::run() {
         try {
 
             Socket client_socket = acceptor_socket.accept();
-            auto client = std::make_unique<ClientHandler>(std::move(client_socket));
+            auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_loop);
             clients.push_back(std::move(client));
             std::cout << CLIENT_CONNECTED << std::endl;
             reap();
@@ -23,7 +23,6 @@ void Acceptor::run() {
 
             if (!should_keep_running())
                 break;
-            
             std::cerr << "[" << ACCEPTOR << "] " << EXCEPTION << ": " << e.what();
         }
     }

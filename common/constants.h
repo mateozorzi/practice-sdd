@@ -15,4 +15,14 @@ enum class ClientAction : uint8_t {
     SEND_CAR_MOVEMENT = 0x03
 };
 
+
+constexpr uint8_t NO_REQUEST = 0x00;
+constexpr uint8_t MOVE_CAR = 0x03;
+
+constexpr uint8_t ACCELERATE = 0x01;
+constexpr uint8_t BRAKE = 0x02;
+constexpr uint8_t TURN_LEFT = 0x03;
+constexpr uint8_t TURN_RIGHT = 0x04;
+
+
 #endif
