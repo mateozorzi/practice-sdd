@@ -28,20 +28,20 @@ void GameLoop::handle_car_movement(GameCommand& game_command) {
     const uint32_t client_id = game_command.client_id;
     const MovementDTO& movement_dto = game_command.movement_dto;
 
-    cars[client_id].handle_movement(movement_dto);
+    auto [it, inserted] = cars.try_emplace(client_id, world);
+
+    it->second.handle_movement(movement_dto);
 }
+
 
 void GameLoop::update_positions() {
 
     for (auto& [client_id, car] : cars) {
 
-        if (car.update_position()) {
+        car.update_position();
 
-            CarPositionDTO car_position_dto = car.get_position_dto();
-            std::cout << "X: " << car_position_dto.x_position;
-            std::cout << "  |   Y: " << car_position_dto.y_position << std::endl;
-            broadcast(car_position_dto);
-        }
+        CarPositionDTO car_position_dto = car.get_position_dto();
+        broadcast(car_position_dto);
     }
 }
 

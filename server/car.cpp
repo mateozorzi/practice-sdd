@@ -1,9 +1,26 @@
 #include "car.h"
 
 
-Car::Car() : x(300), y(200), angle(0),
-    moving_up(false), moving_down(false),
-    moving_left(false), moving_right(false) {}
+Car::Car(b2World& world): body(nullptr), x(0), y(0), angle(0) {
+
+    b2BodyDef body_definition;
+    body_definition.type = b2_dynamicBody;
+    body_definition.position.Set(0.0f, 0.0f);
+    body_definition.linearDamping = 1.0f;
+    body_definition.angularDamping = 2.0f;
+    body = world.CreateBody(&body_definition);
+
+    b2PolygonShape shape;
+    shape.SetAsBox(1.0f, 0.5f);
+
+    b2FixtureDef fixture;
+    fixture.shape = &shape;
+    fixture.density = 1.0f;
+    fixture.friction = 0.3f;
+    fixture.restitution = 0.0f;
+
+    body->CreateFixture(&fixture);
+}
 
 
 void Car::handle_movement(const MovementDTO& movement_dto) {

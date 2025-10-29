@@ -7,7 +7,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <box2d/box2d.h>
 
 #include "common/car_position_dto.h"
 #include "common/constants.h"
