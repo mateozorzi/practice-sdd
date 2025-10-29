@@ -38,7 +38,8 @@ void GameLoop::update_positions() {
 
     for (auto& [client_id, car] : cars) {
 
-        car.update_position();
+        // 1.0f / 60.0f = TIME_STEP
+        car.update_position(1.0f / 60.0f);
 
         CarPositionDTO car_position_dto = car.get_position_dto();
         broadcast(car_position_dto);
@@ -89,6 +90,8 @@ void GameLoop::run() {
             }
 
             update_positions();
+            // 6 = VELOCITY_ITERATIONS      2 = POSITION_ITERATIONS
+            world.Step(1.0f / 60.0f, 6, 2);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }

@@ -11,9 +11,6 @@
 class Car {
 
     b2Body* body;
-    uint32_t x;
-    uint32_t y;
-    uint32_t angle;
 
     bool moving_up = false;
     bool moving_down = false;
@@ -28,7 +25,7 @@ public:
     explicit Car(b2World& world);
 
     void handle_movement(const MovementDTO& movement_dto);
-    bool update_position();
+    void update_position(float delta_time);
     
     CarPositionDTO get_position_dto() const;
 };

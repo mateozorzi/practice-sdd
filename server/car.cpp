@@ -1,13 +1,13 @@
 #include "car.h"
 
 
-Car::Car(b2World& world): body(nullptr), x(0), y(0), angle(0) {
+Car::Car(b2World& world): body(nullptr) {
 
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
     body_definition.position.Set(0.0f, 0.0f);
-    body_definition.linearDamping = 1.0f;
-    body_definition.angularDamping = 2.0f;
+    body_definition.linearDamping = 2.0f;
+    body_definition.angularDamping = 4.0f;
     body = world.CreateBody(&body_definition);
 
     b2PolygonShape shape;
@@ -42,36 +42,52 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
     }
 }
 
-bool Car::update_position() {
+void Car::update_position(float delta_time) {
 
-    const uint32_t speed = 2;
+    b2Vec2 forward_vector = body->GetWorldVector(b2Vec2(0.0f, 1.0f));
+    b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
 
-    if (moving_up && y > speed) {
+    b2Vec2 velocity = body->GetLinearVelocity();
 
-        y -= speed;
-        angle = 0;
-    }
-    if (moving_down) {
+    float forward_speed = b2Dot(velocity, forward_vector);
+    float lateral_speed = b2Dot(velocity, right_vector);
 
-        y += speed;
-        angle = 180;
-    }
-    if (moving_left && x > speed) {
+    // 0.85f = DRIFT FACTOR
+    b2Vec2 new_velocity = forward_speed * forward_vector + (lateral_speed * 0.85f) * right_vector;
 
-        x -= speed;
-        angle = 270;
-    }
-    if (moving_right) {
+    body->SetLinearVelocity(new_velocity);
 
-        x += speed;
-        angle = 90;
-    }
+    // 10.0f = ACCELERATION
+    if (moving_up)
+        forward_speed -= 10.0f * delta_time;
 
-    return moving_up || moving_down || moving_left || moving_right;
+    if (moving_down)
+        forward_speed += 10.0f * 0.06f * delta_time;
+
+    // 15.0f = MAX_SPEED
+    if (forward_speed > 15.0f)
+        forward_speed = 15.0f;
+    else if (forward_speed < -15.0f)
+        forward_speed = -15.0f;
+    
+    body->SetLinearVelocity(forward_speed * forward_vector + (lateral_speed * 0.85) * right_vector);
+
+    // 5.0f = TURN_TORQUE
+    if (moving_left)
+        body->ApplyTorque(-5.0f, true);
+    if (moving_right)
+        body->ApplyTorque(5.0f, true);
 }
 
 
 CarPositionDTO Car::get_position_dto() const {
 
-    return CarPositionDTO(x, y, angle);
+    b2Vec2 position = body->GetPosition();
+    float angle_radians = body->GetAngle();
+
+    // 20.0f = PIXELS_PER_METER
+    uint32_t x_pixels = static_cast<uint32_t>(position.x * 20.0f);
+    uint32_t y_pixels = static_cast<uint32_t>(position.y * 20.0f);
+    uint32_t angle_degrees = static_cast<uint32_t>(angle_radians * (180.0f / 3.14159265f));
+    return CarPositionDTO(x_pixels, y_pixels, angle_degrees);
 }
