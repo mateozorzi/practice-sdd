@@ -35,12 +35,13 @@ void GameLoop::update_positions() {
 
     for (auto& [client_id, car] : cars) {
 
-        car.update_position();
+        if (car.update_position()) {
 
-        CarPositionDTO car_position_dto = car.get_position_dto();
-        std::cout << "X: " << car_position_dto.x_position << std::endl;
-        std::cout << "Y: " << car_position_dto.y_position << std::endl;
-        broadcast(car_position_dto);
+            CarPositionDTO car_position_dto = car.get_position_dto();
+            std::cout << "X: " << car_position_dto.x_position;
+            std::cout << "  |   Y: " << car_position_dto.y_position << std::endl;
+            broadcast(car_position_dto);
+        }
     }
 }
 

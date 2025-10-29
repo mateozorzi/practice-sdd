@@ -25,7 +25,7 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
     }
 }
 
-void Car::update_position() {
+bool Car::update_position() {
 
     const uint32_t speed = 2;
 
@@ -49,6 +49,8 @@ void Car::update_position() {
         x += speed;
         angle = 90;
     }
+
+    return moving_up || moving_down || moving_left || moving_right;
 }
 
 

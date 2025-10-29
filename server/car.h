@@ -25,7 +25,7 @@ public:
     explicit Car();
 
     void handle_movement(const MovementDTO& movement_dto);
-    void update_position();
+    bool update_position();
     
     CarPositionDTO get_position_dto() const;
 };
