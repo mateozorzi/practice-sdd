@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <box2d/box2d.h>
 
 #include "common/car_position_dto.h"
 #include "common/constants.h"
@@ -34,6 +35,7 @@ class GameLoop: public Thread {
     std::vector<Queue<CarPositionDTO>*> client_queues;
     Queue<GameCommand> command_queue;
     std::unordered_map<uint32_t, Car> cars;
+    b2World world;
 
     void broadcast(const CarPositionDTO& msg);
 

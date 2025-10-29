@@ -6,7 +6,7 @@
 #include <thread>
 
 
-GameLoop::GameLoop(): command_queue() {}
+GameLoop::GameLoop(): world(b2Vec2(0.0f, 0.0f)) {}
 
 
 void GameLoop::broadcast(const CarPositionDTO& msg) {
