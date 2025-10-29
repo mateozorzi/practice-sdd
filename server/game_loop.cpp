@@ -9,38 +9,6 @@
 GameLoop::GameLoop(): command_queue() {}
 
 
-void GameLoop::handle_car_movement(GameCommand& game_command) {
-
-    const CarMovement car_movement = game_command.car_movement;
-    CarPositionDTO car_position_dto;
-
-    switch (car_movement) {
-
-
-        case CarMovement::ACCELERATE:
-            car_position_dto = CarPositionDTO(0, 0, 0);
-            break;
-        case CarMovement::BRAKE:
-            car_position_dto = CarPositionDTO(0, 10, 0);
-            break;
-        case CarMovement::TURN_LEFT:
-            car_position_dto = CarPositionDTO(0, 0, 0);
-            break;
-        case CarMovement::TURN_RIGHT:
-            car_position_dto = CarPositionDTO(10, 0, 0);
-            break;
-    }
-     
-
-    broadcast(car_position_dto);
-
-    std::cout << "GAMELOOP Broadcasting hardcoded position: " << std::endl;
-    std::cout << "Car x: " << car_position_dto.x_position << std::endl;
-    std::cout << "Car y: " << car_position_dto.y_position << std::endl;
-    std::cout << "Car angle: " << car_position_dto.angle << std::endl;
-}
-
-
 void GameLoop::broadcast(const CarPositionDTO& msg) {
 
     std::lock_guard<std::mutex> lock(mtx);
@@ -51,6 +19,29 @@ void GameLoop::broadcast(const CarPositionDTO& msg) {
 
             client_queue->try_push(msg);
         } catch (const ClosedQueue&) {}
+    }
+}
+
+
+void GameLoop::handle_car_movement(GameCommand& game_command) {
+
+    const uint32_t client_id = game_command.client_id;
+    const MovementDTO& movement_dto = game_command.movement_dto;
+
+    cars[client_id].handle_movement(movement_dto);
+}
+
+void GameLoop::update_positions() {
+
+    for (auto& [client_id, car] : cars) {
+
+        if (car.update_position()) {
+
+            CarPositionDTO car_position_dto = car.get_position_dto();
+            std::cout << "X: " << car_position_dto.x_position;
+            std::cout << "  |   Y: " << car_position_dto.y_position << std::endl;
+            broadcast(car_position_dto);
+        }
     }
 }
 
@@ -69,6 +60,8 @@ void GameLoop::register_client(Queue<CarPositionDTO>* client_queue) {
 void GameLoop::unregister_client(Queue<CarPositionDTO>* client_queue) {
 
     std::lock_guard<std::mutex> lock(mtx);
+
+    client_queue->close();
 
     client_queues.erase(std::remove(client_queues.begin(), client_queues.end(), client_queue),
                         client_queues.end());
@@ -95,6 +88,8 @@ void GameLoop::run() {
                 break;
             }
 
+            update_positions();
+
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
     } catch (const ClosedQueue&) {}
@@ -105,8 +100,4 @@ void GameLoop::stop() {
     _keep_running = false;
 
     command_queue.close();
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    for (auto* q: client_queues) q->close();
 }

@@ -33,6 +33,8 @@ public:
     CommonProtocol& operator=(const CommonProtocol& other) = delete;
 
     explicit CommonProtocol(Socket& socket);
+
+    void stop();
 };
 
 

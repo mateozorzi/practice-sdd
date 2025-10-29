@@ -3,6 +3,7 @@
 
 #include "receiver.h"
 
+#include "common/movement_dto.h"
 #include "common/liberror.h"
 
 
@@ -12,23 +13,9 @@ Receiver::Receiver(ServerProtocol& server_protocol, GameLoop& game_loop,
 
 void Receiver::handle_car_movement(const ClientRequest& client_request) {
 
-    const CarMovement car_movement = server_protocol.receive_car_movement();
+    const MovementDTO& movement_dto = server_protocol.receive_movement();
+    game_loop.add_command(GameCommand(client_id, client_request, movement_dto));
 
-    switch (car_movement) {
-
-        case CarMovement::ACCELERATE:
-            game_loop.add_command(GameCommand(client_id, client_request, CarMovement::ACCELERATE));
-            break;
-        case CarMovement::BRAKE:
-            game_loop.add_command(GameCommand(client_id, client_request, CarMovement::BRAKE));
-            break;
-        case CarMovement::TURN_LEFT:
-            game_loop.add_command(GameCommand(client_id, client_request, CarMovement::TURN_LEFT));
-            break;
-        case CarMovement::TURN_RIGHT:
-            game_loop.add_command(GameCommand(client_id, client_request, CarMovement::TURN_RIGHT));
-            break;
-    }
 }
 
 void Receiver::run() {
@@ -40,6 +27,8 @@ void Receiver::run() {
             const ClientRequest client_request = server_protocol.receive_client_request();
             if (client_request == ClientRequest::MOVE_CAR)
                 handle_car_movement(client_request);
+            else if (client_request == ClientRequest::NO_REQUEST)
+                break;
         }
     } catch (const LibError&) {
 
@@ -54,6 +43,7 @@ void Receiver::stop() {
 
     if (_keep_running) {
 
+        _is_alive = false;
         _keep_running = false;
     }
 }

@@ -85,3 +85,10 @@ std::string CommonProtocol::recv_string() {
 
     return std::string(buf.begin(), buf.end());
 }
+
+
+void CommonProtocol::stop() {
+
+    socket.shutdown(SHUT_RDWR);
+    socket.close();
+}

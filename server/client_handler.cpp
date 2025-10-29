@@ -19,10 +19,15 @@ ClientHandler::ClientHandler(Socket&& socket, GameLoop& game_loop):
 }
 
 
-bool ClientHandler::is_alive() const { return receiver.is_alive() || sender.is_alive(); } // Shoukd change this later!
+bool ClientHandler::is_alive() const { return receiver.is_alive() && sender.is_alive(); }
 
 
 void ClientHandler::stop() {
+
+    try {
+
+        server_protocol.stop();
+    } catch (const LibError&) {}
 
     receiver.stop();
     sender.stop();
