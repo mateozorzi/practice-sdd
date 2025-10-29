@@ -9,38 +9,6 @@
 GameLoop::GameLoop(): command_queue() {}
 
 
-void GameLoop::handle_car_movement(GameCommand& game_command) {
-
-    const CarMovement car_movement = game_command.car_movement;
-    CarPositionDTO car_position_dto;
-
-    switch (car_movement) {
-
-
-        case CarMovement::ACCELERATE:
-            car_position_dto = CarPositionDTO(0, 0, 0);
-            break;
-        case CarMovement::BRAKE:
-            car_position_dto = CarPositionDTO(0, 10, 0);
-            break;
-        case CarMovement::TURN_LEFT:
-            car_position_dto = CarPositionDTO(0, 0, 0);
-            break;
-        case CarMovement::TURN_RIGHT:
-            car_position_dto = CarPositionDTO(10, 0, 0);
-            break;
-    }
-     
-
-    broadcast(car_position_dto);
-
-    std::cout << "GAMELOOP Broadcasting hardcoded position: " << std::endl;
-    std::cout << "Car x: " << car_position_dto.x_position << std::endl;
-    std::cout << "Car y: " << car_position_dto.y_position << std::endl;
-    std::cout << "Car angle: " << car_position_dto.angle << std::endl;
-}
-
-
 void GameLoop::broadcast(const CarPositionDTO& msg) {
 
     std::lock_guard<std::mutex> lock(mtx);
@@ -89,7 +57,7 @@ void GameLoop::run() {
                 while (command_queue.try_pop(game_command)) {
                     
                     if (game_command.client_request == ClientRequest::MOVE_CAR)
-                        handle_car_movement(game_command);
+                        break;
                 }
 
             } catch (const ClosedQueue&) {

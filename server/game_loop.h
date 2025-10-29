@@ -10,6 +10,7 @@
 
 #include "common/car_position_dto.h"
 #include "common/constants.h"
+#include "common/movement_dto.h"
 #include "common/queue.h"
 #include "common/thread.h"
 
@@ -21,7 +22,7 @@ struct GameCommand {
 
     uint32_t client_id;
     ClientRequest client_request;
-    CarMovement car_movement;
+    MovementDTO movement_dto;
 };
 
 
@@ -32,7 +33,6 @@ class GameLoop: public Thread {
     std::vector<Queue<CarPositionDTO>*> client_queues;
     std::mutex mtx;
 
-    void handle_car_movement(GameCommand& game_command);
     void broadcast(const CarPositionDTO& msg);
 
 

@@ -4,6 +4,7 @@ target_sources(taller_common
     car_position_dto.cpp
     common_protocol.cpp
     foo.cpp
+    movement_dto.cpp
     liberror.cpp
     resolver.cpp
     resolvererror.cpp
@@ -13,6 +14,7 @@ target_sources(taller_common
     car_position_dto.h
     common_protocol.h
     foo.h
+    movement_dto.h
     liberror.h
     queue.h
     resolver.h

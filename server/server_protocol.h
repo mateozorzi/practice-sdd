@@ -3,6 +3,7 @@
 
 
 #include "common/car_position_dto.h"
+#include "common/movement_dto.h"
 #include "common/common_protocol.h"
 
 #include "client_request.h"
@@ -12,7 +13,6 @@ class ServerProtocol final: public CommonProtocol {
 
 
     ClientRequest convert_byte_to_request(uint8_t byte) const;
-    CarMovement convert_byte_to_car_movement(uint8_t byte) const;
 
 
 public:
@@ -24,7 +24,8 @@ public:
     void send_car_position(const CarPositionDTO& car_position_dto);
 
     ClientRequest receive_client_request();
-    CarMovement receive_car_movement();
+
+    MovementDTO receive_movement();
 };
 
 
