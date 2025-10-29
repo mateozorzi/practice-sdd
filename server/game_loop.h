@@ -14,6 +14,7 @@
 #include "common/queue.h"
 #include "common/thread.h"
 
+#include "car.h"
 #include "client_request.h"
 #include "server_protocol.h"
 
@@ -29,11 +30,15 @@ struct GameCommand {
 class GameLoop: public Thread {
 
 
-    Queue<GameCommand> command_queue;
-    std::vector<Queue<CarPositionDTO>*> client_queues;
     std::mutex mtx;
+    std::vector<Queue<CarPositionDTO>*> client_queues;
+    Queue<GameCommand> command_queue;
+    std::unordered_map<uint32_t, Car> cars;
 
     void broadcast(const CarPositionDTO& msg);
+
+    void handle_car_movement(GameCommand& game_command);
+    void update_positions();
 
 
 public:

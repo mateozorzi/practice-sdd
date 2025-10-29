@@ -23,6 +23,28 @@ void GameLoop::broadcast(const CarPositionDTO& msg) {
 }
 
 
+void GameLoop::handle_car_movement(GameCommand& game_command) {
+
+    const uint32_t client_id = game_command.client_id;
+    const MovementDTO& movement_dto = game_command.movement_dto;
+
+    cars[client_id].handle_movement(movement_dto);
+}
+
+void GameLoop::update_positions() {
+
+    for (auto& [client_id, car] : cars) {
+
+        car.update_position();
+
+        CarPositionDTO car_position_dto = car.get_position_dto();
+        std::cout << "X: " << car_position_dto.x_position << std::endl;
+        std::cout << "Y: " << car_position_dto.y_position << std::endl;
+        broadcast(car_position_dto);
+    }
+}
+
+
 void GameLoop::add_command(const GameCommand& cmd) { command_queue.push(cmd); }
 
 
@@ -57,13 +79,15 @@ void GameLoop::run() {
                 while (command_queue.try_pop(game_command)) {
                     
                     if (game_command.client_request == ClientRequest::MOVE_CAR)
-                        break;
+                        handle_car_movement(game_command);
                 }
 
             } catch (const ClosedQueue&) {
 
                 break;
             }
+
+            update_positions();
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
