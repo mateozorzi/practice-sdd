@@ -1,15 +1,16 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
-#include "client_protocol.h"
-#include "common/thread.h"
-#include "common/queue.h"
 #include "common/car_position_dto.h"
+#include "common/queue.h"
+#include "common/thread.h"
+
+#include "client_protocol.h"
 
 struct GameState {
     // Forward Declaration
 };
 
-class Receiver : public Thread {
+class Receiver: public Thread {
     ClientProtocol& protocol;
     GameState game_state;
     std::mutex state_mutex;
@@ -22,4 +23,4 @@ public:
     void run() override;
 };
 
-#endif //RECEIVER_H
+#endif  // RECEIVER_H

@@ -2,10 +2,11 @@
 #define CLIENT_PROTOCOL_H
 
 #include <string>
+
+#include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
 #include "../common/movement_dto.h"
-#include "../common/car_position_dto.h"
 
 enum class ServerResponse {
 
