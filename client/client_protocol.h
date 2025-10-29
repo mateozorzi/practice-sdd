@@ -5,7 +5,7 @@
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
 #include "../common/movement_dto.h"
-
+#include "../common/car_position_dto.h"
 
 enum class ServerResponse {
 
@@ -16,7 +16,6 @@ enum class ServerResponse {
     SEND_ERROR_MESSAGE,
     UNKNOWN
 };
-
 
 class ClientProtocol final: public CommonProtocol {
     Socket client_socket;
@@ -29,7 +28,7 @@ public:
 
     void send_username();
     void send_movement(const MovementDTO& movement);
+    CarPositionDTO receive_car_position();
 };
-
 
 #endif

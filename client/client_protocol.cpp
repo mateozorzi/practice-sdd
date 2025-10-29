@@ -15,3 +15,10 @@ void ClientProtocol::send_movement(const MovementDTO& movement) {
     add_uint8_to_buffer(static_cast<uint8_t>(movement.isMoving ? 1 : 0));
     send_buffer();
 }
+
+CarPositionDTO ClientProtocol::receive_car_position() {
+    const uint32_t x_position = recv_uint32();
+    const uint32_t y_position = recv_uint32();
+    const uint32_t angle = recv_uint32();
+    return CarPositionDTO(x_position, y_position, angle);
+}

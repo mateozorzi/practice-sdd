@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 #include "../common/movement_dto.h"
+#include "../common/car_position_dto.h"
 
 using namespace SDL2pp;
 
@@ -47,17 +48,14 @@ void Client::run() {
 	sprite_cars.SetColorKey(true, color_key);
 	Texture sprites(renderer, sprite_cars);
 
-	// Posición del vehiculo en el mundo
-	int pos_x = 300;
-	int pos_y = 200;
+	// Posición del auto (se lee desde el servidor)
+	int pos_x = 0;
+	int pos_y = 0;
+	int angle = 0;
 
 	// Desplazamiento de la cámara
 	int camera_x = 0;
 	int camera_y = 0;
-
-	// Sprite del vehiculo
-	int car_x = 128;
-	int car_y = 32;
 
 	// Estado de WASD
 	bool key_w = false;
@@ -133,30 +131,18 @@ void Client::run() {
 			}
 		}
 
-		if (key_w && pos_y > 0) {
-			pos_y -= 2;
-			car_y = 32; // sprite arriba
-		}
-		if (key_s && pos_y < bg_height + 160) {
-			pos_y += 2;
-			car_y = 0; // sprite abajo
-		}
-		if (key_a && pos_x > 0) {
-			pos_x -= 2;
-			car_x = 96;  // sprite izquierda
-		}
-		if (key_d && pos_x < bg_width + 240) {
-			pos_x += 2;
-			car_x = 160; // sprite derecha
-		}
-
-		if (!key_a && !key_d) {
-			car_x = 128;
+		// Obtener posición del auto desde el servidor
+		Queue<CarPositionDTO>& car_queue = receiver.get_car_position_queue();
+		CarPositionDTO car_position;
+		if (car_queue.try_pop(car_position)) {
+			pos_x = car_position.x_position;
+			pos_y = car_position.y_position;
+			angle = car_position.angle;
 		}
 
 	// Actualizar camara siguiendo al auto
-	const int view_width = 512;
-	const int view_height = 288;
+	constexpr int view_width = 512;
+	constexpr int view_height = 288;
 	camera_x = pos_x - (view_width / 2) + 25;
 	camera_y = pos_y - (view_height / 2) + 25;
 
@@ -166,53 +152,56 @@ void Client::run() {
 	if (camera_x > bg_width - view_width) camera_x = bg_width - view_width;
 	if (camera_y > bg_height - view_height) camera_y = bg_height - view_height;
 
-		renderer.Clear();
+	renderer.Clear();
 
-		// Dibujar elementos del juego
-		draw_background(renderer, background, camera_x, camera_y, view_width, view_height);
-		draw_car(renderer, sprites, pos_x, pos_y, camera_x, camera_y, car_x, car_y, view_width, view_height);
-		draw_health_bar(renderer, health);
-		draw_minimap(renderer, minimap_static, pos_x, pos_y, bg_width, bg_height, minimap_width, minimap_height);
+	// Dibujar elementos del juego
+	draw_background(renderer, background, camera_x, camera_y, view_width, view_height);
+	draw_car(renderer, sprites, pos_x, pos_y, camera_x, camera_y, angle, view_width, view_height);
+	draw_health_bar(renderer, health);
+	draw_minimap(renderer, minimap_static, pos_x, pos_y, bg_width, bg_height, minimap_width, minimap_height);
 
-		renderer.Present();
+	renderer.Present();
 
-		SDL_Delay(10);
+	SDL_Delay(10);
 	}
 }
 
-void Client::draw_background(Renderer& renderer, Texture& background, int camera_x, int camera_y, int view_width, int view_height) {
+void Client::draw_background(Renderer& renderer, Texture& background, const int camera_x, const int camera_y,
+	int view_width, int view_height) {
 	renderer.Copy(background,
 		Rect(camera_x, camera_y, view_width, view_height),
 		Rect(0, 0, 1920, 1080));
 }
 
-void Client::draw_car(Renderer& renderer, Texture& sprites, int pos_x, int pos_y, int camera_x, int camera_y, int car_x,
-	int car_y, int view_width, int view_height) {
-	int car_screen_x = (pos_x - camera_x) * 1920 / view_width;
-	int car_screen_y = (pos_y - camera_y) * 1080 / view_height;
+void Client::draw_car(Renderer& renderer, Texture& sprites, const int pos_x, const int pos_y, const int camera_x, const int camera_y, const int angle,
+	int view_width, int view_height) {
+	const int car_screen_x = (pos_x - camera_x) * 1920 / view_width;
+	const int car_screen_y = (pos_y - camera_y) * 1080 / view_height;
 
-	renderer.Copy(sprites,Rect(car_x, car_y, 32, 32),
-		Rect(car_screen_x, car_screen_y, 60, 60));
+	// Usar solo sprite vertical y rotarlo con SDL
+	renderer.Copy(sprites, Rect(128, 32, 32, 32),
+		Rect(car_screen_x, car_screen_y, 60, 60),
+		angle, NullOpt, SDL_FLIP_NONE);
 }
 
 void Client::draw_health_bar(Renderer& renderer, int health) {
-	const int health_bar_width = 400;
-	const int health_bar_height = 20;
-	const int health_bar_x = 20;
-	const int health_bar_y = 1080 - health_bar_height - 20;
+	constexpr int health_bar_width = 400;
+	constexpr int health_bar_height = 20;
+	constexpr int health_bar_x = 20;
+	constexpr int health_bar_y = 1080 - health_bar_height - 20;
 
 	// Fondo de la barra
 	renderer.SetDrawColor(0, 0, 0, 255);
 	renderer.FillRect(Rect(health_bar_x, health_bar_y, health_bar_width, health_bar_height));
 
 	// Dibujar barra de vida
-	int current_health_width = (health * health_bar_width) / 100;
+	const int current_health_width = (health * health_bar_width) / 100;
 	renderer.SetDrawColor(255, 0, 0, 255);
 	renderer.FillRect(Rect(health_bar_x, health_bar_y, current_health_width, health_bar_height));
 }
 
-void Client::draw_minimap(Renderer& renderer, Texture& minimap_static, int pos_x, int pos_y, int bg_width, int bg_height,
-	int minimap_width, int minimap_height) {
+void Client::draw_minimap(Renderer& renderer, Texture& minimap_static, const int pos_x, const int pos_y,
+	const int bg_width, const int bg_height, int minimap_width, int minimap_height) {
 	const int minimap_x = 1920 - minimap_width - 20;
 	const int minimap_y = 1080 - minimap_height - 20;
 
@@ -224,8 +213,8 @@ void Client::draw_minimap(Renderer& renderer, Texture& minimap_static, int pos_x
 	renderer.Copy(minimap_static,NullOpt, Rect(minimap_x, minimap_y, minimap_width, minimap_height));
 
 	// Jugador en el minimapa
-	int player_minimap_x = minimap_x + (pos_x * minimap_width / bg_width);
-	int player_minimap_y = minimap_y + (pos_y * minimap_height / bg_height);
+	const int player_minimap_x = minimap_x + (pos_x * minimap_width / bg_width);
+	const int player_minimap_y = minimap_y + (pos_y * minimap_height / bg_height);
 
 	// Dibujar jugador en minimapa
 	renderer.SetDrawColor(255, 255, 0, 255);

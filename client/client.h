@@ -6,7 +6,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
-
 class Client {
 public:
     explicit Client(const std::string& hostname, const std::string& servname);
@@ -22,7 +21,7 @@ private:
         int camera_x, int camera_y, int view_width, int view_height);
     
     void draw_car(SDL2pp::Renderer& renderer, SDL2pp::Texture& sprites, int pos_x, int pos_y, int camera_x, int camera_y,
-        int car_x, int car_y, int view_width, int view_height);
+        int angle, int view_width, int view_height);
     
     void draw_health_bar(SDL2pp::Renderer& renderer, int health);
     
