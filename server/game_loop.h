@@ -34,6 +34,7 @@ class GameLoop: public Thread {
     std::vector<Queue<CarPositionDTO>*> client_queues;
     Queue<GameCommand> command_queue;
     std::unordered_map<uint32_t, Car> cars;
+    b2World world;
 
     void broadcast(const CarPositionDTO& msg);
 
