@@ -1,10 +1,10 @@
 #ifndef CLIENT_PROTOCOL_H
 #define CLIENT_PROTOCOL_H
 
-
 #include <string>
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
+#include "../common/movement_dto.h"
 
 
 enum class ServerResponse {
@@ -28,7 +28,7 @@ public:
     explicit ClientProtocol(const std::string& hostname, const std::string& port);
 
     void send_username();
-    void send_car_movement(CarMovement movement);
+    void send_movement(const MovementDTO& movement);
 };
 
 
