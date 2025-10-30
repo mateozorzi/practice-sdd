@@ -1,6 +1,6 @@
 #include "server_protocol.h"
 
-#include "common/constants.h"
+#include "../common/constants.h"
 
 
 ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {
@@ -32,6 +32,14 @@ ClientRequest ServerProtocol::receive_client_request() {
     const uint8_t byte = recv_uint8();
 
     return convert_byte_to_request(byte);
+}
+
+
+PlayerDTO ServerProtocol::receive_username() {
+
+    const std::string& username = recv_string();
+
+    return PlayerDTO(username);
 }
 
 MovementDTO ServerProtocol::receive_movement() {

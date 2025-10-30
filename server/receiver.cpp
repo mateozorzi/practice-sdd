@@ -3,8 +3,8 @@
 #include <chrono>
 #include <thread>
 
-#include "common/liberror.h"
-#include "common/movement_dto.h"
+#include "../common/liberror.h"
+#include "../common/movement_dto.h"
 
 
 Receiver::Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor,

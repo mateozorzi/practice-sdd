@@ -4,8 +4,8 @@
 
 #include <box2d/box2d.h>
 
-#include "common/car_position_dto.h"
-#include "common/movement_dto.h"
+#include "../common/car_position_dto.h"
+#include "../common/movement_dto.h"
 
 
 constexpr float PIXELS_PER_METER = 30.0f;
