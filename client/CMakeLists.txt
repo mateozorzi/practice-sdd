@@ -13,6 +13,7 @@ target_sources(taller_client
     receiver.cpp
 
     Lobby/lobby.cpp
+    Lobby/selectcars.cpp
 
     ${QRC_FILES}
     ${UI_FILES}
@@ -25,6 +26,7 @@ target_sources(taller_client
     receiver.h
 
     Lobby/lobby.h
+    Lobby/selectcars.h
 
 
     )
