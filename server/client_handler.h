@@ -16,7 +16,7 @@ class ClientHandler {
 
     Socket client_socket;
     ServerProtocol server_protocol;
-    GameLoop& game_loop;
+    GameMonitor& game_monitor;
     uint32_t client_id;
 
     Receiver receiver;
@@ -29,7 +29,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& socket, GameLoop& game_loop, uint32_t client_id);
+    explicit ClientHandler(Socket&& socket, GameMonitor& game_monitor, uint32_t client_id);
 
     bool is_alive() const;
 

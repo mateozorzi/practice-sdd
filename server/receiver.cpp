@@ -7,14 +7,14 @@
 #include "common/movement_dto.h"
 
 
-Receiver::Receiver(ServerProtocol& server_protocol, GameLoop& game_loop, const uint32_t client_id):
-        server_protocol(server_protocol), game_loop(game_loop), client_id(client_id) {}
+Receiver::Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor, const uint32_t client_id):
+        server_protocol(server_protocol), game_monitor(game_monitor), client_id(client_id) {}
 
 
 void Receiver::handle_car_movement(const ClientRequest& client_request) {
 
     const MovementDTO& movement_dto = server_protocol.receive_movement();
-    game_loop.add_command(GameCommand(client_id, client_request, movement_dto));
+    game_monitor.add_command(GameCommand(client_id, client_request, movement_dto));
 }
 
 void Receiver::run() {

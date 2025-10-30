@@ -4,14 +4,13 @@
 
 #include <string>
 
-#include "../common/constants.h"
-
 #include "acceptor.h"
 #include "game_loop.h"
 
 
 class Server {
 
+    GameMonitor game_monitor;
     GameLoop game_loop;
     Acceptor clients_acceptor;
 
