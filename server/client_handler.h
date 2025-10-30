@@ -32,7 +32,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& socket, GameLoop& game_loop);
+    explicit ClientHandler(Socket&& socket, GameLoop& game_loop, uint32_t client_id);
 
     bool is_alive() const;
 

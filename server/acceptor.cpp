@@ -15,9 +15,10 @@ void Acceptor::run() {
         try {
 
             Socket client_socket = acceptor_socket.accept();
-            auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_loop);
+            client_id++;
+            auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_loop, client_id);
             clients.push_back(std::move(client));
-            std::cout << CLIENT_CONNECTED << std::endl;
+            std::cout << CLIENT_CONNECTED << " | Client id: " << client_id << std::endl;
             reap();
         } catch (const std::exception& e) {
 

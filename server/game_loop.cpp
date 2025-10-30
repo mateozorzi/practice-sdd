@@ -27,8 +27,8 @@ void GameLoop::handle_car_movement(GameCommand& game_command) {
 
     const uint32_t client_id = game_command.client_id;
     const MovementDTO& movement_dto = game_command.movement_dto;
-
-    auto [it, inserted] = cars.try_emplace(client_id, world);
+    const CarConfig config;
+    auto [it, inserted] = cars.try_emplace(client_id, world, config);
 
     it->second.handle_movement(movement_dto);
 }
@@ -38,8 +38,7 @@ void GameLoop::update_positions() {
 
     for (auto& [client_id, car] : cars) {
 
-        // 1.0f / 60.0f = TIME_STEP
-        car.update_position(1.0f / 60.0f);
+        car.update_position();
 
         CarPositionDTO car_position_dto = car.get_position_dto();
         broadcast(car_position_dto);
@@ -91,7 +90,7 @@ void GameLoop::run() {
 
             update_positions();
             // 6 = VELOCITY_ITERATIONS      2 = POSITION_ITERATIONS
-            world.Step(1.0f / 60.0f, 6, 2);
+            world.Step(1.0f / 60.0f, 10, 6);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
