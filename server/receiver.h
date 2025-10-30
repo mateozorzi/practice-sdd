@@ -2,17 +2,11 @@
 #define RECEIVER_H
 
 
-#include "common/thread.h"
+#include "../common/constants.h"
+#include "../common/thread.h"
 
 #include "game_loop.h"
 #include "server_protocol.h"
-
-
-constexpr std::string_view RECEIVER = "RECEIVER";
-constexpr std::string_view RECEIVER_EXCEPTION = "Exception";
-constexpr std::string_view RECEIVER_EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
-
-constexpr std::string_view RECEIVER_ACTIVATED = "Receiver is now running!";
 
 
 class Receiver final: public Thread {

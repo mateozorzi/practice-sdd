@@ -33,7 +33,7 @@ void Sender::run() {
 
     } catch (const std::exception& e) {
 
-        std::cerr << "[" << SENDER << "] " << SENDER_EXCEPTION << ": " << e.what();
+        std::cerr << "[" << SENDER << "] " << EXCEPTION << ": " << e.what();
     }
 }
 
@@ -55,6 +55,6 @@ Sender::~Sender() {
         Sender::stop();
     } catch (const std::exception& e) {
 
-        std::cerr << "[" << SENDER << "] " << SENDER_EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        std::cerr << "[" << SENDER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
     }
 }

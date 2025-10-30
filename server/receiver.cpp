@@ -26,14 +26,14 @@ void Receiver::run() {
             const ClientRequest client_request = server_protocol.receive_client_request();
             if (client_request == ClientRequest::MOVE_CAR)
                 handle_car_movement(client_request);
-            else if (client_request == ClientRequest::NO_REQUEST)
+            else if (client_request == ClientRequest::DISCONNECT)
                 break;
         }
     } catch (const LibError&) {
 
     } catch (const std::exception& e) {
 
-        std::cerr << "[" << RECEIVER << "] " << RECEIVER_EXCEPTION << ": " << e.what();
+        std::cerr << "[" << RECEIVER << "] " << EXCEPTION << ": " << e.what();
     }
 }
 
@@ -54,7 +54,6 @@ Receiver::~Receiver() {
         Receiver::stop();
     } catch (const std::exception& e) {
 
-        std::cerr << "[" << RECEIVER << "] " << RECEIVER_EXCEPTION_IN_DESTRUCTOR << ": "
-                  << e.what();
+        std::cerr << "[" << RECEIVER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
     }
 }

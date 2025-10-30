@@ -19,6 +19,11 @@
 #include "server_protocol.h"
 
 
+constexpr float GAME_STEP = 1.0f / 60.0f;
+constexpr int VELOCITY_ITERATIONS = 10;
+constexpr int POSITION_ITERATIONS = 6;
+
+
 struct GameCommand {
 
     uint32_t client_id;

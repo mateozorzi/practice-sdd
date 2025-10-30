@@ -1,16 +1,12 @@
 #ifndef SENDER_H
 #define SENDER_H
 
-#include "common/queue.h"
-#include "common/thread.h"
+#include "../common/constants.h"
+#include "../common/queue.h"
+#include "../common/thread.h"
 
 #include "game_loop.h"
 #include "server_protocol.h"
-
-
-constexpr std::string_view SENDER = "SENDER";
-constexpr std::string_view SENDER_EXCEPTION = "Exception";
-constexpr std::string_view SENDER_EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 
 class Sender final: public Thread {

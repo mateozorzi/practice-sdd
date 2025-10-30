@@ -7,8 +7,8 @@ ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const 
 
     switch (byte) {
 
-        case NO_REQUEST:
-            return ClientRequest::NO_REQUEST;
+        case DISCONNECT:
+            return ClientRequest::DISCONNECT;
         case MOVE_CAR:
             return ClientRequest::MOVE_CAR;
         default:

@@ -4,14 +4,11 @@
 
 #include <string_view>
 
-#include "common/socket.h"
+#include "../common/constants.h"
+#include "../common/socket.h"
 
 #include "receiver.h"
 #include "sender.h"
-
-
-constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
-constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 
 class ClientHandler {

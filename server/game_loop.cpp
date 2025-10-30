@@ -89,8 +89,7 @@ void GameLoop::run() {
             }
 
             update_positions();
-            // 10 = VELOCITY_ITERATIONS      6 = POSITION_ITERATIONS
-            world.Step(1.0f / 60.0f, 10, 6);
+            world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }

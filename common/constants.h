@@ -2,27 +2,30 @@
 #define CONSTANTS_H
 
 #include <cstdint>
-
-enum class CarMovement : uint8_t {
-    ACCELERATE = 0x01,
-    BRAKE = 0x02,
-    TURN_LEFT = 0x03,
-    TURN_RIGHT = 0x04
-};
-
-enum class ClientAction : uint8_t {
-    SEND_USERNAME = 0x01,
-    SEND_CAR_MOVEMENT = 0x03
-};
+#include <string_view>
 
 
-constexpr uint8_t NO_REQUEST = 0x00;
+enum class ClientAction : uint8_t { SEND_USERNAME = 0x01, SEND_CAR_MOVEMENT = 0x03 };
+
+
+// SERVER
+constexpr char SERVER_CMD_EXIT = 'q';
+constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
+constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
+
+// PROTOCOL
+constexpr uint8_t DISCONNECT = 0x00;
 constexpr uint8_t MOVE_CAR = 0x03;
 
-constexpr uint8_t ACCELERATE = 0x01;
-constexpr uint8_t BRAKE = 0x02;
-constexpr uint8_t TURN_LEFT = 0x03;
-constexpr uint8_t TURN_RIGHT = 0x04;
+// SERVER CLASSES
+constexpr std::string_view SERVER = "SERVER";
+constexpr std::string_view ACCEPTOR = "ACCEPTOR";
+constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
+constexpr std::string_view RECEIVER = "RECEIVER";
+constexpr std::string_view SENDER = "SENDER";
 
+// EXCEPTIONS
+constexpr std::string_view EXCEPTION = "Exception";
+constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 #endif
