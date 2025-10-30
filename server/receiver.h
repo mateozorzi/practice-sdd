@@ -23,7 +23,8 @@ public:
     Receiver(const Receiver&) = delete;
     Receiver& operator=(const Receiver&) = delete;
 
-    explicit Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor, uint32_t client_id);
+    explicit Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor,
+                      uint32_t client_id);
 
     void run() override;
     void stop() override;

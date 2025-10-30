@@ -6,10 +6,12 @@
 #include "common/liberror.h"
 
 
-Sender::Sender(ServerProtocol& server_protocol, GameMonitor& game_monitor, const uint32_t client_id):
-        server_protocol(server_protocol), game_monitor(game_monitor), client_id(client_id), client_message_queue(game_monitor.register_client(client_id)) {
-
-}
+Sender::Sender(ServerProtocol& server_protocol, GameMonitor& game_monitor,
+               const uint32_t client_id):
+        server_protocol(server_protocol),
+        game_monitor(game_monitor),
+        client_id(client_id),
+        client_message_queue(game_monitor.register_client(client_id)) {}
 
 
 void Sender::run() {
