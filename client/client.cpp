@@ -1,10 +1,16 @@
 #include "client.h"
+#include <string>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
+
+#include <QApplication>
+#include "Lobby/lobby.h"
+#include <QString>
+#include <QEventLoop>
 
 // NOLINTNEXTLINE(build/namespaces)
 using namespace SDL2pp;
@@ -15,7 +21,49 @@ Client::Client(const std::string& hostname, const std::string& servname):
     receiver.start();
 }
 
+bool Client::lobby(){
+    int fake_argc = 0;
+    char *fake_argv[] = { nullptr };
+    QApplication app(fake_argc, fake_argv);
+    
+    Lobby l;
+    l.showMaximized();
+
+    std::string username;
+    bool close_game = false;
+
+    // Conectás la señal del lobby con el cliente
+    QObject::connect(&l, &Lobby::input_username, [&](const QString &name){
+        username = name.toStdString();
+        std::cout << "Username entered: " << username << std::endl;
+        
+        //protocol.send_username(name.toStdString());
+
+        //server send car market if username valid -> new ui where client choose car -> ui car upgrades -> return false
+        //if not, response with an error id and ask again
+
+        app.quit();
+
+    });
+
+    // exit signal
+    QObject::connect(&l, &Lobby::game_close, [&]() {
+        // client close the game
+        close_game = true;
+        app.quit();
+    });
+
+
+    app.exec();
+    return close_game;
+}
+
 void Client::run() {
+    if (lobby()) {
+        exit(0);
+    }
+    
+
     // Initialize SDL library
     SDL sdl(SDL_INIT_VIDEO);
 

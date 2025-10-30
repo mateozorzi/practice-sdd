@@ -115,6 +115,11 @@ endif()
 # Program section
 # ---------------
 if(TALLER_CLIENT)
+    set(CMAKE_AUTOUIC ON)
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTORCC ON)
+    find_package(Qt6 COMPONENTS Core REQUIRED)
+    find_package(Qt6 COMPONENTS Widgets REQUIRED)
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(taller_client)
 
@@ -123,7 +128,7 @@ if(TALLER_CLIENT)
 
     # Add source files and enable warnings
     # HEY!! TODO XXX: add more subfolders here
-    add_subdirectory(client)
+    add_subdirectory(client Lobby)
 
     set_project_warnings(taller_client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
@@ -134,7 +139,7 @@ if(TALLER_CLIENT)
     target_compile_definitions(taller_client PRIVATE DATA_PATH="${PROJECT_SOURCE_DIR}/client/cars")
 
     # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
+    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer Qt6::Widgets Qt6::Core)
 endif()
 
 if(TALLER_SERVER)
