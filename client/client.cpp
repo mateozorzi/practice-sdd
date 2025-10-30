@@ -9,6 +9,7 @@
 
 #include <QApplication>
 #include "Lobby/lobby.h"
+#include "Lobby/selectcars.h"
 #include <QString>
 #include <QEventLoop>
 
@@ -21,16 +22,44 @@ Client::Client(const std::string& hostname, const std::string& servname):
     receiver.start();
 }
 
-bool Client::lobby(){
-    int fake_argc = 0;
-    char *fake_argv[] = { nullptr };
-    QApplication app(fake_argc, fake_argv);
-    
+bool Client::car_selection(/*QApplication& app*/){
+    SelectCars sc;
+    sc.showMaximized();
+
+    bool back_to_lobby = false;
+
+    QEventLoop loop;
+
+    //confirm signal, the client select the car
+    QObject::connect(&sc, &SelectCars::confirm_car, [&](const QString &car) {
+        // client confirm the car selection
+        std::string selected_car = car.toStdString();
+        std::cout << "Car selected: " << selected_car << std::endl;
+        back_to_lobby = true;
+        loop.quit();
+    });
+
+
+    //exit signal, the client close the car selection menu, go back to lobby
+    QObject::connect(&sc, &SelectCars::back_to_lobby, [&]() {
+        // client exit the car selection menu
+        back_to_lobby = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return back_to_lobby;
+}
+
+bool Client::lobby(/*QApplication& app*/){    
     Lobby l;
     l.showMaximized();
 
     std::string username;
     bool close_game = false;
+
+    QEventLoop loop;
 
     // Conectás la señal del lobby con el cliente
     QObject::connect(&l, &Lobby::input_username, [&](const QString &name){
@@ -40,9 +69,13 @@ bool Client::lobby(){
         //protocol.send_username(name.toStdString());
 
         //server send car market if username valid -> new ui where client choose car -> ui car upgrades -> return false
-        //if not, response with an error id and ask again
+        l.hide();
+        close_game = car_selection(/*app*/);
 
-        app.quit();
+        if (close_game) {
+            loop.quit();
+        }
+        //if not, response with an error id and ask again
 
     });
 
@@ -50,18 +83,26 @@ bool Client::lobby(){
     QObject::connect(&l, &Lobby::game_close, [&]() {
         // client close the game
         close_game = true;
-        app.quit();
+        loop.quit();
     });
 
+    loop.exec();
 
-    app.exec();
     return close_game;
 }
 
 void Client::run() {
-    if (lobby()) {
+    int fake_argc = 0;
+    char *fake_argv[] = { nullptr };
+    QApplication app(fake_argc, fake_argv);
+    //lobby ui
+    if (lobby(/*app*/)) {
         exit(0);
     }
+
+    app.exec();
+
+
     
 
     // Initialize SDL library
