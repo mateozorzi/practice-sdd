@@ -18,8 +18,8 @@ void Acceptor::run() {
 
             Socket client_socket = acceptor_socket.accept();
             client_id++;
-            auto client =
-                    std::make_unique<ClientHandler>(std::move(client_socket), game_monitor, client_id);
+            auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_monitor,
+                                                          client_id);
             clients.push_back(std::move(client));
             std::cout << "A client has connected successfully! "
                       << "| Client id: " << client_id << std::endl;

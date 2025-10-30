@@ -19,7 +19,8 @@ class GameCommand {
 
 public:
     GameCommand();
-    explicit GameCommand(uint32_t client_id, const ClientRequest& client_request, const MovementDTO& movement_dto);
+    explicit GameCommand(uint32_t client_id, const ClientRequest& client_request,
+                         const MovementDTO& movement_dto);
 
     uint32_t get_client_id() const;
     ClientRequest get_client_request() const;
