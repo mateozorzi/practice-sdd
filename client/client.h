@@ -9,6 +9,8 @@
 #include "receiver.h"
 #include "sender.h"
 
+#include <QApplication>
+
 class Client {
 public:
     explicit Client(const std::string& hostname, const std::string& servname);
@@ -31,6 +33,9 @@ private:
     void draw_minimap(SDL2pp::Renderer& renderer, SDL2pp::Texture& minimap_static, int pos_x,
                       int pos_y, int bg_width, int bg_height, int minimap_width,
                       int minimap_height);
+
+    bool lobby(/*QApplication &app*/);
+    bool car_selection(/*QApplication &app*/);
 };
 
 #endif  // CLIENT_H

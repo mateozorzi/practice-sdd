@@ -6,15 +6,11 @@
 #include <memory>
 #include <string>
 
-#include "common/socket.h"
-#include "common/thread.h"
+#include "../common/constants.h"
+#include "../common/socket.h"
+#include "../common/thread.h"
 
 #include "client_handler.h"
-
-
-constexpr std::string_view ACCEPTOR = "ACCEPTOR";
-constexpr std::string_view CLIENT_CONNECTED = "A client has connected successfully!";
-constexpr std::string_view EXCEPTION = "Exception";
 
 
 class Acceptor final: public Thread {
@@ -22,7 +18,8 @@ class Acceptor final: public Thread {
 
     Socket acceptor_socket;
     std::list<std::unique_ptr<ClientHandler>> clients;
-    GameLoop& game_loop;
+    GameMonitor& game_monitor;
+    uint32_t client_id = 0;
 
     void reap();
 
@@ -31,7 +28,7 @@ public:
     Acceptor(const Acceptor&) = delete;
     Acceptor& operator=(const Acceptor&) = delete;
 
-    explicit Acceptor(const std::string& port, GameLoop& game_loop);
+    explicit Acceptor(const std::string& port, GameMonitor& game_monitor);
 
     void run() override;
     void stop() override;

@@ -1,71 +1,67 @@
 #include "game_loop.h"
 
-#include <algorithm>
 #include <chrono>
-#include <iostream>
-#include <thread>
+
+#include "../common/constants.h"
 
 
-GameLoop::GameLoop(): world(b2Vec2(0.0f, 0.0f)) {}
+GameLoop::GameLoop(GameMonitor& game_monitor):
+        command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)) {
 
+    game_monitor.register_command_queue(command_queue);
 
-void GameLoop::broadcast(const CarPositionDTO& msg) {
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    for (auto* client_queue: client_queues) {
-
-        try {
-
-            client_queue->try_push(msg);
-        } catch (const ClosedQueue&) {}
-    }
+    command_handlers = {
+            {ClientRequest::MOVE_CAR,
+             [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
+            {ClientRequest::DISCONNECT,
+             [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
 }
 
 
-void GameLoop::handle_car_movement(GameCommand& game_command) {
+void GameLoop::remove_car(const uint32_t client_id) {
 
-    const uint32_t client_id = game_command.client_id;
-    const MovementDTO& movement_dto = game_command.movement_dto;
+    const auto it = cars.find(client_id);
 
-    auto [it, inserted] = cars.try_emplace(client_id, world);
-
-    it->second.handle_movement(movement_dto);
+    if (it != cars.end())
+        cars.erase(it);
 }
 
+
+void GameLoop::process_commands() {
+
+    GameCommand game_command;
+
+    while (command_queue.try_pop(game_command)) handle_command(game_command);
+}
+
+
+void GameLoop::handle_car_movement(const GameCommand& game_command) {
+
+    auto [it, inserted] = cars.try_emplace(game_command.get_client_id(), world, CarConfig());
+
+    it->second.handle_movement(game_command.get_movement_dto());
+}
+
+void GameLoop::handle_disconnection(const GameCommand& game_command) {
+
+    remove_car(game_command.get_client_id());
+}
+
+void GameLoop::handle_command(const GameCommand& game_command) {
+
+    const auto it = command_handlers.find(game_command.get_client_request());
+
+    if (it != command_handlers.end())
+        it->second(game_command);
+}
 
 void GameLoop::update_positions() {
 
-    for (auto& [client_id, car] : cars) {
+    for (auto& [client_id, car]: cars) {
 
-        // 1.0f / 60.0f = TIME_STEP
-        car.update_position(1.0f / 60.0f);
-
-        CarPositionDTO car_position_dto = car.get_position_dto();
-        broadcast(car_position_dto);
+        car.update_position();
+        game_monitor.broadcast(car.get_position_dto());
     }
-}
-
-
-void GameLoop::add_command(const GameCommand& cmd) { command_queue.push(cmd); }
-
-
-void GameLoop::register_client(Queue<CarPositionDTO>* client_queue) {
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    client_queues.push_back(client_queue);
-}
-
-
-void GameLoop::unregister_client(Queue<CarPositionDTO>* client_queue) {
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    client_queue->close();
-
-    client_queues.erase(std::remove(client_queues.begin(), client_queues.end(), client_queue),
-                        client_queues.end());
 }
 
 
@@ -78,29 +74,41 @@ void GameLoop::run() {
             GameCommand game_command;
             try {
 
-                while (command_queue.try_pop(game_command)) {
-                    
-                    if (game_command.client_request == ClientRequest::MOVE_CAR)
-                        handle_car_movement(game_command);
-                }
-
+                process_commands();
             } catch (const ClosedQueue&) {
 
                 break;
             }
 
             update_positions();
-            // 6 = VELOCITY_ITERATIONS      2 = POSITION_ITERATIONS
-            world.Step(1.0f / 60.0f, 6, 2);
+            world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
     } catch (const ClosedQueue&) {}
 }
 
+
 void GameLoop::stop() {
 
-    _keep_running = false;
+    if (_keep_running)
+        _keep_running = false;
 
-    command_queue.close();
+    try {
+
+        command_queue.close();
+        cars.clear();
+    } catch (const std::exception&) {}
+}
+
+
+GameLoop::~GameLoop() {
+
+    try {
+
+        GameLoop::stop();
+    } catch (const std::exception& e) {
+
+        std::cerr << "[" << GAME_LOOP << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+    }
 }

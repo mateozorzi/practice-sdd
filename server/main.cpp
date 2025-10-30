@@ -1,8 +1,8 @@
-#include "server.h"
-
 #include <cstdint>
 #include <iostream>
 #include <string>
+
+#include "server.h"
 
 
 constexpr uint8_t SUCCESS = 0;
@@ -19,7 +19,7 @@ int main(const int argc, const char* const argv[]) {
 
     if (argc != SERVER_ARGUMENTS) {
 
-        std::cerr << "[" << SERVER_MAIN << "] " << ERROR_ARGUMENTS_SERVER << std::endl;; 
+        std::cerr << "[" << SERVER_MAIN << "] " << ERROR_ARGUMENTS_SERVER << std::endl;
         return ERROR;
     }
 

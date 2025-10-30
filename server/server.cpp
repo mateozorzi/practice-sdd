@@ -1,10 +1,10 @@
 #include "server.h"
 
-
 #include <iostream>
 
 
-Server::Server(const std::string& port): clients_acceptor(port, game_loop) {}
+Server::Server(const std::string& port):
+        game_loop(game_monitor), clients_acceptor(port, game_monitor) {}
 
 
 void Server::run() {
@@ -28,11 +28,11 @@ void Server::run() {
 
 void Server::stop() {
 
-    game_loop.stop();
     clients_acceptor.stop();
+    game_loop.stop();
 
-    game_loop.join();
     clients_acceptor.join();
+    game_loop.join();
 }
 
 

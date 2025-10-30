@@ -1,10 +1,17 @@
 #include "client.h"
+#include <string>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
+
+#include <QApplication>
+#include "Lobby/lobby.h"
+#include "Lobby/selectcars.h"
+#include <QString>
+#include <QEventLoop>
 
 // NOLINTNEXTLINE(build/namespaces)
 using namespace SDL2pp;
@@ -15,7 +22,89 @@ Client::Client(const std::string& hostname, const std::string& servname):
     receiver.start();
 }
 
+bool Client::car_selection(/*QApplication& app*/){
+    SelectCars sc;
+    sc.showMaximized();
+
+    bool back_to_lobby = false;
+
+    QEventLoop loop;
+
+    //confirm signal, the client select the car
+    QObject::connect(&sc, &SelectCars::confirm_car, [&](const QString &car) {
+        // client confirm the car selection
+        std::string selected_car = car.toStdString();
+        std::cout << "Car selected: " << selected_car << std::endl;
+        back_to_lobby = true;
+        loop.quit();
+    });
+
+
+    //exit signal, the client close the car selection menu, go back to lobby
+    QObject::connect(&sc, &SelectCars::back_to_lobby, [&]() {
+        // client exit the car selection menu
+        back_to_lobby = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return back_to_lobby;
+}
+
+bool Client::lobby(/*QApplication& app*/){    
+    Lobby l;
+    l.showMaximized();
+
+    std::string username;
+    bool close_game = false;
+
+    QEventLoop loop;
+
+    // Conectás la señal del lobby con el cliente
+    QObject::connect(&l, &Lobby::input_username, [&](const QString &name){
+        username = name.toStdString();
+        std::cout << "Username entered: " << username << std::endl;
+        
+        //protocol.send_username(name.toStdString());
+
+        //server send car market if username valid -> new ui where client choose car -> ui car upgrades -> return false
+        l.hide();
+        close_game = car_selection(/*app*/);
+
+        if (close_game) {
+            loop.quit();
+        }
+        //if not, response with an error id and ask again
+
+    });
+
+    // exit signal
+    QObject::connect(&l, &Lobby::game_close, [&]() {
+        // client close the game
+        close_game = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return close_game;
+}
+
 void Client::run() {
+    int fake_argc = 0;
+    char *fake_argv[] = { nullptr };
+    QApplication app(fake_argc, fake_argv);
+    //lobby ui
+    if (lobby(/*app*/)) {
+        exit(0);
+    }
+
+    app.exec();
+
+
+    
+
     // Initialize SDL library
     SDL sdl(SDL_INIT_VIDEO);
 
@@ -172,7 +261,7 @@ void Client::run() {
 
         renderer.Present();
 
-        SDL_Delay(10);
+        SDL_Delay(16);
     }
 }
 

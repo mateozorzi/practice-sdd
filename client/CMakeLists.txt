@@ -1,3 +1,8 @@
+
+file(GLOB QRC_FILES "Lobby/*.qrc")
+
+file(GLOB UI_FILES "Lobby/*.ui")
+
 target_sources(taller_client
     PRIVATE
     # .cpp files
@@ -6,10 +11,22 @@ target_sources(taller_client
     client.cpp
     sender.cpp
     receiver.cpp
+
+    Lobby/lobby.cpp
+    Lobby/selectcars.cpp
+
+    ${QRC_FILES}
+    ${UI_FILES}
+
     PUBLIC
     # .h files
     client_protocol.h
     client.h
     sender.h
     receiver.h
+
+    Lobby/lobby.h
+    Lobby/selectcars.h
+
+
     )

@@ -2,16 +2,13 @@
 #define CLIENT_HANDLER_H
 
 
-#include "common/socket.h"
+#include <string_view>
+
+#include "../common/constants.h"
+#include "../common/socket.h"
 
 #include "receiver.h"
 #include "sender.h"
-
-#include <string_view>
-
-
-constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
-constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 
 class ClientHandler {
@@ -19,7 +16,7 @@ class ClientHandler {
 
     Socket client_socket;
     ServerProtocol server_protocol;
-    GameLoop& game_loop;
+    GameMonitor& game_monitor;
     uint32_t client_id;
 
     Receiver receiver;
@@ -32,7 +29,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& socket, GameLoop& game_loop);
+    explicit ClientHandler(Socket&& socket, GameMonitor& game_monitor, uint32_t client_id);
 
     bool is_alive() const;
 
