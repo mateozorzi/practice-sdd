@@ -1,6 +1,6 @@
-#include "common/constants.h"
-
 #include "server_protocol.h"
+
+#include "common/constants.h"
 
 
 ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {

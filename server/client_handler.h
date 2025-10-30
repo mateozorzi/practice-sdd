@@ -2,12 +2,12 @@
 #define CLIENT_HANDLER_H
 
 
+#include <string_view>
+
 #include "common/socket.h"
 
 #include "receiver.h"
 #include "sender.h"
-
-#include <string_view>
 
 
 constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";

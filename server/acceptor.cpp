@@ -1,11 +1,13 @@
 #include "acceptor.h"
 
 #include <iostream>
+#include <utility>
 
 #include "common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, GameLoop& game_loop): acceptor_socket(port.c_str()), game_loop(game_loop) {}
+Acceptor::Acceptor(const std::string& port, GameLoop& game_loop):
+        acceptor_socket(port.c_str()), game_loop(game_loop) {}
 
 
 void Acceptor::run() {
@@ -16,7 +18,8 @@ void Acceptor::run() {
 
             Socket client_socket = acceptor_socket.accept();
             client_id++;
-            auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_loop, client_id);
+            auto client =
+                    std::make_unique<ClientHandler>(std::move(client_socket), game_loop, client_id);
             clients.push_back(std::move(client));
             std::cout << CLIENT_CONNECTED << " | Client id: " << client_id << std::endl;
             reap();
@@ -28,7 +31,6 @@ void Acceptor::run() {
         }
     }
 }
-
 
 
 void Acceptor::reap() {
@@ -45,7 +47,6 @@ void Acceptor::reap() {
 
     std::cout << "Clients connected now: " << clients.size() << std::endl;
 }
-
 
 
 void Acceptor::stop() {

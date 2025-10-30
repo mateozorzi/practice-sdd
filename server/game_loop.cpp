@@ -23,7 +23,7 @@ void GameLoop::broadcast(const CarPositionDTO& msg) {
 }
 
 
-void GameLoop::handle_car_movement(GameCommand& game_command) {
+void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
     const uint32_t client_id = game_command.client_id;
     const MovementDTO& movement_dto = game_command.movement_dto;
@@ -36,7 +36,7 @@ void GameLoop::handle_car_movement(GameCommand& game_command) {
 
 void GameLoop::update_positions() {
 
-    for (auto& [client_id, car] : cars) {
+    for (auto& [client_id, car]: cars) {
 
         car.update_position();
 
@@ -78,7 +78,7 @@ void GameLoop::run() {
             try {
 
                 while (command_queue.try_pop(game_command)) {
-                    
+
                     if (game_command.client_request == ClientRequest::MOVE_CAR)
                         handle_car_movement(game_command);
                 }
@@ -89,7 +89,7 @@ void GameLoop::run() {
             }
 
             update_positions();
-            // 6 = VELOCITY_ITERATIONS      2 = POSITION_ITERATIONS
+            // 10 = VELOCITY_ITERATIONS      6 = POSITION_ITERATIONS
             world.Step(1.0f / 60.0f, 10, 6);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));

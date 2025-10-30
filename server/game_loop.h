@@ -38,7 +38,7 @@ class GameLoop: public Thread {
 
     void broadcast(const CarPositionDTO& msg);
 
-    void handle_car_movement(GameCommand& game_command);
+    void handle_car_movement(const GameCommand& game_command);
     void update_positions();
 
 

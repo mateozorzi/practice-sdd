@@ -1,6 +1,6 @@
-#include <cmath>
-
 #include "car.h"
+
+#include <cmath>
 
 
 Car::Car(b2World& world, const CarConfig& config): body(nullptr), config(config) {
@@ -8,7 +8,7 @@ Car::Car(b2World& world, const CarConfig& config): body(nullptr), config(config)
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
     body_definition.position.Set(0.0f, 0.0f);
-    body_definition.angle = b2_pi / 2.0f;;
+    body_definition.angle = b2_pi / 2.0f;
     body_definition.linearDamping = config.linear_damping;
     body_definition.angularDamping = config.angular_damping;
 
@@ -63,17 +63,19 @@ void Car::update_position() {
 
     if (moving_down) {
 
-        b2Vec2 force = body->GetMass() * config.acceleration * config.braking_factor * forward_vector;
+        b2Vec2 force =
+                body->GetMass() * config.acceleration * config.braking_factor * forward_vector;
         body->ApplyForceToCenter(force, true);
     }
 
     float current_speed = b2Dot(body->GetLinearVelocity(), forward_vector);
     if (current_speed > config.max_speed) {
-        b2Vec2 limited_velocity = config.max_speed * forward_vector +
-                                b2Dot(velocity, right_vector) * config.drift_factor * right_vector;
+        b2Vec2 limited_velocity =
+                config.max_speed * forward_vector +
+                b2Dot(velocity, right_vector) * config.drift_factor * right_vector;
         body->SetLinearVelocity(limited_velocity);
     }
-    
+
     b2Vec2 lateral_impulse = -lateral_speed * body->GetMass() * config.drift_factor * right_vector;
     body->ApplyLinearImpulseToCenter(lateral_impulse, true);
 
