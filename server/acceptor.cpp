@@ -6,8 +6,8 @@
 #include "common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, GameLoop& game_loop):
-        acceptor_socket(port.c_str()), game_loop(game_loop) {}
+Acceptor::Acceptor(const std::string& port, GameMonitor& game_monitor):
+        acceptor_socket(port.c_str()), game_monitor(game_monitor) {}
 
 
 void Acceptor::run() {
@@ -19,7 +19,7 @@ void Acceptor::run() {
             Socket client_socket = acceptor_socket.accept();
             client_id++;
             auto client =
-                    std::make_unique<ClientHandler>(std::move(client_socket), game_loop, client_id);
+                    std::make_unique<ClientHandler>(std::move(client_socket), game_monitor, client_id);
             clients.push_back(std::move(client));
             std::cout << "A client has connected successfully! "
                       << "| Client id: " << client_id << std::endl;

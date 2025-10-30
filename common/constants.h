@@ -19,6 +19,8 @@ constexpr uint8_t MOVE_CAR = 0x03;
 
 // SERVER CLASSES
 constexpr std::string_view SERVER = "SERVER";
+constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
+constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr std::string_view ACCEPTOR = "ACCEPTOR";
 constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
 constexpr std::string_view RECEIVER = "RECEIVER";
