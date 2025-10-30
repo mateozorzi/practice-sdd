@@ -15,6 +15,7 @@ constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
 
 // PROTOCOL
 constexpr uint8_t DISCONNECT = 0x00;
+constexpr uint8_t SEND_USERNAME = 0x01;
 constexpr uint8_t MOVE_CAR = 0x03;
 
 // SERVER CLASSES

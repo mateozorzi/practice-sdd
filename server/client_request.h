@@ -6,6 +6,7 @@ enum class ClientRequest {
 
 
     DISCONNECT,
+    SEND_USERNAME,
     MOVE_CAR,
     UNKNOWN
 };

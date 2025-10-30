@@ -9,6 +9,8 @@ ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const 
 
         case DISCONNECT:
             return ClientRequest::DISCONNECT;
+        case SEND_USERNAME:
+            return ClientRequest::SEND_USERNAME;
         case MOVE_CAR:
             return ClientRequest::MOVE_CAR;
         default:

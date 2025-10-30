@@ -21,8 +21,6 @@ void Acceptor::run() {
             auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_monitor,
                                                           client_id);
             clients.push_back(std::move(client));
-            std::cout << "A client has connected successfully! "
-                      << "| Client id: " << client_id << std::endl;
             reap();
         } catch (const std::exception& e) {
 
@@ -46,7 +44,7 @@ void Acceptor::reap() {
         return false;
     });
 
-    std::cout << "Clients connected now: " << clients.size() << std::endl;
+    std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
 }
 
 
