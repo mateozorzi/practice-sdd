@@ -21,4 +21,7 @@ target_sources(taller_common
     resolvererror.h
     socket.h
     thread.h
+
+
+    car_dto.h
     )
