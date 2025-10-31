@@ -2,23 +2,15 @@
 #define SERVER_H
 
 
-#include "acceptor.h"
-#include "game_loop.h"
-
 #include <string>
 
-
-constexpr char SERVER_CMD_EXIT = 'q';
-
-constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
-constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
-
-constexpr std::string_view SERVER = "SERVER";
-
+#include "acceptor.h"
+#include "game_loop.h"
 
 
 class Server {
 
+    GameMonitor game_monitor;
     GameLoop game_loop;
     Acceptor clients_acceptor;
 

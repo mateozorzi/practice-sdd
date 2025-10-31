@@ -181,7 +181,7 @@ void Client::run() {
 
         renderer.Present();
 
-        SDL_Delay(10);
+        SDL_Delay(16);
     }
 }
 

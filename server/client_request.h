@@ -5,7 +5,8 @@
 enum class ClientRequest {
 
 
-    NO_REQUEST,
+    DISCONNECT,
+    SEND_USERNAME,
     MOVE_CAR,
     UNKNOWN
 };

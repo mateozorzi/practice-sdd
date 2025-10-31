@@ -1,14 +1,16 @@
-#include "common/constants.h"
-
 #include "server_protocol.h"
+
+#include "../common/constants.h"
 
 
 ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {
 
     switch (byte) {
 
-        case NO_REQUEST:
-            return ClientRequest::NO_REQUEST;
+        case DISCONNECT:
+            return ClientRequest::DISCONNECT;
+        case SEND_USERNAME:
+            return ClientRequest::SEND_USERNAME;
         case MOVE_CAR:
             return ClientRequest::MOVE_CAR;
         default:
@@ -32,6 +34,14 @@ ClientRequest ServerProtocol::receive_client_request() {
     const uint8_t byte = recv_uint8();
 
     return convert_byte_to_request(byte);
+}
+
+
+PlayerDTO ServerProtocol::receive_username() {
+
+    const std::string& username = recv_string();
+
+    return PlayerDTO(username);
 }
 
 MovementDTO ServerProtocol::receive_movement() {

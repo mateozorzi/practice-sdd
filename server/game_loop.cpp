@@ -1,70 +1,79 @@
 #include "game_loop.h"
 
-#include <algorithm>
 #include <chrono>
-#include <iostream>
-#include <thread>
+
+#include "../common/constants.h"
 
 
-GameLoop::GameLoop(): command_queue() {}
+GameLoop::GameLoop(GameMonitor& game_monitor):
+        command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)) {
 
+    game_monitor.register_command_queue(command_queue);
 
-void GameLoop::broadcast(const CarPositionDTO& msg) {
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    for (auto* client_queue: client_queues) {
-
-        try {
-
-            client_queue->try_push(msg);
-        } catch (const ClosedQueue&) {}
-    }
+    command_handlers = {
+            {ClientRequest::SEND_USERNAME,
+             [this](const GameCommand& game_command) { handle_player_username(game_command); }},
+            {ClientRequest::MOVE_CAR,
+             [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
+            {ClientRequest::DISCONNECT,
+             [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
 }
 
 
-void GameLoop::handle_car_movement(GameCommand& game_command) {
+void GameLoop::remove_car(const uint32_t client_id) {
 
-    const uint32_t client_id = game_command.client_id;
-    const MovementDTO& movement_dto = game_command.movement_dto;
+    const auto it = cars.find(client_id);
 
-    cars[client_id].handle_movement(movement_dto);
+    if (it != cars.end())
+        cars.erase(it);
+}
+
+
+void GameLoop::process_commands() {
+
+    GameCommand game_command;
+
+    while (command_queue.try_pop(game_command)) handle_command(game_command);
+}
+
+
+void GameLoop::handle_player_username(const GameCommand& game_command) {
+
+    if (auto player = game_command.get_data<PlayerDTO>())
+    
+        std::cout << "New player with ID:" << game_command.get_client_id() << " has joined the game! | Username: " << player->get().username << std::endl;
+}
+
+
+void GameLoop::handle_car_movement(const GameCommand& game_command) {
+
+    if (auto movement = game_command.get_data<MovementDTO>()) {
+
+        auto [it, inserted] = cars.try_emplace(game_command.get_client_id(), world, CarConfig());
+        it->second.handle_movement(movement->get());
+    }
+}
+
+void GameLoop::handle_disconnection(const GameCommand& game_command) {
+
+    remove_car(game_command.get_client_id());
+}
+
+void GameLoop::handle_command(const GameCommand& game_command) {
+
+    const auto it = command_handlers.find(game_command.get_client_request());
+
+    if (it != command_handlers.end())
+        it->second(game_command);
 }
 
 void GameLoop::update_positions() {
 
-    for (auto& [client_id, car] : cars) {
+    for (auto& [client_id, car]: cars) {
 
-        if (car.update_position()) {
-
-            CarPositionDTO car_position_dto = car.get_position_dto();
-            std::cout << "X: " << car_position_dto.x_position;
-            std::cout << "  |   Y: " << car_position_dto.y_position << std::endl;
-            broadcast(car_position_dto);
-        }
+        car.update_position();
+        game_monitor.broadcast(car.get_position_dto());
     }
-}
-
-
-void GameLoop::add_command(const GameCommand& cmd) { command_queue.push(cmd); }
-
-
-void GameLoop::register_client(Queue<CarPositionDTO>* client_queue) {
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    client_queues.push_back(client_queue);
-}
-
-
-void GameLoop::unregister_client(Queue<CarPositionDTO>* client_queue) {
-
-    std::lock_guard<std::mutex> lock(mtx);
-
-    client_queue->close();
-
-    client_queues.erase(std::remove(client_queues.begin(), client_queues.end(), client_queue),
-                        client_queues.end());
 }
 
 
@@ -77,27 +86,41 @@ void GameLoop::run() {
             GameCommand game_command;
             try {
 
-                while (command_queue.try_pop(game_command)) {
-                    
-                    if (game_command.client_request == ClientRequest::MOVE_CAR)
-                        handle_car_movement(game_command);
-                }
-
+                process_commands();
             } catch (const ClosedQueue&) {
 
                 break;
             }
 
             update_positions();
+            world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
     } catch (const ClosedQueue&) {}
 }
 
+
 void GameLoop::stop() {
 
-    _keep_running = false;
+    if (_keep_running)
+        _keep_running = false;
 
-    command_queue.close();
+    try {
+
+        command_queue.close();
+        cars.clear();
+    } catch (const std::exception&) {}
+}
+
+
+GameLoop::~GameLoop() {
+
+    try {
+
+        GameLoop::stop();
+    } catch (const std::exception& e) {
+
+        std::cerr << "[" << GAME_LOOP << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+    }
 }

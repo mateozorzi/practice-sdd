@@ -2,42 +2,36 @@
 #define GAME_LOOP_H
 
 
-#include <cstdint>
-#include <mutex>
-#include <string>
+#include <functional>
 #include <unordered_map>
-#include <vector>
 
-#include "common/car_position_dto.h"
-#include "common/constants.h"
-#include "common/movement_dto.h"
-#include "common/queue.h"
-#include "common/thread.h"
+#include "../common/thread.h"
 
 #include "car.h"
-#include "client_request.h"
-#include "server_protocol.h"
+#include "game_monitor.h"
 
 
-struct GameCommand {
-
-    uint32_t client_id;
-    ClientRequest client_request;
-    MovementDTO movement_dto;
-};
+constexpr float GAME_STEP = 1.0f / 60.0f;
+constexpr int VELOCITY_ITERATIONS = 10;
+constexpr int POSITION_ITERATIONS = 6;
 
 
-class GameLoop: public Thread {
+class GameLoop final: public Thread {
 
 
-    std::mutex mtx;
-    std::vector<Queue<CarPositionDTO>*> client_queues;
     Queue<GameCommand> command_queue;
+    GameMonitor& game_monitor;
     std::unordered_map<uint32_t, Car> cars;
+    std::unordered_map<ClientRequest, std::function<void(const GameCommand&)>> command_handlers;
+    b2World world;
 
-    void broadcast(const CarPositionDTO& msg);
+    void remove_car(uint32_t client_id);
 
-    void handle_car_movement(GameCommand& game_command);
+    void process_commands();
+    void handle_player_username(const GameCommand& game_command);
+    void handle_car_movement(const GameCommand& game_command);
+    void handle_disconnection(const GameCommand& game_command);
+    void handle_command(const GameCommand& game_command);
     void update_positions();
 
 
@@ -45,14 +39,12 @@ public:
     GameLoop(const GameLoop&) = delete;
     GameLoop& operator=(const GameLoop&) = delete;
 
-    GameLoop();
-
-    void add_command(const GameCommand& cmd);
-    void register_client(Queue<CarPositionDTO>* client_queue);
-    void unregister_client(Queue<CarPositionDTO>* client_queue);
+    explicit GameLoop(GameMonitor& game_monitor);
 
     void run() override;
     void stop() override;
+
+    ~GameLoop() override;
 };
 
 

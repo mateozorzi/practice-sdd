@@ -6,7 +6,7 @@ Sender::Sender(ClientProtocol& protocol): protocol(protocol) {}
 void Sender::run() {
     while (should_keep_running()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(
-                10));  // Solo de prueba, hay que enviar eventos del servidor
+                1));  // Solo de prueba, hay que enviar eventos del servidor
     }
 }
 

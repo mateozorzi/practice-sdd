@@ -1,16 +1,17 @@
+#include "sender.h"
+
 #include <chrono>
 #include <thread>
 
-#include "sender.h"
-
-#include "common/liberror.h"
+#include "../common/liberror.h"
 
 
-Sender::Sender(ServerProtocol& server_protocol, GameLoop& game_loop, const uint32_t client_id):
-    server_protocol(server_protocol), game_loop(game_loop), client_id(client_id) {
-
-    game_loop.register_client(&client_message_queue);
-}
+Sender::Sender(ServerProtocol& server_protocol, GameMonitor& game_monitor,
+               const uint32_t client_id):
+        server_protocol(server_protocol),
+        game_monitor(game_monitor),
+        client_id(client_id),
+        client_message_queue(game_monitor.register_client(client_id)) {}
 
 
 void Sender::run() {
@@ -33,7 +34,7 @@ void Sender::run() {
 
     } catch (const std::exception& e) {
 
-        std::cerr << "[" << SENDER << "] " << SENDER_EXCEPTION << ": " << e.what();
+        std::cerr << "[" << SENDER << "] " << EXCEPTION << ": " << e.what();
     }
 }
 
@@ -43,7 +44,7 @@ void Sender::stop() {
 
         _is_alive = false;
         _keep_running = false;
-        game_loop.unregister_client(&client_message_queue);
+        game_monitor.unregister_client(client_id);
     }
 }
 
@@ -55,6 +56,6 @@ Sender::~Sender() {
         Sender::stop();
     } catch (const std::exception& e) {
 
-        std::cerr << "[" << SENDER << "] " << SENDER_EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        std::cerr << "[" << SENDER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
     }
 }

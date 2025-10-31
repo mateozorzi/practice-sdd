@@ -2,9 +2,10 @@
 #define SERVER_PROTOCOL_h
 
 
-#include "common/car_position_dto.h"
-#include "common/movement_dto.h"
-#include "common/common_protocol.h"
+#include "../common/car_position_dto.h"
+#include "../common/common_protocol.h"
+#include "../common/movement_dto.h"
+#include "../common/player_dto.h"
 
 #include "client_request.h"
 
@@ -25,6 +26,7 @@ public:
 
     ClientRequest receive_client_request();
 
+    PlayerDTO receive_username();
     MovementDTO receive_movement();
 };
 

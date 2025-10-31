@@ -1,32 +1,28 @@
 #ifndef SENDER_H
 #define SENDER_H
 
-#include "common/queue.h"
-#include "common/thread.h"
+#include "../common/constants.h"
+#include "../common/queue.h"
+#include "../common/thread.h"
 
-#include "game_loop.h"
+#include "game_monitor.h"
 #include "server_protocol.h"
-
-
-constexpr std::string_view SENDER = "SENDER";
-constexpr std::string_view SENDER_EXCEPTION = "Exception";
-constexpr std::string_view SENDER_EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 
 class Sender final: public Thread {
 
 
     ServerProtocol& server_protocol;
-    GameLoop& game_loop;
-    Queue<CarPositionDTO> client_message_queue;
+    GameMonitor& game_monitor;
     uint32_t client_id;
+    Queue<CarPositionDTO>& client_message_queue;
 
 
 public:
     Sender(const Sender&) = delete;
     Sender& operator=(const Sender&) = delete;
 
-    explicit Sender(ServerProtocol& server_protocol, GameLoop& game_loop, uint32_t client_id);
+    explicit Sender(ServerProtocol& server_protocol, GameMonitor& game_monitor, uint32_t client_id);
 
     void run() override;
     void stop() override;
