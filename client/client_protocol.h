@@ -27,7 +27,7 @@ public:
 
     explicit ClientProtocol(const std::string& hostname, const std::string& port);
 
-    void send_username();
+    void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
     CarPositionDTO receive_car_position();
 };
