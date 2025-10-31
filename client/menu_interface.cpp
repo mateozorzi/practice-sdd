@@ -70,7 +70,7 @@ bool MenuInterface::lobby(){
         username = name.toStdString();
         std::cout << "Username entered: " << username << std::endl;
 
-        protocol.send_username();
+        protocol.send_username(username);
 
         //server send car market if username valid -> new ui where client choose car -> ui car upgrades -> return false
         l.hide();

@@ -19,7 +19,6 @@ Client::Client(const std::string& hostname, const std::string& servname):
 }
 
 void Client::run() {
-    MenuInterface menu;
     //lobby ui
     if (menu.lobby()) {
         exit(0);

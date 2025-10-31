@@ -8,6 +8,7 @@
 #include "client_protocol.h"
 #include "receiver.h"
 #include "sender.h"
+#include "menu_interface.h"
 
 #include <QApplication>
 
