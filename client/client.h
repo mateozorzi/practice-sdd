@@ -21,6 +21,7 @@ private:
     ClientProtocol protocol;
     Sender sender;
     Receiver receiver;
+    MenuInterface menu;
 
     void draw_background(SDL2pp::Renderer& renderer, SDL2pp::Texture& background, int camera_x,
                          int camera_y, int view_width, int view_height);
@@ -34,8 +35,6 @@ private:
                       int pos_y, int bg_width, int bg_height, int minimap_width,
                       int minimap_height);
 
-    bool lobby(/*QApplication &app*/);
-    bool car_selection(/*QApplication &app*/);
 };
 
 #endif  // CLIENT_H
