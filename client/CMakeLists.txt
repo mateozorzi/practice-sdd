@@ -14,6 +14,7 @@ target_sources(taller_client
 
     Lobby/lobby.cpp
     Lobby/selectcars.cpp
+    menu_interface.cpp
 
     ${QRC_FILES}
     ${UI_FILES}
@@ -27,6 +28,7 @@ target_sources(taller_client
 
     Lobby/lobby.h
     Lobby/selectcars.h
+    menu_interface.h
 
 
     )

@@ -2,4 +2,9 @@
     <qresource prefix="/lobby">
         <file>images/max.jpg</file>
     </qresource>
+    <qresource prefix="/cars">
+        <file>images/Car C.png</file>
+        <file>images/Car B.png</file>
+        <file>images/Car A.png</file>
+    </qresource>
 </RCC>

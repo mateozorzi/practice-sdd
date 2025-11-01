@@ -13,6 +13,9 @@ target_sources(game_editor
     EditorMapas/editor.cpp
     EditorMapas/messages.cpp
     EditorMapas/checkpoint.cpp
+    EditorMapas/selectcircuit.cpp
+    EditorMapas/race.cpp
+    EditorMapas/editormenu.cpp
     
     ${QRC_FILES}
     
@@ -26,4 +29,7 @@ target_sources(game_editor
     EditorMapas/messages.h
     EditorMapas/checkpoint.h
     EditorMapas/Constants.h
+    EditorMapas/selectcircuit.h
+    EditorMapas/race.h
+    EditorMapas/editormenu.h
 )
