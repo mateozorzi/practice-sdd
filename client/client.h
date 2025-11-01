@@ -1,16 +1,15 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+#include <QApplication>
 #include <string>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
 #include "client_protocol.h"
+#include "menu_interface.h"
 #include "receiver.h"
 #include "sender.h"
-#include "menu_interface.h"
-
-#include <QApplication>
 
 class Client {
 public:
@@ -24,18 +23,17 @@ private:
     Receiver receiver;
     MenuInterface menu;
 
-    void draw_background(SDL2pp::Renderer& renderer, SDL2pp::Texture& background, int camera_x,
-                         int camera_y, int view_width, int view_height);
+    void draw_background(SDL2pp::Renderer& renderer, SDL2pp::Texture& background,
+                         const SDL2pp::Rect& view_rect);
 
     void draw_car(SDL2pp::Renderer& renderer, SDL2pp::Texture& sprites, int pos_x, int pos_y,
-                  int camera_x, int camera_y, int angle, int view_width, int view_height);
+                  const SDL2pp::Rect& view_rect, int angle);
 
     void draw_health_bar(SDL2pp::Renderer& renderer, int health);
 
     void draw_minimap(SDL2pp::Renderer& renderer, SDL2pp::Texture& minimap_static, int pos_x,
                       int pos_y, int bg_width, int bg_height, int minimap_width,
                       int minimap_height);
-
 };
 
 #endif  // CLIENT_H

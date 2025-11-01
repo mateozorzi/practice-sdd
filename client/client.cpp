@@ -8,6 +8,7 @@
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
 
+#include "camera.h"
 #include "menu_interface.h"
 
 // NOLINTNEXTLINE(build/namespaces)
@@ -73,6 +74,11 @@ void Client::run() {
 
     // Vida del jugador (0-100)
     int health = 50;  // Para probar como baja la barra de vida
+
+    // Camara
+    constexpr int view_width = 512;
+    constexpr int view_height = 288;
+    Camera camera(view_width, view_height, bg_width, bg_height);
 
     while (true) {
         SDL_Event event;
@@ -140,10 +146,6 @@ void Client::run() {
             }
         }
 
-        // Desplazamiento de la cámara
-        int camera_x = 0;
-        int camera_y = 0;
-
         // Obtener la ultima posición del auto desde el servidor
         Queue<CarPositionDTO>& car_queue = receiver.get_car_position_queue();
         CarPositionDTO car_position;
@@ -157,28 +159,14 @@ void Client::run() {
             angle = car_position.angle;
         }
 
-        // Actualizar camara siguiendo al auto
-        constexpr int view_width = 512;
-        constexpr int view_height = 288;
-        camera_x = pos_x - (view_width / 2) + 25;
-        camera_y = pos_y - (view_height / 2) + 25;
-
-        // Limite de camara
-        if (camera_x < 0)
-            camera_x = 0;
-        if (camera_y < 0)
-            camera_y = 0;
-        if (camera_x > bg_width - view_width)
-            camera_x = bg_width - view_width;
-        if (camera_y > bg_height - view_height)
-            camera_y = bg_height - view_height;
+        // Posicionar camara sobre el auto
+        camera.update(pos_x, pos_y);
 
         renderer.Clear();
 
         // Dibujar elementos del juego
-        draw_background(renderer, background, camera_x, camera_y, view_width, view_height);
-        draw_car(renderer, sprites, pos_x, pos_y, camera_x, camera_y, angle, view_width,
-                 view_height);
+        draw_background(renderer, background, camera.get_view_rect());
+        draw_car(renderer, sprites, pos_x, pos_y, camera.get_view_rect(), angle);
         draw_health_bar(renderer, health);
         draw_minimap(renderer, minimap_static, pos_x, pos_y, bg_width, bg_height, minimap_width,
                      minimap_height);
@@ -189,17 +177,14 @@ void Client::run() {
     }
 }
 
-void Client::draw_background(Renderer& renderer, Texture& background, const int camera_x,
-                             const int camera_y, int view_width, int view_height) {
-    renderer.Copy(background, Rect(camera_x, camera_y, view_width, view_height),
-                  Rect(0, 0, 1920, 1080));
+void Client::draw_background(Renderer& renderer, Texture& background, const Rect& view_rect) {
+    renderer.Copy(background, view_rect, Rect(0, 0, 1920, 1080));
 }
 
 void Client::draw_car(Renderer& renderer, Texture& sprites, const int pos_x, const int pos_y,
-                      const int camera_x, const int camera_y, const int angle, int view_width,
-                      int view_height) {
-    const int car_screen_x = (pos_x - camera_x) * 1920 / view_width;
-    const int car_screen_y = (pos_y - camera_y) * 1080 / view_height;
+                      const Rect& view_rect, const int angle) {
+    const int car_screen_x = (pos_x - view_rect.x) * 1920 / view_rect.w;
+    const int car_screen_y = (pos_y - view_rect.y) * 1080 / view_rect.h;
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(sprites, Rect(128, 32, 32, 32), Rect(car_screen_x, car_screen_y, 60, 60), angle,
