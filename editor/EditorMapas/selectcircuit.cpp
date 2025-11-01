@@ -110,7 +110,7 @@ void SelectCircuit::on_pushButton_clicked()
 
 void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
 {
-    if(row != 0){
+    if(row != 0 && column > 0){
         //no click in a race name
         return;
     }
