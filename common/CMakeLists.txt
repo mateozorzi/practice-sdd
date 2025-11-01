@@ -6,6 +6,7 @@ target_sources(taller_common
     foo.cpp
     movement_dto.cpp
     liberror.cpp
+    player_dto.cpp
     resolver.cpp
     resolvererror.cpp
     socket.cpp
@@ -16,9 +17,13 @@ target_sources(taller_common
     foo.h
     movement_dto.h
     liberror.h
+    player_dto.h
     queue.h
     resolver.h
     resolvererror.h
     socket.h
     thread.h
+
+
+    car_dto.h
     )

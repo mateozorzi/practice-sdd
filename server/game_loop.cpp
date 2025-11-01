@@ -11,6 +11,8 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
     game_monitor.register_command_queue(command_queue);
 
     command_handlers = {
+            {ClientRequest::SEND_USERNAME,
+             [this](const GameCommand& game_command) { handle_player_username(game_command); }},
             {ClientRequest::MOVE_CAR,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
             {ClientRequest::DISCONNECT,
@@ -35,11 +37,21 @@ void GameLoop::process_commands() {
 }
 
 
+void GameLoop::handle_player_username(const GameCommand& game_command) {
+
+    if (auto player = game_command.get_data<PlayerDTO>())
+    
+        std::cout << "New player with ID:" << game_command.get_client_id() << " has joined the game! | Username: " << player->get().username << std::endl;
+}
+
+
 void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
-    auto [it, inserted] = cars.try_emplace(game_command.get_client_id(), world, CarConfig());
+    if (auto movement = game_command.get_data<MovementDTO>()) {
 
-    it->second.handle_movement(game_command.get_movement_dto());
+        auto [it, inserted] = cars.try_emplace(game_command.get_client_id(), world, CarConfig());
+        it->second.handle_movement(movement->get());
+    }
 }
 
 void GameLoop::handle_disconnection(const GameCommand& game_command) {

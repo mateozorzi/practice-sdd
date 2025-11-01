@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 
-#include "common/liberror.h"
+#include "../common/liberror.h"
 
 
 ClientHandler::ClientHandler(Socket&& socket, GameMonitor& game_monitor, uint32_t client_id):

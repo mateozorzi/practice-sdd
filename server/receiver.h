@@ -16,6 +16,7 @@ class Receiver final: public Thread {
     GameMonitor& game_monitor;
     uint32_t client_id;
 
+    void handle_player_username(const ClientRequest& client_request);
     void handle_car_movement(const ClientRequest& client_request);
 
 

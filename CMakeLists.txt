@@ -109,6 +109,7 @@ if(TALLER_CLIENT OR GAME_EDITOR)
         GIT_PROGRESS TRUE
     )
 
+    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable Box2D unit tests")
     FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp box2d)
 endif()
 

@@ -31,6 +31,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         messages.h messages.cpp
         checkpoint.h checkpoint.cpp
         Constants.h
+        editormenu.h editormenu.cpp editormenu.ui
+        selectcircuit.h selectcircuit.cpp selectcircuit.ui
+        race.h race.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

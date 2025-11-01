@@ -5,7 +5,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "common/thread.h"
+#include "../common/thread.h"
 
 #include "car.h"
 #include "game_monitor.h"
@@ -28,6 +28,7 @@ class GameLoop final: public Thread {
     void remove_car(uint32_t client_id);
 
     void process_commands();
+    void handle_player_username(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);
