@@ -107,9 +107,19 @@ if(TALLER_CLIENT OR GAME_EDITOR)
         GIT_TAG v2.4.1
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
+        # override box2d max polygon vertices
+        PATCH_COMMAND sed -i "s/#define b2_maxPolygonVertices\t8/#define b2_maxPolygonVertices\t16/g" include/box2d/b2_settings.h || true
     )
 
-    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp box2d)
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+    )
+
+    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp box2d nlohmann_json)
 endif()
 
 # Program section
@@ -156,7 +166,7 @@ if(TALLER_SERVER)
     set_project_warnings(taller_server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # Link the taller_common lib target
-    target_link_libraries(taller_server taller_common box2d)
+    target_link_libraries(taller_server taller_common box2d nlohmann_json::nlohmann_json)
 endif()
 
 if(GAME_EDITOR)

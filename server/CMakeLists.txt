@@ -12,6 +12,7 @@ target_sources(taller_server
     sender.cpp
     server.cpp
     server_protocol.cpp
+    world_utils.cpp
     PUBLIC
     # .h files
     acceptor.h
@@ -25,4 +26,6 @@ target_sources(taller_server
     sender.h
     server.h
     server_protocol.h
+    world_creation_exception.h
+    world_utils.h
     )

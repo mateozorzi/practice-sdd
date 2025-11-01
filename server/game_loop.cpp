@@ -3,6 +3,10 @@
 #include <chrono>
 
 #include "../common/constants.h"
+#include <vector>
+#include "world_utils.h"
+#include "../common/constants.h"
+#include "world_creation_exception.h"
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor):
@@ -17,6 +21,18 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
             {ClientRequest::DISCONNECT,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
+    
+    auto polygons = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
+    for (const auto& p: polygons) {
+        try {
+            bool added = WorldUtils::add_polygon_to_world(p, world);
+            if (!added) {
+                std::cout << "Polygon of size " << p.size() << " ommited\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Could not add collision bodies: ") + std::string(e.what()));
+        }
+    }
 }
 
 
