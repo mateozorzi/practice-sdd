@@ -1,6 +1,5 @@
 #include "sender.h"
 
-#include <chrono>
 Sender::Sender(ClientProtocol& protocol): protocol(protocol) {}
 
 void Sender::run() {
