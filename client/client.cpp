@@ -144,10 +144,14 @@ void Client::run() {
         int camera_x = 0;
         int camera_y = 0;
 
-        // Obtener posición del auto desde el servidor
+        // Obtener la ultima posición del auto desde el servidor
         Queue<CarPositionDTO>& car_queue = receiver.get_car_position_queue();
         CarPositionDTO car_position;
-        if (car_queue.try_pop(car_position)) {
+        bool has_position = false;
+        while (car_queue.try_pop(car_position)) {
+            has_position = true;
+        }
+        if (has_position) {
             pos_x = car_position.x_position;
             pos_y = car_position.y_position;
             angle = car_position.angle;
