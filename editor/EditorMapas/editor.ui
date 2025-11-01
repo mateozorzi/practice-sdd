@@ -54,7 +54,7 @@
     </property>
     <property name="maximumSize">
      <size>
-      <width>431</width>
+      <width>16777215</width>
       <height>92</height>
      </size>
     </property>
@@ -111,17 +111,20 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <height>16777215</height>
      </size>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 0, 0);</string>
+    </property>
     <property name="text">
      <string>Exit</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>9</x>
-      <y>146</y>
-      <width>865</width>
-      <height>335</height>
+      <x>10</x>
+      <y>190</y>
+      <width>862</width>
+      <height>281</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -141,9 +144,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
        <property name="maximumSize">
         <size>
-         <width>300</width>
-         <height>400</height>
+         <width>270</width>
+         <height>276</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/liberty_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -153,16 +160,20 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <item>
       <widget class="QLabel" name="img2">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="maximumSize">
         <size>
-         <width>400</width>
-         <height>400</height>
+         <width>270</width>
+         <height>276</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/san_andreas.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -179,12 +190,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
        </property>
        <property name="maximumSize">
         <size>
-         <width>300</width>
-         <height>400</height>
+         <width>270</width>
+         <height>276</height>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);</string>
+        <string notr="true">
+</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/mapas/imagenes/vice_city.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -193,7 +205,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>9</x>
@@ -220,6 +232,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
      <item>
       <widget class="QPushButton" name="mapa1">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(0, 0, 0);</string>
+       </property>
        <property name="text">
         <string>Liberty City</string>
        </property>
@@ -227,6 +242,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </item>
      <item>
       <widget class="QPushButton" name="mapa2">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(0, 0, 0);</string>
+       </property>
        <property name="text">
         <string>San Andreas</string>
        </property>
@@ -234,6 +252,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </item>
      <item>
       <widget class="QPushButton" name="mapa3">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(0, 0, 0);</string>
+       </property>
        <property name="text">
         <string>Vice City</string>
        </property>
@@ -241,15 +262,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </item>
     </layout>
    </widget>
+   <zorder>layoutWidget</zorder>
    <zorder>Tituloventana</zorder>
-   <zorder>mapa1</zorder>
-   <zorder>mapa2</zorder>
-   <zorder>mapa3</zorder>
    <zorder>Exit</zorder>
-   <zorder>img1</zorder>
-   <zorder>img2</zorder>
-   <zorder>img3</zorder>
-   <zorder></zorder>
+   <zorder>layoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

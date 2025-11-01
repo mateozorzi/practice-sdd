@@ -61,7 +61,7 @@ void Creador::update_counter() {
 }
 
 Checkpoint Creador::calculate_checkpoint(const QPoint& pos){
-
+    int id = static_cast<int>(ui->n_checkpoints->value() +1);
     int left = pos.x(), right = pos.x();
     while (left > 0 && is_street(QPoint(left - 1, pos.y()))) left--;
     while (right < mask_circuit.width() - 1 && is_street(QPoint(right + 1, pos.y()))) right++;
@@ -78,20 +78,20 @@ Checkpoint Creador::calculate_checkpoint(const QPoint& pos){
         QRect rect(pos.x() - INTERSECTION_SIZE / 2,
                    pos.y() - INTERSECTION_SIZE / 2,
                    INTERSECTION_SIZE, INTERSECTION_SIZE);
-        return Checkpoint(INTERSECTION, pos, rect);
+        return Checkpoint(id,INTERSECTION, pos, rect);
 
     }else if (horizontalLength < verticalLength) {
         // horizontal checkpoint
         int height = 8;
 
         QRect rect = QRect(left, pos.y() - height/2, horizontalLength, height);
-        return Checkpoint(HORIZONTAL, pos, rect);
+        return Checkpoint(id,HORIZONTAL, pos, rect);
     } else {
         // vertical checkpoint
         int width = 8;
 
         QRect rect = QRect(pos.x() - width/2, up, width, verticalLength);
-        return Checkpoint(VERTICAL, pos, rect);
+        return Checkpoint(id,VERTICAL, pos, rect);
     }
 
 }
@@ -216,7 +216,13 @@ void Creador::on_Done_clicked()
         return;
     }
 
-    if (checkpoints.export_checkpoints(map)){
+    QString name_circuit = ui->name_circuit->text();
+    if (name_circuit.length() < MIN_LENGTH){
+        m.message_no_args(this, "Error", "Fill the name of the circuit.\n The name must have at least five letters");
+        return;
+    }
+
+    if (checkpoints.export_checkpoints(name_circuit, map)){
         //file create succesfully
         m.message_no_args(this, "Success", "Congratulations! Creation complete");
         emit close_w();

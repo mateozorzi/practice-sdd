@@ -12,6 +12,10 @@
 
 Coordinates::Coordinates(){}
 
+Coordinates::Coordinates(QVector<Checkpoint>& checkpoint)
+    : checkpoints(checkpoint)
+{}
+
 bool Coordinates::point_too_close(const Checkpoint& checkpoint){
     QPoint pos = checkpoint.get_click();
     for (const Checkpoint& p: checkpoints){
@@ -47,16 +51,28 @@ bool Coordinates::add_checkpoint(const Checkpoint& checkpoint){
     return true;
 }
 
+void Coordinates::update_id(int id_delete){
+    for (int i = id_delete; i < checkpoints.size(); ++i) {
+        checkpoints[i].update_id();
+    }
+}
+
 
 QPoint Coordinates::delete_checkpoint(const QPoint& point){
     QPoint del(-1, -1);
+    int id_delete = 0;
 
     for (auto it = checkpoints.begin(); it != checkpoints.end(); ++it) {
         if (it->contains(point)) {
             del = it->get_click();
+            id_delete = it->get_id();
             checkpoints.erase(it);
             break;
         }
+    }
+
+    if(del.x() != -1){
+        update_id(id_delete-1);
     }
 
     return del;
@@ -66,7 +82,18 @@ bool Coordinates::enough_checkpoints(){
     return (checkpoints.size() >= MIN_CHECKPOINTS);
 }
 
-bool Coordinates::export_checkpoints(const QString& map){
+QString Coordinates::get_map_name(const QString& map){
+    QFileInfo fileInfo(map);
+    QString filename = fileInfo.baseName();
+
+    // Buscamos la última aparición de " - "
+    int lastDash = filename.lastIndexOf(" - ");
+    QString city = filename.mid(lastDash + 3);
+
+    return city;
+}
+
+bool Coordinates::export_checkpoints(const QString& name, const QString& map){
     QString path = QCoreApplication::applicationDirPath() + "/../server/races";
     QDir dir(path);
 
@@ -74,15 +101,13 @@ bool Coordinates::export_checkpoints(const QString& map){
         return false;
     }
 
-    QFileInfo fileInfo(map);
-    QString baseName = fileInfo.baseName();
 
-    QString race_name = baseName + ".csv";
+    QString race_name = name + ".csv";
     QString path_race = dir.filePath(race_name);
 
     int id = 1;
     while (QFile::exists(path_race)) {
-        race_name = baseName + "_" + QString::number(id) + ".csv";
+        race_name = name + "_" + QString::number(id) + ".csv";
         path_race = dir.filePath(race_name);
         id++;
     }
@@ -91,10 +116,12 @@ bool Coordinates::export_checkpoints(const QString& map){
         return false;
     }
 
+    QString city = get_map_name(map);
+
     QTextStream out(&archivo);
-    out << "id, orientation, xCenter, yCenter, height, width\n";
-    int id_checkpoint = 0;
+    out << "id, orientation, xCenter, yCenter, height, width,"<<city<<"\n";
     for (const Checkpoint& p : checkpoints){
+        int id_checkpoint = p.get_id();
         char orientation = p.get_orientation();
         QRect r= p.get_rect();
         QPoint center = r.center();

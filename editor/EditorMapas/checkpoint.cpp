@@ -1,7 +1,8 @@
 #include "checkpoint.h"
 
-Checkpoint::Checkpoint(const char o, const QPoint& pos, const QRect& figure)
-    : orientation(o)
+Checkpoint::Checkpoint(const int id, const char o, const QPoint& pos, const QRect& figure)
+    : id(id)
+    ,orientation(o)
     , click(pos)
     , rect(figure)
 {}
@@ -12,6 +13,14 @@ bool Checkpoint::operator==(const Checkpoint& other) const {
 
 bool Checkpoint::contains(const QPoint& pos) const {
     return rect.contains(pos.x(), pos.y());
+}
+
+int Checkpoint::get_id() const{
+    return id;
+}
+
+void Checkpoint::update_id(){
+    id--;
 }
 
 QPoint Checkpoint::get_click() const {
