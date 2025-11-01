@@ -17,6 +17,9 @@ public:
     Editor(QWidget *parent = nullptr);
     ~Editor();
 
+signals:
+    void close_editor();
+
 private slots:
     void on_mapa1_clicked();
 
