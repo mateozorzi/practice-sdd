@@ -48,11 +48,6 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
 }
 
 void Car::update_position() {
-    
-    // Don't apply forces if colliding
-    if (is_colliding) {
-        return;
-    }
 
     b2Vec2 forward_vector = body->GetWorldVector(b2Vec2(0.0f, 1.0f));
     b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
