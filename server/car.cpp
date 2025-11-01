@@ -66,7 +66,7 @@ void Car::update_position() {
 void Car::apply_torque(const b2Vec2 direction_vector, const bool is_reverse) {
     b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
     b2Vec2 velocity = body->GetLinearVelocity();
-    // float direction_speed = b2Dot(velocity, direction_vector);
+    float direction_speed = b2Dot(velocity, direction_vector);
     float lateral_speed = b2Dot(velocity, right_vector);
 
     float current_speed = b2Dot(body->GetLinearVelocity(), direction_vector);
@@ -86,11 +86,11 @@ void Car::apply_torque(const b2Vec2 direction_vector, const bool is_reverse) {
     const int fix_reverse_turn_direction = (direction_vector.y == -1.0f) ? -1 : 1;
 
     if (moving_left 
-        // && std::fabs(direction_speed) > config.min_turn_speed
+        && (std::fabs(direction_speed) > config.min_turn_speed || is_reverse)
     )
         body->ApplyTorque(sgn_torque * fix_reverse_turn_direction * config.turn_torque, true);
     if (moving_right 
-        // && std::fabs(direction_speed) > config.min_turn_speed
+        && ( std::fabs(direction_speed) > config.min_turn_speed || is_reverse)
     )
         body->ApplyTorque(-sgn_torque * fix_reverse_turn_direction * config.turn_torque, true);
 }
