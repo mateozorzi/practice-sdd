@@ -32,7 +32,8 @@ constexpr std::string_view EXCEPTION = "Exception";
 constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
 // WORLD
-// TODO: replace with command line parameter
+constexpr float PIXELS_PER_METER = 30.0f;
+    // TODO: replace with command line parameter
 constexpr std::string_view POLYGONS_LIBERTY_CITY = "/home/nestor/Desktop/CLIonProjects/TP_Taller_de_Programacion-Need-For-Speed/server/world/polygons_liberty_city.json";
 
 

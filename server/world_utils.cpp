@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "../common/constants.h"
 
 bool WorldUtils::add_polygon_to_world(
     const std::vector<std::vector<int>>& polygon, 
@@ -24,7 +25,9 @@ bool WorldUtils::add_polygon_to_world(
         if (polygon[i].size() < 2) {
             throw WorldCreationException("Invalid vertex format");
         }
-        vertices[i].Set(static_cast<float>(polygon[i][0]), static_cast<float>(polygon[i][1]));
+        auto x = pixels_to_meters(static_cast<float>(polygon[i][0]));
+        auto y = pixels_to_meters(static_cast<float>(polygon[i][1]));
+        vertices[i].Set(x, y);
     }
 
     // Create the polygon shape
@@ -94,4 +97,12 @@ std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_json(c
     }
     
     return polygons;
+}
+
+float WorldUtils::meters_to_pixels(const float meters) {
+    return meters * PIXELS_PER_METER;
+}
+
+float WorldUtils::pixels_to_meters(const float pixels) {
+    return pixels / PIXELS_PER_METER;
 }

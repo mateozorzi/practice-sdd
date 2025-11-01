@@ -8,8 +8,6 @@
 #include "../common/movement_dto.h"
 
 
-constexpr float PIXELS_PER_METER = 30.0f;
-
 struct CarConfig {
 
     float width = 1.0f;
