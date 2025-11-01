@@ -45,7 +45,8 @@ bool WorldUtils::add_polygon_to_world(
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &polygonShape;
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
+    fixtureDef.friction = 0.0f;
+    fixtureDef.restitution = 0.5f;
     
     // Attach the fixture to the body
     body->CreateFixture(&fixtureDef);

@@ -52,6 +52,8 @@ public:
     void handle_movement(const MovementDTO& movement_dto);
     void update_position();
 
+    void apply_torque(b2Vec2 direction_vector);
+
     CarPositionDTO get_position_dto() const;
     
     void set_collision(bool colliding);

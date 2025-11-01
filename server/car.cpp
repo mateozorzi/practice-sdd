@@ -3,7 +3,6 @@
 #include <cmath>
 #include "../common/constants.h"
 
-
 Car::Car(b2World& world, const CarConfig& config): body(nullptr), config(config) {
 
     b2BodyDef body_definition;
@@ -27,7 +26,6 @@ Car::Car(b2World& world, const CarConfig& config): body(nullptr), config(config)
     body->CreateFixture(&fixture);
 }
 
-
 void Car::handle_movement(const MovementDTO& movement_dto) {
 
     switch (movement_dto.direction) {
@@ -50,29 +48,31 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
 void Car::update_position() {
 
     b2Vec2 forward_vector = body->GetWorldVector(b2Vec2(0.0f, 1.0f));
-    b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
-    b2Vec2 velocity = body->GetLinearVelocity();
-
-    float forward_speed = b2Dot(velocity, forward_vector);
-    float lateral_speed = b2Dot(velocity, right_vector);
-
+    b2Vec2 reverse_vector = body->GetWorldVector(b2Vec2(0.0f, -1.0f));
+    
     if (moving_up) {
-
         b2Vec2 force = -body->GetMass() * config.acceleration * forward_vector;
         body->ApplyForceToCenter(force, true);
+        this->apply_torque(forward_vector);
     }
 
     if (moving_down) {
-
-        b2Vec2 force =
-                body->GetMass() * config.acceleration * config.braking_factor * forward_vector;
+        b2Vec2 force = body->GetMass() * config.acceleration * config.braking_factor * forward_vector;
         body->ApplyForceToCenter(force, true);
+        this->apply_torque(reverse_vector);
     }
+}
 
-    float current_speed = b2Dot(body->GetLinearVelocity(), forward_vector);
+void Car::apply_torque(b2Vec2 direction_vector) {
+    b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
+    b2Vec2 velocity = body->GetLinearVelocity();
+    // float direction_speed = b2Dot(velocity, direction_vector);
+    float lateral_speed = b2Dot(velocity, right_vector);
+
+    float current_speed = b2Dot(body->GetLinearVelocity(), direction_vector);
     if (current_speed > config.max_speed) {
         b2Vec2 limited_velocity =
-                config.max_speed * forward_vector +
+                config.max_speed * direction_vector +
                 b2Dot(velocity, right_vector) * config.drift_factor * right_vector;
         body->SetLinearVelocity(limited_velocity);
     }
@@ -80,12 +80,15 @@ void Car::update_position() {
     b2Vec2 lateral_impulse = -lateral_speed * body->GetMass() * config.drift_factor * right_vector;
     body->ApplyLinearImpulseToCenter(lateral_impulse, true);
 
-    if (moving_left && std::fabs(forward_speed) > config.min_turn_speed)
+    if (moving_left 
+        // && std::fabs(direction_speed) > config.min_turn_speed
+    )
         body->ApplyTorque(-config.turn_torque, true);
-    if (moving_right && std::fabs(forward_speed) > config.min_turn_speed)
+    if (moving_right 
+        // && std::fabs(direction_speed) > config.min_turn_speed
+    )
         body->ApplyTorque(config.turn_torque, true);
 }
-
 
 CarPositionDTO Car::get_position_dto() const {
 
