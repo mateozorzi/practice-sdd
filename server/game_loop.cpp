@@ -10,9 +10,13 @@
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor):
-        command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)) {
+        command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)), 
+        collision_listener(cars) {
 
     game_monitor.register_command_queue(command_queue);
+    
+    // Set the collision listener for the world
+    world.SetContactListener(&collision_listener);
 
     command_handlers = {
             {ClientRequest::SEND_USERNAME,

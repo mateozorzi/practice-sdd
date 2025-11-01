@@ -42,6 +42,7 @@ class Car {
     bool moving_down = false;
     bool moving_left = false;
     bool moving_right = false;
+    bool is_colliding = false;
 
 
 public:
@@ -54,6 +55,9 @@ public:
     void update_position();
 
     CarPositionDTO get_position_dto() const;
+    
+    void set_collision(bool colliding);
+    b2Body* get_body() const;
 };
 
 #endif
