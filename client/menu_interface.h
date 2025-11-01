@@ -8,11 +8,10 @@ private:
     ClientProtocol& protocol;
 
 public:
-    MenuInterface(ClientProtocol& protocol);
+    explicit MenuInterface(ClientProtocol& protocol);
     bool lobby();
     bool car_selection();
-
 };
 
 
-#endif // MENU_INTERFACE_H
+#endif  // MENU_INTERFACE_H

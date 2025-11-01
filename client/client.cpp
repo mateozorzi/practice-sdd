@@ -1,4 +1,5 @@
 #include "client.h"
+
 #include <string>
 
 #include <SDL2/SDL.h>
@@ -7,7 +8,7 @@
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
 
-#include "menu_interface.h" 
+#include "menu_interface.h"
 
 // NOLINTNEXTLINE(build/namespaces)
 using namespace SDL2pp;
@@ -19,7 +20,7 @@ Client::Client(const std::string& hostname, const std::string& servname):
 }
 
 void Client::run() {
-    //lobby ui
+    // lobby ui
     if (menu.lobby()) {
         exit(0);
     }
@@ -87,25 +88,25 @@ void Client::run() {
                     case SDLK_w:
                         if (!key_w) {
                             key_w = true;
-                            protocol.send_movement(MovementDTO(Direction::UP, true));
+                            sender.add_event(MovementDTO(Direction::UP, true));
                         }
                         break;
                     case SDLK_s:
                         if (!key_s) {
                             key_s = true;
-                            protocol.send_movement(MovementDTO(Direction::DOWN, true));
+                            sender.add_event(MovementDTO(Direction::DOWN, true));
                         }
                         break;
                     case SDLK_a:
                         if (!key_a) {
                             key_a = true;
-                            protocol.send_movement(MovementDTO(Direction::LEFT, true));
+                            sender.add_event(MovementDTO(Direction::LEFT, true));
                         }
                         break;
                     case SDLK_d:
                         if (!key_d) {
                             key_d = true;
-                            protocol.send_movement(MovementDTO(Direction::RIGHT, true));
+                            sender.add_event(MovementDTO(Direction::RIGHT, true));
                         }
                         break;
                 }
@@ -114,25 +115,25 @@ void Client::run() {
                     case SDLK_w:
                         if (key_w) {
                             key_w = false;
-                            protocol.send_movement(MovementDTO(Direction::UP, false));
+                            sender.add_event(MovementDTO(Direction::UP, false));
                         }
                         break;
                     case SDLK_s:
                         if (key_s) {
                             key_s = false;
-                            protocol.send_movement(MovementDTO(Direction::DOWN, false));
+                            sender.add_event(MovementDTO(Direction::DOWN, false));
                         }
                         break;
                     case SDLK_a:
                         if (key_a) {
                             key_a = false;
-                            protocol.send_movement(MovementDTO(Direction::LEFT, false));
+                            sender.add_event(MovementDTO(Direction::LEFT, false));
                         }
                         break;
                     case SDLK_d:
                         if (key_d) {
                             key_d = false;
-                            protocol.send_movement(MovementDTO(Direction::RIGHT, false));
+                            sender.add_event(MovementDTO(Direction::RIGHT, false));
                         }
                         break;
                 }
@@ -243,6 +244,7 @@ void Client::draw_minimap(Renderer& renderer, Texture& minimap_static, const int
 Client::~Client() {
     if (sender.is_alive()) {
         sender.stop();
+        sender.close_queue();
         sender.join();
     }
     if (receiver.is_alive()) {
