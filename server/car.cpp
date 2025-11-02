@@ -45,54 +45,63 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
     }
 }
 
-void Car::update_position() {
+
+void Car::detect_linear_movement() {
 
     b2Vec2 forward_vector = body->GetWorldVector(b2Vec2(0.0f, 1.0f));
-    b2Vec2 reverse_vector = body->GetWorldVector(b2Vec2(0.0f, -1.0f));
-    
-    if (moving_up) {
-        b2Vec2 force = -body->GetMass() * config.acceleration * forward_vector;
-        body->ApplyForceToCenter(force, true);
-        this->apply_torque(forward_vector);
-    }
 
-    if (moving_down) {
-        b2Vec2 force = body->GetMass() * config.acceleration * config.braking_factor * forward_vector;
-        body->ApplyForceToCenter(force, true);
-        this->apply_torque(reverse_vector, true);
+    b2Vec2 force = body->GetMass() * config.acceleration * forward_vector;
+
+    if (moving_up)
+        body->ApplyForceToCenter(-force, true);
+
+    if (moving_down)
+        body->ApplyForceToCenter(config.braking_factor * force, true);
+    
+    b2Vec2 velocity = body->GetLinearVelocity();
+    float current_speed = velocity.Length();
+
+    if (current_speed > config.max_speed) {
+
+        float scale = config.max_speed / current_speed;
+        b2Vec2 limited_velocity(velocity.x * scale, velocity.y * scale);
+        body->SetLinearVelocity(limited_velocity);
     }
 }
 
-void Car::apply_torque(const b2Vec2 direction_vector, const bool is_reverse) {
+void Car::detect_rotation() {
+
+    b2Vec2 velocity = body->GetLinearVelocity();
+    float current_speed = velocity.Length();
+
+    if (current_speed > config.min_turn_speed) {
+
+        if (moving_left)
+            body->ApplyTorque(-config.turn_torque, true);
+        if (moving_right)
+            body->ApplyTorque(config.turn_torque, true);
+    }
+}
+
+void Car::detect_drifting() {
+
     b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
     b2Vec2 velocity = body->GetLinearVelocity();
-    float direction_speed = b2Dot(velocity, direction_vector);
-    float lateral_speed = b2Dot(velocity, right_vector);
 
-    float current_speed = b2Dot(body->GetLinearVelocity(), direction_vector);
-    if (current_speed > config.max_speed) {
-        b2Vec2 limited_velocity =
-                config.max_speed * direction_vector +
-                b2Dot(velocity, right_vector) * config.drift_factor * right_vector;
-        body->SetLinearVelocity(limited_velocity);
-    }
+    b2Vec2 lateral_velocity = b2Dot(velocity, right_vector) * right_vector;
+    b2Vec2 lateral_impulse = -config.drift_factor * body->GetMass() * lateral_velocity;
 
-    b2Vec2 lateral_impulse = -lateral_speed * body->GetMass() * config.drift_factor * right_vector;
     body->ApplyLinearImpulseToCenter(lateral_impulse, true);
+}
 
-    const int sgn_torque = is_reverse ? 1 : -1;
 
-    // If map rotates with car, this constant is not necessary
-    const int fix_reverse_turn_direction = (direction_vector.y == -1.0f) ? -1 : 1;
+void Car::update_position() {
+    
+    detect_linear_movement();
 
-    if (moving_left 
-        && (std::fabs(direction_speed) > config.min_turn_speed || is_reverse)
-    )
-        body->ApplyTorque(sgn_torque * fix_reverse_turn_direction * config.turn_torque, true);
-    if (moving_right 
-        && ( std::fabs(direction_speed) > config.min_turn_speed || is_reverse)
-    )
-        body->ApplyTorque(-sgn_torque * fix_reverse_turn_direction * config.turn_torque, true);
+    detect_rotation();
+
+    detect_drifting();
 }
 
 CarPositionDTO Car::get_position_dto() const {
@@ -106,10 +115,13 @@ CarPositionDTO Car::get_position_dto() const {
     return CarPositionDTO(x_pixels, y_pixels, angle_degrees);
 }
 
+
 void Car::set_collision(bool colliding) {
+
     is_colliding = colliding;
 }
 
 b2Body* Car::get_body() const {
+
     return body;
 }

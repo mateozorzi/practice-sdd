@@ -18,10 +18,10 @@ struct CarConfig {
 
     float linear_damping = 1.0f;   // Sliding effect after stopping moving (lower = more sliding)
     float angular_damping = 2.5f;  // The same that above, but when turning (lower = more turning)
-    float min_turn_speed = 1.3f;
+    float min_turn_speed = 1.0f;
 
     float acceleration = 4.0f;
-    float braking_factor = 0.2f;  // How strong the car brakes
+    float braking_factor = 0.3f;  // How strong the car brakes
     float max_speed = 14.0f;
     float drift_factor = 0.7f;  // The lower = more drifting
     float turn_torque = 4.8f;
@@ -42,6 +42,9 @@ class Car {
     bool moving_right = false;
     bool is_colliding = false;
 
+    void detect_linear_movement();
+    void detect_rotation();
+    void detect_drifting();
 
 public:
     Car(const Car&) = delete;
@@ -50,9 +53,8 @@ public:
     explicit Car(b2World& world, const CarConfig& config);
 
     void handle_movement(const MovementDTO& movement_dto);
-    void update_position();
 
-    void apply_torque(const b2Vec2 direction_vector, const bool is_reverse = false);
+    void update_position();
 
     CarPositionDTO get_position_dto() const;
     
