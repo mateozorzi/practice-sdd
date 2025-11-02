@@ -8,8 +8,6 @@
 #include "../common/movement_dto.h"
 
 
-constexpr float PIXELS_PER_METER = 30.0f;
-
 struct CarConfig {
 
     float width = 1.0f;
@@ -42,6 +40,7 @@ class Car {
     bool moving_down = false;
     bool moving_left = false;
     bool moving_right = false;
+    bool is_colliding = false;
 
 
 public:
@@ -53,7 +52,12 @@ public:
     void handle_movement(const MovementDTO& movement_dto);
     void update_position();
 
+    void apply_torque(const b2Vec2 direction_vector, const bool is_reverse = false);
+
     CarPositionDTO get_position_dto() const;
+    
+    void set_collision(bool colliding);
+    b2Body* get_body() const;
 };
 
 #endif
