@@ -23,6 +23,7 @@ Creador::Creador(const QString& path, const QString& path_mask, QWidget *parent)
     , mask(path_mask)
     , checkpoints(Coordinates())
     , m(Messages())
+    , race(Race())
 {
     ui->setupUi(this);
 
@@ -46,7 +47,8 @@ Creador::Creador(const Race& r, QWidget *parent)
     , map(r.map)
     , mask(r.mask)
     , checkpoints(r.checkpoints)
-    , m(Messages()){
+    , m(Messages())
+    , race(r){
 
     ui->setupUi(this);
 
@@ -71,8 +73,8 @@ void Creador::import_checkpoints(){
 
     for (Checkpoint c: v_checkpoints){
         QRect r = c.rect;
-        scene->addRect(r,
-                       QPen(Qt::red), QBrush(Qt::yellow));
+        int id = c.id;
+        draw_checkpoint(r,id);
     }
 }
 
@@ -118,13 +120,13 @@ Checkpoint Creador::calculate_checkpoint(const QPoint& pos){
 
     }else if (horizontalLength < verticalLength) {
         // horizontal checkpoint
-        int height = 8;
+        int height = 15;
 
         QRect rect = QRect(left, pos.y() - height/2, horizontalLength, height);
         return Checkpoint(id,HORIZONTAL, pos, rect);
     } else {
         // vertical checkpoint
-        int width = 8;
+        int width = 15;
 
         QRect rect = QRect(pos.x() - width/2, up, width, verticalLength);
         return Checkpoint(id,VERTICAL, pos, rect);
@@ -132,30 +134,79 @@ Checkpoint Creador::calculate_checkpoint(const QPoint& pos){
 
 }
 
+void Creador::draw_id_checkpoint(QRect& fig, const int id){
+    QGraphicsTextItem* text = scene->addText(QString::number(id));
 
-void Creador::update_map(const QPoint& pos, int mode){
-    if (mode == ADD){
-        Checkpoint checkpoint = calculate_checkpoint(pos);
-        if(checkpoints.add_checkpoint(checkpoint)){
-            scene->addRect(checkpoint.get_rect(),
-                                                QPen(Qt::red), QBrush(Qt::yellow));
+    QFont font("Arial", 12, QFont::Bold);
+    text->setFont(font);
 
-        }else{
-            m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
+    text->setDefaultTextColor(Qt::black);
+    text->setZValue(2);
+
+    qreal text_x = fig.x() + fig.width() / 2 - text->boundingRect().width() / 2;
+    qreal text_y = fig.y() + fig.height() / 2 - text->boundingRect().height() / 2;
+    text->setPos(text_x, text_y);
+}
+
+void Creador::draw_checkpoint(QRect& fig, const int id) {
+    scene->addRect(
+        fig,
+        QPen(Qt::red),
+        QBrush(Qt::yellow)
+    );
+
+    draw_id_checkpoint(fig, id);
+}
+
+void Creador::update_id(const int id){
+    //delete every id from nexts checkpoints
+    checkpoints.update_id(id);
+    for (QGraphicsItem* item : scene->items()) {
+        if (dynamic_cast<QGraphicsRectItem*>(item) || dynamic_cast<QGraphicsTextItem*>(item)) {
+            scene->removeItem(item);
+            delete item;
         }
+    }
 
-    }else if (mode == REMOVE){
-        QPointF clickPos = pos;
+    import_checkpoints();
+}
 
-        for (QGraphicsItem* item : scene->items()) {
-            if (auto rect = dynamic_cast<QGraphicsRectItem*>(item)) {
-                if(rect->contains(clickPos)){
-                    scene->removeItem(item);
-                    delete item;
-                    break;
+void Creador::update_map_delete(const QPoint& pos, const int id){
+    QPointF clickPos = pos;
+
+    for (QGraphicsItem* item : scene->items()) {
+        if (auto rect = dynamic_cast<QGraphicsRectItem*>(item)) {
+            if(rect->contains(clickPos)){
+
+                QList<QGraphicsItem*> nearbyItems = scene->items(rect->sceneBoundingRect());
+                for (QGraphicsItem* nearby : nearbyItems) {
+                    if (auto text = dynamic_cast<QGraphicsTextItem*>(nearby)) {
+                        if (text->toPlainText() == QString::number(id)){
+                            scene->removeItem(text);
+                            delete text;
+                            break;
+                        }
+                    }
                 }
+
+                scene->removeItem(item);
+                delete item;
+                break;
             }
         }
+    }
+
+    update_counter();
+    update_id(id);
+}
+
+void Creador::update_map_add(const QPoint& pos){
+    Checkpoint checkpoint = calculate_checkpoint(pos);
+    if(checkpoints.add_checkpoint(checkpoint)){
+        draw_checkpoint(checkpoint.rect, checkpoint.id);
+
+    }else{
+        m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
     }
 
     update_counter();
@@ -185,7 +236,7 @@ void Creador::add_checkpoint(QMouseEvent *event){
     QPoint pos = scenePos.toPoint();
 
     if(is_street(pos)){
-        update_map(pos, ADD);
+        update_map_add(pos);
     }else{
         m.checkpoint_message(this, "Error", "Can´t add checkpoint in (%1, %2)", pos);
     }
@@ -196,10 +247,10 @@ void Creador::delete_checkpoint(QMouseEvent *event){
     QPointF scenePos = ui->labelmap->mapToScene(event->pos());
     QPoint pos = scenePos.toPoint();
 
-    QPoint del = checkpoints.delete_checkpoint(pos);
+    Checkpoint del = checkpoints.delete_checkpoint(pos);
 
-    if(del.x() != -1){
-        update_map(del, REMOVE);
+    if(del.click.x() != -1){
+        update_map_delete(del.click, del.id);
     }else{
         m.checkpoint_message(this, "Error", "No checkpoint in (%1, %2)", pos);
     }
@@ -258,8 +309,16 @@ void Creador::on_Done_clicked()
         return;
     }
 
+
     if (checkpoints.export_checkpoints(name_circuit, map, this->mask, this)){
         //file create succesfully
+        if (name_circuit != race.name){
+            QString old_path = QCoreApplication::applicationDirPath() + "/../server/races/" + race.name + ".csv";
+            QFile old_file(old_path);
+            if (old_file.exists()) {
+                old_file.remove();
+            }
+        }
         m.message_no_args(this, "Success", "Congratulations! Creation complete");
         emit close_w();
         this->close();

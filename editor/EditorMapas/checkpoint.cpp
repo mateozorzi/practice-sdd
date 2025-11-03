@@ -7,30 +7,22 @@ Checkpoint::Checkpoint(const int id, const char o, const QPoint& pos, const QRec
     , rect(figure)
 {}
 
+Checkpoint::Checkpoint()
+    : id(0)
+    , orientation('\0')
+    , click (QPoint(-1,-1))
+    , rect (QRect())
+{}
+
 bool Checkpoint::operator==(const Checkpoint& other) const {
-    return (orientation == other.get_orientation() && click == other.get_click());
+    return (orientation == other.orientation && click == other.click);
 }
 
 bool Checkpoint::contains(const QPoint& pos) const {
     return rect.contains(pos.x(), pos.y());
 }
 
-int Checkpoint::get_id() const{
-    return id;
-}
-
 void Checkpoint::update_id(){
     id--;
 }
 
-QPoint Checkpoint::get_click() const {
-    return click;
-}
-
-QRect Checkpoint::get_rect() const {
-    return rect;
-}
-
-char Checkpoint::get_orientation() const{
-    return orientation;
-}
