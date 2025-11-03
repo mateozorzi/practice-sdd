@@ -12,12 +12,17 @@ SelectCircuit::SelectCircuit(const QString& path, QWidget *parent)
 {
     ui->setupUi(this);
 
-    //set up the table with the races available
+    fill_table();
+
+}
+
+void SelectCircuit::fill_table(){
     QDir dir(path_races);
 
     //races names
     QStringList races_names = dir.entryList(QStringList() << "*.csv", QDir::Files);
 
+    ui->tableRaces->clear();
     ui->tableRaces->setRowCount(races_names.length());
 
     //ui->tableRaces->setVerticalHeaderLabels(races_names);
@@ -25,11 +30,21 @@ SelectCircuit::SelectCircuit(const QString& path, QWidget *parent)
     ui->tableRaces->setColumnCount(col.size());
     ui->tableRaces->setHorizontalHeaderLabels(col);
 
+    ui->tableRaces->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableRaces->setShowGrid(false);
+    ui->tableRaces->verticalHeader()->setVisible(false);
+
+    //QFont tableFont;
+    //tableFont.setPointSize(12);
+    //ui->tableRaces->setFont(tableFont);
+    //ui->tableRaces->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
+    //tableFont.setBold(true);
+    //tableFont.setPointSize(18);
+    //ui->tableRaces->horizontalHeader()->setFont(tableFont);
 
     read_info_races(races_names);
 
     fill_races_info();
-
 }
 
 void SelectCircuit::fill_races_info(){
@@ -41,7 +56,7 @@ void SelectCircuit::fill_races_info(){
 
         ui->tableRaces->setItem(id, 0, new QTableWidgetItem(name));
         ui->tableRaces->setItem(id, 1, new QTableWidgetItem(city));
-        ui->tableRaces->setItem(id, 1, new QTableWidgetItem(QString::number(n_c)));
+        ui->tableRaces->setItem(id, 2, new QTableWidgetItem(QString::number(n_c)));
     }
 }
 
@@ -121,9 +136,6 @@ void SelectCircuit::on_pushButton_clicked()
 
 void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
 {
-
-    qDebug() << "Doble click en:" << row<<","<<column<<"\n";
-
     if(column != 0){
         //no click in a race name
         return;
@@ -132,8 +144,6 @@ void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
     //open the race, initialize the checkpoints, can edit the race again
     QTableWidgetItem* cell = ui->tableRaces->item(row,column);
     QString race_name = cell->text();
-
-    qDebug() << "Doble click en:" << race_name;
 
     int cont = 0;
     bool found = false;
@@ -147,12 +157,10 @@ void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
     }
 
     if (!found) {
-        qWarning() << "No se encontró la carrera con nombre:" << race_name;
         return;
     }
 
     Race race_click = races[cont];
-    qDebug() << "Abriendo creador para:" << race_click.name;
 
     // abrir creador
     this->hide();
@@ -160,6 +168,8 @@ void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(c, &Creador::close_w, this, [this]() {
+        races.clear();
+        fill_table();
         this->show();
     });
 

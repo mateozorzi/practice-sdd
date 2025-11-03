@@ -32,6 +32,8 @@ public:
 
     bool export_checkpoints(const QString& name, const QString& map, const QString& mask, QWidget* window);
 
+    QVector<Checkpoint> get_checkpoints();
+
     bool is_empty();
 
     Checkpoint last_checkpoint();

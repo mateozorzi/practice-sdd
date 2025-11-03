@@ -29,6 +29,7 @@ private:
     QVector<Race> races;
     QString path_races;
 
+    void fill_table();
     void read_info_races(const QStringList& races);
     void fill_races_info();
 };

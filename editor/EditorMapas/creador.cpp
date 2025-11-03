@@ -67,6 +67,13 @@ Creador::Creador(const Race& r, QWidget *parent)
 
 void Creador::import_checkpoints(){
     //draw checkpoints on the map
+    QVector<Checkpoint> v_checkpoints = checkpoints.get_checkpoints();
+
+    for (Checkpoint c: v_checkpoints){
+        QRect r = c.rect;
+        scene->addRect(r,
+                       QPen(Qt::red), QBrush(Qt::yellow));
+    }
 }
 
 void Creador::set_background(const QString& path){

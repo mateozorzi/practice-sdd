@@ -156,6 +156,10 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
     return true;
 }
 
+QVector<Checkpoint> Coordinates::get_checkpoints(){
+    return checkpoints;
+}
+
 bool Coordinates::is_empty(){
     return checkpoints.empty();
 }
