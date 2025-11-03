@@ -3,11 +3,10 @@
 
 #include <QVector>
 #include <QPoint>
+#include <QObject>
 #include "checkpoint.h"
 
-class Coordinates
-{
-
+class Coordinates{
 private:
     QVector<Checkpoint> checkpoints;
 
@@ -31,7 +30,7 @@ public:
 
     bool enough_checkpoints();
 
-    bool export_checkpoints(const QString& name, const QString& map);
+    bool export_checkpoints(const QString& name, const QString& map, const QString& mask, QWidget* window);
 
     bool is_empty();
 
