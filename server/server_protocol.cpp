@@ -5,13 +5,13 @@
 
 ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {
 
-    switch (byte) {
+    switch (static_cast<ClientAction>(byte)) {
 
-        case DISCONNECT:
+        case ClientAction::DISCONNECT:
             return ClientRequest::DISCONNECT;
-        case SEND_USERNAME:
+        case ClientAction::SEND_USERNAME:
             return ClientRequest::SEND_USERNAME;
-        case MOVE_CAR:
+        case ClientAction::SEND_CAR_MOVEMENT:
             return ClientRequest::MOVE_CAR;
         default:
             return ClientRequest::UNKNOWN;

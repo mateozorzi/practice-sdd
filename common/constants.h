@@ -5,18 +5,13 @@
 #include <string_view>
 
 
-enum class ClientAction : uint8_t { SEND_USERNAME = 0x01, SEND_CAR_MOVEMENT = 0x03 };
+enum class ClientAction : uint8_t { DISCONNECT = 0x00, SEND_USERNAME = 0x01, SEND_CAR_MOVEMENT = 0x03 };
 
 
 // SERVER
 constexpr char SERVER_CMD_EXIT = 'q';
 constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
 constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
-
-// PROTOCOL
-constexpr uint8_t DISCONNECT = 0x00;
-constexpr uint8_t SEND_USERNAME = 0x01;
-constexpr uint8_t MOVE_CAR = 0x03;
 
 // SERVER CLASSES
 constexpr std::string_view SERVER = "SERVER";
