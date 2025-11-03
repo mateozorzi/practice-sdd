@@ -24,7 +24,7 @@ public:
 
     bool add_checkpoint(const Checkpoint& point);
 
-    QPoint delete_checkpoint(const QPoint& point);
+    Checkpoint delete_checkpoint(const QPoint& point);
 
     void update_id(int id_delete);
 

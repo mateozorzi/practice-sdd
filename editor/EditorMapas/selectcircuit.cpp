@@ -2,6 +2,7 @@
 #include "ui_selectcircuit.h"
 
 #include <QDir>
+#include <QMouseEvent>
 #include "race.h"
 #include "creador.h"
 
@@ -25,22 +26,13 @@ void SelectCircuit::fill_table(){
     ui->tableRaces->clear();
     ui->tableRaces->setRowCount(races_names.length());
 
-    //ui->tableRaces->setVerticalHeaderLabels(races_names);
-    QStringList col = {"Name", "City", "Number of checkpoints"};
+    QStringList col = {"Name", "City", "# Checkpoints", "Actions"};
     ui->tableRaces->setColumnCount(col.size());
     ui->tableRaces->setHorizontalHeaderLabels(col);
 
     ui->tableRaces->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableRaces->setShowGrid(false);
     ui->tableRaces->verticalHeader()->setVisible(false);
-
-    //QFont tableFont;
-    //tableFont.setPointSize(12);
-    //ui->tableRaces->setFont(tableFont);
-    //ui->tableRaces->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
-    //tableFont.setBold(true);
-    //tableFont.setPointSize(18);
-    //ui->tableRaces->horizontalHeader()->setFont(tableFont);
 
     read_info_races(races_names);
 
@@ -57,6 +49,15 @@ void SelectCircuit::fill_races_info(){
         ui->tableRaces->setItem(id, 0, new QTableWidgetItem(name));
         ui->tableRaces->setItem(id, 1, new QTableWidgetItem(city));
         ui->tableRaces->setItem(id, 2, new QTableWidgetItem(QString::number(n_c)));
+
+        QPushButton* btn = new QPushButton("Delete");
+        btn->setStyleSheet("background-color: red; color: white; font-weight: bold;min-height: 12px;");
+
+        connect(btn, &QPushButton::clicked, this, [this, name]() {
+            delete_race(name);
+        });
+
+        ui->tableRaces->setCellWidget(id, 3, btn);
     }
 }
 
@@ -117,7 +118,6 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
         Race race(id, baseName, cityName,map,mask, checkpointCount, checkpoints);
         id++;
 
-        // Guardamos o hacemos lo que necesites con `race`
         races.append(race);
     }
 }
@@ -133,6 +133,16 @@ void SelectCircuit::on_pushButton_clicked()
     this->close();
 }
 
+void SelectCircuit::delete_race(const QString& race_name){
+
+    QString path = QCoreApplication::applicationDirPath() + "/../server/races/" + race_name + ".csv";
+    QFile file(path);
+    if (file.exists()) {
+        file.remove();
+        races.clear();
+        fill_table();
+    }
+}
 
 void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
 {
@@ -162,7 +172,6 @@ void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
 
     Race race_click = races[cont];
 
-    // abrir creador
     this->hide();
     Creador *c = new Creador(race_click);
     c->setAttribute(Qt::WA_DeleteOnClose);
@@ -175,4 +184,3 @@ void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
 
     c->showMaximized();
 }
-

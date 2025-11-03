@@ -20,7 +20,7 @@ Coordinates::Coordinates(QVector<Checkpoint>& checkpoint)
 {}
 
 bool Coordinates::point_too_close(const Checkpoint& checkpoint){
-    QPoint pos = checkpoint.get_click();
+    QPoint pos = checkpoint.click;
     for (const Checkpoint& p: checkpoints){
         if(p.contains(pos)){
             return true;
@@ -55,27 +55,24 @@ bool Coordinates::add_checkpoint(const Checkpoint& checkpoint){
 }
 
 void Coordinates::update_id(int id_delete){
-    for (int i = id_delete; i < checkpoints.size(); ++i) {
-        checkpoints[i].update_id();
+    for (int i = 0; i < checkpoints.size(); ++i) {
+        if (checkpoints[i].id > id_delete){
+            checkpoints[i].update_id();
+        }
     }
 }
 
 
-QPoint Coordinates::delete_checkpoint(const QPoint& point){
-    QPoint del(-1, -1);
-    int id_delete = 0;
+Checkpoint Coordinates::delete_checkpoint(const QPoint& point){
+
+    Checkpoint del = Checkpoint();
 
     for (auto it = checkpoints.begin(); it != checkpoints.end(); ++it) {
         if (it->contains(point)) {
-            del = it->get_click();
-            id_delete = it->get_id();
+            del = *it;
             checkpoints.erase(it);
             break;
         }
-    }
-
-    if(del.x() != -1){
-        update_id(id_delete-1);
     }
 
     return del;
@@ -140,9 +137,9 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
     out << map << "," << mask << "\n";
     out << "id, orientation, xCenter, yCenter, height, width,"<<city<<"\n";
     for (const Checkpoint& p : checkpoints){
-        int id_checkpoint = p.get_id();
-        char orientation = p.get_orientation();
-        QRect r= p.get_rect();
+        int id_checkpoint = p.id;
+        char orientation = p.orientation;
+        QRect r= p.rect;
         QPoint center = r.center();
         int height = r.height();
         int width = r.width();
