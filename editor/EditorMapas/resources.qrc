@@ -7,6 +7,8 @@
     <qresource prefix="/images">
         <file>imagenes/bandera.jpg</file>
         <file>imagenes/fondo.png</file>
+        <file>imagenes/new_circuit.jpg</file>
+        <file>imagenes/edit_circuit.png</file>
     </qresource>
     <qresource prefix="/circuitos">
         <file>imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Vice City.png</file>

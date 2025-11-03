@@ -8,6 +8,9 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QString>
+#include <QMessageBox>
+#include <QWidget>
+#include <QStringLiteral>
 #include "Constants.h"
 
 Coordinates::Coordinates(){}
@@ -93,7 +96,7 @@ QString Coordinates::get_map_name(const QString& map){
     return city;
 }
 
-bool Coordinates::export_checkpoints(const QString& name, const QString& map){
+bool Coordinates::export_checkpoints(const QString& name, const QString& map, const QString& mask, QWidget* window){
     QString path = QCoreApplication::applicationDirPath() + "/../server/races";
     QDir dir(path);
 
@@ -105,12 +108,27 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map){
     QString race_name = name + ".csv";
     QString path_race = dir.filePath(race_name);
 
-    int id = 1;
-    while (QFile::exists(path_race)) {
-        race_name = name + "_" + QString::number(id) + ".csv";
-        path_race = dir.filePath(race_name);
-        id++;
+
+    if (QFile::exists(path_race)) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(
+        window,
+        "Warning",
+        "Already exists a race with this name. Do you want to overwrite it?",
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+        if (reply == QMessageBox::No){
+            //new race name (+ "_i")
+            int id = 1;
+            while (QFile::exists(path_race)) {
+                race_name = name + "_" + QString::number(id) + ".csv";
+                path_race = dir.filePath(race_name);
+                id++;
+            }
+        }
     }
+
     QFile archivo(path_race);
     if (!archivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
         return false;
@@ -119,6 +137,7 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map){
     QString city = get_map_name(map);
 
     QTextStream out(&archivo);
+    out << map << "," << mask << "\n";
     out << "id, orientation, xCenter, yCenter, height, width,"<<city<<"\n";
     for (const Checkpoint& p : checkpoints){
         int id_checkpoint = p.get_id();
@@ -135,6 +154,10 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map){
     archivo.close();
 
     return true;
+}
+
+QVector<Checkpoint> Coordinates::get_checkpoints(){
+    return checkpoints;
 }
 
 bool Coordinates::is_empty(){

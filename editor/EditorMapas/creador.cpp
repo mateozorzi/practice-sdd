@@ -40,6 +40,42 @@ Creador::Creador(const QString& path, const QString& path_mask, QWidget *parent)
 
 }
 
+Creador::Creador(const Race& r, QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::Creador)
+    , map(r.map)
+    , mask(r.mask)
+    , checkpoints(r.checkpoints)
+    , m(Messages()){
+
+    ui->setupUi(this);
+
+    scene = new QGraphicsScene(this);
+    ui->labelmap->setScene(scene);
+
+    set_background(map);
+
+    mask_circuit.load(mask);
+
+    ui->n_checkpoints->display(r.n_checkpoints);
+    ui->name_circuit->setText(r.name);
+
+    ui->labelmap->installEventFilter(this);
+
+    import_checkpoints();
+}
+
+void Creador::import_checkpoints(){
+    //draw checkpoints on the map
+    QVector<Checkpoint> v_checkpoints = checkpoints.get_checkpoints();
+
+    for (Checkpoint c: v_checkpoints){
+        QRect r = c.rect;
+        scene->addRect(r,
+                       QPen(Qt::red), QBrush(Qt::yellow));
+    }
+}
+
 void Creador::set_background(const QString& path){
     QPixmap mapPixmap(path);
     if(!mapPixmap.isNull()) {
@@ -222,7 +258,7 @@ void Creador::on_Done_clicked()
         return;
     }
 
-    if (checkpoints.export_checkpoints(name_circuit, map)){
+    if (checkpoints.export_checkpoints(name_circuit, map, this->mask, this)){
         //file create succesfully
         m.message_no_args(this, "Success", "Congratulations! Creation complete");
         emit close_w();
