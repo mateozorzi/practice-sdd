@@ -55,3 +55,10 @@ MovementDTO ServerProtocol::receive_movement() {
 
     return MovementDTO(direction, is_moving);
 }
+
+void ServerProtocol::send_client_id(const uint32_t client_id) {
+
+    add_uint32_to_buffer(client_id);
+
+    send_buffer();
+}
