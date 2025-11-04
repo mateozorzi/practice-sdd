@@ -22,8 +22,8 @@ void Sender::run() {
 
             try {
 
-                const CarPositionDTO& car_position_dto = client_message_queue.pop();
-                server_protocol.send_car_position(car_position_dto);
+                const WorldSnapshot& world_snapshot = client_message_queue.pop();
+                server_protocol.send_world_snapshot(world_snapshot);
 
             } catch (const ClosedQueue&) {
 

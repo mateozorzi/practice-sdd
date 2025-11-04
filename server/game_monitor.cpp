@@ -7,12 +7,12 @@
 #include "../common/constants.h"
 
 
-Queue<CarPositionDTO>& GameMonitor::register_client(const uint32_t client_id) {
+Queue<WorldSnapshot>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<CarPositionDTO>>(100);
-    Queue<CarPositionDTO>& queue_reference = *queue_pointer;
+    auto queue_pointer = std::make_unique<Queue<WorldSnapshot>>(100);
+    Queue<WorldSnapshot>& queue_reference = *queue_pointer;
 
     client_queues[client_id] = std::move(queue_pointer);
 
@@ -35,7 +35,7 @@ void GameMonitor::unregister_client(const uint32_t client_id) {
 }
 
 
-void GameMonitor::broadcast(const CarPositionDTO& car_position_dto) {
+void GameMonitor::broadcast(const WorldSnapshot& world_snapshot) {
 
     std::lock_guard lock(mtx);
 
@@ -43,7 +43,7 @@ void GameMonitor::broadcast(const CarPositionDTO& car_position_dto) {
 
         try {
 
-            client_queue->try_push(car_position_dto);
+            client_queue->try_push(world_snapshot);
         } catch (const std::exception&) {}
     }
 }
