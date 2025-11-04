@@ -24,3 +24,5 @@ CarPositionDTO ClientProtocol::receive_car_position() {
     const uint32_t angle = recv_uint32();
     return CarPositionDTO(client_id, x_position, y_position, angle);
 }
+
+uint32_t ClientProtocol::receive_id() { return recv_uint32(); }

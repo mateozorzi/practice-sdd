@@ -30,6 +30,7 @@ public:
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
     CarPositionDTO receive_car_position();
+    uint32_t receive_id();
 };
 
 #endif
