@@ -3,7 +3,7 @@
 #include <cmath>
 #include "../common/constants.h"
 
-Car::Car(b2World& world, const CarConfig& config): body(nullptr), config(config) {
+Car::Car(const uint32_t client_id, b2World& world, const CarConfig& config): client_id(client_id), body(nullptr), config(config) {
 
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
@@ -116,13 +116,14 @@ void Car::update_position() {
 
 CarPositionDTO Car::get_position_dto() const {
 
-    b2Vec2 position = body->GetPosition();
+    b2Vec2 position_meters = body->GetPosition();
     float angle_radians = body->GetAngle();
 
-    uint32_t x_pixels = static_cast<uint32_t>(position.x * PIXELS_PER_METER);
-    uint32_t y_pixels = static_cast<uint32_t>(position.y * PIXELS_PER_METER);
+    uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * PIXELS_PER_METER);
+    uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * PIXELS_PER_METER);
     uint32_t angle_degrees = static_cast<uint32_t>(angle_radians * (180.0f / b2_pi));
-    return CarPositionDTO(x_pixels, y_pixels, angle_degrees);
+
+    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees);
 }
 
 

@@ -6,6 +6,7 @@
 #include "messages.h"
 #include <QGraphicsScene>
 #include "checkpoint.h"
+#include "race.h"
 
 #define NONE 0
 #define ADD 1
@@ -21,6 +22,7 @@ class Creador : public QMainWindow
 
 public:
     Creador(const QString& path, const QString& path_mask, QWidget *parent = nullptr);
+    Creador(const Race& r, QWidget *parent = nullptr);
     void set_background(const QString& path);
     void handle_checkpoints(QMouseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event) override;
@@ -34,14 +36,20 @@ private:
     Coordinates checkpoints;
     Messages m;
     QImage mask_circuit;
+    Race race;
 
     void add_checkpoint(QMouseEvent *event);
     void delete_checkpoint(QMouseEvent *event);
     void update_counter();
-    void update_map(const QPoint& pos, int mode);
+    void update_map_add(const QPoint& pos);
+    void update_map_delete(const QPoint& pos, const int id);
     void crear_csv();
     bool is_street(const QPoint& pos);
     Checkpoint calculate_checkpoint(const QPoint& pos);
+    void import_checkpoints();
+    void draw_id_checkpoint(QRect& fig, const int id);
+    void draw_checkpoint(QRect& fig, const int id);
+    void update_id(const int id);
 
 signals:
     void close_w();

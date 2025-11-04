@@ -15,6 +15,7 @@ Receiver::Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor,
 void Receiver::handle_player_username(const ClientRequest& client_request) {
 
     const PlayerDTO& player_dto = server_protocol.receive_username();
+    server_protocol.send_client_id(client_id);
     game_monitor.add_command(GameCommand(client_id, client_request, player_dto));
 }
 

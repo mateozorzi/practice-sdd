@@ -61,7 +61,7 @@ void GameLoop::handle_player_username(const GameCommand& game_command) {
 
     if (auto player = game_command.get_data<PlayerDTO>())
     
-        std::cout << "New player with ID:" << game_command.get_client_id() << " has joined the game! | Username: " << player->get().username << std::endl;
+        std::cout << "New player with ID: " << game_command.get_client_id() << " has joined the game! | Username: " << player->get().username << std::endl;
 }
 
 
@@ -69,7 +69,8 @@ void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
     if (auto movement = game_command.get_data<MovementDTO>()) {
 
-        auto [it, inserted] = cars.try_emplace(game_command.get_client_id(), world, CarConfig());
+        uint32_t client_id = game_command.get_client_id();
+        auto [it, inserted] = cars.try_emplace(client_id, client_id, world, CarConfig());
         it->second.handle_movement(movement->get());
     }
 }

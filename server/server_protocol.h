@@ -28,6 +28,8 @@ public:
 
     PlayerDTO receive_username();
     MovementDTO receive_movement();
+
+    void send_client_id(uint32_t client_id);
 };
 
 

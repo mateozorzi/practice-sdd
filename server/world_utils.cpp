@@ -25,8 +25,8 @@ bool WorldUtils::add_polygon_to_world(
         if (polygon[i].size() < 2) {
             throw WorldCreationException("Invalid vertex format");
         }
-        auto x = pixels_to_meters(static_cast<float>(polygon[i][0]));
-        auto y = pixels_to_meters(static_cast<float>(polygon[i][1]));
+        float x = pixels_to_meters(polygon[i][0] + WORLD_OFFSET_ADJUST_PIXELS_X);
+        float y = pixels_to_meters(polygon[i][1] + WORLD_OFFSET_ADJUST_PIXELS_Y) ;
         vertices[i].Set(x, y);
     }
 

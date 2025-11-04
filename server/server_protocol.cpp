@@ -5,13 +5,13 @@
 
 ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {
 
-    switch (byte) {
+    switch (static_cast<ClientAction>(byte)) {
 
-        case DISCONNECT:
+        case ClientAction::DISCONNECT:
             return ClientRequest::DISCONNECT;
-        case SEND_USERNAME:
+        case ClientAction::SEND_USERNAME:
             return ClientRequest::SEND_USERNAME;
-        case MOVE_CAR:
+        case ClientAction::SEND_CAR_MOVEMENT:
             return ClientRequest::MOVE_CAR;
         default:
             return ClientRequest::UNKNOWN;
@@ -21,6 +21,7 @@ ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const 
 
 void ServerProtocol::send_car_position(const CarPositionDTO& car_position_dto) {
 
+    add_uint32_to_buffer(car_position_dto.client_id);
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
@@ -53,4 +54,11 @@ MovementDTO ServerProtocol::receive_movement() {
     bool is_moving = (is_moving_byte != 0);
 
     return MovementDTO(direction, is_moving);
+}
+
+void ServerProtocol::send_client_id(const uint32_t client_id) {
+
+    add_uint32_to_buffer(client_id);
+
+    send_buffer();
 }

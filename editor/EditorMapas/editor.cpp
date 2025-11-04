@@ -25,7 +25,8 @@ void Editor::on_mapa1_clicked()
 
     // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show();
+        emit close_editor();
+        this->close();
     });
 
     c->showMaximized();
@@ -43,7 +44,8 @@ void Editor::on_mapa2_clicked()
 
     // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show();
+        emit close_editor();
+        this->close();
     });
 
     c->showMaximized();
@@ -61,7 +63,9 @@ void Editor::on_mapa3_clicked()
 
     // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show();
+        emit close_editor();
+        this->close();
+
     });
 
     c->showMaximized();

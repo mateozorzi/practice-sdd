@@ -5,18 +5,13 @@
 #include <string_view>
 
 
-enum class ClientAction : uint8_t { SEND_USERNAME = 0x01, SEND_CAR_MOVEMENT = 0x03 };
+enum class ClientAction : uint8_t { DISCONNECT = 0x00, SEND_USERNAME = 0x01, SEND_CAR_MOVEMENT = 0x03 };
 
 
 // SERVER
 constexpr char SERVER_CMD_EXIT = 'q';
 constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
 constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
-
-// PROTOCOL
-constexpr uint8_t DISCONNECT = 0x00;
-constexpr uint8_t SEND_USERNAME = 0x01;
-constexpr uint8_t MOVE_CAR = 0x03;
 
 // SERVER CLASSES
 constexpr std::string_view SERVER = "SERVER";
@@ -36,5 +31,7 @@ constexpr float PIXELS_PER_METER = 30.0f;
     // TODO: replace with command line parameter
 constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/world/polygons_liberty_city.json";
 
+constexpr int WORLD_OFFSET_ADJUST_PIXELS_X = -31;
+constexpr int WORLD_OFFSET_ADJUST_PIXELS_Y = -7;
 
 #endif

@@ -24,11 +24,14 @@ private slots:
 
     void on_tableRaces_cellDoubleClicked(int row, int column);
 
+
 private:
     Ui::SelectCircuit *ui;
     QVector<Race> races;
     QString path_races;
 
+    void delete_race(const QString& race_name);
+    void fill_table();
     void read_info_races(const QStringList& races);
     void fill_races_info();
 };

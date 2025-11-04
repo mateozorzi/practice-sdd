@@ -33,6 +33,7 @@ struct CarConfig {
 
 class Car {
 
+    uint32_t client_id;
     b2Body* body;
     CarConfig config;
 
@@ -50,7 +51,7 @@ public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;
 
-    explicit Car(b2World& world, const CarConfig& config);
+    explicit Car(uint32_t client_id, b2World& world, const CarConfig& config);
 
     void handle_movement(const MovementDTO& movement_dto);
 
