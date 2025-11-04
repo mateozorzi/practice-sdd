@@ -90,11 +90,16 @@ void GameLoop::handle_command(const GameCommand& game_command) {
 
 void GameLoop::update_positions() {
 
+    WorldSnapshot world_snapshot;
+    world_snapshot.reserve(cars.size());
+
     for (auto& [client_id, car]: cars) {
 
         car.update_position();
-        game_monitor.broadcast(car.get_position_dto());
+        world_snapshot.add_car_position(car.get_position_dto());
     }
+
+    game_monitor.broadcast(world_snapshot);
 }
 
 

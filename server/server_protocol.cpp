@@ -19,14 +19,12 @@ ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const 
 }
 
 
-void ServerProtocol::send_car_position(const CarPositionDTO& car_position_dto) {
+void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
 
     add_uint32_to_buffer(car_position_dto.client_id);
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
-
-    send_buffer();
 }
 
 
@@ -59,6 +57,14 @@ MovementDTO ServerProtocol::receive_movement() {
 void ServerProtocol::send_client_id(const uint32_t client_id) {
 
     add_uint32_to_buffer(client_id);
+
+    send_buffer();
+}
+
+void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
+
+    for (const auto& car_position : world_snapshot.get_car_positions())
+        add_car_position_to_buffer(car_position);
 
     send_buffer();
 }

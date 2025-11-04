@@ -8,9 +8,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../common/car_position_dto.h"
 #include "../common/queue.h"
 
+#include "world_snapshot.h"
 #include "game_command.h"
 
 
@@ -18,7 +18,7 @@ class GameMonitor {
 
 
     std::mutex mtx;
-    std::unordered_map<uint32_t, std::unique_ptr<Queue<CarPositionDTO>>> client_queues;
+    std::unordered_map<uint32_t, std::unique_ptr<Queue<WorldSnapshot>>> client_queues;
     std::optional<std::reference_wrapper<Queue<GameCommand>>> command_queue_reference;
 
 
@@ -28,9 +28,9 @@ public:
 
     GameMonitor() = default;
 
-    Queue<CarPositionDTO>& register_client(uint32_t client_id);
+    Queue<WorldSnapshot>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
-    void broadcast(const CarPositionDTO& car_position_dto);
+    void broadcast(const WorldSnapshot& world_snapshot);
     void remove_client(uint32_t client_id);
 
     void register_command_queue(Queue<GameCommand>& command_queue);

@@ -15,7 +15,7 @@ class Sender final: public Thread {
     ServerProtocol& server_protocol;
     GameMonitor& game_monitor;
     uint32_t client_id;
-    Queue<CarPositionDTO>& client_message_queue;
+    Queue<WorldSnapshot>& client_message_queue;
 
 
 public:
