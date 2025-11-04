@@ -1,10 +1,13 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 #include <QApplication>
+#include <map>
 #include <string>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
+
+#include "../common/car_position_dto.h"
 
 #include "client_protocol.h"
 #include "menu_interface.h"
@@ -22,6 +25,7 @@ private:
     Sender sender;
     Receiver receiver;
     MenuInterface menu;
+    uint32_t client_id;
 
     void draw_background(SDL2pp::Renderer& renderer, SDL2pp::Texture& background,
                          const SDL2pp::Rect& view_rect);

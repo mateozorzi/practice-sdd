@@ -15,9 +15,12 @@
 using namespace SDL2pp;
 
 Client::Client(const std::string& hostname, const std::string& servname):
-        protocol(hostname, servname), sender(protocol), receiver(protocol), menu(protocol) {
+        protocol(hostname, servname),
+        sender(protocol),
+        receiver(protocol),
+        menu(protocol),
+        client_id(0) {
     sender.start();
-    receiver.start();
 }
 
 void Client::run() {
@@ -47,8 +50,8 @@ void Client::run() {
     const int bg_height = background_surface.GetHeight();
 
     // Cargar minimapa
-    const int minimap_width = 384;   // 1920 : 5
-    const int minimap_height = 216;  // 1080 : 5
+    constexpr int minimap_width = 384;   // 1920 : 5
+    constexpr int minimap_height = 216;  // 1080 : 5
     Texture minimap_static(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                            minimap_width, minimap_height);
     renderer.SetTarget(minimap_static);
@@ -60,11 +63,6 @@ void Client::run() {
     const Uint32 color_key = SDL_MapRGB(sprite_cars.Get()->format, 163, 163, 13);
     sprite_cars.SetColorKey(true, color_key);
     Texture sprites(renderer, sprite_cars);
-
-    // Posición del auto (se lee desde el servidor)
-    int pos_x = 0;
-    int pos_y = 0;
-    int angle = 0;
 
     // Estado de WASD
     bool key_w = false;
@@ -79,6 +77,13 @@ void Client::run() {
     constexpr int view_width = 512;
     constexpr int view_height = 288;
     Camera camera(view_width, view_height, bg_width, bg_height);
+
+    // Recibir client_id del servidor antes de iniciar receiver
+    client_id = protocol.receive_id();
+    receiver.start();
+
+    // ID - Posicion
+    std::map<uint32_t, CarPositionDTO> cars;
 
     while (true) {
         SDL_Event event;
@@ -115,6 +120,8 @@ void Client::run() {
                             sender.add_event(MovementDTO(Direction::RIGHT, true));
                         }
                         break;
+                    default: {
+                    };
                 }
             } else if (event.type == SDL_KEYUP) {
                 switch (event.key.keysym.sym) {
@@ -142,36 +149,47 @@ void Client::run() {
                             sender.add_event(MovementDTO(Direction::RIGHT, false));
                         }
                         break;
+                    default: {
+                    };
                 }
             }
         }
 
-        // Obtener la ultima posición del auto desde el servidor
+        // Obtener posiciones
         Queue<CarPositionDTO>& car_queue = receiver.get_car_position_queue();
         CarPositionDTO car_position;
-        bool has_position = false;
         while (car_queue.try_pop(car_position)) {
-            has_position = true;
-        }
-        if (has_position) {
-            pos_x = car_position.x_position;
-            pos_y = car_position.y_position;
-            angle = car_position.angle;
+            // Actualizar cada posicion segun cliente
+            cars[car_position.client_id] = car_position;
         }
 
-        // Posicionar camara sobre el auto
-        camera.update(pos_x, pos_y);
+        // Hallar posicion del cliente actual
+        if (cars.find(client_id) != cars.end()) {
+            const CarPositionDTO& my_car = cars[client_id];
+            const uint32_t pos_x = my_car.x_position;
+            const uint32_t pos_y = my_car.y_position;
 
-        renderer.Clear();
+            // Seguir a cliente actual
+            camera.update(pos_x, pos_y);
 
-        // Dibujar elementos del juego
-        draw_background(renderer, background, camera.get_view_rect());
-        draw_car(renderer, sprites, pos_x, pos_y, camera.get_view_rect(), angle);
-        draw_health_bar(renderer, health);
-        draw_minimap(renderer, minimap_static, pos_x, pos_y, bg_width, bg_height, minimap_width,
-                     minimap_height);
+            renderer.Clear();
 
-        renderer.Present();
+            // Dibujar elementos del juego
+            draw_background(renderer, background, camera.get_view_rect());
+
+            // Dibujar todos los autos
+            for (const auto& car_pair: cars) {
+                const CarPositionDTO& car = car_pair.second;
+                draw_car(renderer, sprites, car.x_position, car.y_position, camera.get_view_rect(),
+                         car.angle);
+            }
+
+            draw_health_bar(renderer, health);
+            draw_minimap(renderer, minimap_static, pos_x, pos_y, bg_width, bg_height, minimap_width,
+                         minimap_height);
+
+            renderer.Present();
+        }
 
         SDL_Delay(16);
     }
