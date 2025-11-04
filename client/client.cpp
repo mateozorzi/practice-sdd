@@ -180,8 +180,7 @@ void Client::run() {
             // Dibujar todos los autos
             for (const auto& car_pair: cars) {
                 const CarPositionDTO& car = car_pair.second;
-                draw_car(renderer, sprites, car.x_position, car.y_position, camera.get_view_rect(),
-                         car.angle);
+                draw_car(renderer, sprites, car.x_position, car.y_position, car.angle);
             }
 
             draw_health_bar(renderer, health);
@@ -200,9 +199,9 @@ void Client::draw_background(Renderer& renderer, Texture& background, const Rect
 }
 
 void Client::draw_car(Renderer& renderer, Texture& sprites, const int pos_x, const int pos_y,
-                      const Rect& view_rect, const int angle) {
-    const int car_screen_x = (pos_x - view_rect.x) * 1920 / view_rect.w;
-    const int car_screen_y = (pos_y - view_rect.y) * 1080 / view_rect.h;
+                      const int angle) {
+    const int car_screen_x = pos_x - 30;
+    const int car_screen_y = pos_y - 30;
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(sprites, Rect(128, 32, 32, 32), Rect(car_screen_x, car_screen_y, 60, 60), angle,

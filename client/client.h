@@ -31,7 +31,7 @@ private:
                          const SDL2pp::Rect& view_rect);
 
     void draw_car(SDL2pp::Renderer& renderer, SDL2pp::Texture& sprites, int pos_x, int pos_y,
-                  const SDL2pp::Rect& view_rect, int angle);
+                  int angle);
 
     void draw_health_bar(SDL2pp::Renderer& renderer, int health);
 
