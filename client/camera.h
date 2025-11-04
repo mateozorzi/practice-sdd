@@ -18,11 +18,6 @@ public:
     void update(int player_x, int player_y);
 
     SDL2pp::Rect get_view_rect() const;
-
-    int get_camera_x() const;
-    int get_camera_y() const;
-    int get_view_width() const;
-    int get_view_height() const;
 };
 
 #endif  // CAMERA_H
