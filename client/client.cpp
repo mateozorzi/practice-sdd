@@ -1,6 +1,8 @@
 #include "client.h"
 
+#include <any>
 #include <string>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
@@ -25,9 +27,13 @@ Client::Client(const std::string& hostname, const std::string& servname):
 
 void Client::run() {
     // lobby ui
+    /*
     if (menu.lobby()) {
         exit(0);
     }
+    */
+
+    protocol.send_username("a");
 
     // Initialize SDL library
     SDL sdl(SDL_INIT_VIDEO);
@@ -156,15 +162,30 @@ void Client::run() {
         }
 
         // Obtener posiciones
-        Queue<CarPositionDTO>& car_queue = receiver.get_car_position_queue();
-        CarPositionDTO car_position;
-        while (car_queue.try_pop(car_position)) {
-            // Actualizar cada posicion segun cliente
-            cars[car_position.client_id] = car_position;
+        Queue<std::vector<CarPositionDTO>>& car_queue = receiver.get_car_positions_queue();
+        std::vector<CarPositionDTO> car_positions;
+        bool has_positions = false;
+        while (car_queue.try_pop(car_positions)) {
+            has_positions = true;
         }
-
+        if (has_positions) {
+            std::vector<uint32_t> received_ids;
+            for (CarPositionDTO& car_position: car_positions) {
+                received_ids.push_back(car_position.client_id);
+                cars[car_position.client_id] = car_position;
+            }
+            for (auto it = cars.begin(); it != cars.end();) {
+                const bool found = std::ranges::any_of(
+                        received_ids, [&](uint32_t id) { return id == it->first; });
+                if (!found) {
+                    it = cars.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+        }
         // Hallar posicion del cliente actual
-        if (cars.find(client_id) != cars.end()) {
+        if (cars.contains(client_id)) {
             const CarPositionDTO& my_car = cars[client_id];
             const uint32_t pos_x = my_car.x_position;
             const uint32_t pos_y = my_car.y_position;
@@ -180,7 +201,8 @@ void Client::run() {
             // Dibujar todos los autos
             for (const auto& car_pair: cars) {
                 const CarPositionDTO& car = car_pair.second;
-                draw_car(renderer, sprites, car.x_position, car.y_position, car.angle);
+                draw_car(renderer, sprites, car.x_position, car.y_position, camera.get_view_rect(),
+                         car.angle);
             }
 
             draw_health_bar(renderer, health);
@@ -199,9 +221,9 @@ void Client::draw_background(Renderer& renderer, Texture& background, const Rect
 }
 
 void Client::draw_car(Renderer& renderer, Texture& sprites, const int pos_x, const int pos_y,
-                      const int angle) {
-    const int car_screen_x = pos_x - 30;
-    const int car_screen_y = pos_y - 30;
+                      const Rect& view_rect, const int angle) {
+    const int car_screen_x = (pos_x - view_rect.x) * 1920 / view_rect.w;
+    const int car_screen_y = (pos_y - view_rect.y) * 1080 / view_rect.h;
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(sprites, Rect(128, 32, 32, 32), Rect(car_screen_x, car_screen_y, 60, 60), angle,
