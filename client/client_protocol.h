@@ -2,6 +2,7 @@
 #define CLIENT_PROTOCOL_H
 
 #include <string>
+#include <vector>
 
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
@@ -30,6 +31,7 @@ public:
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
     CarPositionDTO receive_car_position();
+    std::vector<CarPositionDTO> receive_car_positions();
     uint32_t receive_id();
 };
 
