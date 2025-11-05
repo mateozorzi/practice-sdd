@@ -226,7 +226,7 @@ void Client::draw_car(Renderer& renderer, Texture& sprites, const int pos_x, con
     const int car_screen_y = (pos_y - view_rect.y) * 1080 / view_rect.h;
 
     // Usar solo sprite vertical y rotarlo con SDL
-    renderer.Copy(sprites, Rect(128, 32, 32, 32), Rect(car_screen_x, car_screen_y, 64, 64), angle,
+    renderer.Copy(sprites, Rect(128, 32, 32, 32), Rect(car_screen_x - 32, car_screen_y - 32, 64, 64), angle,
                   NullOpt, SDL_FLIP_NONE);
 }
 
