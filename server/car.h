@@ -18,7 +18,7 @@ struct CarConfig {
 
     float linear_damping = 1.0f;   // Sliding effect after stopping moving (lower = more sliding)
     float angular_damping = 2.5f;  // The same that above, but when turning (lower = more turning)
-    float min_turn_speed = 1.0f;
+    float min_turn_speed = 0.1f;
 
     float acceleration = 4.0f;
     float breaking_factor = 0.3f;  // How strong the car brakes

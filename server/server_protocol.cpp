@@ -63,6 +63,8 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
 
 void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
 
+    add_uint8_to_buffer(world_snapshot.get_size());
+
     for (const auto& car_position : world_snapshot.get_car_positions())
         add_car_position_to_buffer(car_position);
 

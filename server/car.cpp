@@ -73,23 +73,13 @@ void Car::detect_rotation() {
 
     b2Vec2 velocity = body->GetLinearVelocity();
     float current_speed = velocity.Length();
-    const bool is_forward = this->moving_up;
 
-    if (current_speed > config.min_turn_speed || (!is_forward && current_speed > config.min_turn_speed * config.breaking_factor)) {
-        if (moving_left) {
-            if (is_forward) {
-                body->ApplyTorque(-config.turn_torque, true);
-            } else {
-                body->ApplyTorque(config.turn_torque, true);
-            }
-        }
-        if (moving_right) {
-            if (is_forward) {
-                body->ApplyTorque(config.turn_torque, true);
-            } else {
-                body->ApplyTorque(-config.turn_torque, true);
-            }
-        }
+    if (current_speed > config.min_turn_speed) {
+
+        if (moving_left)
+            body->ApplyTorque(-config.turn_torque, true);
+        if (moving_right)
+            body->ApplyTorque(config.turn_torque, true);
     }
 }
 
