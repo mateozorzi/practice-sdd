@@ -15,7 +15,7 @@ Car::Car(const uint32_t client_id, b2World& world, const CarConfig& config): cli
     body = world.CreateBody(&body_definition);
 
     b2PolygonShape shape;
-    shape.SetAsBox(config.width, config.height);
+    shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
 
     b2FixtureDef fixture;
     fixture.shape = &shape;

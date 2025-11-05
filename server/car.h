@@ -10,8 +10,10 @@
 
 struct CarConfig {
 
-    float width = 1.0f;
-    float height = 0.5f;
+    float width = 22.0f / 30.0f / 2.0f;
+    // WIDHT IN PIXELS OF THE SPRITE (22) / PIXELS PER METER (30) / CLIENT SPRITE UPSCALING (2x)
+    float height = 28.0f / 30.0f / 2.0f;
+    // HEIGHT IN PIXELS OF THE SPRITE (29) / PIXELS PER METER (30) / CLIENT SPRITE UPSCALING (2x)
     float density = 1.0f;
     float friction = 0.4f;
     float restitution = 0.0f;
@@ -24,7 +26,7 @@ struct CarConfig {
     float breaking_factor = 0.3f;  // How strong the car brakes
     float max_speed = 14.0f;
     float drift_factor = 0.7f;  // The lower = more drifting
-    float turn_torque = 4.8f;
+    float turn_torque = 0.03f;
 
     float mass = 1.0f;
     int health = 100;
