@@ -7,7 +7,7 @@
 
 #include "../common/thread.h"
 
-#include "car.h"
+#include "player.h"
 #include "game_monitor.h"
 #include "collision_listener.h"
 
@@ -22,7 +22,7 @@ class GameLoop final: public Thread {
 
     Queue<GameCommand> command_queue;
     GameMonitor& game_monitor;
-    std::unordered_map<uint32_t, Car> cars;
+    std::unordered_map<uint32_t, Player> players;
     std::unordered_map<ClientRequest, std::function<void(const GameCommand&)>> command_handlers;
     b2World world;
     CollisionListener collision_listener;

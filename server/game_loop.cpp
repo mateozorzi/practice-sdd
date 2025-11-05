@@ -11,11 +11,10 @@
 
 GameLoop::GameLoop(GameMonitor& game_monitor):
         command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)), 
-        collision_listener(cars) {
+        collision_listener(players) {
 
     game_monitor.register_command_queue(command_queue);
     
-    // Set the collision listener for the world
     world.SetContactListener(&collision_listener);
 
     command_handlers = {
@@ -42,10 +41,10 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
 
 void GameLoop::remove_car(const uint32_t client_id) {
 
-    const auto it = cars.find(client_id);
+    const auto it = players.find(client_id);
 
-    if (it != cars.end())
-        cars.erase(it);
+    if (it != players.end())
+        players.erase(it);
 }
 
 
@@ -59,9 +58,21 @@ void GameLoop::process_commands() {
 
 void GameLoop::handle_player_username(const GameCommand& game_command) {
 
-    if (auto player = game_command.get_data<PlayerDTO>())
-    
-        std::cout << "New player with ID: " << game_command.get_client_id() << " has joined the game! | Username: " << player->get().username << std::endl;
+    if (auto player_dto = game_command.get_data<PlayerDTO>()) {
+
+        uint32_t client_id = game_command.get_client_id();
+        players.try_emplace(
+            client_id, 
+            client_id, 
+            player_dto->get().username, 
+            world, 
+            CarConfig()
+        );
+
+        std::cout << "New player with ID: " << client_id 
+                << " has joined the game! | Username: " 
+                << player_dto->get().username << std::endl;
+    }
 }
 
 
@@ -70,8 +81,9 @@ void GameLoop::handle_car_movement(const GameCommand& game_command) {
     if (auto movement = game_command.get_data<MovementDTO>()) {
 
         uint32_t client_id = game_command.get_client_id();
-        auto [it, inserted] = cars.try_emplace(client_id, client_id, world, CarConfig());
-        it->second.handle_movement(movement->get());
+        auto it = players.find(client_id);
+        if (it != players.end())
+            it->second.handle_car_movement(movement->get());
     }
 }
 
@@ -91,12 +103,12 @@ void GameLoop::handle_command(const GameCommand& game_command) {
 void GameLoop::update_positions() {
 
     WorldSnapshot world_snapshot;
-    world_snapshot.reserve(cars.size());
+    world_snapshot.reserve(players.size());
 
-    for (auto& [client_id, car]: cars) {
+    for (auto& [client_id, player]: players) {
 
-        car.update_position();
-        world_snapshot.add_car_position(car.get_position_dto());
+        player.update_car_position();
+        world_snapshot.add_car_position(player.get_car_position());
     }
 
     game_monitor.broadcast(world_snapshot);
@@ -135,7 +147,7 @@ void GameLoop::stop() {
     try {
 
         command_queue.close();
-        cars.clear();
+        players.clear();
     } catch (const std::exception&) {}
 }
 
