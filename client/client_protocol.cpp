@@ -25,4 +25,13 @@ CarPositionDTO ClientProtocol::receive_car_position() {
     return CarPositionDTO(client_id, x_position, y_position, angle);
 }
 
+std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
+    const uint8_t size = recv_uint8();
+    std::vector<CarPositionDTO> positions;
+    for (uint8_t i = 0; i < size; ++i) {
+        positions.push_back(receive_car_position());
+    }
+    return positions;
+}
+
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
