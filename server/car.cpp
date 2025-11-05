@@ -7,7 +7,7 @@ Car::Car(const uint32_t client_id, b2World& world, const CarConfig& config): cli
 
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
-    body_definition.position.Set(0.0f, 0.0f);
+    body_definition.position.Set(2.828f, 3.171f); // Starting from the main road
     body_definition.angle = b2_pi / 2.0f;
     body_definition.linearDamping = config.linear_damping;
     body_definition.angularDamping = config.angular_damping;
@@ -15,7 +15,7 @@ Car::Car(const uint32_t client_id, b2World& world, const CarConfig& config): cli
     body = world.CreateBody(&body_definition);
 
     b2PolygonShape shape;
-    shape.SetAsBox(config.width, config.height);
+    shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
 
     b2FixtureDef fixture;
     fixture.shape = &shape;

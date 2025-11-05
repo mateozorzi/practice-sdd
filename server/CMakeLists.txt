@@ -9,6 +9,7 @@ target_sources(taller_server
     game_loop.cpp
     game_monitor.cpp
     main.cpp
+    player.cpp
     receiver.cpp
     sender.cpp
     server.cpp
@@ -25,6 +26,7 @@ target_sources(taller_server
     game_command.h
     game_loop.h
     game_monitor.h
+    player.h
     receiver.h
     sender.h
     server.h
