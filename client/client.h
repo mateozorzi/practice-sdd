@@ -10,6 +10,7 @@
 #include "../common/car_position_dto.h"
 
 #include "client_protocol.h"
+#include "input_manager.h"
 #include "menu_interface.h"
 #include "receiver.h"
 #include "sender.h"
@@ -22,8 +23,8 @@ public:
 
 private:
     ClientProtocol protocol;
-    Sender sender;
     Receiver receiver;
+    InputManager input_manager;
     MenuInterface menu;
     uint32_t client_id;
 

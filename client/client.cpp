@@ -18,12 +18,10 @@ using namespace SDL2pp;
 
 Client::Client(const std::string& hostname, const std::string& servname):
         protocol(hostname, servname),
-        sender(protocol),
         receiver(protocol),
+        input_manager(protocol),
         menu(protocol),
-        client_id(0) {
-    sender.start();
-}
+        client_id(0) {}
 
 void Client::run() {
     // lobby ui
@@ -70,12 +68,6 @@ void Client::run() {
     sprite_cars.SetColorKey(true, color_key);
     Texture sprites(renderer, sprite_cars);
 
-    // Estado de WASD
-    bool key_w = false;
-    bool key_a = false;
-    bool key_s = false;
-    bool key_d = false;
-
     // Vida del jugador (0-100)
     int health = 50;  // Para probar como baja la barra de vida
 
@@ -92,73 +84,8 @@ void Client::run() {
     std::map<uint32_t, CarPositionDTO> cars;
 
     while (true) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                return;
-            }
-            if (event.type == SDL_KEYDOWN) {
-                switch (event.key.keysym.sym) {
-                    case SDLK_ESCAPE:
-                    case SDLK_q:
-                        return;
-                    case SDLK_w:
-                        if (!key_w) {
-                            key_w = true;
-                            sender.add_event(MovementDTO(Direction::UP, true));
-                        }
-                        break;
-                    case SDLK_s:
-                        if (!key_s) {
-                            key_s = true;
-                            sender.add_event(MovementDTO(Direction::DOWN, true));
-                        }
-                        break;
-                    case SDLK_a:
-                        if (!key_a) {
-                            key_a = true;
-                            sender.add_event(MovementDTO(Direction::LEFT, true));
-                        }
-                        break;
-                    case SDLK_d:
-                        if (!key_d) {
-                            key_d = true;
-                            sender.add_event(MovementDTO(Direction::RIGHT, true));
-                        }
-                        break;
-                    default: {
-                    };
-                }
-            } else if (event.type == SDL_KEYUP) {
-                switch (event.key.keysym.sym) {
-                    case SDLK_w:
-                        if (key_w) {
-                            key_w = false;
-                            sender.add_event(MovementDTO(Direction::UP, false));
-                        }
-                        break;
-                    case SDLK_s:
-                        if (key_s) {
-                            key_s = false;
-                            sender.add_event(MovementDTO(Direction::DOWN, false));
-                        }
-                        break;
-                    case SDLK_a:
-                        if (key_a) {
-                            key_a = false;
-                            sender.add_event(MovementDTO(Direction::LEFT, false));
-                        }
-                        break;
-                    case SDLK_d:
-                        if (key_d) {
-                            key_d = false;
-                            sender.add_event(MovementDTO(Direction::RIGHT, false));
-                        }
-                        break;
-                    default: {
-                    };
-                }
-            }
+        if (!input_manager.handle_movement()) {
+            return;
         }
 
         // Obtener posiciones
@@ -226,8 +153,9 @@ void Client::draw_car(Renderer& renderer, Texture& sprites, const int pos_x, con
     const int car_screen_y = (pos_y - view_rect.y) * 1080 / view_rect.h;
 
     // Usar solo sprite vertical y rotarlo con SDL
-    renderer.Copy(sprites, Rect(128, 32, 32, 32), Rect(car_screen_x - 32, car_screen_y - 32, 64, 64), angle,
-                  NullOpt, SDL_FLIP_NONE);
+    renderer.Copy(sprites, Rect(128, 32, 32, 32),
+                  Rect(car_screen_x - 32, car_screen_y - 32, 64, 64), angle, NullOpt,
+                  SDL_FLIP_NONE);
 }
 
 void Client::draw_health_bar(Renderer& renderer, int health) {
@@ -270,11 +198,6 @@ void Client::draw_minimap(Renderer& renderer, Texture& minimap_static, const int
 }
 
 Client::~Client() {
-    if (sender.is_alive()) {
-        sender.stop();
-        sender.close_queue();
-        sender.join();
-    }
     if (receiver.is_alive()) {
         receiver.stop();
         receiver.join();
