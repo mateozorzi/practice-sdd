@@ -42,7 +42,6 @@ void SDLManager::set_minimap() {
     renderer.SetTarget();
 }
 
-
 void SDLManager::clear_screen() { renderer.Clear(); }
 
 void SDLManager::show_screen() { renderer.Present(); }

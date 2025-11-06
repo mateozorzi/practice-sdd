@@ -13,9 +13,6 @@
 #include "camera.h"
 #include "menu_interface.h"
 
-// NOLINTNEXTLINE(build/namespaces)
-using namespace SDL2pp;
-
 Client::Client(const std::string& hostname, const std::string& servname):
         protocol(hostname, servname),
         receiver(protocol),
@@ -24,13 +21,6 @@ Client::Client(const std::string& hostname, const std::string& servname):
         client_id(0) {}
 
 void Client::run() {
-    // lobby ui
-    /*
-    if (menu.lobby()) {
-        exit(0);
-    }
-    */
-
     // Recibir client_id del servidor antes de iniciar receiver
     protocol.send_username("a");
     client_id = protocol.receive_id();
