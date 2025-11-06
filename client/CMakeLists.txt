@@ -12,6 +12,7 @@ target_sources(taller_client
     sender.cpp
     receiver.cpp
     camera.cpp
+    input_manager.cpp
 
     Lobby/lobby.cpp
     Lobby/selectcars.cpp
@@ -27,6 +28,7 @@ target_sources(taller_client
     sender.h
     receiver.h
     camera.h
+    input_manager.h
 
     Lobby/lobby.h
     Lobby/selectcars.h
