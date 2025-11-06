@@ -8,6 +8,7 @@
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
 #include "../common/movement_dto.h"
+#include "../common/car_catalogue_dto.h"
 
 enum class ServerResponse {
 
@@ -32,6 +33,8 @@ public:
     void send_movement(const MovementDTO& movement);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
+    void ask_for_catalogue();
+    CarCatalogueDTO receive_car_catalogue();
     uint32_t receive_id();
 };
 

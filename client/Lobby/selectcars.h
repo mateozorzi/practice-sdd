@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include "../../common/car_dto.h"
+#include "../../common/car_catalogue_dto.h"
 
 namespace Ui {
 class SelectCars;
@@ -17,25 +18,24 @@ signals:
     void confirm_car(QString select_car);
 
 public:
-    explicit SelectCars(QWidget* parent = nullptr);
+    explicit SelectCars(CarCatalogueDTO& catalogue, QWidget* parent = nullptr);
     ~SelectCars();
-
-    void set_market(const std::vector<car_dto>& cars);
 
 private slots:
     void value_format();
-    void rows_format();
-
-    void onCarSelected(int index);
 
     void on_Confirm_clicked();
 
     void on_Exit_clicked();
 
+    //void onCarChosen(const QString& model);
+
 private:
     Ui::SelectCars* ui;
     QGraphicsScene* scene;
-    std::vector<car_dto> market;
+    CarCatalogueDTO catalogue;
+
+    void set_market();
 };
 
 #endif  // SELECTCARS_H

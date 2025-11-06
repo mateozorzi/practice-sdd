@@ -25,11 +25,11 @@ Client::Client(const std::string& hostname, const std::string& servname):
 
 void Client::run() {
     // lobby ui
-    /*
+    
     if (menu.lobby()) {
         exit(0);
     }
-    */
+    
 
     protocol.send_username("a");
 

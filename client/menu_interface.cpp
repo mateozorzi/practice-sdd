@@ -9,24 +9,27 @@
 #include <QString>
 #include <QEventLoop>
 #include "../common/car_dto.h"
+#include "../common/car_catalogue_dto.h"
 
 MenuInterface::MenuInterface(ClientProtocol& protocol) : protocol(protocol) {}
 
 
 bool MenuInterface::car_selection(){
-    SelectCars sc;
+    //server send market of cars
+    //protocol.ask_for_catalogue();
+    //CarCatalogueDTO catalogue = protocol.receive_car_catalogue();
+    std::vector<car_dto> cars = std::vector<car_dto>{
+        car_dto("Compact", 10, 5, 5, 3),
+        car_dto("Sport", 15, 2, 6, 4),
+        car_dto("Convertible", 20, 10, 7, 5)
+    };
+
+    CarCatalogueDTO catalogue(std::move(cars));
+    
+    SelectCars sc(catalogue);
     sc.showMaximized();
 
     bool car_selection = false;
-
-    //server sends market of cars to choose
-    //client send information to sc about cars to show in the ui
-    std::vector<car_dto> market = std::vector<car_dto>{
-        car_dto("Car A", 10, 5, 5, 3),
-        car_dto("Car B", 15, 2, 6, 4),
-        car_dto("Car C", 20, 10, 7, 5)
-    };
-    sc.set_market(market);
 
     QEventLoop loop;
 
