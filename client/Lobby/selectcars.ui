@@ -83,8 +83,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">gridline-color: gray;
-background: transparent;</string>
+         <string notr="true"/>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>

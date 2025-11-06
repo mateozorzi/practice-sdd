@@ -25,10 +25,11 @@ Client::Client(const std::string& hostname, const std::string& servname):
 
 void Client::run() {
     // lobby ui
-    
-    if (menu.lobby()) {
+    int client_id = menu.lobby();
+    if (client_id == -1) {
         exit(0);
     }
+    exit(0); //delte later
     
 
     protocol.send_username("a");

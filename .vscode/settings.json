@@ -77,6 +77,10 @@
         "xutility": "cpp",
         "csignal": "cpp",
         "qapplication": "cpp",
-        "qeventloop": "cpp"
+        "qeventloop": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "ranges": "cpp",
+        "valarray": "cpp"
     }
 }

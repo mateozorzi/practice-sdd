@@ -6,5 +6,9 @@
         <file>images/Sport.png</file>
         <file>images/Convertible.png</file>
         <file>images/Compact.png</file>
+        <file>images/Truck.png</file>
+        <file>images/Sedan.png</file>
+        <file>images/Rally.png</file>
+        <file>images/Jeep.png</file>
     </qresource>
 </RCC>

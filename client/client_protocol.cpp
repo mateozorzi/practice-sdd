@@ -1,5 +1,6 @@
 #include "client_protocol.h"
 #include "../common/car_catalogue_dto.h"
+#include "../common/car_dto.h"
 #include <iostream>
 
 
@@ -53,7 +54,7 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue(){
         uint8_t acceleration = recv_uint8();
         cars.push_back(car_dto(model, health, handling, speed, acceleration));
     }
-    return CarCatalogueDTO(cars);
+    return CarCatalogueDTO(std::move(cars));
 }
 
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }

@@ -16,16 +16,16 @@ MenuInterface::MenuInterface(ClientProtocol& protocol) : protocol(protocol) {}
 
 bool MenuInterface::car_selection(){
     //server send market of cars
-    //protocol.ask_for_catalogue();
-    //CarCatalogueDTO catalogue = protocol.receive_car_catalogue();
-    std::vector<car_dto> cars = std::vector<car_dto>{
-        car_dto("Compact", 10, 5, 5, 3),
-        car_dto("Sport", 15, 2, 6, 4),
-        car_dto("Convertible", 20, 10, 7, 5)
-    };
+    protocol.ask_for_catalogue();
+    CarCatalogueDTO catalogue = protocol.receive_car_catalogue();
+    //std::vector<car_dto> cars = std::vector<car_dto>{
+    //    car_dto("Compact", 10, 5, 5, 3),
+    //    car_dto("Sport", 15, 2, 6, 4),
+    //    car_dto("Convertible", 20, 10, 7, 5)
+    //};
 
-    CarCatalogueDTO catalogue(std::move(cars));
-    
+    //CarCatalogueDTO catalogue(std::move(cars));
+    std::cout << "Received car catalogue of size: " << static_cast<int>(catalogue.size) << std::endl;
     SelectCars sc(catalogue);
     sc.showMaximized();
 
@@ -34,10 +34,10 @@ bool MenuInterface::car_selection(){
     QEventLoop loop;
 
     //confirm signal, the client select the car
-    QObject::connect(&sc, &SelectCars::confirm_car, [&](const QString &car) {
+    QObject::connect(&sc, &SelectCars::confirm_car, [&](const car_dto& car) {
         // client confirm the car selection
-        std::string selected_car = car.toStdString();
-        std::cout << "Car selected: " << selected_car << std::endl;
+        std::cout << "Car selected: " << car.model << std::endl;
+        //client send car_selected to server
         car_selection = true;
         loop.quit();
     });
@@ -64,7 +64,7 @@ bool MenuInterface::lobby(){
     l.showMaximized();
 
     std::string username;
-    bool close_game = false;
+    uint32_t client_id = -1;
 
     //QEventLoop loop;
 
@@ -74,6 +74,8 @@ bool MenuInterface::lobby(){
         std::cout << "Username entered: " << username << std::endl;
 
         protocol.send_username(username);
+        client_id = protocol.receive_id(); // wait for server response
+        std::cout << "Received client ID: " << client_id << std::endl;
 
         //server send car market if username valid -> new ui where client choose car -> ui car upgrades -> return false
         l.hide();
@@ -81,11 +83,10 @@ bool MenuInterface::lobby(){
 
         //car no selected, client close the game
         if (!car_selected) {
-            close_game = true;
-            app.quit();
+            //show enter username again
+            l.show();
         }else{
             //car selected, start the game
-            close_game = false;
             app.quit();
         }
         
@@ -96,11 +97,12 @@ bool MenuInterface::lobby(){
     // exit signal
     QObject::connect(&l, &Lobby::game_close, [&]() {
         // client close the game
-        close_game = true;
+        client_id = -1;
+        l.close();
         app.quit();
     });
 
     app.exec();
 
-    return close_game;
+    return client_id;
 }

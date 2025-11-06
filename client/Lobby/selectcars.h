@@ -15,7 +15,7 @@ class SelectCars: public QMainWindow {
 
 signals:
     void back_to_lobby();
-    void confirm_car(QString select_car);
+    void confirm_car(const car_dto& car);
 
 public:
     explicit SelectCars(CarCatalogueDTO& catalogue, QWidget* parent = nullptr);
@@ -24,16 +24,15 @@ public:
 private slots:
     void value_format();
 
-    void on_Confirm_clicked();
-
     void on_Exit_clicked();
 
-    //void onCarChosen(const QString& model);
 
 private:
     Ui::SelectCars* ui;
     QGraphicsScene* scene;
     CarCatalogueDTO catalogue;
+
+    void onCarChosen(const car_dto& car);
 
     void set_market();
 };

@@ -177,8 +177,8 @@ void GameLoop::run() {
                 break;
             }
 
-            update_positions();
-            world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+            //update_positions();
+            //world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
