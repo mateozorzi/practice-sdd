@@ -1,6 +1,7 @@
 target_sources(taller_common
     PRIVATE
     # .cpp files
+    car_catalogue_dto.cpp
     car_position_dto.cpp
     common_protocol.cpp
     foo.cpp
@@ -12,6 +13,7 @@ target_sources(taller_common
     socket.cpp
     PUBLIC
     # .h files
+    car_catalogue_dto.h
     car_position_dto.h
     common_protocol.h
     foo.h
