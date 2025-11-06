@@ -1,5 +1,7 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
+#include <vector>
+
 #include "common/car_position_dto.h"
 #include "common/queue.h"
 #include "common/thread.h"
@@ -14,12 +16,12 @@ class Receiver: public Thread {
     ClientProtocol& protocol;
     GameState game_state;
     std::mutex state_mutex;
-    Queue<CarPositionDTO> car_position_queue;
+    Queue<std::vector<CarPositionDTO>> car_positions_queue;
 
 public:
     explicit Receiver(ClientProtocol& protocol);
     GameState get_game_state() const;
-    Queue<CarPositionDTO>& get_car_position_queue();
+    Queue<std::vector<CarPositionDTO>>& get_car_positions_queue();
     void run() override;
 };
 

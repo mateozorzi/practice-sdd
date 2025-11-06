@@ -7,6 +7,8 @@
     <qresource prefix="/images">
         <file>imagenes/bandera.jpg</file>
         <file>imagenes/fondo.png</file>
+        <file>imagenes/new_circuit.jpg</file>
+        <file>imagenes/edit_circuit.png</file>
     </qresource>
     <qresource prefix="/circuitos">
         <file>imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Vice City.png</file>
@@ -14,8 +16,8 @@
         <file>imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png</file>
     </qresource>
     <qresource prefix="/mask">
-        <file>imagenes/003_B_STREETS_vice_city.png</file>
-        <file>imagenes/002_B_STREETS_san_andreas.png</file>
-        <file>imagenes/001_B_STREETS_liberty_city.png</file>
+        <file>imagenes/003 - B_STREETS - Vice City.png</file>
+        <file>imagenes/002 - B_STREETS - San Andreas.png</file>
+        <file>imagenes/001 - B_STREETS - Liberty City.png</file>
     </qresource>
 </RCC>

@@ -4,25 +4,34 @@ target_sources(taller_server
     acceptor.cpp
     car.cpp
     client_handler.cpp
+    collision_listener.cpp
     game_command.cpp
     game_loop.cpp
     game_monitor.cpp
     main.cpp
+    player.cpp
     receiver.cpp
     sender.cpp
     server.cpp
     server_protocol.cpp
+    world_snapshot.cpp
+    world_utils.cpp
     PUBLIC
     # .h files
     acceptor.h
     car.h
     client_handler.h
     client_request.h
+    collision_listener.h
     game_command.h
     game_loop.h
     game_monitor.h
+    player.h
     receiver.h
     sender.h
     server.h
     server_protocol.h
+    world_creation_exception.h
+    world_snapshot.h
+    world_utils.h
     )

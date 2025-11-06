@@ -3,11 +3,10 @@
 
 #include <QVector>
 #include <QPoint>
+#include <QObject>
 #include "checkpoint.h"
 
-class Coordinates
-{
-
+class Coordinates{
 private:
     QVector<Checkpoint> checkpoints;
 
@@ -15,18 +14,25 @@ private:
 
     bool is_a_checkpoint(const Checkpoint& point);
 
+    QString get_map_name(const QString& map);
+
 
 public:
     Coordinates();
+    Coordinates(QVector<Checkpoint>& checkpoint);
     ~Coordinates();
 
     bool add_checkpoint(const Checkpoint& point);
 
-    QPoint delete_checkpoint(const QPoint& point);
+    Checkpoint delete_checkpoint(const QPoint& point);
+
+    void update_id(int id_delete);
 
     bool enough_checkpoints();
 
-    bool export_checkpoints(const QString& map);
+    bool export_checkpoints(const QString& name, const QString& map, const QString& mask, QWidget* window);
+
+    QVector<Checkpoint> get_checkpoints();
 
     bool is_empty();
 

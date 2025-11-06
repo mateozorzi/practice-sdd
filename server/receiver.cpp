@@ -15,7 +15,26 @@ Receiver::Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor,
 void Receiver::handle_player_username(const ClientRequest& client_request) {
 
     const PlayerDTO& player_dto = server_protocol.receive_username();
+    server_protocol.send_client_id(client_id);
     game_monitor.add_command(GameCommand(client_id, client_request, player_dto));
+}
+
+void Receiver::handle_get_car_catalogue() {
+
+    std::vector<car_dto> cars = {
+        // Name, Health, Handling, MaxSpeed, Acceleration
+        {"Compact", 100, 90, 100, 80},
+        {"Sport", 80, 95, 150, 100},
+        {"Convertible", 85, 90, 140, 95},
+        {"Sedan", 90, 85, 120, 75},
+        {"Jeep", 150, 70, 85, 60},
+        {"Rally", 120, 80, 110, 70},
+        {"Truck", 200, 50, 80, 40}
+    };
+
+    CarCatalogueDTO catalogue(std::move(cars));
+
+    server_protocol.send_car_catalogue(catalogue);
 }
 
 void Receiver::handle_car_movement(const ClientRequest& client_request) {
@@ -33,6 +52,8 @@ void Receiver::run() {
             const ClientRequest client_request = server_protocol.receive_client_request();
             if (client_request == ClientRequest::SEND_USERNAME)
                 handle_player_username(client_request);
+            else if (client_request == ClientRequest::GET_CAR_CATALOGUE)
+                handle_get_car_catalogue();
             else if (client_request == ClientRequest::MOVE_CAR)
                 handle_car_movement(client_request);
             else if (client_request == ClientRequest::DISCONNECT)

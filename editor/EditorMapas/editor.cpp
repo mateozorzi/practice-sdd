@@ -17,7 +17,7 @@ Editor::~Editor()
 void Editor::on_mapa1_clicked()
 {
     QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png";
-    QString mask = ":/mask/imagenes/001_B_STREETS_liberty_city.png";
+    QString mask = ":/mask/imagenes/001 - B_STREETS - Liberty City.png";
     //liberty city map
     this->hide();
     Creador *c = new Creador(mapa, mask);
@@ -25,7 +25,8 @@ void Editor::on_mapa1_clicked()
 
     // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show();
+        emit close_editor();
+        this->close();
     });
 
     c->showMaximized();
@@ -35,7 +36,7 @@ void Editor::on_mapa1_clicked()
 void Editor::on_mapa2_clicked()
 {
     QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - San Andreas.png";
-    QString mask = ":/mask/imagenes/002_B_STREETS_san_andreas.png";
+    QString mask = ":/mask/imagenes/002 - B_STREETS - San Andreas.png";
     //san andreas amp
     this->hide();
     Creador *c = new Creador(mapa, mask);
@@ -43,7 +44,8 @@ void Editor::on_mapa2_clicked()
 
     // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show();
+        emit close_editor();
+        this->close();
     });
 
     c->showMaximized();
@@ -53,7 +55,7 @@ void Editor::on_mapa2_clicked()
 void Editor::on_mapa3_clicked()
 {
     QString mapa = ":/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Vice City.png";
-    QString mask = ":/mask/imagenes/003_B_STREETS_vice_city.png";
+    QString mask = ":/mask/imagenes/003 - B_STREETS - Vice City.png";
     //vice city map
     this->hide();
     Creador *c = new Creador(mapa, mask);
@@ -61,7 +63,9 @@ void Editor::on_mapa3_clicked()
 
     // signal to know when the editor has close
     connect(c, &Creador::close_w, this, [this]() {
-        this->show();
+        emit close_editor();
+        this->close();
+
     });
 
     c->showMaximized();
@@ -72,6 +76,7 @@ void Editor::on_mapa3_clicked()
 
 void Editor::on_Exit_clicked()
 {
-    QApplication::quit();
+    emit close_editor();
+    this->close();
 }
 

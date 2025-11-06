@@ -17,8 +17,21 @@ void ClientProtocol::send_movement(const MovementDTO& movement) {
 }
 
 CarPositionDTO ClientProtocol::receive_car_position() {
+
+    const uint32_t client_id = recv_uint32();
     const uint32_t x_position = recv_uint32();
     const uint32_t y_position = recv_uint32();
     const uint32_t angle = recv_uint32();
-    return CarPositionDTO(x_position, y_position, angle);
+    return CarPositionDTO(client_id, x_position, y_position, angle);
 }
+
+std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
+    const uint8_t size = recv_uint8();
+    std::vector<CarPositionDTO> positions;
+    for (uint8_t i = 0; i < size; ++i) {
+        positions.push_back(receive_car_position());
+    }
+    return positions;
+}
+
+uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
