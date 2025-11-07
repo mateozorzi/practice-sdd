@@ -24,3 +24,8 @@ void Camera::update(const int player_x, const int player_y) {
 }
 
 SDL2pp::Rect Camera::get_view_rect() const { return {camera_x, camera_y, view_width, view_height}; }
+
+bool Camera::on_screen(const SDL2pp::Rect& game) {
+    const SDL2pp::Rect view = get_view_rect();
+    return view.Intersects(game);
+}

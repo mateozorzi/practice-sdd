@@ -18,6 +18,8 @@ public:
     void update(int player_x, int player_y);
 
     SDL2pp::Rect get_view_rect() const;
+
+    bool on_screen(const SDL2pp::Rect& game);
 };
 
 #endif  // CAMERA_H
