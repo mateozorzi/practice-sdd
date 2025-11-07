@@ -137,17 +137,14 @@ void SDLManager::render_bridges() {
         if (!camera.on_screen(bridge_src_full))
             continue;
 
-        const SDL2pp::Rect bridge_src(bridge_src_full.x, bridge_src_full.y, bridge_src_full.w,
-                                      bridge_src_full.h);
-
         // Vista en pantalla
         const int dx = (bridge_src_full.x - view.x) * screen_w / view.w;
         const int dy = (bridge_src_full.y - view.y) * screen_h / view.h;
-        const int dw = bridge_src.w * screen_w / view.w;
-        const int dh = bridge_src.h * screen_h / view.h;
+        const int dw = bridge_src_full.w * screen_w / view.w;
+        const int dh = bridge_src_full.h * screen_h / view.h;
         const SDL2pp::Rect bridge_dst(dx, dy, dw, dh);
 
-        renderer.Copy(map.value(), bridge_src, bridge_dst);
+        renderer.Copy(map.value(), bridge_src_full, bridge_dst);
     }
 }
 
