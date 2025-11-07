@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/lobby">
         <file>images/max.jpg</file>
+        <file>images/join.png</file>
+        <file>images/create.png</file>
     </qresource>
     <qresource prefix="/cars">
         <file>images/Sport.png</file>

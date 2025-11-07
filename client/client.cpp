@@ -12,6 +12,8 @@
 
 #include "camera.h"
 #include "menu_interface.h"
+#include "../common/player_dto.h"
+
 
 // NOLINTNEXTLINE(build/namespaces)
 using namespace SDL2pp;
@@ -25,8 +27,8 @@ Client::Client(const std::string& hostname, const std::string& servname):
 
 void Client::run() {
     // lobby ui
-    int client_id = menu.lobby();
-    if (client_id == -1) {
+    PlayerDTO player = menu.lobby();
+    if (static_cast<int>(player.id) == -1) {
         exit(0);
     }
     exit(0); //delte later

@@ -3,14 +3,16 @@
 
 #include "client_protocol.h"
 
+#include "../common/player_dto.h"
+
 class MenuInterface {
 private:
     ClientProtocol& protocol;
 
 public:
     explicit MenuInterface(ClientProtocol& protocol);
-    bool lobby();
-    bool car_selection();
+    PlayerDTO lobby();
+    bool car_selection(PlayerDTO& player);
 };
 
 
