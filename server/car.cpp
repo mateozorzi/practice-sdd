@@ -1,0 +1,128 @@
+#include "car.h"
+
+#include <cmath>
+#include "../common/constants.h"
+
+Car::Car(const uint32_t client_id, b2World& world, const CarConfig& config): client_id(client_id), body(nullptr), config(config) {
+
+    b2BodyDef body_definition;
+    body_definition.type = b2_dynamicBody;
+    body_definition.position.Set(2.828f, 3.171f); // Starting from the main road
+    body_definition.angle = b2_pi / 2.0f;
+    body_definition.linearDamping = config.linear_damping;
+    body_definition.angularDamping = config.angular_damping;
+
+    body = world.CreateBody(&body_definition);
+
+    b2PolygonShape shape;
+    shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
+
+    b2FixtureDef fixture;
+    fixture.shape = &shape;
+    fixture.density = config.density;
+    fixture.friction = config.friction;
+    fixture.restitution = config.restitution;
+
+    body->CreateFixture(&fixture);
+}
+
+void Car::handle_movement(const MovementDTO& movement_dto) {
+
+    switch (movement_dto.direction) {
+
+        case Direction::UP:
+            moving_up = movement_dto.isMoving;
+            break;
+        case Direction::DOWN:
+            moving_down = movement_dto.isMoving;
+            break;
+        case Direction::LEFT:
+            moving_left = movement_dto.isMoving;
+            break;
+        case Direction::RIGHT:
+            moving_right = movement_dto.isMoving;
+            break;
+    }
+}
+
+
+void Car::detect_linear_movement() {
+
+    b2Vec2 forward_vector = body->GetWorldVector(b2Vec2(0.0f, 1.0f));
+
+    b2Vec2 force = body->GetMass() * config.acceleration * forward_vector;
+
+    if (moving_up)
+        body->ApplyForceToCenter(-force, true);
+
+    if (moving_down)
+        body->ApplyForceToCenter(config.breaking_factor * force, true);
+    
+    b2Vec2 velocity = body->GetLinearVelocity();
+    float current_speed = velocity.Length();
+
+    if (current_speed > config.max_speed) {
+
+        float scale = config.max_speed / current_speed;
+        b2Vec2 limited_velocity(velocity.x * scale, velocity.y * scale);
+        body->SetLinearVelocity(limited_velocity);
+    }
+}
+
+void Car::detect_rotation() {
+
+    b2Vec2 velocity = body->GetLinearVelocity();
+    float current_speed = velocity.Length();
+
+    if (current_speed > config.min_turn_speed) {
+
+        if (moving_left)
+            body->ApplyTorque(-config.turn_torque, true);
+        if (moving_right)
+            body->ApplyTorque(config.turn_torque, true);
+    }
+}
+
+void Car::detect_drifting() {
+
+    b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
+    b2Vec2 velocity = body->GetLinearVelocity();
+
+    b2Vec2 lateral_velocity = b2Dot(velocity, right_vector) * right_vector;
+    b2Vec2 lateral_impulse = -config.drift_factor * body->GetMass() * lateral_velocity;
+
+    body->ApplyLinearImpulseToCenter(lateral_impulse, true);
+}
+
+
+void Car::update_position() {
+    
+    detect_linear_movement();
+
+    detect_rotation();
+
+    detect_drifting();
+}
+
+CarPositionDTO Car::get_position_dto() const {
+
+    b2Vec2 position_meters = body->GetPosition();
+    float angle_radians = body->GetAngle();
+
+    uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * PIXELS_PER_METER);
+    uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * PIXELS_PER_METER);
+    uint32_t angle_degrees = static_cast<uint32_t>(angle_radians * (180.0f / b2_pi));
+
+    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees);
+}
+
+
+void Car::set_collision(bool colliding) {
+
+    is_colliding = colliding;
+}
+
+b2Body* Car::get_body() const {
+
+    return body;
+}

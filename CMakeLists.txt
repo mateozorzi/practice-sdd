@@ -50,6 +50,11 @@ target_include_directories(taller_common PUBLIC .)
 # sudo apt-get install libopus-dev libopusfile-dev libxmp-dev libfluidsynth-dev fluidsynth libwavpack1 libwavpack-dev libfreetype-dev wavpack
 #
 
+# Enable SDL2pp with Image, TTF and Mixer support
+set(SDL2PP_WITH_IMAGE YES)
+set(SDL2PP_WITH_TTF YES)
+set(SDL2PP_WITH_MIXER YES)
+
 # Install libSDL2 and libSDL2pp (for client or editor)
 # HEY!! TODO XXX: add more dependendies (either for client, server or editor)
 if(TALLER_CLIENT OR GAME_EDITOR)
@@ -96,12 +101,36 @@ if(TALLER_CLIENT OR GAME_EDITOR)
         URL https://github.com/libSDL2pp/libSDL2pp/archive/cc198c9a5657048bee67ece82de620b2d5661084.zip
     )
 
-    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp)
+    FetchContent_Declare(
+        box2d
+        GIT_REPOSITORY https://github.com/erincatto/box2d.git
+        GIT_TAG v2.4.1
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        # override box2d max polygon vertices
+        PATCH_COMMAND sed -i "s/#define b2_maxPolygonVertices\t8/#define b2_maxPolygonVertices\t16/g" include/box2d/b2_settings.h || true
+    )
+
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+    )
+
+    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable Box2D unit tests")
+    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp box2d nlohmann_json)
 endif()
 
 # Program section
 # ---------------
 if(TALLER_CLIENT)
+    set(CMAKE_AUTOUIC ON)
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTORCC ON)
+    find_package(Qt6 COMPONENTS Core REQUIRED)
+    find_package(Qt6 COMPONENTS Widgets REQUIRED)
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(taller_client)
 
@@ -110,15 +139,18 @@ if(TALLER_CLIENT)
 
     # Add source files and enable warnings
     # HEY!! TODO XXX: add more subfolders here
-    add_subdirectory(client)
+    add_subdirectory(client Lobby)
 
     set_project_warnings(taller_client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # add libSDL2pp's headers
     target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR})
 
+    # Define DATA_PATH for the client
+    target_compile_definitions(taller_client PRIVATE DATA_PATH="${PROJECT_SOURCE_DIR}/client/cars")
+
     # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp)
+    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer Qt6::Widgets Qt6::Core)
 endif()
 
 if(TALLER_SERVER)
@@ -135,7 +167,7 @@ if(TALLER_SERVER)
     set_project_warnings(taller_server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # Link the taller_common lib target
-    target_link_libraries(taller_server taller_common)
+    target_link_libraries(taller_server taller_common box2d nlohmann_json::nlohmann_json)
 endif()
 
 if(GAME_EDITOR)
