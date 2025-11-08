@@ -24,7 +24,7 @@ void ClientProtocol::send_movement(const MovementDTO& movement) {
 void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
     //add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::CREATE_LOBBY));
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.lobby_id));
-    add_string_to_buffer(lobby.owner);
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.owner_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
     send_buffer();

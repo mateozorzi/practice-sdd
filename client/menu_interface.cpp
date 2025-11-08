@@ -73,7 +73,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         int max_players = cl.get_number_players();
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
 
-        //protocol.send_create_lobby(LobbyDTO(player.id, player.username, lobby_name, max_players));
+        //protocol.send_create_lobby(LobbyDTO(player.id, player.id, lobby_name, max_players));
 
         loop.quit();
 
