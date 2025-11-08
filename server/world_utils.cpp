@@ -25,8 +25,8 @@ bool WorldUtils::add_polygon_to_world(
         if (polygon[i].size() < 2) {
             throw WorldCreationException("Invalid vertex format");
         }
-        float x = pixels_to_meters(polygon[i][0] + WORLD_OFFSET_ADJUST_PIXELS_X);
-        float y = pixels_to_meters(polygon[i][1] + WORLD_OFFSET_ADJUST_PIXELS_Y) ;
+        float x = pixels_to_meters(polygon[i][0]);
+        float y = pixels_to_meters(polygon[i][1]) ;
         vertices[i].Set(x, y);
     }
 
@@ -46,7 +46,7 @@ bool WorldUtils::add_polygon_to_world(
     fixtureDef.shape = &polygonShape;
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.0f;
-    fixtureDef.restitution = 0.5f;
+    fixtureDef.restitution = 0.0f;
     
     // Attach the fixture to the body
     body->CreateFixture(&fixtureDef);
