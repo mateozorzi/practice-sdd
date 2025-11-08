@@ -73,7 +73,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         int max_players = cl.get_number_players();
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
 
-        protocol.send_create_lobby(LobbyDTO(1, player.id, lobby_name, max_players));
+        //protocol.send_create_lobby(LobbyDTO(1, player.id, lobby_name, max_players));
 
         loop.quit();
 
@@ -107,7 +107,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     QObject::connect(&jl, &JoinLobby::join_lobby, [&]() {
         //client select a lobby and send it to server
         uint32_t lobby_id = 1; // jl.get_selected_lobby_id();
-        protocol.send_join_lobby(lobby_id);
+        //protocol.send_join_lobby(lobby_id);
         std::cout << "Sent join lobby request for lobby ID: " << lobby_id << std::endl;
 
         //wait for the server to confirm join

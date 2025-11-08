@@ -31,7 +31,6 @@ void Client::run() {
     if (static_cast<int>(player.id) == -1) {
         exit(0);
     }
-    exit(0); //delte later
     
     client_id = player.id;
 
