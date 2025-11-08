@@ -72,6 +72,11 @@ void GameLoop::handle_player_username(const GameCommand& game_command) {
         std::cout << "New player with ID: " << client_id 
                 << " has joined the game! | Username: " 
                 << player_dto->get().username << std::endl;
+
+        auto it = players.find(client_id);
+        if (it != players.end()) {
+            it->second.set_in_game();
+    }
     }
 }
 
@@ -115,25 +120,30 @@ void GameLoop::update_positions() {
 }
 
 
+bool GameLoop::any_player_in_game() const {
+
+    return std::any_of(players.begin(), players.end(),
+                       [](const auto& p) { return p.second.is_in_game(); });
+}
+
+
 void GameLoop::run() {
 
     try {
 
         while (should_keep_running()) {
 
-            GameCommand game_command;
-            try {
+            process_commands();
 
-                process_commands();
-            } catch (const ClosedQueue&) {
+            if (any_player_in_game()) {
 
-                break;
+                update_positions();
+                world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+                std::this_thread::sleep_for(std::chrono::milliseconds(16));
+            } else {
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
-
-            update_positions();
-            world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
     } catch (const ClosedQueue&) {}
 }

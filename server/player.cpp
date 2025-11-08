@@ -7,7 +7,8 @@ Player::Player(uint32_t client_id, const std::string& username,
       username(username),
       car(std::make_unique<Car>(client_id, world, config)),
       health(100),
-      races_won(0) {}
+      races_won(0),
+      in_game(false) {}
 
 
 uint32_t Player::get_client_id() const {
@@ -48,4 +49,15 @@ void Player::set_car_collision(bool colliding) {
 
     if (car)
         car->set_collision(colliding);
+}
+
+
+bool Player::is_in_game() const {
+
+    return in_game;
+}
+
+void Player::set_in_game() {
+
+    in_game = true;
 }
