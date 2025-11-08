@@ -19,3 +19,9 @@ void JoinLobby::on_refresh_clicked()
     emit refresh();
 }
 
+
+void JoinLobby::on_pushButton_clicked()
+{
+    emit join_lobby();
+}
+
