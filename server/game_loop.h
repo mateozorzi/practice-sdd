@@ -31,6 +31,7 @@ class GameLoop final: public Thread {
 
     void process_commands();
     void handle_player_username(const GameCommand& game_command);
+    void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);

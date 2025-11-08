@@ -31,12 +31,11 @@ void Client::run() {
     if (static_cast<int>(player.id) == -1) {
         exit(0);
     }
-    exit(0); //delte later
     
 
     // Recibir client_id del servidor antes de iniciar receiver
-    protocol.send_username("a");
-    client_id = protocol.receive_id();
+    //protocol.send_username("a");
+    // client_id = protocol.receive_id();
     receiver.start();
 
     // Vida del jugador (0-100)

@@ -15,6 +15,10 @@ GameCommand::GameCommand(const uint32_t client_id, const ClientRequest& client_r
                         const PlayerDTO& player_dto)
 : client_id(client_id), client_request(client_request), command_data(player_dto) {}
 
+GameCommand::GameCommand(const uint32_t client_id, const ClientRequest& client_request,
+                        const car_dto& car_dto)
+: client_id(client_id), client_request(client_request), command_data(car_dto) {}
+
 
 uint32_t GameCommand::get_client_id() const { return client_id; }
 

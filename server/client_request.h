@@ -9,6 +9,7 @@ enum class ClientRequest {
     SEND_USERNAME,
     MOVE_CAR,
     GET_CAR_CATALOGUE,
+    SEND_CAR_SELECTION,
     UNKNOWN
 };
 

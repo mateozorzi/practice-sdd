@@ -20,6 +20,8 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
     command_handlers = {
             {ClientRequest::SEND_USERNAME,
              [this](const GameCommand& game_command) { handle_player_username(game_command); }},
+            {ClientRequest::SEND_CAR_SELECTION,
+             [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
             {ClientRequest::MOVE_CAR,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
             {ClientRequest::DISCONNECT,
@@ -65,18 +67,26 @@ void GameLoop::handle_player_username(const GameCommand& game_command) {
             client_id, 
             client_id, 
             player_dto->get().username, 
-            world, 
-            CarConfig()
+            world
         );
 
         std::cout << "New player with ID: " << client_id 
                 << " has joined the game! | Username: " 
                 << player_dto->get().username << std::endl;
 
-        //auto it = players.find(client_id);
-        //if (it != players.end()) {
-        //    it->second.set_in_game();
-    //}
+    }
+}
+
+void GameLoop::handle_car_selection(const GameCommand& game_command) {
+
+    if (auto car = game_command.get_data<car_dto>()) {
+
+        uint32_t client_id = game_command.get_client_id();
+        auto it = players.find(client_id);
+        if (it != players.end()) {
+            it->second.set_car_configuration(car->get());
+            it->second.set_in_game();
+        }
     }
 }
 

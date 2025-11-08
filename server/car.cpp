@@ -3,7 +3,7 @@
 #include <cmath>
 #include "../common/constants.h"
 
-Car::Car(const uint32_t client_id, b2World& world, const CarConfig& config): client_id(client_id), body(nullptr), config(config) {
+Car::Car(const uint32_t client_id, b2World& world): client_id(client_id), body(nullptr), config(CarConfig()) {
 
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
@@ -125,4 +125,13 @@ void Car::set_collision(bool colliding) {
 b2Body* Car::get_body() const {
 
     return body;
+}
+
+
+void Car::set_configuration(const car_dto& car_configuration) {
+
+    // std::string model = car_configuration.model;
+
+    // Need to check which model of car the client wants here.
+    (void)car_configuration;  // To avoid unused parameter warning
 }
