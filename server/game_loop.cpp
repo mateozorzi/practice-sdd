@@ -73,10 +73,10 @@ void GameLoop::handle_player_username(const GameCommand& game_command) {
                 << " has joined the game! | Username: " 
                 << player_dto->get().username << std::endl;
 
-        auto it = players.find(client_id);
-        if (it != players.end()) {
-            it->second.set_in_game();
-    }
+        //auto it = players.find(client_id);
+        //if (it != players.end()) {
+        //    it->second.set_in_game();
+    //}
     }
 }
 
