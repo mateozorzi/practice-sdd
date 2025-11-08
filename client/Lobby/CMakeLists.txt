@@ -35,6 +35,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         createlobby.h createlobby.cpp createlobby.ui
         joinlobby.h joinlobby.cpp joinlobby.ui
         gamelobby.h gamelobby.cpp gamelobby.ui
+        waitingroom.h waitingroom.cpp waitingroom.ui
+
+
 
     )
 # Define target properties for Android with Qt 6 as:
