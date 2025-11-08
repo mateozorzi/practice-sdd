@@ -76,6 +76,11 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "csignal": "cpp",
-        "qapplication": "cpp"
+        "qapplication": "cpp",
+        "qeventloop": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "ranges": "cpp",
+        "valarray": "cpp"
     }
 }

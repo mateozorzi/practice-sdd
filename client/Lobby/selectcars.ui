@@ -58,92 +58,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="spacing">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QComboBox" name="combobox">
-        <property name="minimumSize">
-         <size>
-          <width>271</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>271</width>
-          <height>26</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(229, 165, 10);
-background-color: rgb(0, 0, 0);</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTextEdit" name="textEdit_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>498</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>26</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background: transparent;</string>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QGraphicsView" name="Carimage">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>271</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QTableWidget" name="Carinfo">
         <property name="sizePolicy">
@@ -165,8 +83,7 @@ background-color: rgb(0, 0, 0);</string>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">gridline-color: gray;
-background: transparent;</string>
+         <string notr="true"/>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
@@ -273,37 +190,12 @@ background: transparent;</string>
         </property>
         <property name="styleSheet">
          <string notr="true">border: 2px solid;
-color: rgb(246, 211, 45);
-background-color: rgb(224, 27, 36);
-border-color: rgb(245, 194, 17);</string>
+color: rgb(255, 255, 255);
+background-color: rgb(0, 0, 0);
+border-color: rgb(255, 255, 255);</string>
         </property>
         <property name="text">
          <string>Exit</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="Confirm">
-        <property name="minimumSize">
-         <size>
-          <width>131</width>
-          <height>51</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>131</width>
-          <height>51</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border: 2px solid;
-color: rgb(246, 211, 45);
-background-color: rgb(224, 27, 36);
-border-color: rgb(245, 194, 17);</string>
-        </property>
-        <property name="text">
-         <string>Confirm</string>
         </property>
        </widget>
       </item>

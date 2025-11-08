@@ -3,6 +3,11 @@
 #include "editor.h"
 #include "selectcircuit.h"
 
+#include <QDir>
+#include <QCoreApplication>
+
+const QString PROJECT_ROOT_NAME = "TP_Taller_de_Programacion-Need-For-Speed";
+
 EditorMenu::EditorMenu(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::EditorMenu)
@@ -37,11 +42,36 @@ void EditorMenu::on_pushButton_3_clicked()
 }
 
 
+QString EditorMenu::find_races_path() {
+    QDir dir(QCoreApplication::applicationDirPath());
+    while (true) {
+        if (dir.exists("server")) {
+            dir.cd("server");
+            if (!dir.exists("races")) {
+                dir.mkdir("races");
+            }
+            dir.cd("races");
+            return dir.absolutePath();
+        }
+
+        if (dir.dirName() == PROJECT_ROOT_NAME){
+            break;
+        }
+
+        if (!dir.cdUp()) {
+            break;
+        }
+    }
+    return QString();
+}
+
 void EditorMenu::on_pushButton_clicked()
 {
     //edit a already existing race
     this->hide();
-    SelectCircuit *c = new SelectCircuit("../server/races");
+
+    QString races_path = find_races_path();
+    SelectCircuit *c = new SelectCircuit(races_path);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // signal to know when the editor has close
