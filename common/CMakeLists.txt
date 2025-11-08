@@ -26,6 +26,6 @@ target_sources(taller_common
     socket.h
     thread.h
 
-
+    lobby_dto.h
     car_dto.h
     )

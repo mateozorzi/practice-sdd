@@ -6,11 +6,15 @@
 #include <QApplication>
 #include "Lobby/lobby.h"
 #include "Lobby/selectcars.h"
+#include "Lobby/creategame.h"
+#include "Lobby/createlobby.h"
+#include "Lobby/joinlobby.h"
 #include <QString>
 #include <QEventLoop>
 #include "../common/car_dto.h"
 #include "../common/car_catalogue_dto.h"
 #include "../common/player_dto.h"
+#include "../common/lobby_dto.h"
 
 MenuInterface::MenuInterface(ClientProtocol& protocol) : protocol(protocol) {}
 
@@ -52,6 +56,128 @@ bool MenuInterface::car_selection(PlayerDTO& player){
     return car_selection;
 }
 
+bool MenuInterface::create_lobby(PlayerDTO& player) {
+    //create lobby ui
+    CreateLobby cl;
+    cl.showMaximized();
+
+    bool closed = false;
+
+    QEventLoop loop;
+
+    //create lobby signal
+    QObject::connect(&cl, &CreateLobby::create_lobby, [&]() {
+        //save info of ther lobby, and send to server
+        std::string lobby_name = cl.get_lobby_name().toStdString();
+        int max_players = cl.get_number_players();
+        std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
+
+        //protocol.send_create_lobby(LobbyDTO(player.id, player.username, lobby_name, max_players));
+
+        loop.quit();
+
+    });
+
+    //close menu signal
+    QObject::connect(&cl, &CreateLobby::close_menu, [&]() {
+        closed = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return closed;
+    
+}
+
+bool MenuInterface::join_lobby(PlayerDTO& player) {
+    // join lobby ui
+    JoinLobby jl;
+    jl.showMaximized();
+
+    bool closed = false;
+
+    //server sends available lobbies
+    QEventLoop loop;
+
+    //join lobby signal
+
+
+    //refresh lobbies signal
+    QObject::connect(&jl, &JoinLobby::refresh, [&]() {
+        //request lobbies to server and update ui
+
+        std::cout <<player.username <<" refreshing available lobbies..." << std::endl;
+
+        //server sends available lobbies
+    });
+
+    //close menu signal
+    QObject::connect(&jl, &JoinLobby::close_menu, [&]() {
+        closed = true;
+        loop.quit();
+    });
+    
+    loop.exec();
+
+    return closed;
+
+}
+
+bool MenuInterface::lobby_create(PlayerDTO& player) {
+    creategame cg;
+    cg.showMaximized();
+
+    bool closed = false;
+
+    //client have two options: create or join lobby
+    QEventLoop loop;
+
+    //create lobby signal
+    QObject::connect(&cg, &creategame::create_lobby, [&]() {
+        cg.hide();
+        
+        bool close_menu = false;
+        
+        close_menu = create_lobby(player);
+
+        if (close_menu){
+            cg.show();
+        }else{
+            cg.close();
+
+            loop.quit();
+        }
+    });
+
+    //join lobby signal
+    QObject::connect(&cg, &creategame::join_lobby, [&]() {
+        cg.hide();
+        bool close_menu = false;
+        
+        close_menu = join_lobby(player);
+
+        if (close_menu){
+            cg.show();
+        }else{
+            cg.close();
+
+            loop.quit();
+
+        }
+    });
+
+    //close menu signal
+    QObject::connect(&cg, &creategame::close_menu, [&]() {
+        closed = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return closed;
+}
+
 PlayerDTO MenuInterface::lobby(){    
     int fake_argc = 0;
     char *fake_argv[] = { nullptr };
@@ -64,6 +190,8 @@ PlayerDTO MenuInterface::lobby(){
 
     std::string username;
     uint32_t client_id = -1;
+
+    bool menu_closed = false;
 
     //QEventLoop loop;
 
@@ -78,23 +206,28 @@ PlayerDTO MenuInterface::lobby(){
         std::cout << "Username entered: " << player.username << std::endl;
         std::cout << "Received client ID: " << player.id << std::endl;
 
-        player.username = username;
-        player.id = client_id;
-
-        //server send car market if username valid -> new ui where client choose car -> ui car upgrades -> return false
+        
+        //server send car market if username valid -> enter lobby (create or join)
         l.hide();
-        bool car_selected = car_selection(player);
+        menu_closed = lobby_create(player);
 
-        //car no selected, client close the game
-        if (!car_selected) {
+        if (menu_closed){
             //show enter username again
             l.show();
         }else{
-            //car selected, start the game
-            app.quit();
+            //new ui where client choose car -> ui car upgrades -> return false
+            bool car_selected = car_selection(player);
+
+            //car no selected, client close the game
+            if (!car_selected) {
+                //show enter username again
+                l.show();
+            }else{
+                //car selected, start the game
+                l.close();
+                app.quit();
+            }
         }
-        
-        //if not, response with an error id and ask again
 
     });
 

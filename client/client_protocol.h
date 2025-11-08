@@ -9,6 +9,7 @@
 #include "../common/constants.h"
 #include "../common/movement_dto.h"
 #include "../common/car_catalogue_dto.h"
+#include "../common/lobby_dto.h"
 
 enum class ServerResponse {
 
@@ -31,6 +32,7 @@ public:
 
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
+    void send_create_lobby(const LobbyDTO& lobby);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
     void ask_for_catalogue();

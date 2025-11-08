@@ -32,6 +32,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         images.qrc
         selectcars.h selectcars.cpp selectcars.ui
         creategame.h creategame.cpp creategame.ui
+        createlobby.h createlobby.cpp createlobby.ui
+        joinlobby.h joinlobby.cpp joinlobby.ui
+        gamelobby.h gamelobby.cpp gamelobby.ui
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Lobby APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

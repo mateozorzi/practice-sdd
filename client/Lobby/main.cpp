@@ -14,7 +14,8 @@ int main(int argc, char* argv[]) {
     //SelectCars c;
     //c.showMaximized();
 
-    creategame g;
-    g.showMaximized();
+    //creategame g;
+    //g.showMaximized();
+
     return a.exec();
 }
