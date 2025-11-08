@@ -21,6 +21,7 @@ class Player {
     std::unique_ptr<Car> car;
     uint16_t health;
     uint16_t races_won;
+    bool in_game;
 
 
 public:
@@ -37,6 +38,9 @@ public:
     void update_car_position();
     CarPositionDTO get_car_position() const;
     void set_car_collision(bool colliding);
+
+    bool is_in_game() const;
+    void set_in_game();
     
 };
 

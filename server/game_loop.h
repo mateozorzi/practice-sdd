@@ -36,6 +36,8 @@ class GameLoop final: public Thread {
     void handle_command(const GameCommand& game_command);
     void update_positions();
 
+    bool any_player_in_game() const;
+
 
 public:
     GameLoop(const GameLoop&) = delete;
