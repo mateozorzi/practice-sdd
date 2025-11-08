@@ -38,7 +38,4 @@ constexpr float PIXELS_PER_METER = 30.0f;
     // TODO: replace with command line parameter
 constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/world/polygons_liberty_city.json";
 
-constexpr int WORLD_OFFSET_ADJUST_PIXELS_X = -31;
-constexpr int WORLD_OFFSET_ADJUST_PIXELS_Y = -7;
-
 #endif
