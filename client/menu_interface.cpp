@@ -39,6 +39,7 @@ bool MenuInterface::car_selection(PlayerDTO& player){
         player.car = car;
         std::cout << "Car selected: " << player.car.model << std::endl;
         //client send car_selected to server
+        protocol.send_car_selection(car);
         car_selection = true;
         loop.quit();
     });

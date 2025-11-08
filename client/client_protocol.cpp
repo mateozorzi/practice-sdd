@@ -30,6 +30,12 @@ void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
     send_buffer();
 }
 
+void ClientProtocol::send_car_selection(const car_dto& car){
+    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_SELECTION));
+    add_string_to_buffer(car.model);
+    send_buffer();
+}
+
 CarPositionDTO ClientProtocol::receive_car_position() {
 
     const uint32_t client_id = recv_uint32();
