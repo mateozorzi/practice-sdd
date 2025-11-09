@@ -9,6 +9,7 @@
 #include "Lobby/creategame.h"
 #include "Lobby/createlobby.h"
 #include "Lobby/joinlobby.h"
+#include "Lobby/waitingroom.h"
 #include <QString>
 #include <QEventLoop>
 #include "../common/car_dto.h"
@@ -137,11 +138,36 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
 }
 
+bool MenuInterface::waiting_room(const bool is_owner) {
+    WaitingRoom w(is_owner);
+    w.showMaximized();
+
+    bool closed = false;
+
+    QEventLoop loop;
+
+    //start lobby signal
+    QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
+        loop.quit();
+    });
+
+    //exit signal
+    QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
+        closed = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return closed;
+}
+
 bool MenuInterface::lobby_create(PlayerDTO& player) {
     creategame cg;
     cg.showMaximized();
 
     bool closed = false;
+    bool owner = false;
 
     //client have two options: create or join lobby
     QEventLoop loop;
@@ -158,6 +184,8 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
             cg.show();
         }else{
             cg.close();
+
+            owner = true;
 
             loop.quit();
         }
@@ -187,6 +215,11 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
     });
 
     loop.exec();
+
+    if (!closed){
+        //open waiting room
+        closed = waiting_room(owner);
+    }
 
     return closed;
 }
