@@ -5,9 +5,6 @@
 #include <iostream>
 
 
-ClientProtocol::ClientProtocol(const std::string& hostname, const std::string& port):
-        CommonProtocol(client_socket), client_socket(hostname.c_str(), port.c_str()) {}
-
 void ClientProtocol::send_username(const std::string& username) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_USERNAME));
     add_string_to_buffer(username);

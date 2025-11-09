@@ -23,6 +23,7 @@ public:
     ~Client();
 
 private:
+    Socket client_socket;
     SDLManager sdl_manager;
     ClientProtocol protocol;
     Receiver receiver;
