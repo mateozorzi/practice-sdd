@@ -33,6 +33,7 @@ public:
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
     void send_create_lobby(const LobbyDTO& lobby);
+    void ask_for_lobbies();
     void send_join_lobby(uint32_t lobby_id);
     void send_car_selection(const car_dto& car);
     CarPositionDTO receive_car_position();

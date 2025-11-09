@@ -99,6 +99,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     bool closed = false;
 
     //client ask for available lobbies
+    //protocol.ask_for_lobbies();
 
     //server sends available lobbies
     QEventLoop loop;
