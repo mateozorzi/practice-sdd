@@ -31,7 +31,8 @@ void Client::run() {
     if (static_cast<int>(player.id) == -1) {
         exit(0);
     }
-    
+
+    client_id = player.id;
 
     // Recibir client_id del servidor antes de iniciar receiver
     //protocol.send_username("a");

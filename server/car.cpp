@@ -111,7 +111,17 @@ CarPositionDTO Car::get_position_dto() const {
 
     uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * PIXELS_PER_METER);
     uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * PIXELS_PER_METER);
-    uint32_t angle_degrees = static_cast<uint32_t>(angle_radians * (180.0f / b2_pi));
+
+    float angle_degrees_float = angle_radians * (180.0f / b2_pi);
+    
+    angle_degrees_float = fmod(angle_degrees_float, 360.0f);
+    if (angle_degrees_float < 0.0f)
+        angle_degrees_float += 360.0f;
+    
+    uint32_t angle_degrees = static_cast<uint32_t>(angle_degrees_float + 0.5f);
+    
+    if (angle_degrees >= 360)
+        angle_degrees = 0;
 
     return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees);
 }
