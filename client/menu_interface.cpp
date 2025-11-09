@@ -61,7 +61,7 @@ bool MenuInterface::car_selection(PlayerDTO& player){
 bool MenuInterface::create_lobby(PlayerDTO& player) {
     //create lobby ui
     CreateLobby cl;
-    cl.showMaximized();
+    cl.show();
 
     bool closed = false;
 
@@ -95,7 +95,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 bool MenuInterface::join_lobby(PlayerDTO& player) {
     // join lobby ui
     JoinLobby jl;
-    jl.showMaximized();
+    jl.show();
 
     bool closed = false;
 
@@ -140,7 +140,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
 bool MenuInterface::waiting_room(const bool is_owner) {
     WaitingRoom w(is_owner);
-    w.showMaximized();
+    w.show();
 
     bool closed = false;
 
@@ -164,7 +164,7 @@ bool MenuInterface::waiting_room(const bool is_owner) {
 
 bool MenuInterface::lobby_create(PlayerDTO& player) {
     creategame cg;
-    cg.showMaximized();
+    cg.show();
 
     bool closed = false;
     bool owner = false;
@@ -230,7 +230,7 @@ PlayerDTO MenuInterface::lobby(){
     QApplication app(fake_argc, fake_argv);
     
     Lobby l;
-    l.showMaximized();
+    l.show();
 
     PlayerDTO player("", -1, car_dto());
 

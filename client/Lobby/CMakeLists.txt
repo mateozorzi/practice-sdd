@@ -34,7 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         creategame.h creategame.cpp creategame.ui
         createlobby.h createlobby.cpp createlobby.ui
         joinlobby.h joinlobby.cpp joinlobby.ui
-        gamelobby.h gamelobby.cpp gamelobby.ui
+
         waitingroom.h waitingroom.cpp waitingroom.ui
 
 

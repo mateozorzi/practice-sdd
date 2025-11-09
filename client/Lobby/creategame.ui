@@ -82,7 +82,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </property>
     <property name="font">
      <font>
-      <pointsize>14</pointsize>
+      <pointsize>16</pointsize>
      </font>
     </property>
     <property name="styleSheet">
@@ -118,7 +118,7 @@ border-color: rgb(255, 255, 255);</string>
     </property>
     <property name="font">
      <font>
-      <pointsize>14</pointsize>
+      <pointsize>16</pointsize>
      </font>
     </property>
     <property name="styleSheet">
@@ -151,6 +151,11 @@ border-color: rgb(255, 255, 255);</string>
       <width>131</width>
       <height>51</height>
      </size>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+     </font>
     </property>
     <property name="styleSheet">
      <string notr="true">border: 2px solid;
