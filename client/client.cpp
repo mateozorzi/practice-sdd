@@ -46,6 +46,8 @@ void Client::run() {
     // ID - Posicion
     std::map<uint32_t, CarPositionDTO> cars;
 
+
+    //sld_manager its initialized here
     sdl_manager = std::make_unique<SDLManager>();
 
     while (true) {
