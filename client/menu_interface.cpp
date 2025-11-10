@@ -9,6 +9,7 @@
 #include "Lobby/creategame.h"
 #include "Lobby/createlobby.h"
 #include "Lobby/joinlobby.h"
+#include "Lobby/waitingroom.h"
 #include <QString>
 #include <QEventLoop>
 #include "../common/car_dto.h"
@@ -60,7 +61,7 @@ bool MenuInterface::car_selection(PlayerDTO& player){
 bool MenuInterface::create_lobby(PlayerDTO& player) {
     //create lobby ui
     CreateLobby cl;
-    cl.showMaximized();
+    cl.show();
 
     bool closed = false;
 
@@ -72,8 +73,10 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         std::string lobby_name = cl.get_lobby_name().toStdString();
         int max_players = cl.get_number_players();
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
+        LobbyDTO lobby(1, player.id, lobby_name, max_players);
+        //protocol.send_create_lobby(lobby);
 
-        //protocol.send_create_lobby(LobbyDTO(player.id, player.id, lobby_name, max_players));
+        closed = waiting_room(true, lobby);
 
         loop.quit();
 
@@ -94,15 +97,29 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 bool MenuInterface::join_lobby(PlayerDTO& player) {
     // join lobby ui
     JoinLobby jl;
-    jl.showMaximized();
+    jl.show();
 
     bool closed = false;
+
+    //client ask for available lobbies
+    //protocol.ask_for_lobbies();
 
     //server sends available lobbies
     QEventLoop loop;
 
     //join lobby signal
+    QObject::connect(&jl, &JoinLobby::join_lobby, [&]() {
+        //client select a lobby and send it to server
+        uint32_t lobby_id = 1; // jl.get_selected_lobby_id();
+        //protocol.send_join_lobby(lobby_id);
+        std::cout << "Sent join lobby request for lobby ID: " << lobby_id << std::endl;
 
+        //wait for the server to confirm join
+        LobbyDTO lobby(lobby_id, lobby_id, "Test Lobby", 4);
+        closed = waiting_room(false, lobby);
+
+        loop.quit();
+    });
 
     //refresh lobbies signal
     QObject::connect(&jl, &JoinLobby::refresh, [&]() {
@@ -125,11 +142,36 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
 }
 
-bool MenuInterface::lobby_create(PlayerDTO& player) {
-    creategame cg;
-    cg.showMaximized();
+bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
+    WaitingRoom w(is_owner, lobby);
+    w.show();
 
     bool closed = false;
+
+    QEventLoop loop;
+
+    //start lobby signal
+    QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
+        loop.quit();
+    });
+
+    //exit signal
+    QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
+        closed = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return closed;
+}
+
+bool MenuInterface::lobby_create(PlayerDTO& player) {
+    creategame cg;
+    cg.show();
+
+    bool closed = false;
+    bool owner = false;
 
     //client have two options: create or join lobby
     QEventLoop loop;
@@ -146,6 +188,8 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
             cg.show();
         }else{
             cg.close();
+
+            owner = true;
 
             loop.quit();
         }
@@ -185,7 +229,7 @@ PlayerDTO MenuInterface::lobby(){
     QApplication app(fake_argc, fake_argv);
     
     Lobby l;
-    l.showMaximized();
+    l.show();
 
     PlayerDTO player("", -1, car_dto());
 

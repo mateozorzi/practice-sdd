@@ -19,8 +19,8 @@
 using namespace SDL2pp;
 
 Client::Client(const std::string& hostname, const std::string& servname):
-        client_socket(hostname.c_str(), servname.c_str()),
-        protocol(client_socket),
+        sdl_manager(nullptr),
+        protocol(hostname, servname),
         receiver(protocol),
         input_manager(protocol),
         menu(protocol),
@@ -32,12 +32,12 @@ void Client::run() {
     if (static_cast<int>(player.id) == -1) {
         exit(0);
     }
-
+    
     client_id = player.id;
 
     // Recibir client_id del servidor antes de iniciar receiver
     //protocol.send_username("a");
-    // client_id = protocol.receive_id();
+    //client_id = protocol.receive_id();
     receiver.start();
 
     // Vida del jugador (0-100)
@@ -45,6 +45,10 @@ void Client::run() {
 
     // ID - Posicion
     std::map<uint32_t, CarPositionDTO> cars;
+
+
+    //sld_manager its initialized here
+    sdl_manager = std::make_unique<SDLManager>();
 
     while (true) {
         if (!input_manager.handle_movement()) {
@@ -73,7 +77,7 @@ void Client::run() {
                 }
             }
         }
-        sdl_manager.render(client_id, health, cars);
+        sdl_manager->render(client_id, health, cars);
     }
 }
 

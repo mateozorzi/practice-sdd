@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
-    <height>573</height>
+    <width>1006</width>
+    <height>727</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,8 +22,7 @@
   <property name="styleSheet">
    <string notr="true">QWidget#centralwidget {
     background-image: url(:/lobby/images/max.jpg);
-    background-repeat: no-repeat;
-    background-position: center;
+
 }
 </string>
   </property>

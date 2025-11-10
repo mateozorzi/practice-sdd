@@ -11,7 +11,10 @@ enum class ClientAction : uint8_t {
     SEND_USERNAME = 0x01,
     SEND_CAR_MOVEMENT = 0x03,
     GET_CAR_CATALOGUE = 0x04,
-    SEND_CAR_SELECTION = 0x05
+    SEND_CAR_SELECTION = 0x05,
+    SEND_CREATE_LOBBY = 0x06,
+    SEND_JOIN_LOBBY = 0x07,
+    GET_LOBBY_LIST = 0x08
 
 };
 
