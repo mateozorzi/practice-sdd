@@ -16,6 +16,10 @@ void LobbyReceiver::run() {
             //    break;
             //}
 
+            //if server send taht the lobby has been delete
+            //emit lobbyDeleted();
+            //break;
+
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             
 

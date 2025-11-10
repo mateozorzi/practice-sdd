@@ -15,6 +15,7 @@ public:
 
 signals:
     void lobbyStarted();
+    void lobbyDeleted();
 
 private:
     ClientProtocol& protocol;

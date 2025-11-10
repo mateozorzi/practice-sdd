@@ -173,11 +173,19 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         loop.quit();
     });
 
+    //lobby deleted signal from lobbyReceiver
+    QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, [&](){
+        w.close();
+        closed = true;
+        loop.quit();
+    });
+
     lobbyReceiver.start();
 
     //start lobby signal
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
+        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
         //protocol.send_start_lobby();
         
         loop.quit();
@@ -186,6 +194,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
     //exit signal
     QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
+        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
         //if owner
         //protocol.send_delete_lobby();
 
