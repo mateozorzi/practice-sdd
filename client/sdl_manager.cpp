@@ -1,8 +1,12 @@
 #include "sdl_manager.h"
 
+#include <fstream>
 #include <map>
 
 #include <SDL2/SDL.h>
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
+
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
@@ -21,6 +25,7 @@ void SDLManager::set_map() {
     const SDL2pp::Surface background_surface(
             DATA_PATH "/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
     map = SDL2pp::Texture(renderer, background_surface);
+    bridges_rects = loadRects(DATA_PATH "/Top_Layer_Liberty_City.json");
 }
 
 void SDLManager::set_sprite() {
@@ -42,10 +47,28 @@ void SDLManager::set_minimap() {
     renderer.SetTarget();
 }
 
-
 void SDLManager::clear_screen() { renderer.Clear(); }
 
 void SDLManager::show_screen() { renderer.Present(); }
+
+std::vector<SDL2pp::Rect> SDLManager::loadRects(const std::string& path) {
+    std::ifstream file(path);
+    nlohmann::json data;
+    file >> data;
+
+    std::vector<SDL2pp::Rect> rects;
+    for (const auto& bridge: data) {
+        if (bridge.size() == 4) {
+            int x = bridge[0][0];
+            int y = bridge[0][1];
+            int w = bridge[1][0].get<int>() - x;
+            int h = bridge[2][1].get<int>() - y;
+
+            rects.emplace_back(x, y, w, h);
+        }
+    }
+    return rects;
+}
 
 void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
@@ -105,6 +128,26 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
     renderer.FillRect(SDL2pp::Rect(player_minimap_x - 2, player_minimap_y - 2, 10, 10));
 }
 
+void SDLManager::render_bridges() {
+    const SDL2pp::Rect view = camera.get_view_rect();
+    constexpr int screen_w = 1920;
+    constexpr int screen_h = 1080;
+
+    for (const auto& bridge_src_full: bridges_rects) {
+        if (!camera.on_screen(bridge_src_full))
+            continue;
+
+        // Vista en pantalla
+        const int dx = (bridge_src_full.x - view.x) * screen_w / view.w;
+        const int dy = (bridge_src_full.y - view.y) * screen_h / view.h;
+        const int dw = bridge_src_full.w * screen_w / view.w;
+        const int dh = bridge_src_full.h * screen_h / view.h;
+        const SDL2pp::Rect bridge_dst(dx, dy, dw, dh);
+
+        renderer.Copy(map.value(), bridge_src_full, bridge_dst);
+    }
+}
+
 void SDLManager::render(const uint32_t client_id, const int health,
                         std::map<uint32_t, CarPositionDTO> cars) {
     if (cars.contains(client_id)) {
@@ -123,6 +166,9 @@ void SDLManager::render(const uint32_t client_id, const int health,
             CarPositionDTO car = car_pair.second;
             render_player(car);
         }
+
+        // Capa superior (puentes) por encima del fondo y de los autos
+        render_bridges();
 
         render_hud_health(health);
         render_hud_minimap(pos_x, pos_y);
