@@ -15,17 +15,17 @@ app:
             pixels_per_meter: 30.0
             collisions:
                 liberty_city:
-                    blocks_file: "server/world/polygons_liberty_city.json"
-                    bridges_file: "server/world/bridges_liberty_city.json"
-                    decorations_file: "server/world/decorations_liberty_city.json"
+                    blocks_file: "server/resources/world/polygons_liberty_city.json"
+                    bridges_file: "server/resources/world/bridges_liberty_city.json"
+                    decorations_file: "server/resources/world/decorations_liberty_city.json"
                 san_andreas:
-                    blocks_file: "server/world/blocks_san_andreas.json"
-                    bridges_file: "server/world/bridges_san_andreas.json"
-                    decorations_file: "server/world/decorations_san_andreas.json"
+                    blocks_file: "server/resources/world/blocks_san_andreas.json"
+                    bridges_file: "server/resources/world/bridges_san_andreas.json"
+                    decorations_file: "server/resources/world/decorations_san_andreas.json"
                 vice_city:
-                    blocks_file: "server/world/blocks_vice_city.json"
-                    bridges_file: "server/world/bridges_vice_city.json"
-                    decorations_file: "server/world/decorations_vice_city.json"
+                    blocks_file: "server/resources/world/blocks_vice_city.json"
+                    bridges_file: "server/resources/world/bridges_vice_city.json"
+                    decorations_file: "server/resources/world/decorations_vice_city.json"
             sprites:
                 car:
                     width: 0.366667  
