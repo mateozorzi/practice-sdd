@@ -4,6 +4,7 @@
 
 #include <box2d/box2d.h>
 
+#include "../common/car_dto.h"
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
 
@@ -53,7 +54,7 @@ public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;
 
-    explicit Car(uint32_t client_id, b2World& world, const CarConfig& config);
+    explicit Car(uint32_t client_id, b2World& world);
 
     void handle_movement(const MovementDTO& movement_dto);
 
@@ -63,6 +64,8 @@ public:
     
     void set_collision(bool colliding);
     b2Body* get_body() const;
+
+    void set_configuration(const car_dto& car_configuration);
 };
 
 #endif

@@ -12,11 +12,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+include_directories(${CMAKE_SOURCE_DIR}/../../common)
+
 set(PROJECT_SOURCES
         main.cpp
         lobby.cpp
         lobby.h
         lobby.ui
+        # AGREGAR ESTOS ARCHIVOS
+        ../../common/car_catalogue_dto.h
+        ../../common/car_dto.h
+        selectcars.h selectcars.cpp selectcars.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -25,6 +31,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         images.qrc
         selectcars.h selectcars.cpp selectcars.ui
+        creategame.h creategame.cpp creategame.ui
+        createlobby.h createlobby.cpp createlobby.ui
+        joinlobby.h joinlobby.cpp joinlobby.ui
+
+        waitingroom.h waitingroom.cpp waitingroom.ui
+
+
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Lobby APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

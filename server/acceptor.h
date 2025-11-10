@@ -18,6 +18,7 @@ class Acceptor final: public Thread {
 
     Socket acceptor_socket;
     std::list<std::unique_ptr<ClientHandler>> clients;
+    // Lobby& lobby;
     GameMonitor& game_monitor;
     uint32_t client_id = 0;
 
@@ -29,6 +30,7 @@ public:
     Acceptor& operator=(const Acceptor&) = delete;
 
     explicit Acceptor(const std::string& port, GameMonitor& game_monitor);
+    //explicit Acceptor(const std::string& port, Lobby& lobby);
 
     void run() override;
     void stop() override;

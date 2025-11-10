@@ -2,24 +2,41 @@
 
 #include "ui_selectcars.h"
 #include "../../common/car_dto.h"
+#include "../../common/car_catalogue_dto.h"
+#include <QLabel>
 
-SelectCars::SelectCars(QWidget* parent): QMainWindow(parent), ui(new Ui::SelectCars) {
+#define MAX_IMG 64
+
+SelectCars::SelectCars(CarCatalogueDTO& catalogue, QWidget* parent):
+        QMainWindow(parent)
+        , ui(new Ui::SelectCars)
+        , catalogue(catalogue)
+{
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
 
-    ui->Carinfo->setRowCount(5);
-    ui->Carinfo->setColumnCount(1);
-    QStringList rowLabels;
-    rowLabels << "Model" << "Health" << "Handling" << "Acceleration" << "Speed";
-    ui->Carinfo->setVerticalHeaderLabels(rowLabels);
-    QStringList colLabels;
-    colLabels << "Value";
-    ui->Carinfo->setHorizontalHeaderLabels(colLabels);
-    ui->Carinfo->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    rows_format();
     value_format();
 
-    connect(ui->combobox, &QComboBox::currentIndexChanged, this, &SelectCars::onCarSelected);
+    ui->Carinfo->setRowCount(catalogue.size);
+    ui->Carinfo->setColumnCount(7);
+    QStringList colLabels;
+    colLabels <<""<< "Name" << "Health" << "Handling" << "Acceleration" << "Speed"<<"Action";;
+    ui->Carinfo->setHorizontalHeaderLabels(colLabels);
+    ui->Carinfo->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->Carinfo->horizontalHeader()->setVisible(true);
+    ui->Carinfo->verticalHeader()->setVisible(false);
+
+    ui->Carinfo->setColumnWidth(0, MAX_IMG+15);
+
+    for (int row = 0; row < catalogue.size; ++row) {
+        ui->Carinfo->setRowHeight(row, 20);
+    }
+
+    for (int col = 1; col < 7; ++col) {
+        ui->Carinfo->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Stretch);
+    }
+
+    set_market();
 
 }
 
@@ -28,74 +45,103 @@ SelectCars::~SelectCars() {
     delete scene;
 }
 
-void SelectCars::on_Confirm_clicked()
-{
-    QString select_car = ui->combobox->currentText();
-    emit confirm_car(select_car);
-    this->close();
-}
-
-
 void SelectCars::on_Exit_clicked()
 {
     emit back_to_lobby();
     this->close();
 }
 
-void SelectCars::onCarSelected(int index){
-    const car_dto& car = market[index];
-
-    QString path = ":/cars/images/" + QString::fromStdString(car.model) + ".png";
-    scene->clear();
-    scene->addPixmap(QPixmap(path));
-    ui->Carimage->setScene(scene);
-    ui->Carimage->fitInView(scene->itemsBoundingRect(), Qt::KeepAspectRatio);
-
-    ui->Carinfo->clearContents();
-    ui->Carinfo->setItem(0, 0, new QTableWidgetItem(QString::fromStdString(car.model)));
-    ui->Carinfo->setItem(1, 0, new QTableWidgetItem(QString::number(car.health)));
-    ui->Carinfo->setItem(2, 0, new QTableWidgetItem(QString::number(car.handling)));
-    ui->Carinfo->setItem(3, 0, new QTableWidgetItem(QString::number(car.acceleration)));
-    ui->Carinfo->setItem(4, 0, new QTableWidgetItem(QString::number(car.speed)));
-    value_format();
-}
-
-void SelectCars::rows_format(){
-    QString headerStyle = R"(
-    QHeaderView::section {
-        background-color: black;
-        color: white;
-        font-weight: bold;
-        font-size: 25pt;
-        text-align: center;
-        padding: 8px;
-    }
-    )";
-    ui->Carinfo->verticalHeader()->setStyleSheet(headerStyle);
-}
-
 void SelectCars::value_format(){
-    QFont font;
-    font.setPointSize(24);
-
-    int column = 0;
-    for (int row = 0; row < ui->Carinfo->rowCount(); ++row) {
-        QTableWidgetItem* item = ui->Carinfo->item(row, column);
-        if (item) {
-            item->setBackground(Qt::black);
-            item->setForeground(Qt::white);
-            item->setFont(font);
-            item->setTextAlignment(Qt::AlignCenter);
-        }
+    QString style = R"(
+    QTableWidget#Carinfo {
+        background-color: transparent;
+        alternate-background-color: transparent;
     }
+
+    QTableWidget#Carinfo::item {
+        color: black;
+        font-size: 14pt;
+        border: 1px solid black;
+        background-color: white;
+        text-align: center;
+    }
+
+    QTableWidget#Carinfo::item:selected {
+        background-color: #e0e0e0;
+        color: black;
+    }
+
+    QHeaderView::section {
+        color: white;
+        font-size: 25pt;
+        font-weight: bold;
+        background-color: black;
+        border: 1px solid black;
+        text-align: center;
+    }
+
+    QTableWidget#Carinfo QLabel {
+        background-color: white;
+        border: none;
+        font-size: 14pt;
+    }
+)";
+
+    ui->Carinfo->setStyleSheet(style);
 }
 
-void SelectCars::set_market(const std::vector<car_dto>& cars){
-    market = cars;
+void SelectCars::onCarChosen(const car_dto& car){
+    emit confirm_car(car);
+}
 
-    for (const car_dto& car: cars){
-        QString name = QString::fromStdString(car.model);
-        ui->combobox->addItem(name);
+void SelectCars::set_market(){
+    int row = 0;
+    for (const car_dto& car: catalogue.cars){
+        QString path = ":/cars/images/" + QString::fromStdString(car.model) + ".png";
+
+        //image
+        QLabel* imageLabel = new QLabel();
+        QPixmap pixmap(path);
+        if (!pixmap.isNull()) {
+            pixmap = pixmap.scaled(MAX_IMG, MAX_IMG, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+        imageLabel->setPixmap(pixmap);
+        imageLabel->setAlignment(Qt::AlignCenter);
+        ui->Carinfo->setCellWidget(row, 0, imageLabel);
+
+        //info
+        QFont itemFont;
+        itemFont.setPointSize(14);
+        itemFont.setBold(false);
+        QStringList carData = {
+                QString::fromStdString(car.model),
+                QString::number(car.health),
+                QString::number(car.handling),
+                QString::number(car.acceleration),
+                QString::number(car.speed)
+        };
+
+        for (int col = 0; col < carData.size(); col++) {
+            QTableWidgetItem* item = new QTableWidgetItem(carData[col]);
+            item->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+            item->setFont(itemFont);
+            item->setForeground(Qt::black);
+            ui->Carinfo->setItem(row, col + 1, item);
+        }
+        //action
+
+
+        QPushButton* chooseButton = new QPushButton("Choose");
+        chooseButton->setStyleSheet("background-color: green; color: white; font-weight: bold;min-height: 35px;");
+
+        connect(chooseButton, &QPushButton::clicked, this, [this, car]() {
+            this->onCarChosen(car);
+        });
+
+        ui->Carinfo->setCellWidget(row, 6, chooseButton);
+
+        row++;
     }
+
 }
 

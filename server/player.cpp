@@ -2,12 +2,13 @@
 
 
 Player::Player(uint32_t client_id, const std::string& username, 
-               b2World& world, const CarConfig& config)
+               b2World& world)
     : client_id(client_id),
       username(username),
-      car(std::make_unique<Car>(client_id, world, config)),
+      car(std::make_unique<Car>(client_id, world)),
       health(100),
-      races_won(0) {}
+      races_won(0),
+      in_game(false) {}
 
 
 uint32_t Player::get_client_id() const {
@@ -48,4 +49,22 @@ void Player::set_car_collision(bool colliding) {
 
     if (car)
         car->set_collision(colliding);
+}
+
+
+bool Player::is_in_game() const {
+
+    return in_game;
+}
+
+void Player::set_in_game() {
+
+    in_game = true;
+}
+
+
+void Player::set_car_configuration(const car_dto& car_configuration) {
+
+    if (car)
+        car->set_configuration(car_configuration);
 }

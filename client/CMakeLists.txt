@@ -17,6 +17,10 @@ target_sources(taller_client
 
     Lobby/lobby.cpp
     Lobby/selectcars.cpp
+    Lobby/creategame.cpp
+    Lobby/createlobby.cpp
+    Lobby/joinlobby.cpp
+    Lobby/waitingroom.cpp
     menu_interface.cpp
 
     ${QRC_FILES}
@@ -35,6 +39,10 @@ target_sources(taller_client
     Lobby/lobby.h
     Lobby/selectcars.h
     menu_interface.h
+    Lobby/creategame.h
+    Lobby/createlobby.h
+    Lobby/joinlobby.h
+    Lobby/waitingroom.h
 
 
     )

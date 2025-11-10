@@ -12,18 +12,33 @@
 
 #include "camera.h"
 #include "menu_interface.h"
+#include "../common/player_dto.h"
+
+
+// NOLINTNEXTLINE(build/namespaces)
+using namespace SDL2pp;
 
 Client::Client(const std::string& hostname, const std::string& servname):
-        protocol(hostname, servname),
+        client_socket(hostname.c_str(), servname.c_str()),
+        sdl_manager(nullptr),
+        protocol(client_socket),
         receiver(protocol),
         input_manager(protocol),
         menu(protocol),
         client_id(0) {}
 
 void Client::run() {
+    // lobby ui
+    PlayerDTO player = menu.lobby();
+    if (static_cast<int>(player.id) == -1) {
+        exit(0);
+    }
+    
+    client_id = player.id;
+
     // Recibir client_id del servidor antes de iniciar receiver
-    protocol.send_username("a");
-    client_id = protocol.receive_id();
+    //protocol.send_username("a");
+    //client_id = protocol.receive_id();
     receiver.start();
 
     // Vida del jugador (0-100)
@@ -31,6 +46,10 @@ void Client::run() {
 
     // ID - Posicion
     std::map<uint32_t, CarPositionDTO> cars;
+
+
+    //sld_manager its initialized here
+    sdl_manager = std::make_unique<SDLManager>();
 
     while (true) {
         if (!input_manager.handle_movement()) {
@@ -59,7 +78,7 @@ void Client::run() {
                 }
             }
         }
-        sdl_manager.render(client_id, health, cars);
+        sdl_manager->render(client_id, health, cars);
     }
 }
 

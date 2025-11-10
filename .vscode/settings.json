@@ -76,6 +76,22 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "csignal": "cpp",
-        "qapplication": "cpp"
+        "qapplication": "cpp",
+        "qeventloop": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "ranges": "cpp",
+        "valarray": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "xfacet": "cpp",
+        "xiosbase": "cpp",
+        "xlocale": "cpp",
+        "xlocbuf": "cpp",
+        "xlocinfo": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xlocnum": "cpp",
+        "xloctime": "cpp"
     }
 }

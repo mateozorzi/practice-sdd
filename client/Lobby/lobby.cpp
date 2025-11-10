@@ -12,7 +12,7 @@ void Lobby::on_Confirm_clicked()
 {
     username = ui->input_username->text();
     if (username.isEmpty()) {
-        QMessageBox::warning(this, "Error", "Debe ingresar un nombre de usuario.");
+        QMessageBox::warning(this, "Error", "Enter a username.");
         return;
     }
     emit input_username(username);
