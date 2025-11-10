@@ -174,5 +174,5 @@ void SDLManager::render(const uint32_t client_id, const int health,
         render_hud_minimap(pos_x, pos_y);
         show_screen();
     }
-    SDL_Delay(16);
+    SDL_Delay(10);
 }
