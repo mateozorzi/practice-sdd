@@ -19,22 +19,21 @@ void ClientProtocol::send_movement(const MovementDTO& movement) {
 }
 
 void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CREATE_LOBBY));
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.lobby_id));
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby.owner_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
     send_buffer();
 }
 
-void ClientProtocol::ask_for_lobbies() {
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_LOBBY_LIST));
+void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     send_buffer();
 }
 
-void ClientProtocol::send_join_lobby(uint32_t lobby_id) {
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_JOIN_LOBBY));
-    add_uint32_to_buffer(lobby_id);
+void ClientProtocol::send_join_lobby(const LobbyDTO& lobby) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_uint32_to_buffer(lobby.lobby_id);
     send_buffer();
 }
 void ClientProtocol::send_car_selection(const car_dto& car){
