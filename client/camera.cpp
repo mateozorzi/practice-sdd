@@ -1,8 +1,5 @@
 #include "camera.h"
 
-// NOLINTNEXTLINE(build/namespaces)
-using namespace SDL2pp;
-
 Camera::Camera(const int view_w, const int view_h, const int world_w, const int world_h):
         camera_x(0),
         camera_y(0),
@@ -26,4 +23,9 @@ void Camera::update(const int player_x, const int player_y) {
         camera_y = world_height - view_height;
 }
 
-Rect Camera::get_view_rect() const { return Rect(camera_x, camera_y, view_width, view_height); }
+SDL2pp::Rect Camera::get_view_rect() const { return {camera_x, camera_y, view_width, view_height}; }
+
+bool Camera::on_screen(const SDL2pp::Rect& game) {
+    const SDL2pp::Rect view = get_view_rect();
+    return view.Intersects(game);
+}
