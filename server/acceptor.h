@@ -30,6 +30,7 @@ public:
     Acceptor& operator=(const Acceptor&) = delete;
 
     explicit Acceptor(const std::string& port, GameMonitor& game_monitor);
+    //explicit Acceptor(const std::string& port, Lobby& lobby);
 
     void run() override;
     void stop() override;
