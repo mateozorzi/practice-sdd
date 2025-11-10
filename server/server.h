@@ -6,10 +6,7 @@
 
 #include "acceptor.h"
 #include "game_loop.h"
-<<<<<<< HEAD
 #include "server_config.h"
-=======
->>>>>>> 6263648 (Feature: Second approach to multigame server.)
 #include "lobby.h"
 
 
