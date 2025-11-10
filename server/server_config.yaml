@@ -1,0 +1,97 @@
+app:
+    game:
+        game_fps: 60.0
+        max_concurrent_matches: 8
+        min_races_per_match: 1
+        max_races_per_match: 6
+        min_cars_per_match: 2
+        max_cars_per_match: 8
+        wait_time_between_races_seconds: 24.0
+    server:
+        # default_server_port: 8080
+        command_queue_capacity: 500
+        waiting_for_players_fps: 5.0
+        world:
+            pixels_per_meter: 30.0
+            collisions:
+                liberty_city:
+                    blocks_file: "server/world/polygons_liberty_city.json"
+                    bridges_file: "server/world/bridges_liberty_city.json"
+                    decorations_file: "server/world/decorations_liberty_city.json"
+                san_andreas:
+                    blocks_file: "server/world/blocks_san_andreas.json"
+                    bridges_file: "server/world/bridges_san_andreas.json"
+                    decorations_file: "server/world/decorations_san_andreas.json"
+                vice_city:
+                    blocks_file: "server/world/blocks_vice_city.json"
+                    bridges_file: "server/world/bridges_vice_city.json"
+                    decorations_file: "server/world/decorations_vice_city.json"
+            sprites:
+                car:
+                    width: 0.366667  
+                    # 22.0f / 30.0f / 2.0f
+                    # WIDHT IN PIXELS OF THE SPRITE (22) / PIXELS PER METER (30) / CLIENT SPRITE UPSCALING (2x)
+
+                    height: 0.466667 
+                    # 28.0f / 30.0f / 2.0f
+                    # HEIGHT IN PIXELS OF THE SPRITE (29) / PIXELS PER METER (30) / CLIENT SPRITE UPSCALING (2x)
+            positions:
+                race_start:
+                    meters_x: 2.828
+                    meters_y: 3.171
+            physics:
+                block:
+                    density: 1.0
+                    friction: 0.0
+                    restitution: 0.0
+                car:
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 2.5
+                    min_turn_speed: 0.1
+                    acceleration: 4.0
+                    breaking_factor: 0.3
+                    max_speed: 14.0
+                    drift_factor: 0.7
+                    turn_torque: 0.03
+                    mass: 1.0
+                    health: 100
+    client:
+        cars:
+            compact:
+                health: 100
+                handling: 90
+                acceleration: 80 
+                speed: 100
+            sport:
+                health: 80
+                handling: 95
+                acceleration: 100
+                speed: 150
+            convertible:
+                health: 85
+                handling: 90
+                acceleration: 95
+                speed: 140
+            sedan:
+                health: 90
+                handling: 85
+                acceleration: 75 
+                speed: 120
+            jeep:
+                health: 150
+                handling: 70
+                acceleration: 60 
+                speed: 85
+            rally:
+                health: 120
+                handling: 80
+                acceleration: 70 
+                speed: 110
+            truck:
+                health: 200
+                handling: 50
+                acceleration: 40 
+                speed: 80

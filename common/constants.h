@@ -20,9 +20,11 @@ enum class ClientAction : uint8_t {
 
 
 // SERVER
+constexpr int MAX_PATH_LENGTH = 4096;
 constexpr char SERVER_CMD_EXIT = 'q';
 constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
 constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
+constexpr std::string_view SERVER_CONFIG_FILEPATH = "server/server_config.yaml";
 
 // SERVER CLASSES
 constexpr std::string_view SERVER = "SERVER";
