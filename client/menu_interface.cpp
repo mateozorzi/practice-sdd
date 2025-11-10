@@ -10,6 +10,7 @@
 #include "Lobby/createlobby.h"
 #include "Lobby/joinlobby.h"
 #include "Lobby/waitingroom.h"
+#include "lobbyreceiver.h"
 #include <QString>
 #include <QEventLoop>
 #include "../common/car_dto.h"
@@ -75,7 +76,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
         //protocol.send_create_lobby(lobby);
-
+        cl.close();
         closed = waiting_room(true, lobby);
 
         loop.quit();
@@ -118,9 +119,16 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         //wait for the server to confirm join
         LobbyDTO lobby(LobbyAction::JOIN_LOBBY, lobby_id);
         //protocol.send_join_lobby(lobby_id);
+        jl.hide();
         closed = waiting_room(false, lobby);
 
-        loop.quit();
+        if (closed) {
+            jl.show();
+        }else{
+            jl.close();
+            loop.quit();
+        }
+
     });
 
     //refresh lobbies signal
@@ -155,20 +163,48 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
 
     bool closed = false;
 
+    LobbyReceiver lobbyReceiver(protocol, &w);
+
     QEventLoop loop;
+
+    //lobby started signal from lobbyReceiver
+    QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&](){
+        w.close();
+        loop.quit();
+    });
+
+    lobbyReceiver.start();
 
     //start lobby signal
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
+        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
+        //protocol.send_start_lobby();
+        
         loop.quit();
     });
 
     //exit signal
     QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
+        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
+        //if owner
+        //protocol.send_delete_lobby();
+
+        //else
+        //protocol_send_leave_lobby();
+
         closed = true;
         loop.quit();
     });
 
+
     loop.exec();
+
+    if (lobbyReceiver.is_alive()){
+        lobbyReceiver.stop();
+        lobbyReceiver.join();
+    }
+
+    std::cout << "Is LobbyReceiver alive? " << lobbyReceiver.is_alive() << std::endl;
 
     return closed;
 }
