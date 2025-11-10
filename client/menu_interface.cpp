@@ -73,8 +73,10 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         std::string lobby_name = cl.get_lobby_name().toStdString();
         int max_players = cl.get_number_players();
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
+        LobbyDTO lobby(1, player.id, lobby_name, max_players);
+        //protocol.send_create_lobby(lobby);
 
-        //protocol.send_create_lobby(LobbyDTO(1, player.id, lobby_name, max_players));
+        closed = waiting_room(true, lobby);
 
         loop.quit();
 
@@ -113,6 +115,8 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         std::cout << "Sent join lobby request for lobby ID: " << lobby_id << std::endl;
 
         //wait for the server to confirm join
+        LobbyDTO lobby(lobby_id, lobby_id, "Test Lobby", 4);
+        closed = waiting_room(false, lobby);
 
         loop.quit();
     });
@@ -138,8 +142,8 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
 }
 
-bool MenuInterface::waiting_room(const bool is_owner) {
-    WaitingRoom w(is_owner);
+bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
+    WaitingRoom w(is_owner, lobby);
     w.show();
 
     bool closed = false;
@@ -215,11 +219,6 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
     });
 
     loop.exec();
-
-    if (!closed){
-        //open waiting room
-        closed = waiting_room(owner);
-    }
 
     return closed;
 }

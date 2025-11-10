@@ -2,6 +2,7 @@
 #define WAITINGROOM_H
 
 #include <QMainWindow>
+#include "../../common/lobby_dto.h"
 
 namespace Ui {
 class WaitingRoom;
@@ -15,7 +16,7 @@ signals:
     void start_lobby();
 
 public:
-    explicit WaitingRoom(const bool is_owner, QWidget* parent = nullptr);
+    explicit WaitingRoom(const bool is_owner, const LobbyDTO& lobby, QWidget* parent = nullptr);
     ~WaitingRoom();
 
 private slots:
@@ -26,6 +27,7 @@ private slots:
 private:
     Ui::WaitingRoom* ui;
     bool is_owner;
+    LobbyDTO lobby;
 };
 
 #endif  // WAITINGROOM_H

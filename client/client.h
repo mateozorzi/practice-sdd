@@ -23,7 +23,7 @@ public:
     ~Client();
 
 private:
-    SDLManager sdl_manager;
+    std::unique_ptr<SDLManager> sdl_manager;
     ClientProtocol protocol;
     Receiver receiver;
     InputManager input_manager;

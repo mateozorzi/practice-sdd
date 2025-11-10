@@ -19,6 +19,7 @@
 using namespace SDL2pp;
 
 Client::Client(const std::string& hostname, const std::string& servname):
+        sdl_manager(nullptr),
         protocol(hostname, servname),
         receiver(protocol),
         input_manager(protocol),
@@ -44,6 +45,8 @@ void Client::run() {
 
     // ID - Posicion
     std::map<uint32_t, CarPositionDTO> cars;
+
+    sdl_manager = std::make_unique<SDLManager>();
 
     while (true) {
         if (!input_manager.handle_movement()) {
@@ -72,7 +75,7 @@ void Client::run() {
                 }
             }
         }
-        sdl_manager.render(client_id, health, cars);
+        sdl_manager->render(client_id, health, cars);
     }
 }
 
