@@ -4,7 +4,7 @@
 
 
 Server::Server(const std::string& port):
-        game_loop(game_monitor), clients_acceptor(port, game_monitor) {}
+        game_loop(game_monitor), clients_acceptor(port, game_monitor/*lobby*/) {}
 
 
 void Server::run() {

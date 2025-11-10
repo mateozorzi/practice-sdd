@@ -19,8 +19,9 @@
 using namespace SDL2pp;
 
 Client::Client(const std::string& hostname, const std::string& servname):
+        client_socket(hostname.c_str(), servname.c_str()),
         sdl_manager(nullptr),
-        protocol(hostname, servname),
+        protocol(client_socket),
         receiver(protocol),
         input_manager(protocol),
         menu(protocol),
