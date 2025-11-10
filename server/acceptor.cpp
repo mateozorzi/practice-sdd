@@ -16,12 +16,13 @@ void Acceptor::run() {
 
         try {
 
-            Socket client_socket = acceptor_socket.accept();
+            Socket peer_socket = acceptor_socket.accept();
+            reap();
             client_id++;
-            auto client = std::make_unique<ClientHandler>(std::move(client_socket), game_monitor,
+            std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), game_monitor,
                                                           client_id);
             clients.push_back(std::move(client));
-            reap();
+            std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
         } catch (const std::exception& e) {
 
             if (!should_keep_running())
@@ -34,6 +35,7 @@ void Acceptor::run() {
 
 void Acceptor::reap() {
 
+    // lobby.reap();
     clients.remove_if([](const std::unique_ptr<ClientHandler>& client) {
         if (!client->is_alive()) {
 
@@ -43,8 +45,6 @@ void Acceptor::reap() {
 
         return false;
     });
-
-    std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
 }
 
 

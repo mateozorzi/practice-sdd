@@ -14,13 +14,21 @@
 class ClientHandler {
 
 
-    Socket client_socket;
+    Socket peer_socket;
     ServerProtocol server_protocol;
     GameMonitor& game_monitor;
-    uint32_t client_id;
+    //Lobby& lobby;
+    const uint32_t client_id;
+    bool is_in_lobby = true;
 
     Receiver receiver;
     Sender sender;
+
+    //void run_lobby_loop();
+    //void extit_lobby();
+
+    //void create_new_match();
+    //void join_existing_match();
 
     void stop();
 
@@ -29,7 +37,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& socket, GameMonitor& game_monitor, uint32_t client_id);
+    explicit ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor,/*Lobby& lobby,*/  uint32_t client_id);
 
     bool is_alive() const;
 

@@ -10,6 +10,7 @@
 
 class Server {
 
+    //Lobby lobby
     GameMonitor game_monitor;
     GameLoop game_loop;
     Acceptor clients_acceptor;
