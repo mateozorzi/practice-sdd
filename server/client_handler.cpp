@@ -6,19 +6,32 @@
 #include "../common/liberror.h"
 
 
-ClientHandler::ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor,/*Lobby& lobby,*/ uint32_t client_id):
+ClientHandler::ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor, uint32_t client_id):
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
         game_monitor(game_monitor),
-        /*lobby(lobby),*/
         client_id(client_id),
-        receiver(server_protocol, game_monitor /* lobby */, client_id),
-        sender(server_protocol, game_monitor /* lobby */, client_id) {
+        receiver(server_protocol, game_monitor, client_id),
+        sender(server_protocol, game_monitor, client_id) {
 
     receiver.start();
     sender.start();
-    //run_lobby_loop();
 }
+
+/*
+
+WIP -> Adding multiple games logic
+
+ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id):
+        peer_socket(std::move(peer_socket)),
+        server_protocol(this->peer_socket),
+        lobby(lobby),
+        client_id(client_id),
+        receiver(server_protocol, lobby, client_id),
+        sender(server_protocol, lobby, client_id) {
+
+    run_lobby_loop();
+}*/
 
 
 bool ClientHandler::is_alive() const { return receiver.is_alive() && sender.is_alive(); }
@@ -38,8 +51,26 @@ void ClientHandler::stop() {
     sender.join();
 
     game_monitor.remove_client(client_id);
-    //lobby.remove_player(client_id);
 }
+
+
+/*
+void ClientHandler::stop() {
+
+    try {
+
+        server_protocol.stop();
+    } catch (const LibError&) {}
+
+    receiver.stop();
+    sender.stop();
+
+    receiver.join();
+    sender.join();
+
+    lobby.remove_player(client_id);
+}
+*/
 
 ClientHandler::~ClientHandler() {
 
@@ -54,8 +85,6 @@ ClientHandler::~ClientHandler() {
 
 
 /*
-
-WIP -> Adding multiple games logic
 
 void ClientHandler::run_lobby_loop() {
 

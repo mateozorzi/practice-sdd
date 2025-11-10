@@ -37,7 +37,9 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor,/*Lobby& lobby,*/  uint32_t client_id);
+    explicit ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor, uint32_t client_id);
+    //explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id);
+
 
     bool is_alive() const;
 

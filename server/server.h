@@ -7,6 +7,7 @@
 #include "acceptor.h"
 #include "game_loop.h"
 #include "server_config.h"
+#include "lobby.h"
 
 
 class Server {

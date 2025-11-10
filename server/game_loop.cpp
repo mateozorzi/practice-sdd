@@ -10,7 +10,7 @@
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor):
-        command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)), 
+        game_monitor(game_monitor), command_queue(500), world(b2Vec2(0.0f, 0.0f)), 
         collision_listener(players) {
 
     game_monitor.register_command_queue(command_queue);
@@ -41,7 +41,42 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
 }
 
 
-void GameLoop::remove_car(const uint32_t client_id) {
+/*
+
+WIP -> Adding multiple games logic
+
+GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue):
+        game_monitor(game_monitor), command_queue(command_queue), world(b2Vec2(0.0f, 0.0f)), 
+        collision_listener(players) {
+    
+    world.SetContactListener(&collision_listener);
+
+    command_handlers = {
+            {ClientRequest::SEND_USERNAME,
+             [this](const GameCommand& game_command) { handle_player_username(game_command); }},
+            {ClientRequest::SEND_CAR_SELECTION,
+             [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
+            {ClientRequest::MOVE_CAR,
+             [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
+            {ClientRequest::DISCONNECT,
+             [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
+    
+    auto polygons = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
+    for (const auto& p: polygons) {
+        try {
+            bool added = WorldUtils::add_polygon_to_world(p, world);
+            if (!added) {
+                std::cout << "Polygon of size " << p.size() << " ommited\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Could not add collision bodies: ") + std::string(e.what()));
+        }
+    }
+}
+
+*/
+
+void GameLoop::remove_player(const uint32_t client_id) {
 
     const auto it = players.find(client_id);
 
@@ -104,7 +139,7 @@ void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
 void GameLoop::handle_disconnection(const GameCommand& game_command) {
 
-    remove_car(game_command.get_client_id());
+    remove_player(game_command.get_client_id());
 }
 
 void GameLoop::handle_command(const GameCommand& game_command) {
