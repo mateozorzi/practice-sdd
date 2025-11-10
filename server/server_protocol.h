@@ -1,7 +1,7 @@
 #ifndef SERVER_PROTOCOL_h
 #define SERVER_PROTOCOL_h
 
-
+#include "../common/car_dto.h"
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/car_catalogue_dto.h"
@@ -28,6 +28,7 @@ public:
     ClientRequest receive_client_request();
 
     PlayerDTO receive_username();
+    car_dto receive_car_selection();
     MovementDTO receive_movement();
 
     void send_client_id(uint32_t client_id);

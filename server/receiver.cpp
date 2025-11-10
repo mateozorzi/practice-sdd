@@ -37,6 +37,14 @@ void Receiver::handle_get_car_catalogue() {
     server_protocol.send_car_catalogue(catalogue);
 }
 
+
+void Receiver::handle_car_selection() {
+
+    const car_dto& car_selection = server_protocol.receive_car_selection();
+    game_monitor.add_command(GameCommand(client_id, ClientRequest::SEND_CAR_SELECTION, car_selection));
+}
+
+
 void Receiver::handle_car_movement(const ClientRequest& client_request) {
 
     const MovementDTO& movement_dto = server_protocol.receive_movement();
@@ -54,6 +62,8 @@ void Receiver::run() {
                 handle_player_username(client_request);
             else if (client_request == ClientRequest::GET_CAR_CATALOGUE)
                 handle_get_car_catalogue();
+            else if (client_request == ClientRequest::SEND_CAR_SELECTION)
+                handle_car_selection();
             else if (client_request == ClientRequest::MOVE_CAR)
                 handle_car_movement(client_request);
             else if (client_request == ClientRequest::DISCONNECT)

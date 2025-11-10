@@ -13,6 +13,8 @@ ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const 
             return ClientRequest::SEND_USERNAME;
         case ClientAction::GET_CAR_CATALOGUE:
             return ClientRequest::GET_CAR_CATALOGUE;
+        case ClientAction::SEND_CAR_SELECTION:
+            return ClientRequest::SEND_CAR_SELECTION;
         case ClientAction::SEND_CAR_MOVEMENT:
             return ClientRequest::MOVE_CAR;
         default:
@@ -69,6 +71,13 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
     }
 
     send_buffer();
+}
+
+car_dto ServerProtocol::receive_car_selection() {
+
+    const std::string model = recv_string();
+
+    return car_dto(model, 0, 0, 0, 0);
 }
 
 void ServerProtocol::send_client_id(const uint32_t client_id) {

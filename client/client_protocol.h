@@ -22,13 +22,12 @@ enum class ServerResponse {
 };
 
 class ClientProtocol final: public CommonProtocol {
-    Socket client_socket;
 
 public:
     ClientProtocol(const ClientProtocol& other) = delete;
     ClientProtocol& operator=(const ClientProtocol& other) = delete;
 
-    explicit ClientProtocol(const std::string& hostname, const std::string& port);
+    using CommonProtocol::CommonProtocol;
 
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
