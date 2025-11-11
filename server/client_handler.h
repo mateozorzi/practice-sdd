@@ -12,7 +12,7 @@
 #include "sender.h"
 
 
-class ClientHandler {
+class ClientHandler final: public Thread {
 
 
     Socket peer_socket;
@@ -24,13 +24,12 @@ class ClientHandler {
     std::unique_ptr<Receiver> receiver;
     std::unique_ptr<Sender> sender;
 
-    void run_lobby_loop();
+
+    void launch_lobby();
     void exit_lobby();
 
     void create_new_match(uint32_t client_id);
     void join_existing_match(uint32_t client_id, uint32_t game_id);
-
-    void stop();
 
 
 public:
@@ -40,7 +39,9 @@ public:
     explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id);
 
 
-    bool is_alive() const;
+    void run() override;
+
+    void stop() override;
 
     ~ClientHandler();
 };

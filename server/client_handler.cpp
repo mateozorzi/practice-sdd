@@ -14,12 +14,7 @@ ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client
         receiver(nullptr),
         sender(nullptr) {
 
-    run_lobby_loop();
 }
-
-
-bool ClientHandler::is_alive() const { return receiver && sender && receiver->is_alive() && sender->is_alive(); }
-
 
 
 void ClientHandler::stop() {
@@ -45,7 +40,7 @@ ClientHandler::~ClientHandler() {
 
     try {
 
-        stop();
+        ClientHandler::stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
@@ -53,12 +48,31 @@ ClientHandler::~ClientHandler() {
 }
 
 
+void ClientHandler::run() {
+
+    while (should_keep_running() && is_in_lobby) {
+        try {
 
 
-void ClientHandler::run_lobby_loop() {
+            launch_lobby();
+        } catch (const LibError&) {
+
+        } catch (const std::exception& e) {
+
+            std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION << ": " << e.what();
+        }
+    }
+
+    ClientHandler::stop();
+}
+
+
+
+void ClientHandler::launch_lobby() {
 
     std::cout << "Lobby loop started for client id: " << client_id << std::endl;
 
+    server_protocol.receive_client_request();
     PlayerDTO player_dto = server_protocol.receive_username();
     std::cout << "Player connected with username: " << player_dto.username << " and client id: " << client_id << std::endl;
     server_protocol.send_client_id(client_id);
@@ -84,6 +98,7 @@ void ClientHandler::run_lobby_loop() {
                     std::cout << "Joining existing match!" << std::endl;
                     break;
                 case LobbyAction::LEAVE_LOBBY:
+                    server_protocol.receive_client_request();
                     player_dto = server_protocol.receive_username();
                     std::cout << "Username re-entered!" << std::endl;
                     break;
@@ -103,8 +118,8 @@ void ClientHandler::run_lobby_loop() {
 void ClientHandler::exit_lobby() {
 
     is_in_lobby = false;
-    sender->start();
-    receiver->start();
+    //sender->start();
+    //receiver->start();
 }
 
 

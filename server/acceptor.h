@@ -22,6 +22,7 @@ class Acceptor final: public Thread {
     uint32_t client_id = 0;
 
     void reap();
+    void clear();
 
 
 public:

@@ -19,6 +19,7 @@ void Acceptor::run() {
             reap();
             client_id++;
             std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
+            client->start();
             clients.push_back(std::move(client));
             std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
         } catch (const std::exception& e) {
@@ -37,12 +38,25 @@ void Acceptor::reap() {
     clients.remove_if([](const std::unique_ptr<ClientHandler>& client) {
         if (!client->is_alive()) {
 
+            client->stop();
+            client->join();
             std::cout << "Reaping dead client..." << std::endl;
             return true;
         }
 
         return false;
     });
+}
+
+void Acceptor::clear() {
+
+    for (auto& client: clients) {
+
+        client->stop();
+        client->join();
+    }
+
+    clients.clear();
 }
 
 
@@ -55,7 +69,7 @@ void Acceptor::stop() {
         acceptor_socket.close();
     } catch (const LibError&) {}
 
-    clients.clear();
+    clear();
 }
 
 
