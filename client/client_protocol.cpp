@@ -85,4 +85,15 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue(){
     return CarCatalogueDTO(std::move(cars));
 }
 
+LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue(){
+    uint8_t size = recv_uint8();
+    std::vector<LobbyDTO> lobbies;
+    for (uint8_t i = 0; i < size; ++i) {
+        uint32_t lobby_id = recv_uint32();
+
+        lobbies.push_back(LobbyDTO(lobby_id));
+    }
+    return LobbyCatalogueDTO(std::move(lobbies));
+}
+
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
