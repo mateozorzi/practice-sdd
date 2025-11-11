@@ -28,9 +28,6 @@ void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
 
 void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
-    add_uint8_to_buffer(0);
-    add_string_to_buffer("");
-    add_uint8_to_buffer(0);
     send_buffer();
 }
 
@@ -94,6 +91,17 @@ LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue(){
         lobbies.push_back(LobbyDTO(lobby_id));
     }
     return LobbyCatalogueDTO(std::move(lobbies));
+}
+
+LobbyDTO ClientProtocol::receive_lobby_info(){
+    const uint8_t action_byte = recv_uint8();
+    const uint32_t lobby_id = recv_uint32();
+    //const std::string lobby_name = recv_string();
+    //const uint8_t max_players = recv_uint8();
+
+    LobbyAction action = static_cast<LobbyAction>(action_byte);
+
+    return LobbyDTO(action, lobby_id);
 }
 
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }

@@ -41,6 +41,7 @@ public:
     void ask_for_catalogue();
     CarCatalogueDTO receive_car_catalogue();
     LobbyCatalogueDTO receive_lobby_catalogue();
+    LobbyDTO receive_lobby_info();
     uint32_t receive_id();
 };
 

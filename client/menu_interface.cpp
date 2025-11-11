@@ -77,7 +77,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
         protocol.send_create_lobby(lobby);
-
+        cl.close();
         closed = waiting_room(true, lobby);
 
         loop.quit();
@@ -99,14 +99,20 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 bool MenuInterface::join_lobby(PlayerDTO& player) {
     //client ask for available lobbies
     LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
-    protocol.ask_for_lobbies(lobby_request);
-    LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
+    //protocol.ask_for_lobbies(lobby_request);
+    //LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
+
+    //LobbyCaralogue hardocodeado para pruebas
+    std::vector<LobbyDTO> lobby_vector;
+    lobby_vector.push_back(LobbyDTO(1));
+    lobby_vector.push_back(LobbyDTO(2));
+    LobbyCatalogueDTO lobbies(std::move(lobby_vector));
 
     std::cout<<"Received lobby catalogue of size: " << lobbies.size << std::endl;
     
     
     // join lobby ui
-    JoinLobby jl;
+    JoinLobby jl(lobbies);
     jl.show();
 
     bool closed = false;
@@ -116,14 +122,39 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     QEventLoop loop;
 
     //join lobby signal
-    QObject::connect(&jl, &JoinLobby::join_lobby, [&]() {
+    QObject::connect(&jl, &JoinLobby::join_lobby, [&](uint32_t id) {
         //client select a lobby and send it to server
-        uint32_t lobby_id = 1; // jl.get_selected_lobby_id();
-        std::cout << "Sent join lobby request for lobby ID: " << lobby_id << std::endl;
+        //uint32_t lobby_id = 1; // jl.get_selected_lobby_id();
+        std::cout << "Sent join lobby request for lobby ID: " << id << std::endl;
 
         //wait for the server to confirm join
-        LobbyDTO lobby(LobbyAction::JOIN_LOBBY, lobby_id);
-        //protocol.send_action_lobby(lobby);
+        LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, id);
+        //protocol.send_action_lobby(lobby_req);
+        //waiting for confirmation and lobby info from server
+        LobbyDTO lobby(id);
+        //LobbyDTO lobby = protocol.receive_lobby_info();
+        
+        /*
+        if(lobby.action == LobbyAction::JoinLobby){
+            //join accepted
+            jl.hide();
+            closed = waiting_room(false, lobby);
+
+            if (closed) {
+                jl.show();
+            }else{
+                jl.close();
+                loop.quit();
+            }
+        }else if (lobby.action == LobbyAction::DenyJoinLobby){
+            //join denied
+            //refresh lobbies
+            jl.join_denied(); //QMessageBox warning
+
+        }
+
+        */
+
         jl.hide();
         closed = waiting_room(false, lobby);
 
@@ -143,11 +174,12 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         std::cout <<player.username <<" refreshing available lobbies..." << std::endl;
 
         //server sends available lobbies
-        //LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
-        //protocol.ask_for_lobbies(lobby_request);
-        //protocol.receive_lobbies();
+        LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
+        protocol.ask_for_lobbies(lobby_request);
+        LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
         //refresh table
+        
     });
 
     //close menu signal
