@@ -59,23 +59,6 @@ void GameMonitor::remove_client(const uint32_t client_id) {
         snapshot_queues.erase(it);
 }
 
-
-/*void GameMonitor::register_command_queue(Queue<GameCommand>& command_queue) {
-
-    command_queue_reference = std::ref(command_queue);
-}
-
-void GameMonitor::add_command(const GameCommand& command) const {
-
-    if (command_queue_reference.has_value()) {
-
-        try {
-
-            command_queue_reference->get().push(command);
-        } catch (const ClosedQueue&) {}
-    }
-}*/
-
 GameMonitor::~GameMonitor() {
 
     try {

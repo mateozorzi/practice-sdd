@@ -21,7 +21,6 @@ class GameLoop final: public Thread {
 
 
     GameMonitor& game_monitor;
-    //Queue<GameCommand> command_queue;
     Queue<GameCommand>& command_queue;
     b2World world;
     std::unordered_map<uint32_t, Player> players;
@@ -29,7 +28,6 @@ class GameLoop final: public Thread {
     std::unordered_map<ClientRequest, std::function<void(const GameCommand&)>> command_handlers;
 
     void process_commands();
-    void handle_player_username(const GameCommand& game_command);
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
@@ -54,7 +52,7 @@ public:
     bool is_full() const;
     bool is_empty() const;
 
-    void add_player(uint32_t client_id);
+    void add_player(uint32_t client_id, const std::string& username);
 
     ~GameLoop() override;
 };

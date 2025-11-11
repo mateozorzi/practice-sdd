@@ -26,13 +26,11 @@ public:
 
     explicit Game(uint32_t game_id);
 
-    Queue<GameCommand>& get_command_queue();
-
     bool is_full() const;
     bool is_empty() const;
 
-    Queue<WorldSnapshot>& add_player(uint32_t client_id);
-    void remove_player(uint32_t client_id);
+    std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> add_player(uint32_t client_id, const std::string& username);
+    void remove_player(uint32_t client_id); // TBI
 
     void stop();
 

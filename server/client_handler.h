@@ -25,8 +25,8 @@ class ClientHandler final: public Thread {
     void launch_lobby();
     void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
 
-    void create_new_game(uint32_t client_id);
-    void join_existing_game(uint32_t client_id, uint32_t game_id);
+    void create_new_game(uint32_t client_id, const std::string& username);
+    void join_existing_game(uint32_t client_id, uint32_t game_id, const std::string& username);
 
 
 public:

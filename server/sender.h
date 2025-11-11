@@ -5,7 +5,6 @@
 #include "../common/queue.h"
 #include "../common/thread.h"
 
-//#include "game_monitor.h"
 #include "lobby.h"
 #include "server_protocol.h"
 

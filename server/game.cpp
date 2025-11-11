@@ -4,12 +4,6 @@
 Game::Game(const uint32_t game_id): game_id(game_id), command_queue(500), game_loop(game_monitor, command_queue) {}
 
 
-Queue<GameCommand>& Game::get_command_queue() {
-
-    return command_queue;
-}
-
-
 bool Game::is_full() const {
 
     return game_loop.is_full();
@@ -21,16 +15,16 @@ bool Game::is_empty() const {
 }
 
 
-Queue<WorldSnapshot>& Game::add_player(const uint32_t client_id) {
+std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Game::add_player(const uint32_t client_id, const std::string& username) {
 
     Queue<WorldSnapshot>& snapshot_queue = game_monitor.register_client(client_id);
 
-    game_loop.add_player(client_id);
+    game_loop.add_player(client_id, username);
 
     if (game_loop.is_full())
         game_loop.start();
 
-    return snapshot_queue;
+    return { command_queue, snapshot_queue };
 }
 
 void Game::remove_player(const uint32_t client_id) {

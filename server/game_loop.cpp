@@ -9,38 +9,6 @@
 #include "world_creation_exception.h"
 
 
-/*GameLoop::GameLoop(GameMonitor& game_monitor):
-        game_monitor(game_monitor), command_queue(500), world(b2Vec2(0.0f, 0.0f)), 
-        collision_listener(players) {
-
-    game_monitor.register_command_queue(command_queue);
-    
-    world.SetContactListener(&collision_listener);
-
-    command_handlers = {
-            {ClientRequest::SEND_USERNAME,
-             [this](const GameCommand& game_command) { handle_player_username(game_command); }},
-            {ClientRequest::SEND_CAR_SELECTION,
-             [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
-            {ClientRequest::MOVE_CAR,
-             [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
-            {ClientRequest::DISCONNECT,
-             [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
-    
-    auto polygons = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
-    for (const auto& p: polygons) {
-        try {
-            bool added = WorldUtils::add_polygon_to_world(p, world);
-            if (!added) {
-                std::cout << "Polygon of size " << p.size() << " ommited\n";
-            }
-        } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Could not add collision bodies: ") + std::string(e.what()));
-        }
-    }
-}*/
-
-
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue):
         game_monitor(game_monitor), command_queue(command_queue), world(b2Vec2(0.0f, 0.0f)), 
         collision_listener(players) {
@@ -48,8 +16,6 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue)
     world.SetContactListener(&collision_listener);
 
     command_handlers = {
-            {ClientRequest::SEND_USERNAME,
-             [this](const GameCommand& game_command) { handle_player_username(game_command); }},
             {ClientRequest::SEND_CAR_SELECTION,
              [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
             {ClientRequest::MOVE_CAR,
@@ -90,6 +56,19 @@ bool GameLoop::is_empty() const {
 }
 
 
+void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
+
+        players.try_emplace(
+        client_id,
+        client_id,
+        username,
+        world
+    );
+
+    std::cout << "New player with ID: " << client_id 
+        << " has joined a game! | Username: " << username << std::endl << std::endl;
+}
+
 void GameLoop::process_commands() {
 
     GameCommand game_command;
@@ -97,25 +76,6 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
-
-void GameLoop::handle_player_username(const GameCommand& game_command) {
-
-    if (auto player_dto = game_command.get_data<PlayerDTO>()) {
-
-        uint32_t client_id = game_command.get_client_id();
-        players.try_emplace(
-            client_id, 
-            client_id, 
-            player_dto->get().username, 
-            world
-        );
-
-        std::cout << "New player with ID: " << client_id 
-                << " has joined the game! | Username: " 
-                << player_dto->get().username << std::endl;
-
-    }
-}
 
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
@@ -196,12 +156,6 @@ void GameLoop::run() {
             }
         }
     } catch (const ClosedQueue&) {}
-}
-
-void GameLoop::add_player(const uint32_t client_id) {
-
-    (void)client_id;
-    // TODO
 }
 
 

@@ -5,7 +5,6 @@
 #include "../common/constants.h"
 #include "../common/thread.h"
 
-//#include "game_loop.h"
 #include "lobby.h"
 #include "server_protocol.h"
 
