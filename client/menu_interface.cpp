@@ -118,7 +118,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
         //wait for the server to confirm join
         LobbyDTO lobby(LobbyAction::JOIN_LOBBY, lobby_id);
-        //protocol.send_join_lobby(lobby_id);
+        //protocol.send_action_lobby(lobby);
         jl.hide();
         closed = waiting_room(false, lobby);
 
@@ -168,7 +168,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
     QEventLoop loop;
 
     //lobby started signal from lobbyReceiver
-    QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&](){
+    QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&](){        
         w.close();
         loop.quit();
     });
@@ -186,7 +186,8 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
-        //protocol.send_start_lobby();
+        LobbyDTO start(LobbyAction::START_LOBBY, lobby.lobby_id);
+        //protocol.send_action_lobby(start);
         
         loop.quit();
     });
@@ -195,11 +196,9 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
     QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
-        //if owner
-        //protocol.send_delete_lobby();
-
-        //else
-        //protocol_send_leave_lobby();
+        
+        LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
+        //protocol.send_action_lobby(leave);
 
         closed = true;
         loop.quit();

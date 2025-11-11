@@ -9,7 +9,8 @@ enum class LobbyAction : uint8_t {
     JOIN_LOBBY = 0x01,
     SEND_LOBBY_LIST = 0x02,
     LEAVE_LOBBY = 0x03,
-    EXIT_GAME = 0x04
+    START_LOBBY = 0x04,
+    EXIT_GAME = 0x05
 
 };
 
@@ -27,7 +28,7 @@ struct LobbyDTO {
     LobbyDTO(LobbyAction act, int id, const std::string& name, int max_p):
         action(act), lobby_id(id), lobby_name(name), max_players(max_p) {}
 
-    //join Lobby
+    //join Lobby, start, leave
     LobbyDTO(LobbyAction act, int id):
         action(act), lobby_id(id), lobby_name(""), max_players(0) {}
 };
