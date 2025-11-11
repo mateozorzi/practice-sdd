@@ -77,7 +77,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
         protocol.send_create_lobby(lobby);
-
+        cl.close();
         closed = waiting_room(true, lobby);
 
         loop.quit();
@@ -106,7 +106,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     
     
     // join lobby ui
-    JoinLobby jl;
+    JoinLobby jl(lobbies);
     jl.show();
 
     bool closed = false;
@@ -116,13 +116,14 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     QEventLoop loop;
 
     //join lobby signal
-    QObject::connect(&jl, &JoinLobby::join_lobby, [&]() {
+    QObject::connect(&jl, &JoinLobby::join_lobby, [&](uint32_t id) {
         //client select a lobby and send it to server
-        uint32_t lobby_id = 1; // jl.get_selected_lobby_id();
-        std::cout << "Sent join lobby request for lobby ID: " << lobby_id << std::endl;
+        //uint32_t lobby_id = 1; // jl.get_selected_lobby_id();
+        std::cout << "Sent join lobby request for lobby ID: " << id << std::endl;
 
         //wait for the server to confirm join
         LobbyDTO lobby(LobbyAction::JOIN_LOBBY, lobby_id);
+        LobbyDTO lobby(id);
         protocol.send_action_lobby(lobby);
         jl.hide();
         closed = waiting_room(false, lobby);
@@ -143,11 +144,13 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         std::cout <<player.username <<" refreshing available lobbies..." << std::endl;
 
         //server sends available lobbies
-        //LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
-        //protocol.ask_for_lobbies(lobby_request);
-        //protocol.receive_lobbies();
+        LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
+        protocol.ask_for_lobbies(lobby_request);
+        LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
         //refresh table
+        jl.fill_table(lobbies);
+        
     });
 
     //close menu signal
