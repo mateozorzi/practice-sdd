@@ -13,9 +13,7 @@
 class Server {
 
     ServerConfig config;
-    //Lobby lobby
-    GameMonitor game_monitor;
-    GameLoop game_loop;
+    Lobby lobby;
     Acceptor clients_acceptor;
 
     void stop();

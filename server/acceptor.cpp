@@ -6,16 +6,7 @@
 #include "../common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, GameMonitor& game_monitor):
-        acceptor_socket(port.c_str()), game_monitor(game_monitor) {}
-
-/*
-
-WIP -> Adding multiple games logic
-
 Acceptor::Acceptor(const std::string& port, Lobby& lobby): acceptor_socket(port.c_str()), lobby(lobby) {}
-
-*/
 
 
 void Acceptor::run() {
@@ -27,9 +18,7 @@ void Acceptor::run() {
             Socket peer_socket = acceptor_socket.accept();
             reap();
             client_id++;
-            std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), game_monitor,
-                                                          client_id);
-            //std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
+            std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
             clients.push_back(std::move(client));
             std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
         } catch (const std::exception& e) {

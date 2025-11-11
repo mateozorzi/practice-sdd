@@ -2,6 +2,7 @@
 #define CLIENT_HANDLER_H
 
 
+#include <memory>
 #include <string_view>
 
 #include "../common/constants.h"
@@ -16,19 +17,18 @@ class ClientHandler {
 
     Socket peer_socket;
     ServerProtocol server_protocol;
-    GameMonitor& game_monitor;
-    //Lobby& lobby;
+    Lobby& lobby;
     const uint32_t client_id;
     bool is_in_lobby = true;
 
-    Receiver receiver;
-    Sender sender;
+    std::unique_ptr<Receiver> receiver;
+    std::unique_ptr<Sender> sender;
 
-    //void run_lobby_loop();
-    //void extit_lobby();
+    void run_lobby_loop();
+    void exit_lobby();
 
-    //void create_new_match();
-    //void join_existing_match();
+    void create_new_match(uint32_t client_id);
+    void join_existing_match(uint32_t client_id, uint32_t game_id);
 
     void stop();
 
@@ -37,8 +37,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor, uint32_t client_id);
-    //explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id);
+    explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id);
 
 
     bool is_alive() const;

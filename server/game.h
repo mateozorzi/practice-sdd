@@ -2,6 +2,7 @@
 #define GAME_H
 
 
+#include "../common/constants.h"
 #include "../common/queue.h"
 
 
@@ -14,8 +15,8 @@ class Game {
 
 
     const uint32_t game_id;
-    GameMonitor game_monitor;
     Queue<GameCommand> command_queue;
+    GameMonitor game_monitor;
     GameLoop game_loop;
 
 
@@ -25,14 +26,17 @@ public:
 
     explicit Game(uint32_t game_id);
 
-    void stop();
+    Queue<GameCommand>& get_command_queue();
 
-    void add_player(uint32_t client_id);
+    bool is_full() const;
+    bool is_empty() const;
+
+    Queue<WorldSnapshot>& add_player(uint32_t client_id);
     void remove_player(uint32_t client_id);
 
-    bool is_full();
-    bool is_empty();
+    void stop();
 
+    ~Game();
 };
 
 #endif

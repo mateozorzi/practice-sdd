@@ -9,7 +9,7 @@
 #include "world_creation_exception.h"
 
 
-GameLoop::GameLoop(GameMonitor& game_monitor):
+/*GameLoop::GameLoop(GameMonitor& game_monitor):
         game_monitor(game_monitor), command_queue(500), world(b2Vec2(0.0f, 0.0f)), 
         collision_listener(players) {
 
@@ -38,12 +38,8 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
             throw WorldCreationException(std::string("Could not add collision bodies: ") + std::string(e.what()));
         }
     }
-}
+}*/
 
-
-/*
-
-WIP -> Adding multiple games logic
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue):
         game_monitor(game_monitor), command_queue(command_queue), world(b2Vec2(0.0f, 0.0f)), 
@@ -74,7 +70,6 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue)
     }
 }
 
-*/
 
 void GameLoop::remove_player(const uint32_t client_id) {
 
@@ -82,6 +77,16 @@ void GameLoop::remove_player(const uint32_t client_id) {
 
     if (it != players.end())
         players.erase(it);
+}
+
+bool GameLoop::is_full() const {
+
+    return players.size() >= 1;
+}
+
+bool GameLoop::is_empty() const {
+
+    return players.empty();
 }
 
 
@@ -193,6 +198,12 @@ void GameLoop::run() {
     } catch (const ClosedQueue&) {}
 }
 
+void GameLoop::add_player(const uint32_t client_id) {
+
+    (void)client_id;
+    // TODO
+}
+
 
 void GameLoop::stop() {
 
@@ -201,7 +212,6 @@ void GameLoop::stop() {
 
     try {
 
-        command_queue.close();
         players.clear();
     } catch (const std::exception&) {}
 }

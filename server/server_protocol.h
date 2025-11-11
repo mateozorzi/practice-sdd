@@ -5,6 +5,7 @@
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/car_catalogue_dto.h"
+#include "../common/lobby_dto.h"
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 
@@ -28,6 +29,7 @@ public:
     ClientRequest receive_client_request();
 
     PlayerDTO receive_username();
+    LobbyDTO receive_lobby_info();
     car_dto receive_car_selection();
     MovementDTO receive_movement();
 

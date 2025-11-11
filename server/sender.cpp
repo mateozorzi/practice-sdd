@@ -6,12 +6,12 @@
 #include "../common/liberror.h"
 
 
-Sender::Sender(ServerProtocol& server_protocol, GameMonitor& game_monitor,
-               const uint32_t client_id):
+Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby,
+               const uint32_t client_id, Queue<WorldSnapshot>& snapshot_queue):
         server_protocol(server_protocol),
-        game_monitor(game_monitor),
+        lobby(lobby),
         client_id(client_id),
-        client_message_queue(game_monitor.register_client(client_id)) {}
+        snapshot_queue(snapshot_queue) {}
 
 
 void Sender::run() {
@@ -22,7 +22,7 @@ void Sender::run() {
 
             try {
 
-                const WorldSnapshot& world_snapshot = client_message_queue.pop();
+                const WorldSnapshot& world_snapshot = snapshot_queue.pop();
                 server_protocol.send_world_snapshot(world_snapshot);
 
             } catch (const ClosedQueue&) {
@@ -44,7 +44,6 @@ void Sender::stop() {
 
         _is_alive = false;
         _keep_running = false;
-        game_monitor.unregister_client(client_id);
     }
 }
 
