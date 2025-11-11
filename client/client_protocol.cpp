@@ -28,6 +28,9 @@ void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
 
 void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
     send_buffer();
 }
 

@@ -50,9 +50,18 @@ Lobby::join_existing_game(const uint32_t client_id, const uint32_t game_id, cons
     return queues;
 }
 
-void Lobby::list_games() {
+LobbyCatalogueDTO Lobby::list_games() {
 
-    // TODO: send active games
+    std::lock_guard lock(mtx);
+
+    reap();
+
+    std::vector<LobbyDTO> lobby_dtos;
+
+    for (const auto& [game_id, game_ptr] : games)
+        lobby_dtos.emplace_back(game_id);
+
+    return LobbyCatalogueDTO(std::move(lobby_dtos));
 }
 
 void Lobby::reap() {

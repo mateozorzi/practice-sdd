@@ -108,3 +108,13 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
 
     send_buffer();
 }
+
+void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue) {
+
+    add_uint8_to_buffer(lobby_catalogue.size);
+
+    for (const auto& lobby : lobby_catalogue.lobbies)
+        add_uint32_to_buffer(lobby.lobby_id);
+    
+    send_buffer();
+}
