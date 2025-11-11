@@ -124,6 +124,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         //wait for the server to confirm join
         LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, id);
         //protocol.send_action_lobby(lobby_req);
+        LobbyDTO lobby(id);
         //waiting for confirmation and lobby info from server
         //LobbyDTO lobby = protocol.receive_lobby_info();
         
