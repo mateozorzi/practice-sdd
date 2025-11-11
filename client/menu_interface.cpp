@@ -74,7 +74,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         int max_players = cl.get_number_players();
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
-        //protocol.send_create_lobby(lobby);
+        protocol.send_create_lobby(lobby);
 
         closed = waiting_room(true, lobby);
 

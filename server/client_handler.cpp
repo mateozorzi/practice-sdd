@@ -10,9 +10,7 @@ ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
         lobby(lobby),
-        client_id(client_id),
-        receiver(nullptr),
-        sender(nullptr) {
+        client_id(client_id) {
 
 }
 
@@ -23,14 +21,6 @@ void ClientHandler::stop() {
 
         server_protocol.stop();
     } catch (const LibError&) {}
-
-    if (receiver && sender) {
-        receiver->stop();
-        sender->stop();
-
-        receiver->join();
-        sender->join();
-    }
 
     //lobby.remove_player(client_id);
 }
@@ -70,8 +60,6 @@ void ClientHandler::run() {
 
 void ClientHandler::launch_lobby() {
 
-    std::cout << "Lobby loop started for client id: " << client_id << std::endl;
-
     server_protocol.receive_client_request();
     PlayerDTO player_dto = server_protocol.receive_username();
     std::cout << "Player connected with username: " << player_dto.username << " and client id: " << client_id << std::endl;
@@ -81,11 +69,10 @@ void ClientHandler::launch_lobby() {
 
         try {
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
-
+            std::cout << "Hola pepe " << std::endl;
             switch (lobby_dto.action) {
                 case LobbyAction::CREATE_LOBBY:
-                    std::cout << "Creating new match!" << std::endl;
-                    create_new_match(client_id);
+                    create_new_game(client_id);
                     std::cout << "Creating new match with id: " << client_id << std::endl;
                     break;
                 case LobbyAction::SEND_LOBBY_LIST:
@@ -94,7 +81,7 @@ void ClientHandler::launch_lobby() {
                     std::cout << "Listing matches for player with client id: " << client_id << std::endl;
                     break;
                 case LobbyAction::JOIN_LOBBY:
-                    join_existing_match(client_id, lobby_dto.lobby_id);
+                    join_existing_game(client_id, lobby_dto.lobby_id);
                     std::cout << "Joining existing match!" << std::endl;
                     break;
                 case LobbyAction::LEAVE_LOBBY:
@@ -115,26 +102,28 @@ void ClientHandler::launch_lobby() {
 }
 
 
-void ClientHandler::exit_lobby() {
+void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue) {
 
     is_in_lobby = false;
-    //sender->start();
-    //receiver->start();
+    Receiver receiver(server_protocol, lobby, client_id, command_queue);
+    receiver.start();
+    Sender sender(server_protocol, lobby, client_id, snapshot_queue);
+    sender.run();
 }
 
 
-void ClientHandler::create_new_match(const uint32_t client_id) {
+void ClientHandler::create_new_game(const uint32_t client_id) {
 
-    Queue<GameCommand>& game_queue = lobby.create_new_game(client_id);
-    (void) game_queue;
-    exit_lobby();
+    Queue<GameCommand>& command_queue = lobby.create_new_game(client_id);
+    Queue<WorldSnapshot>& snapshot_queue = lobby.get_snapshot_queue(client_id, client_id);
+    exit_lobby(command_queue, snapshot_queue);
 }
 
 
-void ClientHandler::join_existing_match(const uint32_t client_id, const uint32_t game_id) {
+void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t game_id) {
 
     Queue<GameCommand>& game_queue = lobby.join_existing_game(client_id, game_id);
-    (void) game_queue;
-    exit_lobby();
+    Queue<WorldSnapshot>& snapshot_queue = lobby.get_snapshot_queue(game_id, client_id);
+    exit_lobby(game_queue, snapshot_queue);
 }
 

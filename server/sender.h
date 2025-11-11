@@ -10,14 +10,14 @@
 #include "server_protocol.h"
 
 
-class Sender final: public Thread {
+class Sender final {
 
 
     ServerProtocol& server_protocol;
-    //GameMonitor& game_monitor;
     Lobby& lobby;
     uint32_t client_id;
     Queue<WorldSnapshot>& snapshot_queue;
+    std::atomic_bool keep_running;
 
 
 public:
@@ -27,10 +27,11 @@ public:
     explicit Sender(ServerProtocol& server_protocol, Lobby& lobby,
                     uint32_t client_id, Queue<WorldSnapshot>& snapshot_queue);
 
-    void run() override;
-    void stop() override;
+    void run();
+    bool is_alive();
+    void stop();
 
-    ~Sender() override;
+    ~Sender();
 };
 
 

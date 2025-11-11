@@ -50,7 +50,7 @@ PlayerDTO ServerProtocol::receive_username() {
 LobbyDTO ServerProtocol::receive_lobby_info() {
 
     const uint8_t action_byte = recv_uint8();
-    const uint32_t lobby_id = recv_uint32();
+    const uint8_t lobby_id = recv_uint8();
     const std::string lobby_name = recv_string();
     const uint8_t max_players = recv_uint8();
 

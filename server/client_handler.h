@@ -21,15 +21,12 @@ class ClientHandler final: public Thread {
     const uint32_t client_id;
     bool is_in_lobby = true;
 
-    std::unique_ptr<Receiver> receiver;
-    std::unique_ptr<Sender> sender;
-
 
     void launch_lobby();
-    void exit_lobby();
+    void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
 
-    void create_new_match(uint32_t client_id);
-    void join_existing_match(uint32_t client_id, uint32_t game_id);
+    void create_new_game(uint32_t client_id);
+    void join_existing_game(uint32_t client_id, uint32_t game_id);
 
 
 public:

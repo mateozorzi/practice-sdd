@@ -11,14 +11,15 @@ Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby,
         server_protocol(server_protocol),
         lobby(lobby),
         client_id(client_id),
-        snapshot_queue(snapshot_queue) {}
+        snapshot_queue(snapshot_queue),
+        keep_running(true) {}
 
 
 void Sender::run() {
 
     try {
 
-        while (should_keep_running()) {
+        while (keep_running) {
 
             try {
 
@@ -38,12 +39,16 @@ void Sender::run() {
     }
 }
 
+bool Sender::is_alive() {
+
+    return keep_running;
+}
+
 void Sender::stop() {
 
-    if (_keep_running) {
+    if (keep_running) {
 
-        _is_alive = false;
-        _keep_running = false;
+        keep_running = false;
     }
 }
 
@@ -52,7 +57,7 @@ Sender::~Sender() {
 
     try {
 
-        Sender::stop();
+        stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << SENDER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
