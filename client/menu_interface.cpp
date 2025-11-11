@@ -178,7 +178,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         loop.quit();
     });
 
-    //lobbyReceiver.start();
+    lobbyReceiver.start();
 
     //start lobby signal
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
