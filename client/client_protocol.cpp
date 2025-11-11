@@ -20,7 +20,7 @@ void ClientProtocol::send_movement(const MovementDTO& movement) {
 
 void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby.lobby_id));
+    add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
     send_buffer();
@@ -34,13 +34,14 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     send_buffer();
 }
 
-void ClientProtocol::send_join_lobby(const LobbyDTO& lobby) {
+void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint8_to_buffer(0);
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
     send_buffer();
 }
+
 void ClientProtocol::send_car_selection(const car_dto& car){
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_SELECTION));
     add_string_to_buffer(car.model);
