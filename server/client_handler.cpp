@@ -6,22 +6,97 @@
 #include "../common/liberror.h"
 
 
-ClientHandler::ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor,/*Lobby& lobby,*/ uint32_t client_id):
+ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id):
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
-        game_monitor(game_monitor),
-        /*lobby(lobby),*/
-        client_id(client_id),
-        receiver(server_protocol, game_monitor /* lobby */, client_id),
-        sender(server_protocol, game_monitor /* lobby */, client_id) {
+        lobby(lobby),
+        client_id(client_id) {
 
-    receiver.start();
-    sender.start();
-    //run_lobby_loop();
 }
 
+void ClientHandler::launch_lobby() {
 
-bool ClientHandler::is_alive() const { return receiver.is_alive() && sender.is_alive(); }
+    server_protocol.receive_client_request();
+    PlayerDTO player_dto = server_protocol.receive_username();
+    server_protocol.send_client_id(client_id);
+
+    while (is_in_lobby) {
+
+        try {
+            LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
+            switch (lobby_dto.action) {
+                case LobbyAction::CREATE_LOBBY:
+                    create_new_game(client_id, player_dto.username);
+                    std::cout << "Creating new match with id: " << client_id << std::endl;
+                    break;
+                // These below doesn't work for now...
+                case LobbyAction::SEND_LOBBY_LIST:
+                    lobby.reap();
+                    lobby.list_games();
+                    std::cout << "Listing matches for player with client id: " << client_id << std::endl;
+                    break;
+                case LobbyAction::JOIN_LOBBY:
+                    join_existing_game(client_id, lobby_dto.lobby_id, player_dto.username);
+                    std::cout << "Joining existing match!" << std::endl;
+                    break;
+                case LobbyAction::LEAVE_LOBBY:
+                    player_dto = server_protocol.receive_username();
+                    std::cout << "Username re-entered!" << std::endl;
+                    break;
+                default:
+                    is_in_lobby = false;
+                    break;  
+            }
+        }
+        catch (const std::exception& e) {
+        
+            is_in_lobby = false;
+        }
+    }
+}
+
+void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue) {
+
+    is_in_lobby = false;
+    Receiver receiver(server_protocol, lobby, client_id, command_queue);
+    receiver.start();
+    Sender sender(server_protocol, lobby, client_id, snapshot_queue);
+    sender.run();
+
+    sender.stop();
+    receiver.stop();
+    receiver.join();
+}
+
+void ClientHandler::create_new_game(const uint32_t client_id, const std::string& username) {
+
+    auto [command_queue, snapshot_queue] = lobby.create_new_game(client_id, username);
+    exit_lobby(command_queue, snapshot_queue);
+}
+
+void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t game_id, const std::string& username) {
+
+    auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
+    exit_lobby(command_queue, snapshot_queue);
+}
+
+void ClientHandler::run() {
+
+    while (should_keep_running() && is_in_lobby) {
+        try {
+
+
+            launch_lobby();
+        } catch (const LibError&) {
+
+        } catch (const std::exception& e) {
+
+            std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION << ": " << e.what();
+        }
+    }
+
+    ClientHandler::stop();
+}
 
 
 void ClientHandler::stop() {
@@ -31,89 +106,18 @@ void ClientHandler::stop() {
         server_protocol.stop();
     } catch (const LibError&) {}
 
-    receiver.stop();
-    sender.stop();
-
-    receiver.join();
-    sender.join();
-
-    game_monitor.remove_client(client_id);
-    //lobby.remove_player(client_id);
+    lobby.remove_player(client_id);
 }
+
 
 ClientHandler::~ClientHandler() {
 
     try {
 
-        stop();
+        ClientHandler::stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
     }
 }
-
-
-/*
-
-WIP -> Adding multiple games logic
-
-void ClientHandler::run_lobby_loop() {
-
-    const PlayerDTO& player_dto = server_protocol.receive_username();
-    server_protocol.send_client_id(client_id);
-
-    while (is_in_lobby) {
-
-        try {
-            LobbyDTO lobby_dto = server_protocol.receive_lobby_dto();
-
-            if (lobby_dto.create_new_match) {
-
-                create_new_match();
-                std::cout << "Creating new match with id: " << client_id << std::endl;
-            } else if (lobby_dto.list_matches) {
-
-                lobby.reap();
-                lobby.list_matches();
-                std::cout << "Listing matches for player with client id: " << client_id << std::endl;
-            } else if (lobby_dto.join_match) {
-
-                join_existing_match();
-                std::cout << "Joining existing match!" << std::endl;
-            } else if (lobby_dto.ask_username_again) {
-            
-                player_dto = server_protocol.receive_username();
-                std::cout << "Username re-entered!" << std::endl;
-            } else {
-             
-                break;
-            }
-        }
-    } catch (const std::exception& e) {
-     
-        is_in_lobby = false();
-    }
-}
-
-
-void ClientHandler::extit_lobby() {
-
-    is_in_lobby = false;
-    sender.start();
-    receiver.start();
-}
-
-
-void ClientHandler::create_new_match() {
-
-    // Queue<GameCommand>& game_queue = lobby.create_new_game(client_id, race_name);
-    exit_lobby();
-}
-
-
-void ClientHandler::join_existing_match() {
-
-    // Queue<GameCommand>& game_queue = lobby.join_existing_game(client_id, game_id);
-    exit_lobby();
-}*/
 

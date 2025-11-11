@@ -123,6 +123,22 @@ if(TALLER_CLIENT OR GAME_EDITOR)
     FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp box2d nlohmann_json)
 endif()
 
+# Install yaml-cpp for server configuration
+if(TALLER_SERVER)
+    include(FetchContent)
+    FetchContent_Declare(
+        yaml-cpp
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+        GIT_TAG 0.8.0
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+    )
+    set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Disable yaml-cpp tests")
+    set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable yaml-cpp tools")
+    set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "Disable yaml-cpp contrib")
+    FetchContent_MakeAvailable(yaml-cpp)
+endif()
+
 # Program section
 # ---------------
 if(TALLER_CLIENT)
@@ -167,7 +183,7 @@ if(TALLER_SERVER)
     set_project_warnings(taller_server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # Link the taller_common lib target
-    target_link_libraries(taller_server taller_common box2d nlohmann_json::nlohmann_json)
+    target_link_libraries(taller_server taller_common box2d nlohmann_json::nlohmann_json yaml-cpp::yaml-cpp)
 endif()
 
 if(GAME_EDITOR)

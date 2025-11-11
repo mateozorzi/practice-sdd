@@ -5,7 +5,7 @@
 #include "../common/constants.h"
 #include "../common/thread.h"
 
-#include "game_loop.h"
+#include "lobby.h"
 #include "server_protocol.h"
 
 
@@ -13,8 +13,9 @@ class Receiver final: public Thread {
 
 
     ServerProtocol& server_protocol;
-    GameMonitor& game_monitor;
+    Lobby& lobby;
     uint32_t client_id;
+    Queue<GameCommand>& command_queue;
 
     void handle_player_username(const ClientRequest& client_request);
     void handle_car_selection();
@@ -26,8 +27,8 @@ public:
     Receiver(const Receiver&) = delete;
     Receiver& operator=(const Receiver&) = delete;
 
-    explicit Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor,
-                      uint32_t client_id);
+    explicit Receiver(ServerProtocol& server_protocol, Lobby& lobby, 
+                      uint32_t client_id, Queue<GameCommand>& command_queue);
 
     void run() override;
     void stop() override;

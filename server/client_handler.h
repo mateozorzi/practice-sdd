@@ -2,6 +2,7 @@
 #define CLIENT_HANDLER_H
 
 
+#include <memory>
 #include <string_view>
 
 #include "../common/constants.h"
@@ -11,35 +12,33 @@
 #include "sender.h"
 
 
-class ClientHandler {
+class ClientHandler final: public Thread {
 
 
     Socket peer_socket;
     ServerProtocol server_protocol;
-    GameMonitor& game_monitor;
-    //Lobby& lobby;
+    Lobby& lobby;
     const uint32_t client_id;
     bool is_in_lobby = true;
 
-    Receiver receiver;
-    Sender sender;
 
-    //void run_lobby_loop();
-    //void extit_lobby();
+    void launch_lobby();
+    void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
 
-    //void create_new_match();
-    //void join_existing_match();
-
-    void stop();
+    void create_new_game(uint32_t client_id, const std::string& username);
+    void join_existing_game(uint32_t client_id, uint32_t game_id, const std::string& username);
 
 
 public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& peer_socket, GameMonitor& game_monitor,/*Lobby& lobby,*/  uint32_t client_id);
+    explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id);
 
-    bool is_alive() const;
+
+    void run() override;
+
+    void stop() override;
 
     ~ClientHandler();
 };

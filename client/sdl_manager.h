@@ -1,6 +1,8 @@
 #ifndef SDL_MANAGER_H
 #define SDL_MANAGER_H
 #include <map>
+#include <string>
+#include <vector>
 
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
@@ -19,12 +21,15 @@ private:
     std::optional<SDL2pp::Texture> map;
     std::optional<SDL2pp::Texture> sprite;
     std::optional<SDL2pp::Texture> minimap;
+    std::vector<SDL2pp::Rect> bridges_rects;
 
+    std::vector<SDL2pp::Rect> loadRects(const std::string& path);
 
     void update_camera(int player_x, int player_y);
     void render_player(CarPositionDTO& player);
     void render_hud_health(int health);
     void render_hud_minimap(int player_x, int player_y);
+    void render_bridges();
 
 public:
     SDLManager();

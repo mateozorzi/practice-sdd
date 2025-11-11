@@ -7,16 +7,16 @@
 #include "../common/movement_dto.h"
 
 
-Receiver::Receiver(ServerProtocol& server_protocol, GameMonitor& game_monitor,
-                   const uint32_t client_id):
-        server_protocol(server_protocol), game_monitor(game_monitor), client_id(client_id) {}
+Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby,
+                   const uint32_t client_id, Queue<GameCommand>& command_queue):
+        server_protocol(server_protocol), lobby(lobby), client_id(client_id), command_queue(command_queue) {}
 
 
 void Receiver::handle_player_username(const ClientRequest& client_request) {
 
     const PlayerDTO& player_dto = server_protocol.receive_username();
     server_protocol.send_client_id(client_id);
-    game_monitor.add_command(GameCommand(client_id, client_request, player_dto));
+    command_queue.push(GameCommand(client_id, client_request, player_dto));
 }
 
 void Receiver::handle_get_car_catalogue() {
@@ -41,14 +41,14 @@ void Receiver::handle_get_car_catalogue() {
 void Receiver::handle_car_selection() {
 
     const car_dto& car_selection = server_protocol.receive_car_selection();
-    game_monitor.add_command(GameCommand(client_id, ClientRequest::SEND_CAR_SELECTION, car_selection));
+    command_queue.push(GameCommand(client_id, ClientRequest::SEND_CAR_SELECTION, car_selection));
 }
 
 
 void Receiver::handle_car_movement(const ClientRequest& client_request) {
 
     const MovementDTO& movement_dto = server_protocol.receive_movement();
-    game_monitor.add_command(GameCommand(client_id, client_request, movement_dto));
+    command_queue.push(GameCommand(client_id, client_request, movement_dto));
 }
 
 void Receiver::run() {
