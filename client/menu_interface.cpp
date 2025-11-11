@@ -99,14 +99,8 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 bool MenuInterface::join_lobby(PlayerDTO& player) {
     //client ask for available lobbies
     LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
-    //protocol.ask_for_lobbies(lobby_request);
-    //LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
-
-    //LobbyCaralogue hardocodeado para pruebas
-    std::vector<LobbyDTO> lobby_vector;
-    lobby_vector.push_back(LobbyDTO(1));
-    lobby_vector.push_back(LobbyDTO(2));
-    LobbyCatalogueDTO lobbies(std::move(lobby_vector));
+    protocol.ask_for_lobbies(lobby_request);
+    LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
     std::cout<<"Received lobby catalogue of size: " << lobbies.size << std::endl;
     
@@ -131,7 +125,6 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, id);
         //protocol.send_action_lobby(lobby_req);
         //waiting for confirmation and lobby info from server
-        LobbyDTO lobby(id);
         //LobbyDTO lobby = protocol.receive_lobby_info();
         
         /*
@@ -179,6 +172,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
         //refresh table
+        jl.fill_table(lobbies);
         
     });
 
