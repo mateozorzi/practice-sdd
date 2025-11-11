@@ -23,10 +23,10 @@ MenuInterface::MenuInterface(ClientProtocol& protocol) : protocol(protocol) {}
 
 bool MenuInterface::car_selection(PlayerDTO& player){
     //server send market of cars
+    std::cout<<"Requesting car catalogue from server..."<<std::endl;
     protocol.ask_for_catalogue();
     CarCatalogueDTO catalogue = protocol.receive_car_catalogue();
 
-    //CarCatalogueDTO catalogue(std::move(cars));
     std::cout << "Received car catalogue of size: " << static_cast<int>(catalogue.size) << std::endl;
     SelectCars sc(catalogue);
     sc.showMaximized();
@@ -169,18 +169,16 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
 
     //lobby started signal from lobbyReceiver
     QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&](){        
-        w.close();
         loop.quit();
     });
 
     //lobby deleted signal from lobbyReceiver
     QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, [&](){
-        w.close();
         closed = true;
         loop.quit();
     });
 
-    lobbyReceiver.start();
+    //lobbyReceiver.start();
 
     //start lobby signal
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
@@ -306,7 +304,7 @@ PlayerDTO MenuInterface::lobby(){
         //server send car market if username valid -> enter lobby (create or join)
         l.hide();
         menu_closed = lobby_create(player);
-
+        std::cout << "Menu closed: " << menu_closed << std::endl;
         if (menu_closed){
             //show enter username again
             l.show();
