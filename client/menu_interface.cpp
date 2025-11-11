@@ -102,7 +102,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     protocol.ask_for_lobbies(lobby_request);
     LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
-    std::cout<<"Received lobby catalogue of size: " << lobbies.size << std::endl;
+    std::cout<<"Received lobby catalogue of size: " << (int)lobbies.size << std::endl;
     
     
     // join lobby ui
@@ -123,7 +123,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
         //wait for the server to confirm join
         LobbyDTO lobby(LobbyAction::JOIN_LOBBY, lobby_id);
-        //protocol.send_action_lobby(lobby);
+        protocol.send_action_lobby(lobby);
         jl.hide();
         closed = waiting_room(false, lobby);
 

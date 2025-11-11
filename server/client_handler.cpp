@@ -3,6 +3,8 @@
 #include <iostream>
 #include <utility>
 
+
+#include "../common/lobbies_catalogue_dto.h"
 #include "../common/liberror.h"
 
 
@@ -26,16 +28,16 @@ void ClientHandler::launch_lobby() {
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
                 case LobbyAction::CREATE_LOBBY:
-                    create_new_game(client_id, player_dto.username);
                     std::cout << "Creating new match with id: " << client_id << std::endl;
+                    create_new_game(client_id, player_dto.username);
                     break;
-                // These below doesn't work for now...
                 case LobbyAction::SEND_LOBBY_LIST:
-                    lobby.reap();
-                    lobby.list_games();
-                    std::cout << "Listing matches for player with client id: " << client_id << std::endl;
+                    std::cout << "Sent lobby catalogue to client with id: " << client_id << std::endl;
+                    server_protocol.send_lobby_catalogue(lobby.list_games());
                     break;
+                // These below don't work for now...
                 case LobbyAction::JOIN_LOBBY:
+                    std::cout << "Client requested to join existing lobby." << std::endl;
                     join_existing_game(client_id, lobby_dto.lobby_id, player_dto.username);
                     std::cout << "Joining existing match!" << std::endl;
                     break;

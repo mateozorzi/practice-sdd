@@ -9,6 +9,9 @@
 #include <string>
 
 
+#include "../common/lobbies_catalogue_dto.h"
+
+
 #include "game.h"
 
 
@@ -28,7 +31,7 @@ public:
 
     std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> create_new_game(uint32_t client_id, const std::string& username);
     std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> join_existing_game(uint32_t client_id, uint32_t game_id, const std::string& username);
-    void list_games();
+    LobbyCatalogueDTO list_games();
     void reap();
     void remove_player(uint32_t client_id);
 

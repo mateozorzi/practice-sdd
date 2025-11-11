@@ -6,6 +6,7 @@
 #include "../common/common_protocol.h"
 #include "../common/car_catalogue_dto.h"
 #include "../common/lobby_dto.h"
+#include "../common/lobbies_catalogue_dto.h"
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 
@@ -36,6 +37,7 @@ public:
     void send_client_id(uint32_t client_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
     void send_world_snapshot(const WorldSnapshot& world_snapshot);
+    void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
 };
 
 
