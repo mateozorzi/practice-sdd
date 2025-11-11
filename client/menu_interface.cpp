@@ -17,6 +17,7 @@
 #include "../common/car_catalogue_dto.h"
 #include "../common/player_dto.h"
 #include "../common/lobby_dto.h"
+#include "../common/lobbies_catalogue_dto.h"
 
 MenuInterface::MenuInterface(ClientProtocol& protocol) : protocol(protocol) {}
 
@@ -96,16 +97,20 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 }
 
 bool MenuInterface::join_lobby(PlayerDTO& player) {
+    //client ask for available lobbies
+    LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
+    protocol.ask_for_lobbies(lobby_request);
+    LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
+
+    std::cout<<"Received lobby catalogue of size: " << lobbies.size << std::endl;
+    
+    
     // join lobby ui
     JoinLobby jl;
     jl.show();
 
     bool closed = false;
 
-    //client ask for available lobbies
-    //LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
-    //protocol.ask_for_lobbies(lobby_request);
-    //protocol.receive_lobbies();
 
     //server sends available lobbies
     QEventLoop loop;
@@ -178,7 +183,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         loop.quit();
     });
 
-    //lobbyReceiver.start();
+    lobbyReceiver.start();
 
     //start lobby signal
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
