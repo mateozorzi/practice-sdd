@@ -122,9 +122,12 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         std::cout << "Sent join lobby request for lobby ID: " << id << std::endl;
 
         //wait for the server to confirm join
-        LobbyDTO lobby(LobbyAction::JOIN_LOBBY, lobby_id);
-        LobbyDTO lobby(id);
+        LobbyDTO lobby(LobbyAction::JOIN_LOBBY, id);
         protocol.send_action_lobby(lobby);
+        //wait for server response
+        //LobbyDTO lobby = protocol.receive_action_lobby();
+        
+
         jl.hide();
         closed = waiting_room(false, lobby);
 
