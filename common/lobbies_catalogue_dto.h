@@ -11,7 +11,7 @@ struct LobbyCatalogueDTO {
 
     LobbyCatalogueDTO(): size(0), lobbies() {}
 
-    LobbyCatalogueDTO(const std::vector<LobbyDTO>& lobbies):
+    explicit LobbyCatalogueDTO(const std::vector<LobbyDTO>& lobbies):
         size(static_cast<uint8_t>(lobbies.size())), lobbies(lobbies) {}
 };
 

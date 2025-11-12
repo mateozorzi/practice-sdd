@@ -10,8 +10,8 @@
 
 #include "../common/queue.h"
 
-#include "world_snapshot.h"
 #include "game_command.h"
+#include "world_snapshot.h"
 
 
 class GameMonitor {

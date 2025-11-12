@@ -4,8 +4,7 @@
 
 
 Server::Server(const std::string& port, ServerConfig config):
-        config(config),
-        clients_acceptor(port, lobby) {}
+        config(config), clients_acceptor(port, lobby) {}
 
 
 void Server::run() {

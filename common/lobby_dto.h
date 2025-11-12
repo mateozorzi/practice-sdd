@@ -26,17 +26,17 @@ struct LobbyDTO {
     LobbyDTO(): action(LobbyAction::CREATE_LOBBY), lobby_id(-1), lobby_name(""), max_players(0){}
 
     //create lobby
-    LobbyDTO(LobbyAction act, int id, const std::string& name, int max_p):
+    explicit LobbyDTO(LobbyAction act, int id, const std::string& name, int max_p):
         action(act), lobby_id(id), lobby_name(name), max_players(max_p) {}
 
     //join Lobby, start, leave
-    LobbyDTO(LobbyAction act, int id):
+    explicit LobbyDTO(LobbyAction act, int id):
         action(act), lobby_id(id), lobby_name(""), max_players(0) {}
     
-    LobbyDTO(LobbyAction act):
+    explicit LobbyDTO(LobbyAction act):
         action(act), lobby_id(-1), lobby_name(""), max_players(0) {}
 
-    LobbyDTO(const int id):
+    explicit LobbyDTO(const int id):
         action(LobbyAction::INFO_LOBBY), lobby_id(id), lobby_name(""), max_players(0) {}
 };
 

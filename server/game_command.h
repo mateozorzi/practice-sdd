@@ -29,20 +29,20 @@ public:
     explicit GameCommand(uint32_t client_id, const ClientRequest& client_request,
                          const MovementDTO& movement_dto);
     explicit GameCommand(uint32_t client_id, const ClientRequest& client_request,
-                        const PlayerDTO& player_dto);
+                         const PlayerDTO& player_dto);
     explicit GameCommand(uint32_t client_id, const ClientRequest& client_request,
-                        const car_dto& car_dto);
+                         const car_dto& car_dto);
 
     uint32_t get_client_id() const;
     ClientRequest get_client_request() const;
 
-    template<typename T>
+    template <typename T>
     std::optional<std::reference_wrapper<const T>> get_data() const {
 
-    if (std::holds_alternative<T>(command_data))
-        return std::cref(std::get<T>(command_data));
+        if (std::holds_alternative<T>(command_data))
+            return std::cref(std::get<T>(command_data));
 
-    return std::nullopt;
+        return std::nullopt;
     }
 };
 

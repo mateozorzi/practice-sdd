@@ -6,8 +6,8 @@
 #include "../common/liberror.h"
 
 
-Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby,
-               const uint32_t client_id, Queue<WorldSnapshot>& snapshot_queue):
+Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
+               Queue<WorldSnapshot>& snapshot_queue):
         server_protocol(server_protocol),
         lobby(lobby),
         client_id(client_id),
@@ -39,10 +39,7 @@ void Sender::run() {
     }
 }
 
-bool Sender::is_alive() {
-
-    return keep_running;
-}
+bool Sender::is_alive() { return keep_running; }
 
 void Sender::stop() {
 

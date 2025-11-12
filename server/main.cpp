@@ -2,10 +2,11 @@
 #include <iostream>
 #include <string>
 
+#include "../common/constants.h"
+
+#include "config_loader.h"
 #include "server.h"
 #include "server_config.h"
-#include "config_loader.h"
-#include "../common/constants.h"
 
 
 constexpr uint8_t SUCCESS = 0;
@@ -19,15 +20,18 @@ constexpr std::string_view UNKNOWN_EXCEPTION = "Unknown exception";
 
 
 // TODO: delete
-void debug_print_config(ServerConfig config) {
-    std::cout << "DEBUG CONFIG FILE" << "\n";
+void debug_print_config(const ServerConfig& config) {
+    std::cout << "DEBUG CONFIG FILE"
+              << "\n";
     std::cout << "app.game.game_fps: " << config.app.game.game_fps << "\n";
-    std::cout << "app.server.world.pixels_per_meter: " << config.app.server.world.pixels_per_meter << "\n";
+    std::cout << "app.server.world.pixels_per_meter: " << config.app.server.world.pixels_per_meter
+              << "\n";
 
-    std::cout << "app.server.world.collisions.liberty_city.blocks_file: " 
-                << config.app.server.world.collisions.liberty_city.blocks_file << "\n";
+    std::cout << "app.server.world.collisions.liberty_city.blocks_file: "
+              << config.app.server.world.collisions.liberty_city.blocks_file << "\n";
 
-    std::cout << "app.client.cars.compact.health: " << config.app.client.cars.compact.health << "\n";
+    std::cout << "app.client.cars.compact.health: " << config.app.client.cars.compact.health
+              << "\n";
 }
 
 

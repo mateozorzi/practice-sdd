@@ -1,5 +1,7 @@
 #include "server_protocol.h"
 
+#include <string>
+
 #include "../common/constants.h"
 
 
@@ -103,7 +105,7 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
 
     add_uint8_to_buffer(world_snapshot.get_size());
 
-    for (const auto& car_position : world_snapshot.get_car_positions())
+    for (const auto& car_position: world_snapshot.get_car_positions())
         add_car_position_to_buffer(car_position);
 
     send_buffer();
@@ -113,8 +115,7 @@ void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalog
 
     add_uint8_to_buffer(lobby_catalogue.size);
 
-    for (const auto& lobby : lobby_catalogue.lobbies)
-        add_uint32_to_buffer(lobby.lobby_id);
-    
+    for (const auto& lobby: lobby_catalogue.lobbies) add_uint32_to_buffer(lobby.lobby_id);
+
     send_buffer();
 }

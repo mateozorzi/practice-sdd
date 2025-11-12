@@ -1,12 +1,12 @@
 #ifndef SERVER_PROTOCOL_h
 #define SERVER_PROTOCOL_h
 
+#include "../common/car_catalogue_dto.h"
 #include "../common/car_dto.h"
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
-#include "../common/car_catalogue_dto.h"
-#include "../common/lobby_dto.h"
 #include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_dto.h"
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 

@@ -3,13 +3,14 @@
 
 
 #include <functional>
+#include <string>
 #include <unordered_map>
 
 #include "../common/thread.h"
 
-#include "player.h"
-#include "game_monitor.h"
 #include "collision_listener.h"
+#include "game_monitor.h"
+#include "player.h"
 
 
 constexpr float GAME_STEP = 1.0f / 60.0f;
@@ -20,6 +21,7 @@ constexpr int POSITION_ITERATIONS = 6;
 class GameLoop final: public Thread {
 
 
+    const uint8_t max_players;
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
     b2World world;
@@ -34,15 +36,15 @@ class GameLoop final: public Thread {
     void handle_command(const GameCommand& game_command);
     void update_positions();
 
-    bool any_player_in_game() const;
+    bool all_player_in_game() const;
 
 
 public:
     GameLoop(const GameLoop&) = delete;
     GameLoop& operator=(const GameLoop&) = delete;
 
-    //explicit GameLoop(GameMonitor& game_monitor);
-    explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue);
+    explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
+                      uint8_t max_players);
 
     void run() override;
     void stop() override;

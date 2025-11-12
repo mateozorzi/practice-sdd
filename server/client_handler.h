@@ -3,7 +3,7 @@
 
 
 #include <memory>
-#include <string_view>
+#include <string>
 
 #include "../common/constants.h"
 #include "../common/socket.h"
@@ -25,7 +25,7 @@ class ClientHandler final: public Thread {
     void launch_lobby();
     void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
 
-    void create_new_game(uint32_t client_id, const std::string& username);
+    void create_new_game(uint32_t client_id, const std::string& username, uint8_t max_players);
     void join_existing_game(uint32_t client_id, uint32_t game_id, const std::string& username);
 
 
