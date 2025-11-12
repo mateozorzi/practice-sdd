@@ -13,7 +13,7 @@ class JoinLobby: public QMainWindow {
     Q_OBJECT
 
 signals:
-    void join_lobby(const uint32_t id);
+    void join_lobby(const LobbyDTO& lobby);
     void refresh();
     void close_menu();
 
@@ -22,15 +22,14 @@ public:
     ~JoinLobby();
 
     void fill_table(const LobbyCatalogueDTO& lobbies);
+    void join_denied();
 
 private slots:
     void on_exit_clicked();
 
     void on_refresh_clicked();
 
-    void on_pushButton_clicked();
-
-    void on_join_lobby(const uint32_t id);
+    void on_join_lobby(const LobbyDTO& lobby);
 
 private:
     Ui::JoinLobby* ui;

@@ -3,6 +3,8 @@
 #include "ui_joinlobby.h"
 #include "../../common/lobbies_catalogue_dto.h"
 
+#include <QMessageBox>
+
 JoinLobby::JoinLobby(LobbyCatalogueDTO lobbies, QWidget* parent):
         QMainWindow(parent), ui(new Ui::JoinLobby) {
     ui->setupUi(this);
@@ -10,8 +12,8 @@ JoinLobby::JoinLobby(LobbyCatalogueDTO lobbies, QWidget* parent):
     fill_table(lobbies);
 }
 
-void JoinLobby::on_join_lobby(const uint32_t id){
-    emit join_lobby(id);
+void JoinLobby::on_join_lobby(const LobbyDTO& lobby){
+    emit join_lobby(lobby);
 }
 
 void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies){
@@ -42,13 +44,17 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies){
                                   "    border-radius: 4px;"
                                   "    font-weight: bold;"
                                   "}");
-        uint32_t currentLobbyId = lobbies.lobbies[i].lobby_id;
-        connect(joinButton, &QPushButton::clicked, this, [this, currentLobbyId]() {
-            this->on_join_lobby(currentLobbyId);
+        LobbyDTO currentLobby = lobbies.lobbies[i];
+        connect(joinButton, &QPushButton::clicked, this, [this, currentLobby]() {
+            this->on_join_lobby(currentLobby);
         });
         ui->lobbytable->setCellWidget(i, 1, joinButton);
     }
 
+}
+
+void JoinLobby::join_denied(){
+    QMessageBox::warning(this, "Access Denied", "Denied join to lobby");
 }
 
 JoinLobby::~JoinLobby() { delete ui; }
@@ -64,8 +70,4 @@ void JoinLobby::on_refresh_clicked()
     emit refresh();
 }
 
-
-void JoinLobby::on_pushButton_clicked()
-{
-}
 
