@@ -26,6 +26,5 @@ void WaitingRoom::on_start_clicked()
 void WaitingRoom::on_exit_clicked()
 {
     emit close_menu();
-    this->close();
 }
 

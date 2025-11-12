@@ -78,7 +78,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
         protocol.send_create_lobby(lobby);
         cl.close();
-        closed = waiting_room(true, lobby);
+        //closed = waiting_room(true, lobby);
 
         loop.quit();
 
@@ -127,8 +127,8 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         LobbyDTO lobby_info = protocol.receive_lobby_info();
 
         std::cout << player.username <<" joined lobby ID: " << lobby.lobby_id << std::endl;
-        jl.hide();
-        closed = waiting_room(false, lobby);
+        //jl.hide();
+        //closed = waiting_room(false, lobby);
 
         if (closed) {
             jl.show();
@@ -201,6 +201,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
     //lobby started signal from lobbyReceiver
     QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&](){        
         std::cout<< "received lobby started signal for lobby ID: " << lobby.lobby_id << std::endl;
+        w.close();
         loop.quit();
     });
 
@@ -231,6 +232,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         protocol.send_action_lobby(leave);
 
         closed = true;
+        w.close();
         loop.quit();
         /*if (is_owner){
             std::cout << "Owner leaving, waits for server signal to delete lobby ID: " << lobby.lobby_id << std::endl;
