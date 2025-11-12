@@ -7,7 +7,6 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
-
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080,
@@ -74,13 +73,19 @@ void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
 }
 
-void SDLManager::render_player(CarPositionDTO& player) {
+void SDLManager::render_player(CarPositionDTO& player, const std::string& model) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
     const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
+    SDL2pp::Rect sprite_rect = SDL2pp::Rect(128, 32, 32, 32);  // default
+
+    auto it = CAR_SPRITES.find(model);
+    if (it != CAR_SPRITES.end()) {
+        sprite_rect = it->second;
+    }
 
     // Usar solo sprite vertical y rotarlo con SDL
-    renderer.Copy(sprite.value(), SDL2pp::Rect(128, 32, 32, 32),
+    renderer.Copy(sprite.value(), sprite_rect,
                   SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 64, 64),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
@@ -148,10 +153,10 @@ void SDLManager::render_bridges() {
     }
 }
 
-void SDLManager::render(const uint32_t client_id, const int health,
+void SDLManager::render(const PlayerDTO& player, const int health,
                         std::map<uint32_t, CarPositionDTO> cars) {
-    if (cars.contains(client_id)) {
-        const CarPositionDTO& my_car = cars[client_id];
+    if (cars.contains(player.id)) {
+        const CarPositionDTO& my_car = cars[player.id];
         const uint32_t pos_x = my_car.x_position;
         const uint32_t pos_y = my_car.y_position;
 
@@ -164,7 +169,7 @@ void SDLManager::render(const uint32_t client_id, const int health,
         // Dibujar todos los autos
         for (const auto& car_pair: cars) {
             CarPositionDTO car = car_pair.second;
-            render_player(car);
+            render_player(car, player.car.model);
         }
 
         // Capa superior (puentes) por encima del fondo y de los autos
