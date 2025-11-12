@@ -42,6 +42,7 @@ public:
     CarCatalogueDTO receive_car_catalogue();
     LobbyCatalogueDTO receive_lobby_catalogue();
     LobbyDTO receive_lobby_info();
+    LobbyDTO receive_lobby_action();
     uint32_t receive_id();
 };
 

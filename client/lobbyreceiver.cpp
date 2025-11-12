@@ -11,19 +11,17 @@ void LobbyReceiver::run() {
             //client receive start_lobby
             //start_lobby = protocol.receive_lobby_start();
 
-            //if (start_lobby && should_keep_running()){ {
-            //    emit lobbyStarted();
-            //    break;
-            //}
+            LobbyDTO lobby_update = protocol.receive_lobby_action();
 
-            //if server send taht the lobby has been delete
-            //emit lobbyDeleted();
-            //break;
+            if (lobby_update.action == LobbyAction::START_LOBBY) {
+                emit lobbyStarted();
+                break;
+            } else if (lobby_update.action == LobbyAction::LEAVE_LOBBY ) {
+                emit lobbyDeleted();
+                break;
+            }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            
-
-
         }catch(const std::exception& e){
             break;
         }

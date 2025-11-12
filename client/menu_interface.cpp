@@ -126,7 +126,18 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         //wait for server response
         LobbyDTO lobby_info = protocol.receive_lobby_info();
 
-        if (lobby_info.action == LobbyAction::JOIN_LOBBY) {
+        std::cout << player.username <<" joined lobby ID: " << lobby.lobby_id << std::endl;
+        jl.hide();
+        closed = waiting_room(false, lobby);
+
+        if (closed) {
+            jl.show();
+        }else{
+            jl.close();
+            loop.quit();
+        }
+
+        /*if (lobby_info.action == LobbyAction::JOIN_LOBBY) {
             //lobby accepted
             std::cout << player.username <<" joined lobby ID: " << lobby.lobby_id << std::endl;
             jl.hide();
@@ -144,7 +155,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
             std::cout << player.username <<" join lobby ID: " << lobby.lobby_id << " denied." << std::endl;
             jl.fill_table(lobbies);
             jl.join_denied();
-        }
+        }*/
 
 
     });
@@ -205,7 +216,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
         LobbyDTO start(LobbyAction::START_LOBBY, lobby.lobby_id);
-        //protocol.send_action_lobby(start);
+        protocol.send_action_lobby(start);
         
         loop.quit();
     });
@@ -216,7 +227,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
         
         LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
-        //protocol.send_action_lobby(leave);
+        protocol.send_action_lobby(leave);
 
         closed = true;
         loop.quit();
@@ -230,7 +241,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
         lobbyReceiver.join();
     }
 
-    std::cout << "Is LobbyReceiver alive? " << lobbyReceiver.is_alive() << std::endl;
+    std::cout << "Is thread LobbyReceiver alive? " << lobbyReceiver.is_alive() << std::endl;
 
     return closed;
 }
