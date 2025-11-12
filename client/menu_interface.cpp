@@ -200,11 +200,13 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
 
     //lobby started signal from lobbyReceiver
     QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&](){        
+        std::cout<< "received lobby started signal for lobby ID: " << lobby.lobby_id << std::endl;
         loop.quit();
     });
 
     //lobby deleted signal from lobbyReceiver
     QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, [&](){
+        std::cout<< "received lobby deleted signal for lobby ID: " << lobby.lobby_id << std::endl;
         closed = true;
         loop.quit();
     });
@@ -213,16 +215,15 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
 
     //start lobby signal
     QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
-        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
-        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
+        std::cout<<"emitting start lobby for lobby ID: " << lobby.lobby_id << std::endl;
         LobbyDTO start(LobbyAction::START_LOBBY, lobby.lobby_id);
         protocol.send_action_lobby(start);
         
-        loop.quit();
     });
 
     //exit signal
     QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
+        std::cout<<"emiting leave lobby for lobby ID: " << lobby.lobby_id << std::endl;
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
         QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
         
@@ -231,6 +232,22 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
 
         closed = true;
         loop.quit();
+        /*if (is_owner){
+            std::cout << "Owner leaving, waits for server signal to delete lobby ID: " << lobby.lobby_id << std::endl;
+            LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
+            protocol.send_action_lobby(leave);
+        }else{
+            std::cout<<"Non-owner leaving lobby ID: " << lobby.lobby_id << std::endl;
+            QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
+            QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
+            
+            LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
+            protocol.send_action_lobby(leave);
+    
+            closed = true;
+            loop.quit();
+        }*/
+        
     });
 
 
