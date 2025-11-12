@@ -35,12 +35,11 @@ void ClientHandler::launch_lobby() {
                     std::cout << "Sent lobby catalogue to client with id: " << client_id << std::endl;
                     server_protocol.send_lobby_catalogue(lobby.list_games());
                     break;
-                // These below don't work for now...
                 case LobbyAction::JOIN_LOBBY:
                     std::cout << "Client requested to join existing lobby." << std::endl;
                     join_existing_game(client_id, lobby_dto.lobby_id, player_dto.username);
-                    std::cout << "Joining existing match!" << std::endl;
                     break;
+                // These below don't work for now...
                 case LobbyAction::LEAVE_LOBBY:
                     player_dto = server_protocol.receive_username();
                     std::cout << "Username re-entered!" << std::endl;

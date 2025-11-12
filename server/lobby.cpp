@@ -28,7 +28,7 @@ Lobby::join_existing_game(const uint32_t client_id, const uint32_t game_id, cons
     auto it = games.find(game_id);
 
     if (it == games.end()) {
-        std::cerr << "[Lobby] Error: game " << game_id << " not found" << std::endl;
+        std::cerr << "[Lobby] Error: game " << (int)game_id << " not found" << std::endl;
         static Queue<GameCommand> dummy_command;
         static Queue<WorldSnapshot> dummy_snapshot;
         return { dummy_command, dummy_snapshot };

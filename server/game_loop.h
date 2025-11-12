@@ -34,14 +34,13 @@ class GameLoop final: public Thread {
     void handle_command(const GameCommand& game_command);
     void update_positions();
 
-    bool any_player_in_game() const;
+    bool all_player_in_game() const;
 
 
 public:
     GameLoop(const GameLoop&) = delete;
     GameLoop& operator=(const GameLoop&) = delete;
 
-    //explicit GameLoop(GameMonitor& game_monitor);
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue);
 
     void run() override;

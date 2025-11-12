@@ -47,7 +47,7 @@ void GameLoop::remove_player(const uint32_t client_id) {
 
 bool GameLoop::is_full() const {
 
-    return players.size() >= 1;
+    return players.size() == 1;
 }
 
 bool GameLoop::is_empty() const {
@@ -130,9 +130,9 @@ void GameLoop::update_positions() {
 }
 
 
-bool GameLoop::any_player_in_game() const {
+bool GameLoop::all_player_in_game() const {
 
-    return std::any_of(players.begin(), players.end(),
+    return std::all_of(players.begin(), players.end(),
                        [](const auto& p) { return p.second.is_in_game(); });
 }
 
@@ -145,7 +145,7 @@ void GameLoop::run() {
 
             process_commands();
 
-            if (any_player_in_game()) {
+            if (all_player_in_game()) {
 
                 update_positions();
                 world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
