@@ -6,7 +6,8 @@
 #include "../common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, Lobby& lobby): acceptor_socket(port.c_str()), lobby(lobby) {}
+Acceptor::Acceptor(const std::string& port, Lobby& lobby):
+        acceptor_socket(port.c_str()), lobby(lobby) {}
 
 
 void Acceptor::run() {
@@ -18,10 +19,12 @@ void Acceptor::run() {
             Socket peer_socket = acceptor_socket.accept();
             reap();
             client_id++;
-            std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
+            std::unique_ptr<ClientHandler> client =
+                    std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
             client->start();
             clients.push_back(std::move(client));
-            std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
+            std::cout << "New client just connected! Number of active clients: " << clients.size()
+                      << std::endl;
         } catch (const std::exception& e) {
 
             if (!should_keep_running())

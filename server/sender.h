@@ -23,8 +23,8 @@ public:
     Sender(const Sender&) = delete;
     Sender& operator=(const Sender&) = delete;
 
-    explicit Sender(ServerProtocol& server_protocol, Lobby& lobby,
-                    uint32_t client_id, Queue<WorldSnapshot>& snapshot_queue);
+    explicit Sender(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
+                    Queue<WorldSnapshot>& snapshot_queue);
 
     void run();
     bool is_alive();

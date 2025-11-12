@@ -3,18 +3,15 @@
 #include <iostream>
 #include <utility>
 
-
-#include "../common/lobbies_catalogue_dto.h"
 #include "../common/liberror.h"
+#include "../common/lobbies_catalogue_dto.h"
 
 
 ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id):
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
         lobby(lobby),
-        client_id(client_id) {
-
-}
+        client_id(client_id) {}
 
 void ClientHandler::launch_lobby() {
 
@@ -28,11 +25,13 @@ void ClientHandler::launch_lobby() {
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
                 case LobbyAction::CREATE_LOBBY:
-                    std::cout << "Creating new match with id: " << client_id << std::endl;
-                    create_new_game(client_id, player_dto.username);
+                    std::cout << "Creating new match with id: " << client_id
+                              << "Max players: " << lobby_dto.max_players << std::endl;
+                    create_new_game(client_id, player_dto.username, lobby_dto.max_players);
                     break;
                 case LobbyAction::SEND_LOBBY_LIST:
-                    std::cout << "Sent lobby catalogue to client with id: " << client_id << std::endl;
+                    std::cout << "Sent lobby catalogue to client with id: " << client_id
+                              << std::endl;
                     server_protocol.send_lobby_catalogue(lobby.list_games());
                     break;
                 case LobbyAction::JOIN_LOBBY:
@@ -46,17 +45,17 @@ void ClientHandler::launch_lobby() {
                     break;
                 default:
                     is_in_lobby = false;
-                    break;  
+                    break;
             }
-        }
-        catch (const std::exception& e) {
-        
+        } catch (const std::exception& e) {
+
             is_in_lobby = false;
         }
     }
 }
 
-void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue) {
+void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue,
+                               Queue<WorldSnapshot>& snapshot_queue) {
 
     is_in_lobby = false;
     Receiver receiver(server_protocol, lobby, client_id, command_queue);
@@ -69,13 +68,15 @@ void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSna
     receiver.join();
 }
 
-void ClientHandler::create_new_game(const uint32_t client_id, const std::string& username) {
+void ClientHandler::create_new_game(const uint32_t client_id, const std::string& username,
+                                    const uint8_t max_players) {
 
-    auto [command_queue, snapshot_queue] = lobby.create_new_game(client_id, username);
+    auto [command_queue, snapshot_queue] = lobby.create_new_game(client_id, username, max_players);
     exit_lobby(command_queue, snapshot_queue);
 }
 
-void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t game_id, const std::string& username) {
+void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t game_id,
+                                       const std::string& username) {
 
     auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
     exit_lobby(command_queue, snapshot_queue);
@@ -121,4 +122,3 @@ ClientHandler::~ClientHandler() {
         std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
     }
 }
-

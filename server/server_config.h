@@ -28,24 +28,24 @@ struct BlockPhysicsConfig {
 };
 
 struct CarPhysicsConfig {
-    float   density;
-    float   friction;
-    float   restitution;
-    float   linear_damping;   // Sliding effect after stopping moving (lower = more sliding)
-    float   angular_damping;  // The same that above, but when turning (lower = more turning)
-    float   min_turn_speed;
-    float   acceleration;
-    float   breaking_factor;  // How strong the car brakes
-    float   max_speed;
-    float   drift_factor;  // The lower = more drifting
-    float   turn_torque;
-    float   mass;
-    int     health;
+    float density;
+    float friction;
+    float restitution;
+    float linear_damping;   // Sliding effect after stopping moving (lower = more sliding)
+    float angular_damping;  // The same that above, but when turning (lower = more turning)
+    float min_turn_speed;
+    float acceleration;
+    float breaking_factor;  // How strong the car brakes
+    float max_speed;
+    float drift_factor;  // The lower = more drifting
+    float turn_torque;
+    float mass;
+    int health;
 };
 
 struct PhysicsConfig {
-    struct BlockPhysicsConfig   block;
-    struct CarPhysicsConfig     car;
+    struct BlockPhysicsConfig block;
+    struct CarPhysicsConfig car;
 };
 
 struct CoordinatesConfig {
@@ -79,44 +79,43 @@ struct CollisionsConfig {
 };
 
 struct WorldConfig {
-    float                   pixels_per_meter;
+    float pixels_per_meter;
     struct CollisionsConfig collisions;
-    struct SpritesConfig    sprites;
-    struct PositionsConfig  positions;
-    struct PhysicsConfig    physics;
+    struct SpritesConfig sprites;
+    struct PositionsConfig positions;
+    struct PhysicsConfig physics;
 };
 
 // game = both server and client
 struct GameConfig {
-    float               game_fps;
-    unsigned int        max_concurrent_matches;
-    unsigned int        min_races_per_match;
-    unsigned int        max_races_per_match;
-    unsigned int        min_cars_per_match;
-    unsigned int        max_cars_per_match;
-    float               wait_time_between_races_seconds;
+    float game_fps;
+    unsigned int max_concurrent_matches;
+    unsigned int min_races_per_match;
+    unsigned int max_races_per_match;
+    unsigned int min_cars_per_match;
+    unsigned int max_cars_per_match;
+    float wait_time_between_races_seconds;
 };
 
 struct ClientSpecificConfig {
-    struct CarDefaults  cars;
+    struct CarDefaults cars;
 };
 
 struct ServerSpecificConfig {
     // unsigned short      default_server_port;
-    float               command_queue_capacity;
-    float               waiting_for_players_fps;
-    struct WorldConfig  world;
+    float command_queue_capacity;
+    float waiting_for_players_fps;
+    struct WorldConfig world;
 };
 
 struct ServerConfigDef {
-    struct GameConfig           game;
+    struct GameConfig game;
     struct ServerSpecificConfig server;
     struct ClientSpecificConfig client;
-
 };
 
 struct ServerConfig {
     struct ServerConfigDef app;
 };
 
-#endif // SERVER_CONFIG_H
+#endif  // SERVER_CONFIG_H

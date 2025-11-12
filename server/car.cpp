@@ -1,13 +1,15 @@
 #include "car.h"
 
 #include <cmath>
+
 #include "../common/constants.h"
 
-Car::Car(const uint32_t client_id, b2World& world): client_id(client_id), body(nullptr), config(CarConfig()) {
+Car::Car(const uint32_t client_id, b2World& world):
+        client_id(client_id), body(nullptr), config(CarConfig()) {
 
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
-    body_definition.position.Set(2.828f, 3.171f); // Starting from the main road
+    body_definition.position.Set(2.828f, 3.171f);  // Starting from the main road
     body_definition.angle = b2_pi / 2.0f;
     body_definition.linearDamping = config.linear_damping;
     body_definition.angularDamping = config.angular_damping;
@@ -57,7 +59,7 @@ void Car::detect_linear_movement() {
 
     if (moving_down)
         body->ApplyForceToCenter(config.breaking_factor * force, true);
-    
+
     b2Vec2 velocity = body->GetLinearVelocity();
     float current_speed = velocity.Length();
 
@@ -96,7 +98,7 @@ void Car::detect_drifting() {
 
 
 void Car::update_position() {
-    
+
     detect_linear_movement();
 
     detect_rotation();
@@ -113,13 +115,13 @@ CarPositionDTO Car::get_position_dto() const {
     uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * PIXELS_PER_METER);
 
     float angle_degrees_float = angle_radians * (180.0f / b2_pi);
-    
+
     angle_degrees_float = fmod(angle_degrees_float, 360.0f);
     if (angle_degrees_float < 0.0f)
         angle_degrees_float += 360.0f;
-    
+
     uint32_t angle_degrees = static_cast<uint32_t>(angle_degrees_float + 0.5f);
-    
+
     if (angle_degrees >= 360)
         angle_degrees = 0;
 
@@ -127,15 +129,9 @@ CarPositionDTO Car::get_position_dto() const {
 }
 
 
-void Car::set_collision(bool colliding) {
+void Car::set_collision(bool colliding) { is_colliding = colliding; }
 
-    is_colliding = colliding;
-}
-
-b2Body* Car::get_body() const {
-
-    return body;
-}
+b2Body* Car::get_body() const { return body; }
 
 
 void Car::set_configuration(const car_dto& car_configuration) {

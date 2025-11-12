@@ -2,14 +2,19 @@
 
 #include <chrono>
 #include <thread>
+#include <utility>
+#include <vector>
 
 #include "../common/liberror.h"
 #include "../common/movement_dto.h"
 
 
-Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby,
-                   const uint32_t client_id, Queue<GameCommand>& command_queue):
-        server_protocol(server_protocol), lobby(lobby), client_id(client_id), command_queue(command_queue) {}
+Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
+                   Queue<GameCommand>& command_queue):
+        server_protocol(server_protocol),
+        lobby(lobby),
+        client_id(client_id),
+        command_queue(command_queue) {}
 
 
 void Receiver::handle_player_username(const ClientRequest& client_request) {
@@ -21,16 +26,11 @@ void Receiver::handle_player_username(const ClientRequest& client_request) {
 
 void Receiver::handle_get_car_catalogue() {
 
-    std::vector<car_dto> cars = {
-        // Name, Health, Handling, MaxSpeed, Acceleration
-        {"Compact", 100, 90, 100, 80},
-        {"Sport", 80, 95, 150, 100},
-        {"Convertible", 85, 90, 140, 95},
-        {"Sedan", 90, 85, 120, 75},
-        {"Jeep", 150, 70, 85, 60},
-        {"Rally", 120, 80, 110, 70},
-        {"Truck", 200, 50, 80, 40}
-    };
+    std::vector<car_dto> cars = {// Name, Health, Handling, MaxSpeed, Acceleration
+                                 {"Compact", 100, 90, 100, 80},    {"Sport", 80, 95, 150, 100},
+                                 {"Convertible", 85, 90, 140, 95}, {"Sedan", 90, 85, 120, 75},
+                                 {"Jeep", 150, 70, 85, 60},        {"Rally", 120, 80, 110, 70},
+                                 {"Truck", 200, 50, 80, 40}};
 
     CarCatalogueDTO catalogue(std::move(cars));
 

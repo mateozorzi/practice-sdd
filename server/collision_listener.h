@@ -2,15 +2,15 @@
 #define COLLISION_LISTENER_H
 
 
-#include <box2d/box2d.h>
-#include <unordered_map>
 #include <cstdint>
+#include <unordered_map>
 
+#include <box2d/box2d.h>
 
 #include "player.h"
 
 
-class CollisionListener : public b2ContactListener {
+class CollisionListener: public b2ContactListener {
 
 
     std::unordered_map<uint32_t, Player>& players;

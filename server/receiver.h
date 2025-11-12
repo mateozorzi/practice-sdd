@@ -27,8 +27,8 @@ public:
     Receiver(const Receiver&) = delete;
     Receiver& operator=(const Receiver&) = delete;
 
-    explicit Receiver(ServerProtocol& server_protocol, Lobby& lobby, 
-                      uint32_t client_id, Queue<GameCommand>& command_queue);
+    explicit Receiver(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
+                      Queue<GameCommand>& command_queue);
 
     void run() override;
     void stop() override;

@@ -2,14 +2,12 @@
 #define PLAYER_H
 
 
+#include <cstdint>
 #include <memory>
 #include <string>
-#include <cstdint>
-
 
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
-
 
 #include "car.h"
 
@@ -28,8 +26,7 @@ public:
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    explicit Player(uint32_t client_id, const std::string& username, 
-            b2World& world);
+    explicit Player(uint32_t client_id, const std::string& username, b2World& world);
 
     uint32_t get_client_id() const;
     b2Body* get_car_body() const;
@@ -43,7 +40,6 @@ public:
     void set_in_game();
 
     void set_car_configuration(const car_dto& car_configuration);
-    
 };
 
 
