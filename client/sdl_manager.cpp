@@ -9,10 +9,13 @@
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
+        mix(MIX_INIT_OGG),
+        mixer(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024),
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080,
                SDL_WINDOW_RESIZABLE),
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
-        camera(512, 288, 4640, 4672) {
+        camera(512, 288, 4640, 4672),
+        sounds(mixer) {
     renderer.SetLogicalSize(1920, 1080);
     set_map();
     set_sprite();
@@ -73,7 +76,7 @@ void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
 }
 
-void SDLManager::render_player(CarPositionDTO& player, const std::string& model) {
+void SDLManager::render_player(CarPositionDTO& player, const std::string& model, bool is_moving) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
     const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
@@ -88,6 +91,8 @@ void SDLManager::render_player(CarPositionDTO& player, const std::string& model)
     renderer.Copy(sprite.value(), sprite_rect,
                   SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 64, 64),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
+
+    sounds.play_engine_sound(is_moving);
 }
 
 void SDLManager::render_hud_health(const int health) {
@@ -154,7 +159,7 @@ void SDLManager::render_bridges() {
 }
 
 void SDLManager::render(const PlayerDTO& player, const int health,
-                        std::map<uint32_t, CarPositionDTO> cars) {
+                        std::map<uint32_t, CarPositionDTO> cars, const bool is_moving) {
     if (cars.contains(player.id)) {
         const CarPositionDTO& my_car = cars[player.id];
         const uint32_t pos_x = my_car.x_position;
@@ -169,7 +174,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
         // Dibujar todos los autos
         for (const auto& car_pair: cars) {
             CarPositionDTO car = car_pair.second;
-            render_player(car, player.car.model);
+            render_player(car, player.car.model, is_moving);
         }
 
         // Capa superior (puentes) por encima del fondo y de los autos

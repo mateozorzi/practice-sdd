@@ -75,7 +75,7 @@ void Client::run() {
                 }
             }
         }
-        sdl_manager->render(player, health, cars);
+        sdl_manager->render(player, health, cars, input_manager.is_moving());
     }
 }
 

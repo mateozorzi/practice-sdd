@@ -1,0 +1,37 @@
+#include "sounds.h"
+
+#include <complex>
+
+#include <SDL2/SDL_timer.h>
+
+#include "SDL2pp/Chunk.hh"
+
+Sounds::Sounds(SDL2pp::Mixer& mixer):
+        mixer(mixer), engine_sound("client/assets/sfx_car_engine.wav") {}
+
+void Sounds::initialize_channels() {
+    int current_channel = 1;
+
+    // Agregar channel para los demas jugadores, para choques y win
+
+    player_engine_channel = current_channel;
+}
+
+void Sounds::play_engine_sound(const bool is_moving) {
+    if (!is_moving)
+        return;
+
+    const Uint32 now = SDL_GetTicks();
+    auto& state = engine_state;
+
+    if (now - state.last_engine_time < engine_delay)
+        return;
+
+    if (player_engine_channel == -1) {
+        return;
+    }
+
+    mixer.PlayChannel(player_engine_channel, engine_sound);
+
+    state.last_engine_time = now;
+}

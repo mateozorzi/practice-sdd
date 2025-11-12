@@ -22,6 +22,7 @@ private:
 public:
     explicit InputManager(ClientProtocol& protocol);
     bool handle_movement();
+    bool is_moving() const;
     ~InputManager();
 };
 

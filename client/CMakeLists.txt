@@ -22,6 +22,7 @@ target_sources(taller_client
     Lobby/joinlobby.cpp
     Lobby/waitingroom.cpp
     menu_interface.cpp
+    sounds.cpp
 
     ${QRC_FILES}
     ${UI_FILES}
@@ -35,6 +36,7 @@ target_sources(taller_client
     camera.h
     input_manager.h
     sdl_manager.h
+    sounds.h
 
     Lobby/lobby.h
     Lobby/selectcars.h

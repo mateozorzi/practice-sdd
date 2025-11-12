@@ -12,6 +12,7 @@
 #include "common/player_dto.h"
 
 #include "camera.h"
+#include "sounds.h"
 
 static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
         {"Compact", SDL2pp::Rect(128, 32, 32, 32)},      {"Sport", SDL2pp::Rect(166, 104, 26, 40)},
@@ -22,9 +23,13 @@ static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
 class SDLManager {
 private:
     SDL2pp::SDL sdl;
+    SDL2pp::SDLTTF ttf;
+    SDL2pp::SDLMixer mix;
+    SDL2pp::Mixer mixer;
     SDL2pp::Window window;
     SDL2pp::Renderer renderer;
     Camera camera;
+    Sounds sounds;
     std::optional<SDL2pp::Texture> map;
     std::optional<SDL2pp::Texture> sprite;
     std::optional<SDL2pp::Texture> minimap;
@@ -33,7 +38,7 @@ private:
     std::vector<SDL2pp::Rect> loadRects(const std::string& path);
 
     void update_camera(int player_x, int player_y);
-    void render_player(CarPositionDTO& player, const std::string& model);
+    void render_player(CarPositionDTO& player, const std::string& model, bool is_moving);
     void render_hud_health(int health);
     void render_hud_minimap(int player_x, int player_y);
     void render_bridges();
@@ -44,7 +49,8 @@ public:
     void set_sprite();
     void set_minimap();
     void clear_screen();
-    void render(const PlayerDTO& player, int health, std::map<uint32_t, CarPositionDTO> cars);
+    void render(const PlayerDTO& player, int health, std::map<uint32_t, CarPositionDTO> cars,
+                bool is_moving);
     void show_screen();
 };
 
