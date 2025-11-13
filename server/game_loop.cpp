@@ -21,11 +21,11 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
     world.SetContactListener(&collision_listener);
 
     command_handlers = {
-            {ClientRequest::SEND_CAR_SELECTION,
+            {ClientAction::SEND_CAR_SELECTION,
              [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
-            {ClientRequest::MOVE_CAR,
+            {ClientAction::SEND_CAR_MOVEMENT,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
-            {ClientRequest::DISCONNECT,
+            {ClientAction::DISCONNECT,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
 
     auto polygons = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
@@ -105,7 +105,7 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
 
 void GameLoop::handle_command(const GameCommand& game_command) {
 
-    const auto it = command_handlers.find(game_command.get_client_request());
+    const auto it = command_handlers.find(game_command.get_client_action());
 
     if (it != command_handlers.end())
         it->second(game_command);

@@ -16,6 +16,7 @@ target_sources(taller_common
     car_catalogue_dto.h
     car_position_dto.h
     common_protocol.h
+    game_command_dto.h
     foo.h
     movement_dto.h
     liberror.h

@@ -5,7 +5,7 @@
 #include <string_view>
 
 
-enum class ClientAction : uint8_t { 
+enum class ClientAction : uint8_t {
 
     DISCONNECT = 0x00,
     SEND_USERNAME = 0x01,
@@ -39,7 +39,8 @@ constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 // WORLD
 // TODO: remove, now in yaml
 constexpr float PIXELS_PER_METER = 30.0f;
-    // TODO: replace with command line parameter
-constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/resources/world/polygons_liberty_city.json";
+// TODO: replace with command line parameter
+constexpr std::string_view POLYGONS_LIBERTY_CITY =
+        "server/resources/world/polygons_liberty_city.json";
 
 #endif

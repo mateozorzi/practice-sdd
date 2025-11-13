@@ -13,10 +13,25 @@ ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client
         lobby(lobby),
         client_id(client_id) {}
 
+
 void ClientHandler::launch_lobby() {
 
-    server_protocol.receive_client_request();
-    PlayerDTO player_dto = server_protocol.receive_username();
+    GameCommandDTO initial_command = server_protocol.receive_game_command();
+
+    if (initial_command.client_action != ClientAction::SEND_USERNAME) {
+        std::cerr << "[CLIENT_HANDLER] Expected SEND_USERNAME but got different action"
+                  << std::endl;
+        return;
+    }
+
+    PlayerDTO player_dto;
+    if (auto player_data = initial_command.get_data<PlayerDTO>()) {
+        player_dto = player_data->get();
+    } else {
+        std::cerr << "[CLIENT_HANDLER] Failed to extract username from command" << std::endl;
+        return;
+    }
+
     server_protocol.send_client_id(client_id);
 
     while (is_in_lobby) {
@@ -40,8 +55,6 @@ void ClientHandler::launch_lobby() {
                     break;
                 // These below don't work for now...
                 case LobbyAction::LEAVE_LOBBY:
-                    player_dto = server_protocol.receive_username();
-                    std::cout << "Username re-entered!" << std::endl;
                     break;
                 default:
                     is_in_lobby = false;

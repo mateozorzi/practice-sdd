@@ -21,7 +21,6 @@ class ClientHandler final: public Thread {
     const uint32_t client_id;
     bool is_in_lobby = true;
 
-
     void launch_lobby();
     void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
 
