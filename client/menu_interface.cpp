@@ -341,11 +341,7 @@ PlayerDTO MenuInterface::lobby(){
     QObject::connect(&l, &Lobby::input_username, [&](const QString &name){
         username = name.toStdString();
 
-        if (client_id != static_cast<uint32_t>(-1)){
-            protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));            
-        }else{
-            protocol.send_username(username);
-        }
+        protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));            
         client_id = protocol.receive_id(); // wait for server response
         player.username = username;
         player.id = client_id;

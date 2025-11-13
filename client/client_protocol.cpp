@@ -36,7 +36,9 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
 
 void ClientProtocol::change_username(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
     send_buffer();
 }
 
