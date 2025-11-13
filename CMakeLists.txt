@@ -166,7 +166,7 @@ if(TALLER_CLIENT)
     target_compile_definitions(taller_client PRIVATE DATA_PATH="${PROJECT_SOURCE_DIR}/client/cars")
 
     # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer Qt6::Widgets Qt6::Core)
+    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer nlohmann_json::nlohmann_json Qt6::Widgets Qt6::Core)
 endif()
 
 if(TALLER_SERVER)
