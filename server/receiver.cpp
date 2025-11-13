@@ -49,7 +49,10 @@ void Receiver::run() {
 
             command_queue.push(GameCommand(client_id, std::move(game_command)));
         }
-    } catch (const LibError&) {
+    } catch (const LibError& e) {
+
+        std::cerr << "[RECEIVER] Client " << client_id
+            << " disconnected: " << e.what() << std::endl;
 
     } catch (const std::exception& e) {
 
@@ -62,7 +65,6 @@ void Receiver::stop() {
 
     if (_keep_running) {
 
-        _is_alive = false;
         _keep_running = false;
     }
 }

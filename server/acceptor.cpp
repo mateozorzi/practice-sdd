@@ -23,7 +23,7 @@ void Acceptor::run() {
                     std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
             client->start();
             clients.push_back(std::move(client));
-            std::cout << "New client just connected! Number of active clients: " << clients.size()
+            std::cout << "[" << ACCEPTOR << "] " << "New client has been accepted. Number of active clients: " << clients.size()
                       << std::endl;
         } catch (const std::exception& e) {
 
@@ -43,12 +43,14 @@ void Acceptor::reap() {
 
             client->stop();
             client->join();
-            std::cout << "Reaping dead client..." << std::endl;
+            std::cout << "[" << ACCEPTOR << "] " << "Reaping dead client." << std::endl;
             return true;
         }
 
         return false;
     });
+
+    lobby.reap();
 }
 
 void Acceptor::clear() {

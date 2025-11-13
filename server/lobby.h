@@ -19,7 +19,6 @@ class Lobby {
 
     std::mutex mtx;
     std::unordered_map<uint32_t, std::unique_ptr<Game>> games;
-    std::unordered_map<uint32_t, uint32_t> player_to_game;
 
 
 public:
@@ -35,6 +34,8 @@ public:
     LobbyCatalogueDTO list_games();
     void reap();
     void remove_player(uint32_t client_id, uint32_t game_id);
+
+    ~Lobby() = default;
 };
 
 

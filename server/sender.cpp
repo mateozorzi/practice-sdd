@@ -28,6 +28,7 @@ void Sender::run() {
 
             } catch (const ClosedQueue&) {
 
+                keep_running = false;
                 break;
             }
         }
