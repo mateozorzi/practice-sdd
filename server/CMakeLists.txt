@@ -24,7 +24,6 @@ target_sources(taller_server
     acceptor.h
     car.h
     client_handler.h
-    client_request.h
     collision_listener.h
     config_loader.h
     game.h

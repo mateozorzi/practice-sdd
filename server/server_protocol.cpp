@@ -5,26 +5,6 @@
 #include "../common/constants.h"
 
 
-ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {
-
-    switch (static_cast<ClientAction>(byte)) {
-
-        case ClientAction::DISCONNECT:
-            return ClientRequest::DISCONNECT;
-        case ClientAction::SEND_USERNAME:
-            return ClientRequest::SEND_USERNAME;
-        case ClientAction::GET_CAR_CATALOGUE:
-            return ClientRequest::GET_CAR_CATALOGUE;
-        case ClientAction::SEND_CAR_SELECTION:
-            return ClientRequest::SEND_CAR_SELECTION;
-        case ClientAction::SEND_CAR_MOVEMENT:
-            return ClientRequest::MOVE_CAR;
-        default:
-            return ClientRequest::UNKNOWN;
-    }
-}
-
-
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
 
     add_uint32_to_buffer(car_position_dto.client_id);
@@ -32,15 +12,6 @@ void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_positi
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
 }
-
-
-ClientRequest ServerProtocol::receive_client_request() {
-
-    const uint8_t byte = recv_uint8();
-
-    return convert_byte_to_request(byte);
-}
-
 
 PlayerDTO ServerProtocol::receive_username() {
 
@@ -71,6 +42,29 @@ MovementDTO ServerProtocol::receive_movement() {
 
     return MovementDTO(direction, is_moving);
 }
+
+
+GameCommandDTO ServerProtocol::receive_game_command() {
+
+    const uint8_t action_byte = recv_uint8();
+    const ClientAction client_action = static_cast<ClientAction>(action_byte);
+
+    switch (client_action) {
+
+        case ClientAction::SEND_USERNAME:
+            return GameCommandDTO(client_action, receive_username());
+        case ClientAction::SEND_CAR_MOVEMENT:
+            return GameCommandDTO(client_action, receive_movement());
+        case ClientAction::SEND_CAR_SELECTION:
+            return GameCommandDTO(client_action, receive_car_selection());
+        case ClientAction::GET_CAR_CATALOGUE:
+        case ClientAction::DISCONNECT:
+            return GameCommandDTO(client_action);
+        default:
+            return GameCommandDTO(ClientAction::DISCONNECT);
+    }
+}
+
 
 void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto) {
 

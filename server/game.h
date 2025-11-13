@@ -34,7 +34,7 @@ public:
 
     std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> add_player(uint32_t client_id,
                                                                      const std::string& username);
-    void remove_player(uint32_t client_id);  // TBI
+    void remove_player(uint32_t client_id);
 
     void stop();
 
