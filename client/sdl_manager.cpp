@@ -7,13 +7,15 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
-
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
+        mix(MIX_INIT_OGG),
+        mixer(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024),
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080,
                SDL_WINDOW_RESIZABLE),
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
-        camera(512, 288, 4640, 4672) {
+        camera(512, 288, 4640, 4672),
+        sounds(mixer) {
     renderer.SetLogicalSize(1920, 1080);
     set_map();
     set_sprite();
@@ -25,7 +27,6 @@ void SDLManager::set_map() {
     const SDL2pp::Surface background_surface(
             DATA_PATH "/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
     map = SDL2pp::Texture(renderer, background_surface);
-    bridges_rects = loadRects(DATA_PATH "/Top_Layer_Liberty_City.json");
 }
 
 void SDLManager::set_sprite() {
@@ -51,18 +52,14 @@ void SDLManager::clear_screen() { renderer.Clear(); }
 
 void SDLManager::show_screen() { renderer.Present(); }
 
-std::vector<SDL2pp::Rect> SDLManager::loadRects(const std::string& path) {
-    std::ifstream file(path);
-    nlohmann::json data;
-    file >> data;
-
+std::vector<SDL2pp::Rect> SDLManager::loadRects(const nlohmann::json& data) {
     std::vector<SDL2pp::Rect> rects;
-    for (const auto& bridge: data) {
-        if (bridge.size() == 4) {
-            int x = bridge[0][0];
-            int y = bridge[0][1];
-            int w = bridge[1][0].get<int>() - x;
-            int h = bridge[2][1].get<int>() - y;
+    for (const auto& body: data) {
+        if (body.size() == 4) {
+            int x = body[0][0];
+            int y = body[0][1];
+            int w = body[1][0].get<int>() - x;
+            int h = body[2][1].get<int>() - y;
 
             rects.emplace_back(x, y, w, h);
         }
@@ -74,15 +71,23 @@ void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
 }
 
-void SDLManager::render_player(CarPositionDTO& player) {
+void SDLManager::render_player(CarPositionDTO& player, const std::string& model, bool is_moving) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
     const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
+    SDL2pp::Rect sprite_rect = SDL2pp::Rect(128, 32, 32, 32);  // default
+
+    auto it = CAR_SPRITES.find(model);
+    if (it != CAR_SPRITES.end()) {
+        sprite_rect = it->second;
+    }
 
     // Usar solo sprite vertical y rotarlo con SDL
-    renderer.Copy(sprite.value(), SDL2pp::Rect(128, 32, 32, 32),
+    renderer.Copy(sprite.value(), sprite_rect,
                   SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 64, 64),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
+
+    sounds.play_engine_sound(is_moving);
 }
 
 void SDLManager::render_hud_health(const int health) {
@@ -128,30 +133,34 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
     renderer.FillRect(SDL2pp::Rect(player_minimap_x - 2, player_minimap_y - 2, 10, 10));
 }
 
-void SDLManager::render_bridges() {
+void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
     const SDL2pp::Rect view = camera.get_view_rect();
     constexpr int screen_w = 1920;
     constexpr int screen_h = 1080;
 
-    for (const auto& bridge_src_full: bridges_rects) {
-        if (!camera.on_screen(bridge_src_full))
+    for (const auto& src_rect: rects) {
+        if (!camera.on_screen(src_rect))
             continue;
 
         // Vista en pantalla
-        const int dx = (bridge_src_full.x - view.x) * screen_w / view.w;
-        const int dy = (bridge_src_full.y - view.y) * screen_h / view.h;
-        const int dw = bridge_src_full.w * screen_w / view.w;
-        const int dh = bridge_src_full.h * screen_h / view.h;
-        const SDL2pp::Rect bridge_dst(dx, dy, dw, dh);
+        const int dx = (src_rect.x - view.x) * screen_w / view.w;
+        const int dy = (src_rect.y - view.y) * screen_h / view.h;
+        const int dw = src_rect.w * screen_w / view.w;
+        const int dh = src_rect.h * screen_h / view.h;
+        const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
-        renderer.Copy(map.value(), bridge_src_full, bridge_dst);
+        renderer.Copy(map.value(), src_rect, dst_rect);
     }
 }
 
-void SDLManager::render(const uint32_t client_id, const int health,
-                        std::map<uint32_t, CarPositionDTO> cars) {
-    if (cars.contains(client_id)) {
-        const CarPositionDTO& my_car = cars[client_id];
+void SDLManager::render_bridges() {
+    render_layer(bridges_rects);
+}
+
+void SDLManager::render(const PlayerDTO& player, const int health,
+                        std::map<uint32_t, CarPositionDTO> cars, const bool is_moving) {
+    if (cars.contains(player.id)) {
+        const CarPositionDTO& my_car = cars[player.id];
         const uint32_t pos_x = my_car.x_position;
         const uint32_t pos_y = my_car.y_position;
 
@@ -164,15 +173,64 @@ void SDLManager::render(const uint32_t client_id, const int health,
         // Dibujar todos los autos
         for (const auto& car_pair: cars) {
             CarPositionDTO car = car_pair.second;
-            render_player(car);
+            render_player(car, player.car.model, is_moving);
         }
 
         // Capa superior (puentes) por encima del fondo y de los autos
         render_bridges();
+        render_decorations();
 
         render_hud_health(health);
         render_hud_minimap(pos_x, pos_y);
+        render_stats();
         show_screen();
     }
     SDL_Delay(10);
+}
+
+void SDLManager::draw_row(const std::string& sentence, int y, SDL2pp::Color color,
+                          int size_container) {
+    int font_size = size_container / 10;
+    int text_x = size_container + 10;
+    SDL2pp::Font font("client/assets/fonts/UrbanHaze.ttf", font_size);
+    SDL2pp::Surface surface(font.RenderText_Blended(sentence, color));
+    SDL2pp::Texture text_texture(renderer, surface);
+    renderer.Copy(text_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(text_x, y, text_texture.GetWidth(), text_texture.GetHeight()));
+}
+
+void SDLManager::render_stats() {
+    int box_w = 1920 * 4 / 5;
+    int box_h = 1080 * 4 / 5;
+    int box_x = (1920 - box_w) / 2;
+    int box_y = (1080 - box_h) / 2;
+
+    SDL2pp::Rect stats{box_x, box_y, box_w, box_h};
+
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.SetDrawColor(0, 0, 0, 100);
+    renderer.DrawRect(stats);
+
+    // Hardcodeado (temporal)
+    std::string client_id = "Client ID: 007";
+    std::string final_time = "Tiempo final: 02:34.56";
+
+    SDL2pp::Color text_color = SDL2pp::Color(255, 255, 255, 255);
+
+    int text_start_y = box_y + 10;
+    int line_spacing = (box_h / 10) + 10;
+    draw_row(client_id, text_start_y, text_color, box_x + box_w / 2);
+    draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
+}
+
+void SDLManager::render_decorations() {
+    render_layer(decorations_rects);
+}
+
+void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
+    bridges_rects = loadRects(bridges_rects_data);
+}
+
+void SDLManager::load_decorations_rects(const nlohmann::json& decorations_rects_data) {
+    decorations_rects = loadRects(decorations_rects_data);
 }

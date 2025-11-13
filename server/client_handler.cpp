@@ -16,50 +16,28 @@ ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client
 
 void ClientHandler::launch_lobby() {
 
-    GameCommandDTO initial_command = server_protocol.receive_game_command();
-
-    if (initial_command.client_action != ClientAction::SEND_USERNAME) {
-        std::cerr << "[" << CLIENT_HANDLER << "] " << "Expected SEND_USERNAME but got different action."
-                  << std::endl;
-        return;
-    }
-
-    PlayerDTO player_dto;
-    if (auto player_data = initial_command.get_data<PlayerDTO>()) {
-        player_dto = player_data->get();
-    } else {
-        std::cerr << "[" << CLIENT_HANDLER << "] " << "Failed to extract username from command." << std::endl;
-        return;
-    }
-
-    server_protocol.send_client_id(client_id);
-
     while (is_in_lobby) {
 
         try {
+
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
+
+                case LobbyAction::CHANGE_USERNAME:
+                    update_player_username(lobby_dto.lobby_name);
+                    break;
                 case LobbyAction::CREATE_LOBBY:
-                    std::cerr << "[" << CLIENT_HANDLER << "] " << "Creating new game with ID: " << client_id
-                              << " | Max players: " << lobby_dto.max_players << std::endl;
-                    game_id = client_id;
-                    create_new_game(client_id, player_dto.username, lobby_dto.max_players);
+                    create_new_game(client_id, lobby_dto.max_players);
                     break;
                 case LobbyAction::SEND_LOBBY_LIST:
-                    lobby.reap();
-                    server_protocol.send_lobby_catalogue(lobby.list_games());
-                    std::cerr << "[" << CLIENT_HANDLER << "] " << "Sent lobby catalogue to client with ID: " << client_id
-                        << std::endl;
+                    list_active_games();
                     break;
                 case LobbyAction::JOIN_LOBBY:
-                    std::cerr << "[" << CLIENT_HANDLER << "] " << "Client with ID: " << client_id << " requested to join existing lobby." << std::endl;
-                    game_id = lobby_dto.lobby_id;
-                    join_existing_game(client_id, player_dto.username);
+                    join_existing_game(client_id, lobby_dto.lobby_id);
                     break;
-                // These below don't work for now...
                 case LobbyAction::LEAVE_LOBBY:
-                    break;
                 default:
+                    is_in_lobby = false;
                     break;
             }
         } catch (const std::exception& e) {
@@ -67,9 +45,31 @@ void ClientHandler::launch_lobby() {
             is_in_lobby = false;
         }
     }
+
+    is_in_lobby = false;
 }
 
-void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue,
+
+void ClientHandler::update_player_username(const std::string& actual_username) {
+
+    username = actual_username;
+
+    std::cerr << "[" << CLIENT_HANDLER << "] " << "Updated username for client with ID: " << client_id
+        << " to: " << username << std::endl;
+    
+    server_protocol.send_client_id(client_id);
+}
+
+
+void ClientHandler::list_active_games() {
+
+    lobby.reap();
+    server_protocol.send_lobby_catalogue(lobby.list_games());
+    std::cerr << "[" << CLIENT_HANDLER << "] " << "Sent lobby catalogue to client with ID: " << client_id
+        << std::endl;
+}
+
+void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                Queue<WorldSnapshot>& snapshot_queue) {
 
     is_in_lobby = false;
@@ -83,17 +83,22 @@ void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue,
     receiver.join();
 }
 
-void ClientHandler::create_new_game(const uint32_t client_id, const std::string& username,
-                                    const uint8_t max_players) {
+void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players) {
 
+    std::cerr << "[" << CLIENT_HANDLER << "] " << "Creating new game with ID: " << client_id
+            << " | Max players: " << max_players << std::endl;
+    game_id = client_id;
     auto [command_queue, snapshot_queue] = lobby.create_new_game(client_id, username, max_players);
-    exit_lobby(command_queue, snapshot_queue);
+    exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
-void ClientHandler::join_existing_game(const uint32_t client_id, const std::string& username) {
+void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
+
+    std::cerr << "[" << CLIENT_HANDLER << "] " << "Client with ID: " << client_id << " requested to join existing lobby." << std::endl;
+    game_id = actual_game_id;
 
     auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
-    exit_lobby(command_queue, snapshot_queue);
+    exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
 void ClientHandler::run() {

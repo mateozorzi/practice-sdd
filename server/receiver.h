@@ -18,6 +18,7 @@ class Receiver final: public Thread {
     Queue<GameCommand>& command_queue;
 
     void handle_get_car_catalogue();
+    void handle_get_json_file(const std::string& file_path);
 
 
 public:
