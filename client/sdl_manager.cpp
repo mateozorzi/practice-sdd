@@ -182,7 +182,43 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
         render_hud_health(health);
         render_hud_minimap(pos_x, pos_y);
+        render_stats();
         show_screen();
     }
     SDL_Delay(10);
+}
+
+void SDLManager::draw_row(const std::string& sentence, int y, SDL2pp::Color color,
+                          int size_container) {
+    int font_size = size_container / 10;
+    int text_x = size_container + 10;
+    SDL2pp::Font font("client/assets/fonts/UrbanHaze.ttf", font_size);
+    SDL2pp::Surface surface(font.RenderText_Blended(sentence, color));
+    SDL2pp::Texture text_texture(renderer, surface);
+    renderer.Copy(text_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(text_x, y, text_texture.GetWidth(), text_texture.GetHeight()));
+}
+
+void SDLManager::render_stats() {
+    int box_w = 1920 * 4 / 5;
+    int box_h = 1080 * 4 / 5;
+    int box_x = (1920 - box_w) / 2;
+    int box_y = (1080 - box_h) / 2;
+
+    SDL2pp::Rect stats{box_x, box_y, box_w, box_h};
+
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.SetDrawColor(0, 0, 0, 100);
+    renderer.DrawRect(stats);
+
+    // Hardcodeado (temporal)
+    std::string client_id = "Client ID: 007";
+    std::string final_time = "Tiempo final: 02:34.56";
+
+    SDL2pp::Color text_color = SDL2pp::Color(255, 255, 255, 255);
+
+    int text_start_y = box_y + 10;
+    int line_spacing = (box_h / 10) + 10;
+    draw_row(client_id, text_start_y, text_color, box_x + box_w / 2);
+    draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
 }

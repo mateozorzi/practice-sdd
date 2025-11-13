@@ -52,6 +52,8 @@ public:
     void render(const PlayerDTO& player, int health, std::map<uint32_t, CarPositionDTO> cars,
                 bool is_moving);
     void show_screen();
+    void draw_row(const std::string& sentence, int y, SDL2pp::Color color, int size_container);
+    void render_stats();
 };
 
 #endif

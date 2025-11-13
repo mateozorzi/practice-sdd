@@ -7,7 +7,7 @@
 #include "SDL2pp/Chunk.hh"
 
 Sounds::Sounds(SDL2pp::Mixer& mixer):
-        mixer(mixer), engine_sound("client/assets/sfx_car_engine.wav") {}
+        mixer(mixer), engine_sound("client/assets/sounds/sfx_car_engine.wav") {}
 
 void Sounds::initialize_channels() {
     int current_channel = 1;
