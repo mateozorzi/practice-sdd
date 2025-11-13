@@ -3,7 +3,7 @@
 #include <SDL2pp/Chunk.hh>
 
 #include "SDL2pp/Mixer.hh"
-#include "cmake-build-debug/_deps/sdl2-src/include/SDL_stdinc.h"
+#include <SDL_stdinc.h>
 
 struct EngineState {
     Uint32 last_engine_time = 2500;
