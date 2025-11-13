@@ -16,14 +16,6 @@ Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t
         client_id(client_id),
         command_queue(command_queue) {}
 
-
-void Receiver::handle_player_username(const ClientRequest& client_request) {
-
-    const PlayerDTO& player_dto = server_protocol.receive_username();
-    server_protocol.send_client_id(client_id);
-    command_queue.push(GameCommand(client_id, client_request, player_dto));
-}
-
 void Receiver::handle_get_car_catalogue() {
 
     std::vector<car_dto> cars = {// Name, Health, Handling, MaxSpeed, Acceleration
@@ -38,38 +30,29 @@ void Receiver::handle_get_car_catalogue() {
 }
 
 
-void Receiver::handle_car_selection() {
-
-    const car_dto& car_selection = server_protocol.receive_car_selection();
-    command_queue.push(GameCommand(client_id, ClientRequest::SEND_CAR_SELECTION, car_selection));
-}
-
-
-void Receiver::handle_car_movement(const ClientRequest& client_request) {
-
-    const MovementDTO& movement_dto = server_protocol.receive_movement();
-    command_queue.push(GameCommand(client_id, client_request, movement_dto));
-}
-
 void Receiver::run() {
 
     try {
 
         while (should_keep_running()) {
 
-            const ClientRequest client_request = server_protocol.receive_client_request();
-            if (client_request == ClientRequest::SEND_USERNAME)
-                handle_player_username(client_request);
-            else if (client_request == ClientRequest::GET_CAR_CATALOGUE)
+            GameCommandDTO game_command = server_protocol.receive_game_command();
+            if (game_command.client_action == ClientAction::GET_CAR_CATALOGUE) {
+
                 handle_get_car_catalogue();
-            else if (client_request == ClientRequest::SEND_CAR_SELECTION)
-                handle_car_selection();
-            else if (client_request == ClientRequest::MOVE_CAR)
-                handle_car_movement(client_request);
-            else if (client_request == ClientRequest::DISCONNECT)
+                continue;
+            } else if (game_command.client_action == ClientAction::DISCONNECT) {
+
+                command_queue.push(GameCommand(client_id, std::move(game_command)));
                 break;
+            }
+
+            command_queue.push(GameCommand(client_id, std::move(game_command)));
         }
-    } catch (const LibError&) {
+    } catch (const LibError& e) {
+
+        std::cerr << "[RECEIVER] Client " << client_id
+            << " disconnected: " << e.what() << std::endl;
 
     } catch (const std::exception& e) {
 
@@ -82,7 +65,6 @@ void Receiver::stop() {
 
     if (_keep_running) {
 
-        _is_alive = false;
         _keep_running = false;
     }
 }

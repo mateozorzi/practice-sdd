@@ -1,25 +1,18 @@
 #include "game_command.h"
 
+#include <utility>
+
 
 GameCommand::GameCommand():
-        client_id(0), client_request(ClientRequest::UNKNOWN), command_data(std::monostate{}) {}
+        client_id(0), client_action(ClientAction::DISCONNECT), command_data(std::monostate{}) {}
 
-GameCommand::GameCommand(const uint32_t id, const ClientRequest& client_request):
-        client_id(id), client_request(client_request), command_data(std::monostate{}) {}
 
-GameCommand::GameCommand(const uint32_t client_id, const ClientRequest& client_request,
-                         const MovementDTO& movement_dto):
-        client_id(client_id), client_request(client_request), command_data(movement_dto) {}
-
-GameCommand::GameCommand(const uint32_t client_id, const ClientRequest& client_request,
-                         const PlayerDTO& player_dto):
-        client_id(client_id), client_request(client_request), command_data(player_dto) {}
-
-GameCommand::GameCommand(const uint32_t client_id, const ClientRequest& client_request,
-                         const car_dto& car_dto):
-        client_id(client_id), client_request(client_request), command_data(car_dto) {}
+GameCommand::GameCommand(uint32_t client_id, GameCommandDTO&& dto):
+        client_id(client_id),
+        client_action(dto.client_action),
+        command_data(std::move(dto.command_data)) {}
 
 
 uint32_t GameCommand::get_client_id() const { return client_id; }
 
-ClientRequest GameCommand::get_client_request() const { return client_request; }
+ClientAction GameCommand::get_client_action() const { return client_action; }

@@ -12,11 +12,13 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
 
     auto game = std::make_unique<Game>(game_id, max_players);
 
-    std::cout << "[Lobby] Creating new game with ID " << game_id << " and max players "
-              << (int)max_players << " (Owner has the same id): " << client_id << std::endl;
+    std::cerr << "[" << LOBBY
+              << "] "
+                 "Creating new game with ID: "
+              << game_id << " | Max players: " << (int)max_players
+              << " | (Owner has the same id): " << client_id << std::endl;
 
     auto queues = game->add_player(client_id, username);
-    player_to_game[client_id] = game_id;
     games.emplace(game_id, std::move(game));
 
 
@@ -31,7 +33,11 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
     auto it = games.find(game_id);
 
     if (it == games.end()) {
-        std::cerr << "[Lobby] Error: game " << (int)game_id << " not found" << std::endl;
+
+        std::cerr << "[" << LOBBY
+                  << "] "
+                     "Game "
+                  << (int)game_id << " not found." << std::endl;
         static Queue<GameCommand> dummy_command;
         static Queue<WorldSnapshot> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
@@ -39,16 +45,15 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
 
     Game& game = *(it->second);
     if (game.is_full()) {
-        std::cerr << "[Lobby] Error: game " << game_id << " is full" << std::endl;
+
+        std::cerr << "[" << LOBBY << "] "
+                  << "Game with ID: " << game_id << " is full." << std::endl;
         static Queue<GameCommand> dummy_command;
         static Queue<WorldSnapshot> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 
     auto queues = game.add_player(client_id, username);
-    player_to_game[client_id] = game_id;
-
-    std::cout << "[Lobby] Player " << client_id << " joined the game " << game_id << std::endl;
 
     return queues;
 }
@@ -56,8 +61,6 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
 LobbyCatalogueDTO Lobby::list_games() {
 
     std::lock_guard lock(mtx);
-
-    reap();
 
     std::vector<LobbyDTO> lobby_dtos;
 
@@ -68,14 +71,33 @@ LobbyCatalogueDTO Lobby::list_games() {
 
 void Lobby::reap() {
 
-    // TODO: remove finished games
+    std::lock_guard lock(mtx);
+
+    for (auto it = games.begin(); it != games.end();) {
+
+        Game& game = *it->second;
+        if (game.is_empty()) {
+            std::cerr << "[" << LOBBY << "] "
+                      << "Game with ID: " << (int)it->first << " is now empty, removing it." << std::endl;
+            it = games.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
-void Lobby::remove_player(const uint32_t client_id) {
+void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
 
     std::lock_guard lock(mtx);
 
-    (void)client_id;
+    const auto it = games.find(game_id);
 
-    std::cout << "Still not implemented Lobby::remove player!!" << std::endl;
+    if (it == games.end())
+        return;
+
+    Game& game = *it->second;
+    game.remove_player(client_id);
+    std::cerr << "[" << LOBBY << "] "
+              << "Player with ID: " << client_id << " removed from game with ID: " << (int)game_id
+              << std::endl;
 }

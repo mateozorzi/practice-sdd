@@ -17,10 +17,7 @@ class Receiver final: public Thread {
     uint32_t client_id;
     Queue<GameCommand>& command_queue;
 
-    void handle_player_username(const ClientRequest& client_request);
-    void handle_car_selection();
     void handle_get_car_catalogue();
-    void handle_car_movement(const ClientRequest& client_request);
 
 
 public:

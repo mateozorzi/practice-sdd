@@ -59,11 +59,28 @@ void GameMonitor::remove_client(const uint32_t client_id) {
         snapshot_queues.erase(it);
 }
 
+
+void GameMonitor::stop() {
+
+    std::lock_guard lock(mtx);
+
+    for (auto& [client_id, snapshot_queue]: snapshot_queues) {
+
+        try {
+
+            snapshot_queue->close();
+        } catch (const std::exception&) {}
+    }
+
+    snapshot_queues.clear();
+}
+
+
 GameMonitor::~GameMonitor() {
 
     try {
 
-        snapshot_queues.clear();
+        stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME_MONITOR << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();

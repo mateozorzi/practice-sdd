@@ -31,6 +31,7 @@ public:
     void unregister_client(uint32_t client_id);
     void broadcast(const WorldSnapshot& world_snapshot);
     void remove_client(uint32_t client_id);
+    void stop();
 
     ~GameMonitor();
 };

@@ -124,7 +124,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, lobby.lobby_id);
         protocol.send_action_lobby(lobby_req);
         //wait for server response
-        LobbyDTO lobby_info = protocol.receive_lobby_info();
+        //LobbyDTO lobby_info = protocol.receive_lobby_info();
 
         std::cout << player.username <<" joined lobby ID: " << lobby.lobby_id << std::endl;
         //jl.hide();

@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "../common/game_command_dto.h"
 #include "../common/thread.h"
 
 #include "collision_listener.h"
@@ -27,7 +28,7 @@ class GameLoop final: public Thread {
     b2World world;
     std::unordered_map<uint32_t, Player> players;
     CollisionListener collision_listener;
-    std::unordered_map<ClientRequest, std::function<void(const GameCommand&)>> command_handlers;
+    std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
 
     void process_commands();
     void handle_car_selection(const GameCommand& game_command);
