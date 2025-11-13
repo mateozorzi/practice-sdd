@@ -7,13 +7,15 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
-
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
+        mix(MIX_INIT_OGG),
+        mixer(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024),
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080,
                SDL_WINDOW_RESIZABLE),
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
-        camera(512, 288, 4640, 4672) {
+        camera(512, 288, 4640, 4672),
+        sounds(mixer) {
     renderer.SetLogicalSize(1920, 1080);
     set_map();
     set_sprite();
@@ -74,15 +76,23 @@ void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
 }
 
-void SDLManager::render_player(CarPositionDTO& player) {
+void SDLManager::render_player(CarPositionDTO& player, const std::string& model, bool is_moving) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
     const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
+    SDL2pp::Rect sprite_rect = SDL2pp::Rect(128, 32, 32, 32);  // default
+
+    auto it = CAR_SPRITES.find(model);
+    if (it != CAR_SPRITES.end()) {
+        sprite_rect = it->second;
+    }
 
     // Usar solo sprite vertical y rotarlo con SDL
-    renderer.Copy(sprite.value(), SDL2pp::Rect(128, 32, 32, 32),
+    renderer.Copy(sprite.value(), sprite_rect,
                   SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 64, 64),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
+
+    sounds.play_engine_sound(is_moving);
 }
 
 void SDLManager::render_hud_health(const int health) {
@@ -148,10 +158,10 @@ void SDLManager::render_bridges() {
     }
 }
 
-void SDLManager::render(const uint32_t client_id, const int health,
-                        std::map<uint32_t, CarPositionDTO> cars) {
-    if (cars.contains(client_id)) {
-        const CarPositionDTO& my_car = cars[client_id];
+void SDLManager::render(const PlayerDTO& player, const int health,
+                        std::map<uint32_t, CarPositionDTO> cars, const bool is_moving) {
+    if (cars.contains(player.id)) {
+        const CarPositionDTO& my_car = cars[player.id];
         const uint32_t pos_x = my_car.x_position;
         const uint32_t pos_y = my_car.y_position;
 
@@ -164,7 +174,7 @@ void SDLManager::render(const uint32_t client_id, const int health,
         // Dibujar todos los autos
         for (const auto& car_pair: cars) {
             CarPositionDTO car = car_pair.second;
-            render_player(car);
+            render_player(car, player.car.model, is_moving);
         }
 
         // Capa superior (puentes) por encima del fondo y de los autos
@@ -172,7 +182,43 @@ void SDLManager::render(const uint32_t client_id, const int health,
 
         render_hud_health(health);
         render_hud_minimap(pos_x, pos_y);
+        render_stats();
         show_screen();
     }
     SDL_Delay(10);
+}
+
+void SDLManager::draw_row(const std::string& sentence, int y, SDL2pp::Color color,
+                          int size_container) {
+    int font_size = size_container / 10;
+    int text_x = size_container + 10;
+    SDL2pp::Font font("client/assets/fonts/UrbanHaze.ttf", font_size);
+    SDL2pp::Surface surface(font.RenderText_Blended(sentence, color));
+    SDL2pp::Texture text_texture(renderer, surface);
+    renderer.Copy(text_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(text_x, y, text_texture.GetWidth(), text_texture.GetHeight()));
+}
+
+void SDLManager::render_stats() {
+    int box_w = 1920 * 4 / 5;
+    int box_h = 1080 * 4 / 5;
+    int box_x = (1920 - box_w) / 2;
+    int box_y = (1080 - box_h) / 2;
+
+    SDL2pp::Rect stats{box_x, box_y, box_w, box_h};
+
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.SetDrawColor(0, 0, 0, 100);
+    renderer.DrawRect(stats);
+
+    // Hardcodeado (temporal)
+    std::string client_id = "Client ID: 007";
+    std::string final_time = "Tiempo final: 02:34.56";
+
+    SDL2pp::Color text_color = SDL2pp::Color(255, 255, 255, 255);
+
+    int text_start_y = box_y + 10;
+    int line_spacing = (box_h / 10) + 10;
+    draw_row(client_id, text_start_y, text_color, box_x + box_w / 2);
+    draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
 }
