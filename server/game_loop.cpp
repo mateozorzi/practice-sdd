@@ -1,32 +1,33 @@
 #include "game_loop.h"
 
 #include <chrono>
-
-#include "../common/constants.h"
+#include <string>
 #include <vector>
-#include "world_utils.h"
+
 #include "../common/constants.h"
+
 #include "world_creation_exception.h"
+#include "world_utils.h"
 
 
-GameLoop::GameLoop(GameMonitor& game_monitor):
-        command_queue(500), game_monitor(game_monitor), world(b2Vec2(0.0f, 0.0f)), 
+GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
+                   const uint8_t max_players):
+        max_players(max_players),
+        game_monitor(game_monitor),
+        command_queue(command_queue),
+        world(b2Vec2(0.0f, 0.0f)),
         collision_listener(players) {
 
-    game_monitor.register_command_queue(command_queue);
-    
     world.SetContactListener(&collision_listener);
 
     command_handlers = {
-            {ClientRequest::SEND_USERNAME,
-             [this](const GameCommand& game_command) { handle_player_username(game_command); }},
-            {ClientRequest::SEND_CAR_SELECTION,
+            {ClientAction::SEND_CAR_SELECTION,
              [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
-            {ClientRequest::MOVE_CAR,
+            {ClientAction::SEND_CAR_MOVEMENT,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
-            {ClientRequest::DISCONNECT,
+            {ClientAction::DISCONNECT,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
-    
+
     auto polygons = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
     for (const auto& p: polygons) {
         try {
@@ -35,20 +36,38 @@ GameLoop::GameLoop(GameMonitor& game_monitor):
                 std::cout << "Polygon of size " << p.size() << " ommited\n";
             }
         } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Could not add collision bodies: ") + std::string(e.what()));
+            throw WorldCreationException(std::string("Could not add collision bodies: ") +
+                                         std::string(e.what()));
         }
     }
 }
 
 
-void GameLoop::remove_car(const uint32_t client_id) {
+void GameLoop::remove_player(const uint32_t client_id) {
 
     const auto it = players.find(client_id);
 
     if (it != players.end())
         players.erase(it);
+    
+    game_monitor.unregister_client(client_id);
+    game_monitor.remove_client(client_id);
 }
 
+bool GameLoop::is_full() const { return players.size() >= max_players; }
+
+bool GameLoop::is_empty() const { return players.empty(); }
+
+
+void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
+
+    players.try_emplace(client_id, client_id, username, world);
+
+    std::cerr << "[" << GAME_LOOP << "] "
+              << "Player with ID: " << client_id
+              << " has joined the game. | Username: " << username << std::endl
+              << std::endl;
+}
 
 void GameLoop::process_commands() {
 
@@ -57,25 +76,6 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
-
-void GameLoop::handle_player_username(const GameCommand& game_command) {
-
-    if (auto player_dto = game_command.get_data<PlayerDTO>()) {
-
-        uint32_t client_id = game_command.get_client_id();
-        players.try_emplace(
-            client_id, 
-            client_id, 
-            player_dto->get().username, 
-            world
-        );
-
-        std::cout << "New player with ID: " << client_id 
-                << " has joined the game! | Username: " 
-                << player_dto->get().username << std::endl;
-
-    }
-}
 
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
@@ -104,12 +104,15 @@ void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
 void GameLoop::handle_disconnection(const GameCommand& game_command) {
 
-    remove_car(game_command.get_client_id());
+    std::cerr << "[" << GAME_LOOP << "] "
+            << "Player with ID: " << game_command.get_client_id() << " has disconnected." << std::endl;
+
+    remove_player(game_command.get_client_id());
 }
 
 void GameLoop::handle_command(const GameCommand& game_command) {
 
-    const auto it = command_handlers.find(game_command.get_client_request());
+    const auto it = command_handlers.find(game_command.get_client_action());
 
     if (it != command_handlers.end())
         it->second(game_command);
@@ -130,9 +133,9 @@ void GameLoop::update_positions() {
 }
 
 
-bool GameLoop::any_player_in_game() const {
+bool GameLoop::all_player_in_game() const {
 
-    return std::any_of(players.begin(), players.end(),
+    return std::all_of(players.begin(), players.end(),
                        [](const auto& p) { return p.second.is_in_game(); });
 }
 
@@ -145,7 +148,7 @@ void GameLoop::run() {
 
             process_commands();
 
-            if (any_player_in_game()) {
+            if (all_player_in_game()) {
 
                 update_positions();
                 world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
@@ -166,7 +169,6 @@ void GameLoop::stop() {
 
     try {
 
-        command_queue.close();
         players.clear();
     } catch (const std::exception&) {}
 }

@@ -5,13 +5,14 @@
 #include <string_view>
 
 
-enum class ClientAction : uint8_t { 
+enum class ClientAction : uint8_t {
 
     DISCONNECT = 0x00,
     SEND_USERNAME = 0x01,
     SEND_CAR_MOVEMENT = 0x03,
     GET_CAR_CATALOGUE = 0x04,
     SEND_CAR_SELECTION = 0x05,
+    GET_JSON_FILE = 0x06,
 
 };
 
@@ -25,6 +26,8 @@ constexpr std::string_view SERVER_CONFIG_FILEPATH = "server/resources/server_con
 
 // SERVER CLASSES
 constexpr std::string_view SERVER = "SERVER";
+constexpr std::string_view LOBBY = "LOBBY";
+constexpr std::string_view GAME = "GAME";
 constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
 constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr std::string_view ACCEPTOR = "ACCEPTOR";

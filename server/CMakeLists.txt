@@ -6,9 +6,11 @@ target_sources(taller_server
     client_handler.cpp
     collision_listener.cpp
     config_loader.cpp
+    game.cpp
     game_command.cpp
     game_loop.cpp
     game_monitor.cpp
+    lobby.cpp
     main.cpp
     player.cpp
     receiver.cpp
@@ -22,12 +24,13 @@ target_sources(taller_server
     acceptor.h
     car.h
     client_handler.h
-    client_request.h
     collision_listener.h
     config_loader.h
+    game.h
     game_command.h
     game_loop.h
     game_monitor.h
+    lobby.h
     player.h
     receiver.h
     sender.h

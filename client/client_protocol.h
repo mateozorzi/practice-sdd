@@ -4,12 +4,15 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
 #include "../common/movement_dto.h"
 #include "../common/car_catalogue_dto.h"
 #include "../common/lobby_dto.h"
+#include "../common/lobbies_catalogue_dto.h"
 
 enum class ServerResponse {
 
@@ -33,13 +36,19 @@ public:
     void send_movement(const MovementDTO& movement);
     void send_create_lobby(const LobbyDTO& lobby);
     void ask_for_lobbies(const LobbyDTO& lobby);
-    void send_join_lobby(const LobbyDTO& lobby);
+    void send_action_lobby(const LobbyDTO& lobby);
     void send_car_selection(const car_dto& car);
+    void change_username(const LobbyDTO& lobby);
+    void send_exit(const LobbyDTO& lobby);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
     void ask_for_catalogue();
     CarCatalogueDTO receive_car_catalogue();
+    LobbyCatalogueDTO receive_lobby_catalogue();
+    LobbyDTO receive_lobby_info();
+    LobbyDTO receive_lobby_action();
     uint32_t receive_id();
+    nlohmann::json get_json(const std::string& file_path);
 };
 
 #endif

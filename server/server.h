@@ -6,15 +6,14 @@
 
 #include "acceptor.h"
 #include "game_loop.h"
+#include "lobby.h"
 #include "server_config.h"
 
 
 class Server {
 
     ServerConfig config;
-    //Lobby lobby
-    GameMonitor game_monitor;
-    GameLoop game_loop;
+    Lobby lobby;
     Acceptor clients_acceptor;
 
     void stop();

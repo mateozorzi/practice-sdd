@@ -61,7 +61,7 @@ public:
     void update_position();
 
     CarPositionDTO get_position_dto() const;
-    
+
     void set_collision(bool colliding);
     b2Body* get_body() const;
 
