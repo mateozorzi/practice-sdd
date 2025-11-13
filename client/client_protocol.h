@@ -36,6 +36,8 @@ public:
     void ask_for_lobbies(const LobbyDTO& lobby);
     void send_action_lobby(const LobbyDTO& lobby);
     void send_car_selection(const car_dto& car);
+    void change_username(const LobbyDTO& lobby);
+    void send_exit(const LobbyDTO& lobby);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
     void ask_for_catalogue();
