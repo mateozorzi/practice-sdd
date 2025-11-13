@@ -32,7 +32,7 @@ public:
     bool is_full() const;
     bool is_empty() const;
 
-    std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> add_player(uint32_t client_id,
+    std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> add_player(uint32_t client_id,
                                                                      const std::string& username);
     void remove_player(uint32_t client_id);
 

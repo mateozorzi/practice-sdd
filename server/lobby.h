@@ -28,9 +28,9 @@ public:
 
     Lobby() = default;
 
-    std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> create_new_game(
+    std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> create_new_game(
             uint32_t client_id, const std::string& username, uint8_t max_players);
-    std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> join_existing_game(
+    std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> join_existing_game(
             uint32_t client_id, uint32_t game_id, const std::string& username);
     LobbyCatalogueDTO list_games();
     void reap();

@@ -70,7 +70,7 @@ void ClientHandler::launch_lobby() {
 }
 
 void ClientHandler::exit_lobby(Queue<GameCommand>& command_queue,
-                               Queue<WorldSnapshot>& snapshot_queue) {
+                               Queue<WorldSnapshotDTO>& snapshot_queue) {
 
     is_in_lobby = false;
     Receiver receiver(server_protocol, lobby, client_id, command_queue);

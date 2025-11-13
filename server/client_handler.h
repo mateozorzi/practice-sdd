@@ -23,7 +23,7 @@ class ClientHandler final: public Thread {
     bool is_in_lobby = true;
 
     void launch_lobby();
-    void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
+    void exit_lobby(Queue<GameCommand>& command_queue, Queue<WorldSnapshotDTO>& snapshot_queue);
 
     void create_new_game(uint32_t client_id, const std::string& username, uint8_t max_players);
     void join_existing_game(uint32_t client_id, const std::string& username);

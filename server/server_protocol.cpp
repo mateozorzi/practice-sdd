@@ -95,7 +95,7 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
     send_buffer();
 }
 
-void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
+void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot) {
 
     add_uint8_to_buffer(world_snapshot.get_size());
 

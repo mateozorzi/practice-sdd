@@ -3,7 +3,7 @@
 #include <utility>
 
 
-std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
+std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::create_new_game(
         const uint32_t client_id, const std::string& username, const uint8_t max_players) {
 
     std::lock_guard lock(mtx);
@@ -26,7 +26,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
     return queues;
 }
 
-std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
+std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::join_existing_game(
         const uint32_t client_id, const uint32_t game_id, const std::string& username) {
 
     std::lock_guard lock(mtx);
@@ -40,7 +40,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
                      "Game "
                   << (int)game_id << " not found." << std::endl;
         static Queue<GameCommand> dummy_command;
-        static Queue<WorldSnapshot> dummy_snapshot;
+        static Queue<WorldSnapshotDTO> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 
@@ -50,7 +50,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
         std::cerr << "[" << LOBBY << "] "
                   << "Game with ID: " << game_id << " is full." << std::endl;
         static Queue<GameCommand> dummy_command;
-        static Queue<WorldSnapshot> dummy_snapshot;
+        static Queue<WorldSnapshotDTO> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 

@@ -9,7 +9,7 @@
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 
-#include "world_snapshot.h"
+#include "../common/world_snapshot_dto.h"
 
 
 class ServerProtocol final: public CommonProtocol {
@@ -31,7 +31,7 @@ public:
 
     void send_client_id(uint32_t client_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
-    void send_world_snapshot(const WorldSnapshot& world_snapshot);
+    void send_world_snapshot(const WorldSnapshotDTO& world_snapshot);
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
 };
 

@@ -113,7 +113,7 @@ void GameLoop::handle_command(const GameCommand& game_command) {
 
 void GameLoop::update_positions() {
 
-    WorldSnapshot world_snapshot;
+    WorldSnapshotDTO world_snapshot;
     world_snapshot.reserve(players.size());
 
     for (auto& [client_id, player]: players) {
