@@ -44,7 +44,9 @@ private:
     void render_player(CarPositionDTO& player, const std::string& model, bool is_moving);
     void render_hud_health(int health);
     void render_hud_minimap(int player_x, int player_y);
+    void render_layer(const std::vector<SDL2pp::Rect>& rects);
     void render_bridges();
+    void render_decorations();
 
 public:
     SDLManager();

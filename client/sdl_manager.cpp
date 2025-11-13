@@ -133,24 +133,28 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
     renderer.FillRect(SDL2pp::Rect(player_minimap_x - 2, player_minimap_y - 2, 10, 10));
 }
 
-void SDLManager::render_bridges() {
+void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
     const SDL2pp::Rect view = camera.get_view_rect();
     constexpr int screen_w = 1920;
     constexpr int screen_h = 1080;
 
-    for (const auto& bridge_src_full: bridges_rects) {
-        if (!camera.on_screen(bridge_src_full))
+    for (const auto& src_rect: rects) {
+        if (!camera.on_screen(src_rect))
             continue;
 
         // Vista en pantalla
-        const int dx = (bridge_src_full.x - view.x) * screen_w / view.w;
-        const int dy = (bridge_src_full.y - view.y) * screen_h / view.h;
-        const int dw = bridge_src_full.w * screen_w / view.w;
-        const int dh = bridge_src_full.h * screen_h / view.h;
-        const SDL2pp::Rect bridge_dst(dx, dy, dw, dh);
+        const int dx = (src_rect.x - view.x) * screen_w / view.w;
+        const int dy = (src_rect.y - view.y) * screen_h / view.h;
+        const int dw = src_rect.w * screen_w / view.w;
+        const int dh = src_rect.h * screen_h / view.h;
+        const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
-        renderer.Copy(map.value(), bridge_src_full, bridge_dst);
+        renderer.Copy(map.value(), src_rect, dst_rect);
     }
+}
+
+void SDLManager::render_bridges() {
+    render_layer(bridges_rects);
 }
 
 void SDLManager::render(const PlayerDTO& player, const int health,
@@ -174,7 +178,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
         // Capa superior (puentes) por encima del fondo y de los autos
         render_bridges();
-        // render_decorations();
+        render_decorations();
 
         render_hud_health(health);
         render_hud_minimap(pos_x, pos_y);
@@ -217,6 +221,10 @@ void SDLManager::render_stats() {
     int line_spacing = (box_h / 10) + 10;
     draw_row(client_id, text_start_y, text_color, box_x + box_w / 2);
     draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
+}
+
+void SDLManager::render_decorations() {
+    render_layer(decorations_rects);
 }
 
 void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
