@@ -35,11 +35,22 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     send_buffer();
 }
 
+void ClientProtocol::change_username(const LobbyDTO& lobby) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_string_to_buffer(lobby.lobby_name);
+    send_buffer();
+}
+
 void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    send_buffer();
+}
+
+void ClientProtocol::send_exit(const LobbyDTO& lobby) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     send_buffer();
 }
 
