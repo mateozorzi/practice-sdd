@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
@@ -44,6 +46,7 @@ public:
     LobbyDTO receive_lobby_info();
     LobbyDTO receive_lobby_action();
     uint32_t receive_id();
+    nlohmann::json get_json(const std::string& file_path);
 };
 
 #endif

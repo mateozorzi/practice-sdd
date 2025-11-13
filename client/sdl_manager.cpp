@@ -27,7 +27,6 @@ void SDLManager::set_map() {
     const SDL2pp::Surface background_surface(
             DATA_PATH "/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
     map = SDL2pp::Texture(renderer, background_surface);
-    bridges_rects = loadRects(DATA_PATH "/Top_Layer_Liberty_City.json");
 }
 
 void SDLManager::set_sprite() {
@@ -53,18 +52,14 @@ void SDLManager::clear_screen() { renderer.Clear(); }
 
 void SDLManager::show_screen() { renderer.Present(); }
 
-std::vector<SDL2pp::Rect> SDLManager::loadRects(const std::string& path) {
-    std::ifstream file(path);
-    nlohmann::json data;
-    file >> data;
-
+std::vector<SDL2pp::Rect> SDLManager::loadRects(const nlohmann::json& data) {
     std::vector<SDL2pp::Rect> rects;
-    for (const auto& bridge: data) {
-        if (bridge.size() == 4) {
-            int x = bridge[0][0];
-            int y = bridge[0][1];
-            int w = bridge[1][0].get<int>() - x;
-            int h = bridge[2][1].get<int>() - y;
+    for (const auto& body: data) {
+        if (body.size() == 4) {
+            int x = body[0][0];
+            int y = body[0][1];
+            int w = body[1][0].get<int>() - x;
+            int h = body[2][1].get<int>() - y;
 
             rects.emplace_back(x, y, w, h);
         }
@@ -179,6 +174,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
         // Capa superior (puentes) por encima del fondo y de los autos
         render_bridges();
+        // render_decorations();
 
         render_hud_health(health);
         render_hud_minimap(pos_x, pos_y);
@@ -221,4 +217,12 @@ void SDLManager::render_stats() {
     int line_spacing = (box_h / 10) + 10;
     draw_row(client_id, text_start_y, text_color, box_x + box_w / 2);
     draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
+}
+
+void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
+    bridges_rects = loadRects(bridges_rects_data);
+}
+
+void SDLManager::load_decorations_rects(const nlohmann::json& decorations_rects_data) {
+    decorations_rects = loadRects(decorations_rects_data);
 }

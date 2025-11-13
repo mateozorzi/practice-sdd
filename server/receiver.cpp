@@ -29,6 +29,10 @@ void Receiver::handle_get_car_catalogue() {
     server_protocol.send_car_catalogue(catalogue);
 }
 
+void Receiver::handle_get_json_file(const std::string& file_path) {
+    server_protocol.send_json_file(file_path);
+}
+
 
 void Receiver::run() {
 
@@ -40,6 +44,13 @@ void Receiver::run() {
             if (game_command.client_action == ClientAction::GET_CAR_CATALOGUE) {
 
                 handle_get_car_catalogue();
+                continue;
+            } else if (game_command.client_action == ClientAction::GET_JSON_FILE) {
+
+                auto file_path_opt = game_command.get_data<std::string>();
+                if (file_path_opt.has_value()) {
+                    handle_get_json_file(file_path_opt.value().get());
+                }
                 continue;
             } else if (game_command.client_action == ClientAction::DISCONNECT) {
 

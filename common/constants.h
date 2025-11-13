@@ -12,6 +12,7 @@ enum class ClientAction : uint8_t {
     SEND_CAR_MOVEMENT = 0x03,
     GET_CAR_CATALOGUE = 0x04,
     SEND_CAR_SELECTION = 0x05,
+    GET_JSON_FILE = 0x06,
 
 };
 
