@@ -1,3 +1,6 @@
+#include "../common/constants.h"
+
+
 #include "game.h"
 
 
@@ -30,6 +33,8 @@ void Game::remove_player(const uint32_t client_id) {
 
     game_monitor.unregister_client(client_id);
     game_loop.remove_player(client_id);
+    std::cerr << "[" << GAME << "] "
+            << "Removing player with ID: " << client_id << std::endl;
 }
 
 
@@ -40,7 +45,8 @@ void Game::stop() {
 
     command_queue.close();
 
-    std::cout << "[GAME] Game " << game_id << " stopped." << std::endl;
+    std::cerr << "[" << GAME << "] "
+            << "Game with ID: " << game_id << " stopped." << std::endl;
 }
 
 Game::~Game() {
@@ -50,6 +56,6 @@ Game::~Game() {
         Game::stop();
     } catch (const std::exception& e) {
 
-        std::cerr << "[GAME] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        std::cerr << "[" << GAME << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();
     }
 }

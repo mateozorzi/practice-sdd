@@ -42,6 +42,7 @@ void ClientHandler::launch_lobby() {
                 case LobbyAction::CREATE_LOBBY:
                     std::cout << "Creating new match with id: " << client_id
                               << "Max players: " << lobby_dto.max_players << std::endl;
+                    game_id = client_id;
                     create_new_game(client_id, player_dto.username, lobby_dto.max_players);
                     break;
                 case LobbyAction::SEND_LOBBY_LIST:
@@ -51,7 +52,8 @@ void ClientHandler::launch_lobby() {
                     break;
                 case LobbyAction::JOIN_LOBBY:
                     std::cout << "Client requested to join existing lobby." << std::endl;
-                    join_existing_game(client_id, lobby_dto.lobby_id, player_dto.username);
+                    game_id = lobby_dto.lobby_id;
+                    join_existing_game(client_id, player_dto.username);
                     break;
                 // These below don't work for now...
                 case LobbyAction::LEAVE_LOBBY:
@@ -88,8 +90,7 @@ void ClientHandler::create_new_game(const uint32_t client_id, const std::string&
     exit_lobby(command_queue, snapshot_queue);
 }
 
-void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t game_id,
-                                       const std::string& username) {
+void ClientHandler::join_existing_game(const uint32_t client_id, const std::string& username) {
 
     auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
     exit_lobby(command_queue, snapshot_queue);
@@ -121,7 +122,7 @@ void ClientHandler::stop() {
         server_protocol.stop();
     } catch (const LibError&) {}
 
-    lobby.remove_player(client_id);
+    lobby.remove_player(client_id, game_id);
 }
 
 

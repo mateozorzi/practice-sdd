@@ -25,6 +25,8 @@ constexpr std::string_view SERVER_CONFIG_FILEPATH = "server/resources/server_con
 
 // SERVER CLASSES
 constexpr std::string_view SERVER = "SERVER";
+constexpr std::string_view LOBBY = "LOBBY";
+constexpr std::string_view GAME = "GAME";
 constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
 constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr std::string_view ACCEPTOR = "ACCEPTOR";

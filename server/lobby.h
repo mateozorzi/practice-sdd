@@ -34,7 +34,7 @@ public:
             uint32_t client_id, uint32_t game_id, const std::string& username);
     LobbyCatalogueDTO list_games();
     void reap();
-    void remove_player(uint32_t client_id);
+    void remove_player(uint32_t client_id, uint32_t game_id);
 };
 
 
