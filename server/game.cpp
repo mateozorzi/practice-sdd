@@ -31,7 +31,6 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Game::add_player(
 
 void Game::remove_player(const uint32_t client_id) {
 
-    game_monitor.unregister_client(client_id);
     game_loop.remove_player(client_id);
     std::cerr << "[" << GAME << "] "
             << "Removing player with ID: " << client_id << std::endl;
@@ -44,6 +43,7 @@ void Game::stop() {
     game_loop.join();
 
     command_queue.close();
+    game_monitor.stop();
 
     std::cerr << "[" << GAME << "] "
             << "Game with ID: " << game_id << " stopped." << std::endl;

@@ -43,6 +43,6 @@ constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 constexpr float PIXELS_PER_METER = 30.0f;
 // TODO: replace with command line parameter
 constexpr std::string_view POLYGONS_LIBERTY_CITY =
-        "server/resources/world/polygons_liberty_city.json";
+        "server/resources/world/blocks_liberty_city.json";
 
 #endif
