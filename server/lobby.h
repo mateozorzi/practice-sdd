@@ -21,6 +21,9 @@ class Lobby {
     std::mutex mtx;
     std::unordered_map<uint32_t, std::unique_ptr<Game>> games;
     const ServerConfig& config;
+    std::vector<RaceDTO> races;
+
+    void initialize_races();
 
 
 public:
