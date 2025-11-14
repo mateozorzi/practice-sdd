@@ -26,7 +26,7 @@ void SelectCircuit::fill_table(){
     ui->tableRaces->clear();
     ui->tableRaces->setRowCount(races_names.length());
 
-    QStringList col = {"Name", "City", "# Checkpoints", "Actions"};
+    QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Actions"};
     ui->tableRaces->setColumnCount(col.size());
     ui->tableRaces->setHorizontalHeaderLabels(col);
 
@@ -45,10 +45,11 @@ void SelectCircuit::fill_races_info(){
         QString name = r.name;
         QString city = r.city;
         int n_c = r.n_checkpoints;
-
+        int n_l = r.n_laps;
         ui->tableRaces->setItem(id, 0, new QTableWidgetItem(name));
         ui->tableRaces->setItem(id, 1, new QTableWidgetItem(city));
         ui->tableRaces->setItem(id, 2, new QTableWidgetItem(QString::number(n_c)));
+        ui->tableRaces->setItem(id, 3, new QTableWidgetItem(QString::number(n_l)));
 
         QPushButton* btn = new QPushButton("Delete");
         btn->setStyleSheet("background-color: red; color: white; font-weight: bold;min-height: 12px;");
@@ -57,7 +58,7 @@ void SelectCircuit::fill_races_info(){
             delete_race(name);
         });
 
-        ui->tableRaces->setCellWidget(id, 3, btn);
+        ui->tableRaces->setCellWidget(id, 4, btn);
     }
 }
 
@@ -79,13 +80,21 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
         QString map = images[0];
         QString mask = images[1];
 
-        QString header = in.readLine();
+        QString info = in.readLine(); //skip header City,n_laps
 
-        QStringList headerCols = header.split(',');
-        QString cityName;
-        if (!headerCols.isEmpty()) {
-            cityName = headerCols.last().trimmed();
+        info = in.readLine();
+
+        QStringList infoRace = info.split(',');
+        QString cityName = infoRace[0];
+        QString number_laps = infoRace[1];
+        int n_laps = number_laps.toInt();
+
+
+        QString header = in.readLine();
+        if (header.size() > 0){
+            //header skip
         }
+
 
         QVector<Checkpoint> checkpoints;
         int checkpointCount = 0;
@@ -115,7 +124,7 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
         file.close();
 
         // create a race
-        Race race(id, baseName, cityName,map,mask, checkpointCount, checkpoints);
+        Race race(id, baseName, cityName,map,mask, checkpointCount, checkpoints, n_laps);
         id++;
 
         races.append(race);

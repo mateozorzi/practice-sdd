@@ -1,12 +1,10 @@
 :/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png,:/mask/imagenes/001 - B_STREETS - Liberty City.png
-id, orientation, xCenter, yCenter, height, width,Liberty City
-1,V,175,87,66,15
-2,V,224,87,66,15
-3,V,452,87,66,15
-4,V,525,87,66,15
-5,V,586,87,66,15
-6,V,690,87,66,15
-7,I,770,100,30,30
-8,I,907,87,30,30
-9,H,910,168,15,34
-10,H,910,216,15,34
+City,n_laps
+Liberty City,2
+id, orientation, xCenter, yCenter, height, width,
+1,V,249,86,66,15
+2,I,354,99,30,30
+3,V,470,86,66,15
+4,V,631,86,66,15
+5,V,720,86,66,15
+6,V,828,86,66,15
