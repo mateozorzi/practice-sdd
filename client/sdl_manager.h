@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -41,7 +42,7 @@ private:
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
     void update_camera(int player_x, int player_y);
-    void render_player(CarPositionDTO& player, const std::string& model, bool is_moving);
+    void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving);
     void render_hud_health(int health);
     void render_hud_minimap(int player_x, int player_y);
     void render_layer(const std::vector<SDL2pp::Rect>& rects);
@@ -58,8 +59,8 @@ public:
     void set_sprite();
     void set_minimap();
     void clear_screen();
-    void render(const PlayerDTO& player, int health, std::map<uint32_t, CarPositionDTO> cars,
-                bool is_moving);
+    void render(const PlayerDTO& player, int health,
+                const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars, bool is_moving);
     void show_screen();
     void draw_row(const std::string& sentence, int y, SDL2pp::Color color, int size_container);
     void render_stats();
