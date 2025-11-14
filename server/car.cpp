@@ -1,6 +1,7 @@
 #include "car.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "../common/constants.h"
 
@@ -134,10 +135,15 @@ void Car::set_collision(bool colliding) { is_colliding = colliding; }
 b2Body* Car::get_body() const { return body; }
 
 
-void Car::set_configuration(const car_dto& car_configuration) {
+const car_dto& Car::get_configuration() const {
+    static car_dto car_configuration(model);
+    return car_configuration;
+}
 
-    // std::string model = car_configuration.model;
+void Car::set_configuration(const car_dto& car_configuration) {
+    std::cout<<"Setting car configuration for player id: "<<client_id<<" model: "<<car_configuration.model<<std::endl;
+    model = car_configuration.model;
 
     // Need to check which model of car the client wants here.
-    (void)car_configuration;  // To avoid unused parameter warning
+    //(void)car_configuration;  // To avoid unused parameter warning
 }

@@ -32,7 +32,7 @@ public:
     ClientAction get_client_action() const;
 
     template <typename T>
-    std::optional<std::reference_wrapper<const T>> get_data() const {
+    std::optional<std::reference_wrapper<const T>> get_data() const{
 
         if (std::holds_alternative<T>(command_data))
             return std::cref(std::get<T>(command_data));

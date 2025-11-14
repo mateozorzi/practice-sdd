@@ -29,6 +29,8 @@ public:
     explicit Player(uint32_t client_id, const std::string& username, b2World& world);
 
     uint32_t get_client_id() const;
+    const std::string& get_username() const;
+    const car_dto& get_car() const;
     b2Body* get_car_body() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);

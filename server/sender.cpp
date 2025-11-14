@@ -23,7 +23,7 @@ void Sender::run() {
 
             try {
 
-                const WorldSnapshotDTO& world_snapshot = snapshot_queue.pop();
+                const WorldSnapshotDTO world_snapshot = snapshot_queue.pop();
                 server_protocol.send_world_snapshot(world_snapshot);
 
             } catch (const ClosedQueue&) {

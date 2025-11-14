@@ -1,4 +1,5 @@
 #include "player.h"
+#include <iostream>
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world):
@@ -18,6 +19,16 @@ b2Body* Player::get_car_body() const {
         return car->get_body();
 
     return nullptr;
+}
+
+const std::string& Player::get_username() const { return username; }
+
+const car_dto& Player::get_car() const {
+    static car_dto empty_car;
+    if (car) {
+        return car->get_configuration();
+    }
+    return empty_car;
 }
 
 
@@ -54,7 +65,6 @@ void Player::set_in_game() { in_game = true; }
 
 
 void Player::set_car_configuration(const car_dto& car_configuration) {
-
     if (car)
         car->set_configuration(car_configuration);
 }
