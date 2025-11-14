@@ -84,6 +84,9 @@
         "xlocnum": "cpp",
         "xloctime": "cpp",
         "complex": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "source_location": "cpp"
     }
 }

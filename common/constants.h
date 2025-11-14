@@ -16,6 +16,10 @@ enum class ClientAction : uint8_t {
 
 };
 
+enum class GameLoopAction : uint8_t {
+    SEND_UPDATE_POSITIONS = 0x10,
+    SEND_RACE = 0x11
+};
 
 // SERVER
 constexpr int MAX_PATH_LENGTH = 4096;

@@ -72,7 +72,7 @@ void ClientHandler::list_active_games() {
 }
 
 void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
-                               Queue<WorldSnapshotDTO>& snapshot_queue) {
+                               Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue) {
 
     is_in_lobby = false;
     Receiver receiver(server_protocol, lobby, client_id, command_queue, config);

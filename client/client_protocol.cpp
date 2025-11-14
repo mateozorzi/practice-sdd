@@ -2,8 +2,11 @@
 #include "../common/car_catalogue_dto.h"
 #include "../common/car_dto.h"
 #include "../common/lobby_dto.h"
+#include "../common/world_snapshot_dto.h"
+#include "../common/race_dto.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <variant>
 
 
 void ClientProtocol::send_username(const std::string& username) {
@@ -97,6 +100,17 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
         world_snapshot.add_car_position(player, car_position);
     }
     return world_snapshot;
+}
+
+std::variant<WorldSnapshotDTO, RaceDTO> ClientProtocol::receive_update() {
+    const uint8_t update_type = recv_uint8();
+    if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
+        WorldSnapshotDTO world_snapshot = receive_update_positions();
+        return world_snapshot;
+    } else {//(update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
+        //not imeplemented
+        return RaceDTO();
+    }
 }
 
 

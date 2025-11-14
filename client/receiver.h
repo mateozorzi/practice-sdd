@@ -6,6 +6,8 @@
 #include "common/queue.h"
 #include "common/thread.h"
 #include "../common/world_snapshot_dto.h"
+#include "../common/race_dto.h"
+#include <variant>
 
 #include "client_protocol.h"
 
@@ -17,12 +19,12 @@ class Receiver: public Thread {
     ClientProtocol& protocol;
     GameState game_state;
     std::mutex state_mutex;
-    Queue<WorldSnapshotDTO> car_positions_queue;
+    Queue<std::variant<WorldSnapshotDTO, RaceDTO>> car_positions_queue;
 
 public:
     explicit Receiver(ClientProtocol& protocol);
     GameState get_game_state() const;
-    Queue<WorldSnapshotDTO>& get_car_positions_queue();
+    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& get_car_positions_queue();
     void run() override;
 };
 
