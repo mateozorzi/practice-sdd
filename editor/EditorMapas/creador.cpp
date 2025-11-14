@@ -60,6 +60,7 @@ Creador::Creador(const Race& r, QWidget *parent)
     mask_circuit.load(mask);
 
     ui->n_checkpoints->display(r.n_checkpoints);
+    ui->n_laps->setValue(r.n_laps);
     ui->name_circuit->setText(r.name);
 
     ui->labelmap->installEventFilter(this);
@@ -303,6 +304,12 @@ void Creador::on_Done_clicked()
         return;
     }
 
+    int n_laps = ui->n_laps->value();
+    if (n_laps <= 0){
+        m.message_no_args(this, "Error", "Minimum number of laps is 1.");
+        return;
+    }
+
     QString name_circuit = ui->name_circuit->text();
     if (name_circuit.length() < MIN_LENGTH){
         m.message_no_args(this, "Error", "Fill the name of the circuit.\n The name must have at least five letters");
@@ -310,7 +317,7 @@ void Creador::on_Done_clicked()
     }
 
 
-    if (checkpoints.export_checkpoints(name_circuit, map, this->mask, this)){
+    if (checkpoints.export_checkpoints(name_circuit, map, n_laps,this->mask, this)){
         //file create succesfully
         if (name_circuit != race.name){
             QString old_path = QCoreApplication::applicationDirPath() + "/../server/races/" + race.name + ".csv";
