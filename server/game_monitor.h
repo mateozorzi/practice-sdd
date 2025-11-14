@@ -13,13 +13,14 @@
 #include "game_command.h"
 #include "server_config.h"
 #include "../common/world_snapshot_dto.h"
+#include "../common/race_dto.h"
 
 
 class GameMonitor {
 
 
     std::mutex mtx;
-    std::unordered_map<uint32_t, std::unique_ptr<Queue<WorldSnapshotDTO>>> snapshot_queues;
+    std::unordered_map<uint32_t, std::unique_ptr<Queue<std::variant<WorldSnapshotDTO, RaceDTO>>>> snapshot_queues;
     const ServerConfig& config;
 
 
@@ -29,7 +30,7 @@ public:
 
     explicit GameMonitor(const ServerConfig& config);
 
-    Queue<WorldSnapshotDTO>& register_client(uint32_t client_id);
+    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
     void broadcast(const WorldSnapshotDTO& world_snapshot);
     void remove_client(uint32_t client_id);

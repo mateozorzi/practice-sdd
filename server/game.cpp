@@ -18,10 +18,10 @@ bool Game::is_full() const { return game_loop.is_full(); }
 bool Game::is_empty() const { return game_loop.is_empty(); }
 
 
-std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Game::add_player(
+std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Game::add_player(
         const uint32_t client_id, const std::string& username) {
 
-    Queue<WorldSnapshotDTO>& snapshot_queue = game_monitor.register_client(client_id);
+    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue = game_monitor.register_client(client_id);
 
     game_loop.add_player(client_id, username);
 

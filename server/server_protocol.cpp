@@ -108,7 +108,7 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
 }
 
 void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot) {
-
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS));
     add_uint8_to_buffer(world_snapshot.get_size());
 
     for (const auto& car_position: world_snapshot.get_car_positions()) {

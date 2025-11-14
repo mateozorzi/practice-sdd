@@ -48,29 +48,28 @@ void Client::run() {
     // sld_manager its initialized here
     std::string chosen_map = "liberty_city"; // TODO: remove harcoded
     sdl_manager = std::make_unique<SDLManager>();
-    sdl_manager->load_bridges_rects(protocol.get_json("server/resources/world/bridges_" + chosen_map + ".json"));
-    sdl_manager->load_decorations_rects(protocol.get_json("server/resources/world/decorations_" + chosen_map + ".json"));
+    //sdl_manager->load_bridges_rects(protocol.get_json("server/resources/world/bridges_" + chosen_map + ".json"));
+    //sdl_manager->load_decorations_rects(protocol.get_json("server/resources/world/decorations_" + chosen_map + ".json"));
 
     while (true) {
         if (!input_manager.handle_movement()) {
             return;
         }
-        // Obtener posiciones
-        Queue<WorldSnapshotDTO>& car_queue = receiver.get_car_positions_queue();
+        // Obtener posiciones o race info del receiver
+        Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& car_queue = receiver.get_car_positions_queue();
 
-        WorldSnapshotDTO snapshot = WorldSnapshotDTO();
+        auto snapshot = std::variant<WorldSnapshotDTO, RaceDTO>();
         bool has_positions = false;
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;
         }
 
 
-        std::vector<std::pair<PlayerDTO, CarPositionDTO>> car_positions = snapshot.get_car_positions();
+        std::vector<std::pair<PlayerDTO, CarPositionDTO>> car_positions = std::get_if<WorldSnapshotDTO>(&snapshot)->get_car_positions();
 
         if (has_positions) {
             std::vector<uint32_t> received_ids;
             for (const auto& [player, car_position] : car_positions) {
-                std::cout<<"Player id: "<<player.id<<" model: "<<player.car.model<<std::endl;
                 received_ids.push_back(car_position.client_id);
                 cars[car_position.client_id] = car_position;
             }
