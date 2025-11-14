@@ -23,8 +23,8 @@ b2Body* Player::get_car_body() const {
 
 const std::string& Player::get_username() const { return username; }
 
-const car_dto& Player::get_car() const {
-    static car_dto empty_car;
+const car_dto Player::get_car() const {
+    car_dto empty_car;
     if (car) {
         return car->get_configuration();
     }

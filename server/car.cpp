@@ -135,8 +135,8 @@ void Car::set_collision(bool colliding) { is_colliding = colliding; }
 b2Body* Car::get_body() const { return body; }
 
 
-const car_dto& Car::get_configuration() const {
-    static car_dto car_configuration(model);
+const car_dto Car::get_configuration() const {
+    car_dto car_configuration(model);
     return car_configuration;
 }
 
