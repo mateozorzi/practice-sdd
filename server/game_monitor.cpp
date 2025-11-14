@@ -9,14 +9,14 @@
 
 GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
 
-Queue<WorldSnapshotDTO>& GameMonitor::register_client(const uint32_t client_id) {
+Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<WorldSnapshotDTO>>(
+    auto queue_pointer = std::make_unique<Queue<std::variant<WorldSnapshotDTO, RaceDTO>>>(
         static_cast<size_t>(config.app.server.snapshot_queue_capacity)
     );
-    Queue<WorldSnapshotDTO>& queue_reference = *queue_pointer;
+    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& queue_reference = *queue_pointer;
 
     snapshot_queues[client_id] = std::move(queue_pointer);
 
