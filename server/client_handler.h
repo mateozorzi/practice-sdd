@@ -30,7 +30,7 @@ class ClientHandler final: public Thread {
     void update_player_username(const std::string& actual_username);
     void list_active_games();
 
-    void exit_lobby_and_play(Queue<GameCommand>& command_queue, Queue<WorldSnapshot>& snapshot_queue);
+    void exit_lobby_and_play(Queue<GameCommand>& command_queue, Queue<WorldSnapshotDTO>& snapshot_queue);
     void create_new_game(uint32_t client_id, uint8_t max_players);
     void join_existing_game(uint32_t client_id, uint32_t actual_game_id);
 

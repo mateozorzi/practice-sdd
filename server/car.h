@@ -38,6 +38,7 @@ class Car {
     uint32_t client_id;
     b2Body* body;
     CarConfig config;
+    std::string model;
 
     bool moving_up = false;
     bool moving_down = false;
@@ -60,6 +61,8 @@ public:
     void update_position();
 
     CarPositionDTO get_position_dto() const;
+
+    const car_dto get_configuration() const;
 
     void set_collision(bool colliding);
     b2Body* get_body() const;

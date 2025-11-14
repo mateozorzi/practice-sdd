@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "../common/constants.h"
+#include <iostream>
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
@@ -13,6 +14,13 @@ void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_positi
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
+}
+
+void ServerProtocol::add_player_to_buffer(const PlayerDTO& player){
+
+    add_string_to_buffer(player.username);
+    add_uint32_to_buffer(player.id);
+    add_string_to_buffer(player.car.model);
 }
 
 PlayerDTO ServerProtocol::receive_username() {
@@ -99,12 +107,14 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
     send_buffer();
 }
 
-void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
+void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot) {
 
     add_uint8_to_buffer(world_snapshot.get_size());
 
-    for (const auto& car_position: world_snapshot.get_car_positions())
-        add_car_position_to_buffer(car_position);
+    for (const auto& car_position: world_snapshot.get_car_positions()) {
+        add_player_to_buffer(car_position.first);
+        add_car_position_to_buffer(car_position.second);
+    }
 
     send_buffer();
 }

@@ -9,14 +9,14 @@
 
 GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
 
-Queue<WorldSnapshot>& GameMonitor::register_client(const uint32_t client_id) {
+Queue<WorldSnapshotDTO>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<WorldSnapshot>>(
+    auto queue_pointer = std::make_unique<Queue<WorldSnapshotDTO>>(
         static_cast<size_t>(config.app.server.snapshot_queue_capacity)
     );
-    Queue<WorldSnapshot>& queue_reference = *queue_pointer;
+    Queue<WorldSnapshotDTO>& queue_reference = *queue_pointer;
 
     snapshot_queues[client_id] = std::move(queue_pointer);
 
@@ -39,7 +39,7 @@ void GameMonitor::unregister_client(const uint32_t client_id) {
 }
 
 
-void GameMonitor::broadcast(const WorldSnapshot& world_snapshot) {
+void GameMonitor::broadcast(const WorldSnapshotDTO& world_snapshot) {
 
     std::lock_guard lock(mtx);
 

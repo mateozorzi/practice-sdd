@@ -80,6 +80,26 @@ std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
     return positions;
 }
 
+PlayerDTO ClientProtocol::receive_player(){
+    const std::string& username = recv_string();
+    const uint32_t id = recv_uint32();
+    const std::string car_model = recv_string();
+    car_dto car(car_model);
+    return PlayerDTO(username, id, car);
+}
+
+WorldSnapshotDTO ClientProtocol::receive_update_positions() {
+    const uint8_t size = recv_uint8();
+    WorldSnapshotDTO world_snapshot;
+    for (uint8_t i = 0; i < size; ++i) {
+        PlayerDTO player = receive_player();
+        CarPositionDTO car_position = receive_car_position();
+        world_snapshot.add_car_position(player, car_position);
+    }
+    return world_snapshot;
+}
+
+
 void ClientProtocol::ask_for_catalogue(){
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_CAR_CATALOGUE));
     send_buffer();

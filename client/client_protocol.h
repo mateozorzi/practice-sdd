@@ -13,6 +13,7 @@
 #include "../common/car_catalogue_dto.h"
 #include "../common/lobby_dto.h"
 #include "../common/lobbies_catalogue_dto.h"
+#include "../common/world_snapshot_dto.h"
 
 enum class ServerResponse {
 
@@ -48,6 +49,8 @@ public:
     LobbyDTO receive_lobby_info();
     LobbyDTO receive_lobby_action();
     uint32_t receive_id();
+    WorldSnapshotDTO receive_update_positions();
+    PlayerDTO receive_player();
     nlohmann::json get_json(const std::string& file_path);
 };
 

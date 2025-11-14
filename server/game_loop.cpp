@@ -81,11 +81,14 @@ void GameLoop::process_commands() {
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
     if (auto car = game_command.get_data<car_dto>()) {
-
         uint32_t client_id = game_command.get_client_id();
+        car_dto car_config = car->get();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.set_car_configuration(car->get());
+            it->second.set_car_configuration(car_config);
+            std::string model = it->second.get_car().model;
+            std::cout << "Player with ID: " << it->second.get_client_id()
+                      << " has car model set to: " << model << std::endl;
             it->second.set_in_game();
         }
     }
@@ -121,13 +124,14 @@ void GameLoop::handle_command(const GameCommand& game_command) {
 
 void GameLoop::update_positions() {
 
-    WorldSnapshot world_snapshot;
-    world_snapshot.reserve(players.size());
+    WorldSnapshotDTO world_snapshot;
 
     for (auto& [client_id, player]: players) {
 
         player.update_car_position();
-        world_snapshot.add_car_position(player.get_car_position());
+        car_dto car = player.get_car();
+        PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
+        world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
     game_monitor.broadcast(world_snapshot);

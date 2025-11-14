@@ -9,12 +9,13 @@
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 
-#include "world_snapshot.h"
+#include "../common/world_snapshot_dto.h"
 
 
 class ServerProtocol final: public CommonProtocol {
 
     void add_car_position_to_buffer(const CarPositionDTO& car_position_dto);
+    void add_player_to_buffer(const PlayerDTO& player);
     PlayerDTO receive_username();
     car_dto receive_car_selection();
     MovementDTO receive_movement();
@@ -31,7 +32,7 @@ public:
 
     void send_client_id(uint32_t client_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
-    void send_world_snapshot(const WorldSnapshot& world_snapshot);
+    void send_world_snapshot(const WorldSnapshotDTO& world_snapshot);
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_json_file(const std::string& file_path);
 };
