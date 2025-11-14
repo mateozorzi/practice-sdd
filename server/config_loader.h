@@ -2,11 +2,11 @@
 #define CONFIG_LOADER_H
 
 #include <string>
+
 #include "server_config.h"
 
 class ConfigLoader {
 public:
-
     static ServerConfig load_yaml(const std::string& filepath);
 
 private:
@@ -14,4 +14,4 @@ private:
     ~ConfigLoader() = default;
 };
 
-#endif // CONFIG_LOADER_H
+#endif  // CONFIG_LOADER_H

@@ -93,7 +93,7 @@ QString Coordinates::get_map_name(const QString& map){
     return city;
 }
 
-bool Coordinates::export_checkpoints(const QString& name, const QString& map, const QString& mask, QWidget* window){
+bool Coordinates::export_checkpoints(const QString& name, const QString& map, const int n_laps,const QString& mask, QWidget* window){
     QString path = QCoreApplication::applicationDirPath() + "/../server/races";
     QDir dir(path);
 
@@ -135,7 +135,9 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
 
     QTextStream out(&archivo);
     out << map << "," << mask << "\n";
-    out << "id, orientation, xCenter, yCenter, height, width,"<<city<<"\n";
+    out << "City"<<","<<"n_laps"<<"\n";
+    out << city <<","<<n_laps<<"\n";
+    out << "id, orientation, xCenter, yCenter, height, width,"<<"\n";
     for (const Checkpoint& p : checkpoints){
         int id_checkpoint = p.id;
         char orientation = p.orientation;

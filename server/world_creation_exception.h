@@ -1,8 +1,9 @@
 #include <stdexcept>
+#include <string>
 
 
 class WorldCreationException: public std::runtime_error {
-    
+
 public:
     WorldCreationException(const WorldCreationException&) = delete;
     WorldCreationException& operator=(const WorldCreationException&) = delete;

@@ -21,6 +21,7 @@ target_sources(taller_client
     Lobby/createlobby.cpp
     Lobby/joinlobby.cpp
     Lobby/waitingroom.cpp
+    lobbyreceiver.cpp
     menu_interface.cpp
     sounds.cpp
 
@@ -45,6 +46,7 @@ target_sources(taller_client
     Lobby/createlobby.h
     Lobby/joinlobby.h
     Lobby/waitingroom.h
+    lobbyreceiver.h
 
 
     )

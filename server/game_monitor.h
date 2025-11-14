@@ -10,31 +10,30 @@
 
 #include "../common/queue.h"
 
-#include "world_snapshot.h"
 #include "game_command.h"
+#include "server_config.h"
+#include "../common/world_snapshot_dto.h"
 
 
 class GameMonitor {
 
 
     std::mutex mtx;
-    std::unordered_map<uint32_t, std::unique_ptr<Queue<WorldSnapshot>>> client_queues;
-    std::optional<std::reference_wrapper<Queue<GameCommand>>> command_queue_reference;
+    std::unordered_map<uint32_t, std::unique_ptr<Queue<WorldSnapshotDTO>>> snapshot_queues;
+    const ServerConfig& config;
 
 
 public:
     GameMonitor(const GameMonitor&) = delete;
     GameMonitor& operator=(const GameMonitor&) = delete;
 
-    GameMonitor() = default;
+    explicit GameMonitor(const ServerConfig& config);
 
-    Queue<WorldSnapshot>& register_client(uint32_t client_id);
+    Queue<WorldSnapshotDTO>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
-    void broadcast(const WorldSnapshot& world_snapshot);
+    void broadcast(const WorldSnapshotDTO& world_snapshot);
     void remove_client(uint32_t client_id);
-
-    void register_command_queue(Queue<GameCommand>& command_queue);
-    void add_command(const GameCommand& command) const;
+    void stop();
 
     ~GameMonitor();
 };

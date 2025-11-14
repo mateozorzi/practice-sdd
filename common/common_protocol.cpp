@@ -35,8 +35,8 @@ void CommonProtocol::add_uint32_to_buffer(uint32_t value) {
 
 void CommonProtocol::add_string_to_buffer(const std::string& str) {
 
-    const uint16_t str_size = str.size();
-    add_uint16_to_buffer(str_size);
+    const uint32_t str_size = str.size();
+    add_uint32_to_buffer(str_size);
     const size_t old_size = protocol_buffer.size();
     protocol_buffer.resize(old_size + str_size);
 
@@ -79,7 +79,7 @@ uint32_t CommonProtocol::recv_uint32() {
 
 std::string CommonProtocol::recv_string() {
 
-    const uint16_t string_len = recv_uint16();
+    const uint32_t string_len = recv_uint32();
     std::vector<char> buf(string_len);
     socket.recvall(buf.data(), string_len);
 

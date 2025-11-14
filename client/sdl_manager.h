@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
@@ -34,17 +36,24 @@ private:
     std::optional<SDL2pp::Texture> sprite;
     std::optional<SDL2pp::Texture> minimap;
     std::vector<SDL2pp::Rect> bridges_rects;
+    std::vector<SDL2pp::Rect> decorations_rects;
 
-    std::vector<SDL2pp::Rect> loadRects(const std::string& path);
+    std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
     void update_camera(int player_x, int player_y);
     void render_player(CarPositionDTO& player, const std::string& model, bool is_moving);
     void render_hud_health(int health);
     void render_hud_minimap(int player_x, int player_y);
+    void render_layer(const std::vector<SDL2pp::Rect>& rects);
     void render_bridges();
+    void render_decorations();
 
 public:
     SDLManager();
+
+    void load_bridges_rects(const nlohmann::json& bridges_rects_data);
+    void load_decorations_rects(const nlohmann::json& decorations_rects_data);
+
     void set_map();
     void set_sprite();
     void set_minimap();

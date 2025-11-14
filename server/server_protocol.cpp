@@ -1,26 +1,11 @@
 #include "server_protocol.h"
 
+#include <string>
+#include <fstream>
+#include <sstream>
+
 #include "../common/constants.h"
-
-
-ClientRequest ServerProtocol::convert_byte_to_request(const uint8_t byte) const {
-
-    switch (static_cast<ClientAction>(byte)) {
-
-        case ClientAction::DISCONNECT:
-            return ClientRequest::DISCONNECT;
-        case ClientAction::SEND_USERNAME:
-            return ClientRequest::SEND_USERNAME;
-        case ClientAction::GET_CAR_CATALOGUE:
-            return ClientRequest::GET_CAR_CATALOGUE;
-        case ClientAction::SEND_CAR_SELECTION:
-            return ClientRequest::SEND_CAR_SELECTION;
-        case ClientAction::SEND_CAR_MOVEMENT:
-            return ClientRequest::MOVE_CAR;
-        default:
-            return ClientRequest::UNKNOWN;
-    }
-}
+#include <iostream>
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
@@ -31,20 +16,30 @@ void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_positi
     add_uint32_to_buffer(car_position_dto.angle);
 }
 
+void ServerProtocol::add_player_to_buffer(const PlayerDTO& player){
 
-ClientRequest ServerProtocol::receive_client_request() {
-
-    const uint8_t byte = recv_uint8();
-
-    return convert_byte_to_request(byte);
+    add_string_to_buffer(player.username);
+    add_uint32_to_buffer(player.id);
+    add_string_to_buffer(player.car.model);
 }
-
 
 PlayerDTO ServerProtocol::receive_username() {
 
     const std::string& username = recv_string();
 
     return PlayerDTO(username);
+}
+
+LobbyDTO ServerProtocol::receive_lobby_info() {
+
+    const uint8_t action_byte = recv_uint8();
+    const uint32_t lobby_id = recv_uint32();
+    const std::string lobby_name = recv_string();
+    const uint8_t max_players = recv_uint8();
+
+    LobbyAction action = static_cast<LobbyAction>(action_byte);
+
+    return LobbyDTO(action, lobby_id, lobby_name, max_players);
 }
 
 MovementDTO ServerProtocol::receive_movement() {
@@ -57,6 +52,31 @@ MovementDTO ServerProtocol::receive_movement() {
 
     return MovementDTO(direction, is_moving);
 }
+
+
+GameCommandDTO ServerProtocol::receive_game_command() {
+
+    const uint8_t action_byte = recv_uint8();
+    const ClientAction client_action = static_cast<ClientAction>(action_byte);
+
+    switch (client_action) {
+
+        case ClientAction::SEND_USERNAME:
+            return GameCommandDTO(client_action, receive_username());
+        case ClientAction::SEND_CAR_MOVEMENT:
+            return GameCommandDTO(client_action, receive_movement());
+        case ClientAction::SEND_CAR_SELECTION:
+            return GameCommandDTO(client_action, receive_car_selection());
+        case ClientAction::GET_CAR_CATALOGUE:
+        case ClientAction::DISCONNECT:
+            return GameCommandDTO(client_action);
+        case ClientAction::GET_JSON_FILE:
+            return GameCommandDTO(client_action, recv_string());
+        default:
+            return GameCommandDTO(ClientAction::DISCONNECT);
+    }
+}
+
 
 void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto) {
 
@@ -87,12 +107,39 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
     send_buffer();
 }
 
-void ServerProtocol::send_world_snapshot(const WorldSnapshot& world_snapshot) {
+void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot) {
 
     add_uint8_to_buffer(world_snapshot.get_size());
 
-    for (const auto& car_position : world_snapshot.get_car_positions())
-        add_car_position_to_buffer(car_position);
+    for (const auto& car_position: world_snapshot.get_car_positions()) {
+        add_player_to_buffer(car_position.first);
+        add_car_position_to_buffer(car_position.second);
+    }
 
+    send_buffer();
+}
+
+void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue) {
+
+    add_uint8_to_buffer(lobby_catalogue.size);
+
+    for (const auto& lobby: lobby_catalogue.lobbies) add_uint32_to_buffer(lobby.lobby_id);
+
+    send_buffer();
+}
+
+void ServerProtocol::send_json_file(const std::string& file_path) {
+    std::ifstream file(file_path);
+    if (!file.is_open()) {
+        // Send empty JSON object if file doesn't exist
+        add_string_to_buffer("{}");
+        send_buffer();
+        return;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string json_content = buffer.str();
+    add_string_to_buffer(json_content);
     send_buffer();
 }

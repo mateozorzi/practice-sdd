@@ -4,17 +4,13 @@
 
 
 Server::Server(const std::string& port, ServerConfig config):
-        config(config),
-        game_monitor(),
-        game_loop(game_monitor), 
-        clients_acceptor(port, game_monitor/*lobby*/) {}
+        config(config), lobby(this->config), clients_acceptor(port, lobby, this->config) {}
 
 
 void Server::run() {
 
     try {
 
-        game_loop.start();
         clients_acceptor.start();
         std::cout << SERVER_STARTED << std::endl;
 
@@ -32,10 +28,8 @@ void Server::run() {
 void Server::stop() {
 
     clients_acceptor.stop();
-    game_loop.stop();
 
     clients_acceptor.join();
-    game_loop.join();
 }
 
 

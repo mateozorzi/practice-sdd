@@ -6,16 +6,8 @@
 #include "../common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, GameMonitor& game_monitor):
-        acceptor_socket(port.c_str()), game_monitor(game_monitor) {}
-
-/*
-
-WIP -> Adding multiple games logic
-
-Acceptor::Acceptor(const std::string& port, Lobby& lobby): acceptor_socket(port.c_str()), lobby(lobby) {}
-
-*/
+Acceptor::Acceptor(const std::string& port, Lobby& lobby, const ServerConfig& config):
+        acceptor_socket(port.c_str()), lobby(lobby), config(config) {}
 
 
 void Acceptor::run() {
@@ -27,11 +19,12 @@ void Acceptor::run() {
             Socket peer_socket = acceptor_socket.accept();
             reap();
             client_id++;
-            std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), game_monitor,
-                                                          client_id);
-            //std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id);
+            std::unique_ptr<ClientHandler> client =
+                    std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id, config);
+            client->start();
             clients.push_back(std::move(client));
-            std::cout << "New client just connected! Number of active clients: " << clients.size() << std::endl;
+            std::cout << "[" << ACCEPTOR << "] " << "New client has been accepted. Number of active clients: " << clients.size()
+                      << std::endl;
         } catch (const std::exception& e) {
 
             if (!should_keep_running())
@@ -48,12 +41,27 @@ void Acceptor::reap() {
     clients.remove_if([](const std::unique_ptr<ClientHandler>& client) {
         if (!client->is_alive()) {
 
-            std::cout << "Reaping dead client..." << std::endl;
+            client->stop();
+            client->join();
+            std::cout << "[" << ACCEPTOR << "] " << "Reaping dead client." << std::endl;
             return true;
         }
 
         return false;
     });
+
+    lobby.reap();
+}
+
+void Acceptor::clear() {
+
+    for (auto& client: clients) {
+
+        client->stop();
+        client->join();
+    }
+
+    clients.clear();
 }
 
 
@@ -66,7 +74,7 @@ void Acceptor::stop() {
         acceptor_socket.close();
     } catch (const LibError&) {}
 
-    clients.clear();
+    clear();
 }
 
 

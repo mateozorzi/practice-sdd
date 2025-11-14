@@ -5,29 +5,32 @@
 #include "../common/queue.h"
 #include "../common/thread.h"
 
-#include "game_monitor.h"
+#include "lobby.h"
 #include "server_protocol.h"
 
 
-class Sender final: public Thread {
+class Sender final {
 
 
     ServerProtocol& server_protocol;
-    GameMonitor& game_monitor;
+    Lobby& lobby;
     uint32_t client_id;
-    Queue<WorldSnapshot>& client_message_queue;
+    Queue<WorldSnapshotDTO>& snapshot_queue;
+    std::atomic_bool keep_running;
 
 
 public:
     Sender(const Sender&) = delete;
     Sender& operator=(const Sender&) = delete;
 
-    explicit Sender(ServerProtocol& server_protocol, GameMonitor& game_monitor, uint32_t client_id);
+    explicit Sender(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
+                    Queue<WorldSnapshotDTO>& snapshot_queue);
 
-    void run() override;
-    void stop() override;
+    void run();
+    bool is_alive();
+    void stop();
 
-    ~Sender() override;
+    ~Sender();
 };
 
 

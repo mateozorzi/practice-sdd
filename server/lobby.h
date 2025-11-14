@@ -2,42 +2,42 @@
 #define LOBBY_H
 
 
-#include <mutex>
-#include <unordered_map>
 #include <memory>
-#include <vector>
+#include <mutex>
 #include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
-
-#include "../common/queue.h"
-
+#include "../common/lobbies_catalogue_dto.h"
 
 #include "game.h"
+#include "server_config.h"
 
 
-// WIP -> Adding multiple games logic
 class Lobby {
 
 
     std::mutex mtx;
     std::unordered_map<uint32_t, std::unique_ptr<Game>> games;
-    uint32_t game_id = 0;
+    const ServerConfig& config;
 
 
 public:
     Lobby(const Lobby&) = delete;
     Lobby& operator=(const Lobby&) = delete;
 
-    Lobby() = default;
+    explicit Lobby(const ServerConfig& config);
 
+    std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> create_new_game(
+            uint32_t client_id, const std::string& username, uint8_t max_players);
+    std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> join_existing_game(
+            uint32_t client_id, uint32_t game_id, const std::string& username);
+    LobbyCatalogueDTO list_games();
     void reap();
-    void remove_player(uint32_t game_id, uint32_t client_id);
+    void remove_player(uint32_t client_id, uint32_t game_id);
 
-    std::vector<uint32_t> list_games();
-
-    Queue<GameCommand>& create_new_game(uint32_t client_id, const std::string& race_name);
-    Queue<GameCommand>& join_existing_game(uint32_t client_id, uint32_t game_id);
-
+    ~Lobby() = default;
 };
 
 
