@@ -104,6 +104,7 @@ struct ClientSpecificConfig {
 struct ServerSpecificConfig {
     // unsigned short      default_server_port;
     float command_queue_capacity;
+    float snapshot_queue_capacity;
     float waiting_for_players_fps;
     struct WorldConfig world;
 };

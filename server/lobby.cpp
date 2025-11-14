@@ -3,6 +3,8 @@
 #include <utility>
 
 
+Lobby::Lobby(const ServerConfig& config): config(config) {}
+
 std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
         const uint32_t client_id, const std::string& username, const uint8_t max_players) {
 
@@ -10,7 +12,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
 
     uint32_t game_id = client_id;
 
-    auto game = std::make_unique<Game>(game_id, max_players);
+    auto game = std::make_unique<Game>(game_id, max_players, config);
 
     std::cerr << "[" << LOBBY
               << "] "

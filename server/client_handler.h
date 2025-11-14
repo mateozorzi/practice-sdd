@@ -10,6 +10,7 @@
 
 #include "receiver.h"
 #include "sender.h"
+#include "server_config.h"
 
 
 class ClientHandler final: public Thread {
@@ -18,6 +19,7 @@ class ClientHandler final: public Thread {
     Socket peer_socket;
     ServerProtocol server_protocol;
     Lobby& lobby;
+    const ServerConfig& config;
     const uint32_t client_id;
     std::string username = "Player";
     uint32_t game_id = 0;
@@ -37,7 +39,7 @@ public:
     ClientHandler(const ClientHandler&) = delete;
     ClientHandler& operator=(const ClientHandler&) = delete;
 
-    explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id);
+    explicit ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id, const ServerConfig& config);
 
 
     void run() override;

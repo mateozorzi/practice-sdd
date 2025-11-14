@@ -7,11 +7,15 @@
 #include "../common/constants.h"
 
 
+GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
+
 Queue<WorldSnapshot>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<WorldSnapshot>>(100);
+    auto queue_pointer = std::make_unique<Queue<WorldSnapshot>>(
+        static_cast<size_t>(config.app.server.snapshot_queue_capacity)
+    );
     Queue<WorldSnapshot>& queue_reference = *queue_pointer;
 
     snapshot_queues[client_id] = std::move(queue_pointer);

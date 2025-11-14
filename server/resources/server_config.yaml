@@ -10,6 +10,7 @@ app:
     server:
         # default_server_port: 8080
         command_queue_capacity: 500
+        snapshot_queue_capacity: 100
         waiting_for_players_fps: 5.0
         world:
             pixels_per_meter: 30.0
