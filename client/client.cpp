@@ -3,6 +3,7 @@
 #include <any>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -42,48 +43,48 @@ void Client::run() {
     int health = 100;  // Para probar como baja la barra de vida
 
     // ID - Posicion
-    std::map<uint32_t, CarPositionDTO> cars;
+    // std::map<uint32_t, CarPositionDTO> cars;
 
 
     // sld_manager its initialized here
-    std::string chosen_map = "liberty_city"; // TODO: remove harcoded
+    // std::string chosen_map = "liberty_city";  // TODO: remove harcoded
     sdl_manager = std::make_unique<SDLManager>();
-    //sdl_manager->load_bridges_rects(protocol.get_json("server/resources/world/bridges_" + chosen_map + ".json"));
-    //sdl_manager->load_decorations_rects(protocol.get_json("server/resources/world/decorations_" + chosen_map + ".json"));
+    // sdl_manager->load_bridges_rects(protocol.get_json("server/resources/world/bridges_" +
+    // chosen_map + ".json"));
+    // sdl_manager->load_decorations_rects(protocol.get_json("server/resources/world/decorations_" +
+    // chosen_map + ".json"));
+
+    std::optional<WorldSnapshotDTO> last_world_snapshot;
+    std::optional<RaceDTO> last_race_state;
 
     while (true) {
         if (!input_manager.handle_movement()) {
             return;
         }
-        // Obtener posiciones o race info del receiver
-        Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& car_queue = receiver.get_car_positions_queue();
+        // Obtener posiciones
+        Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& car_queue =
+                receiver.get_car_positions_queue();
 
-        auto snapshot = std::variant<WorldSnapshotDTO, RaceDTO>();
+        std::variant<WorldSnapshotDTO, RaceDTO> snapshot = WorldSnapshotDTO();
         bool has_positions = false;
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;
         }
-
-
-        std::vector<std::pair<PlayerDTO, CarPositionDTO>> car_positions = std::get_if<WorldSnapshotDTO>(&snapshot)->get_car_positions();
-
         if (has_positions) {
-            std::vector<uint32_t> received_ids;
-            for (const auto& [player, car_position] : car_positions) {
-                received_ids.push_back(car_position.client_id);
-                cars[car_position.client_id] = car_position;
-            }
-            for (auto it = cars.begin(); it != cars.end();) {
-                const bool found = std::ranges::any_of(
-                        received_ids, [&](uint32_t id) { return id == it->first; });
-                if (!found) {
-                    it = cars.erase(it);
-                } else {
-                    ++it;
-                }
+            if (std::holds_alternative<WorldSnapshotDTO>(snapshot)) {
+                last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot);
+            } else {
+                last_race_state = std::get<RaceDTO>(snapshot);
             }
         }
-        sdl_manager->render(player, health, cars, input_manager.is_moving());
+
+        std::vector<std::pair<PlayerDTO, CarPositionDTO>> car_positions;
+
+        if (last_world_snapshot.has_value()) {
+            car_positions = last_world_snapshot.value().get_car_positions();
+        }
+
+        sdl_manager->render(player, health, car_positions, input_manager.is_moving());
     }
 }
 

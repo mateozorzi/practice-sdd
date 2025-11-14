@@ -71,7 +71,8 @@ void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
 }
 
-void SDLManager::render_player(CarPositionDTO& player, const std::string& model, bool is_moving) {
+void SDLManager::render_player(const CarPositionDTO& player, const std::string& model,
+                               bool is_moving) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
     const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
@@ -153,38 +154,50 @@ void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
     }
 }
 
-void SDLManager::render_bridges() {
-    render_layer(bridges_rects);
-}
+void SDLManager::render_bridges() { render_layer(bridges_rects); }
 
 void SDLManager::render(const PlayerDTO& player, const int health,
-                        std::map<uint32_t, CarPositionDTO> cars, const bool is_moving) {
-    if (cars.contains(player.id)) {
-        const CarPositionDTO& my_car = cars[player.id];
-        const uint32_t pos_x = my_car.x_position;
-        const uint32_t pos_y = my_car.y_position;
+                        const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars,
+                        const bool is_moving) {
+    CarPositionDTO my_car;
+    bool found = false;
 
-        // Seguir a cliente actual
-        update_camera(pos_x, pos_y);
-        clear_screen();
-
-        renderer.Copy(map.value(), camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
-
-        // Dibujar todos los autos
-        for (const auto& car_pair: cars) {
-            CarPositionDTO car = car_pair.second;
-            render_player(car, player.car.model, is_moving);
+    for (const auto& [car_player, car_pos]: cars) {
+        if (car_player.id == player.id) {
+            my_car = car_pos;
+            found = true;
+            break;
         }
-
-        // Capa superior (puentes) por encima del fondo y de los autos
-        render_bridges();
-        render_decorations();
-
-        render_hud_health(health);
-        render_hud_minimap(pos_x, pos_y);
-        render_stats();
-        show_screen();
     }
+
+    if (!found) {
+        SDL_Delay(10);
+        return;
+    }
+
+    const uint32_t pos_x = my_car.x_position;
+    const uint32_t pos_y = my_car.y_position;
+
+    update_camera(pos_x, pos_y);
+    clear_screen();
+
+    renderer.Copy(map.value(), camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
+
+    // 3. Dibujar todos los autos con su skin correspondiente
+    for (const auto& [car_player, car_pos]: cars) {
+        render_player(car_pos, car_player.car.model, is_moving);
+    }
+
+    // 4. Dibujar capas superiores y HUD
+    render_bridges();
+    render_decorations();
+
+    render_hud_health(health);
+    render_hud_minimap(pos_x, pos_y);
+    render_stats();
+
+    show_screen();
+
     SDL_Delay(10);
 }
 
@@ -223,9 +236,7 @@ void SDLManager::render_stats() {
     draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
 }
 
-void SDLManager::render_decorations() {
-    render_layer(decorations_rects);
-}
+void SDLManager::render_decorations() { render_layer(decorations_rects); }
 
 void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
     bridges_rects = loadRects(bridges_rects_data);
