@@ -154,9 +154,14 @@ void GameLoop::run() {
 
         while (should_keep_running()) {
 
+            //load_races
+
+
             process_commands();
 
             if (all_player_in_game()) {
+
+                //start races
 
                 update_positions();
                 world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
