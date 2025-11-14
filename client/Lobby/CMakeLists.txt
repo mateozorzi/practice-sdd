@@ -36,6 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         joinlobby.h joinlobby.cpp joinlobby.ui
 
         waitingroom.h waitingroom.cpp waitingroom.ui
+        selectcircuits.h selectcircuits.cpp selectcircuits.ui
 
 
 
