@@ -16,6 +16,10 @@ enum class ClientAction : uint8_t {
 
 };
 
+enum class GameLoopAction : uint8_t {
+    SEND_UPDATE_POSITIONS = 0x10,
+    SEND_RACE = 0x11
+};
 
 // SERVER
 constexpr int MAX_PATH_LENGTH = 4096;
@@ -42,8 +46,7 @@ constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 // WORLD
 // TODO: remove, now in yaml
 constexpr float PIXELS_PER_METER = 30.0f;
-// TODO: replace with command line parameter
-constexpr std::string_view POLYGONS_LIBERTY_CITY =
-        "server/resources/world/blocks_liberty_city.json";
+    // TODO: replace with command line parameter
+constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/resources/world/blocks_liberty_city.json";
 
 #endif

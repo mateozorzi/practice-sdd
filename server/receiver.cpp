@@ -10,19 +10,52 @@
 
 
 Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
-                   Queue<GameCommand>& command_queue):
+                   Queue<GameCommand>& command_queue, const ServerConfig& config):
         server_protocol(server_protocol),
         lobby(lobby),
         client_id(client_id),
-        command_queue(command_queue) {}
+        command_queue(command_queue),
+        config(config) {}
 
 void Receiver::handle_get_car_catalogue() {
 
-    std::vector<car_dto> cars = {// Name, Health, Handling, MaxSpeed, Acceleration
-                                 {"Compact", 100, 90, 100, 80},    {"Sport", 80, 95, 150, 100},
-                                 {"Convertible", 85, 90, 140, 95}, {"Sedan", 90, 85, 120, 75},
-                                 {"Jeep", 150, 70, 85, 60},        {"Rally", 120, 80, 110, 70},
-                                 {"Truck", 200, 50, 80, 40}};
+    std::vector<car_dto> cars = {
+        {"Compact", 
+         static_cast<uint8_t>(config.app.client.cars.compact.health), 
+         static_cast<uint8_t>(config.app.client.cars.compact.handling), 
+         static_cast<uint8_t>(config.app.client.cars.compact.speed), 
+         static_cast<uint8_t>(config.app.client.cars.compact.acceleration)},
+        {"Sport", 
+         static_cast<uint8_t>(config.app.client.cars.sport.health), 
+         static_cast<uint8_t>(config.app.client.cars.sport.handling), 
+         static_cast<uint8_t>(config.app.client.cars.sport.speed), 
+         static_cast<uint8_t>(config.app.client.cars.sport.acceleration)},
+        {"Convertible", 
+         static_cast<uint8_t>(config.app.client.cars.convertible.health), 
+         static_cast<uint8_t>(config.app.client.cars.convertible.handling), 
+         static_cast<uint8_t>(config.app.client.cars.convertible.speed), 
+         static_cast<uint8_t>(config.app.client.cars.convertible.acceleration)},
+        {"Sedan", 
+         static_cast<uint8_t>(config.app.client.cars.sedan.health), 
+         static_cast<uint8_t>(config.app.client.cars.sedan.handling), 
+         static_cast<uint8_t>(config.app.client.cars.sedan.speed), 
+         static_cast<uint8_t>(config.app.client.cars.sedan.acceleration)},
+        {"Jeep", 
+         static_cast<uint8_t>(config.app.client.cars.jeep.health), 
+         static_cast<uint8_t>(config.app.client.cars.jeep.handling), 
+         static_cast<uint8_t>(config.app.client.cars.jeep.speed), 
+         static_cast<uint8_t>(config.app.client.cars.jeep.acceleration)},
+        {"Rally", 
+         static_cast<uint8_t>(config.app.client.cars.rally.health), 
+         static_cast<uint8_t>(config.app.client.cars.rally.handling), 
+         static_cast<uint8_t>(config.app.client.cars.rally.speed), 
+         static_cast<uint8_t>(config.app.client.cars.rally.acceleration)},
+        {"Truck", 
+         static_cast<uint8_t>(config.app.client.cars.truck.health), 
+         static_cast<uint8_t>(config.app.client.cars.truck.handling), 
+         static_cast<uint8_t>(config.app.client.cars.truck.speed), 
+         static_cast<uint8_t>(config.app.client.cars.truck.acceleration)}
+    };
 
     CarCatalogueDTO catalogue(std::move(cars));
 

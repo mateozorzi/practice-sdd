@@ -11,6 +11,7 @@
 #include "../common/thread.h"
 
 #include "client_handler.h"
+#include "server_config.h"
 
 
 class Acceptor final: public Thread {
@@ -19,6 +20,7 @@ class Acceptor final: public Thread {
     Socket acceptor_socket;
     std::list<std::unique_ptr<ClientHandler>> clients;
     Lobby& lobby;
+    const ServerConfig& config;
     uint32_t client_id = 0;
 
     void reap();
@@ -29,7 +31,7 @@ public:
     Acceptor(const Acceptor&) = delete;
     Acceptor& operator=(const Acceptor&) = delete;
 
-    explicit Acceptor(const std::string& port, Lobby& lobby);
+    explicit Acceptor(const std::string& port, Lobby& lobby, const ServerConfig& config);
 
     void run() override;
     void stop() override;

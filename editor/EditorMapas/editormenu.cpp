@@ -44,6 +44,8 @@ void EditorMenu::on_pushButton_3_clicked()
 
 QString EditorMenu::find_races_path() {
     QDir dir(QCoreApplication::applicationDirPath());
+    dir.cdUp();
+    qDebug() << "path: "<<dir.path();
     while (true) {
         if (dir.exists("server")) {
             dir.cd("server");
@@ -51,7 +53,8 @@ QString EditorMenu::find_races_path() {
                 dir.mkdir("races");
             }
             dir.cd("races");
-            return dir.absolutePath();
+            qDebug() << "path: "<<dir.path();
+            return dir.path();
         }
 
         if (dir.dirName() == PROJECT_ROOT_NAME){
@@ -59,6 +62,7 @@ QString EditorMenu::find_races_path() {
         }
 
         if (!dir.cdUp()) {
+            qDebug() << "path: "<<dir.path();
             break;
         }
     }

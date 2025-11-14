@@ -7,10 +7,12 @@
 #include "../common/lobbies_catalogue_dto.h"
 
 
-ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id):
+ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id,
+                             const ServerConfig& config):
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
         lobby(lobby),
+        config(config),
         client_id(client_id) {}
 
 
@@ -70,10 +72,10 @@ void ClientHandler::list_active_games() {
 }
 
 void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
-                               Queue<WorldSnapshot>& snapshot_queue) {
+                               Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue) {
 
     is_in_lobby = false;
-    Receiver receiver(server_protocol, lobby, client_id, command_queue);
+    Receiver receiver(server_protocol, lobby, client_id, command_queue, config);
     receiver.start();
     Sender sender(server_protocol, lobby, client_id, snapshot_queue);
     sender.run();

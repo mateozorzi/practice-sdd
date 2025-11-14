@@ -15,7 +15,7 @@ class Sender final {
     ServerProtocol& server_protocol;
     Lobby& lobby;
     uint32_t client_id;
-    Queue<WorldSnapshot>& snapshot_queue;
+    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue;
     std::atomic_bool keep_running;
 
 
@@ -24,7 +24,7 @@ public:
     Sender& operator=(const Sender&) = delete;
 
     explicit Sender(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
-                    Queue<WorldSnapshot>& snapshot_queue);
+                    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue);
 
     void run();
     bool is_alive();

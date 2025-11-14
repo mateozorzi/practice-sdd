@@ -1,16 +1,97 @@
 #include "lobby.h"
 
 #include <utility>
+#include <sstream>
+#include <fstream>
+#include <filesystem>
 
 
-std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
+Lobby::Lobby(const ServerConfig& config): config(config) {
+    initialize_races();
+}
+
+void Lobby::initialize_races() {
+    //races are in races/ folder
+    std::string path_folder = "server/races/";
+
+    //if folder does not exist, there is no races to load
+    if (!std::filesystem::exists(path_folder)) {
+        std::cerr << "[" << LOBBY << "] "
+                  << "Race folder not found, no races to load." << std::endl;
+        return;
+    }
+
+    //folder exists, load races
+    for (const auto& entry : std::filesystem::directory_iterator(path_folder)) {
+        if (entry.path().extension() == ".csv") {
+            std::cout << "Loading race file: " << entry.path().filename() << std::endl;
+            
+            std::ifstream file(entry.path());
+            std::string line;
+            
+            // editor info: skip
+            std::getline(file, line);
+            // headers: City, n_laps: skip
+            std::getline(file, line);
+
+            //info city and number of laps
+            std::getline(file, line);
+            std::stringstream ss(line);
+            std::string cell;
+            std::vector<std::string> row;
+
+            while (std::getline(ss, cell, ',')) {
+                row.push_back(cell);
+            }
+
+            std::string city = row[0];
+            uint8_t n_laps = static_cast<uint8_t>(std::stoi(row[1]));
+
+            //header: id, orientation, xCenter, yCenter, height, width,: skip
+            std::getline(file, line);
+            std::vector<CheckpointDTO> checkpoints;
+            while (std::getline(file, line)) {
+                std::stringstream ss(line);
+                std::string cell;
+                std::vector<std::string> row;
+                
+                while (std::getline(ss, cell, ',')) {
+                    row.push_back(cell);
+                }
+                
+                uint8_t id = static_cast<uint8_t>(std::stoi(row[0]));
+                char orientation = row[1][0];
+                uint16_t x = static_cast<uint16_t>(std::stoi(row[2]));
+                uint16_t y = static_cast<uint16_t>(std::stoi(row[3]));
+                uint8_t height = static_cast<uint8_t>(std::stoi(row[4]));
+                uint8_t width = static_cast<uint8_t>(std::stoi(row[5]));
+
+                CheckpointDTO c(id, orientation, x, y, width, height);
+                checkpoints.push_back(c);
+            }
+
+            //race name is file name withou extension
+            std::string race_name = entry.path().stem().string();
+
+            RaceDTO race(race_name, city, checkpoints, n_laps);
+
+            std::cout << "Loaded race: " << race.name << " in " << race.city 
+                      << " with " << race.checkpoints.size() << " checkpoints and "
+                      << (int)race.laps << " laps." << std::endl;
+
+            races.push_back(race);
+        }
+    }
+}
+
+std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Lobby::create_new_game(
         const uint32_t client_id, const std::string& username, const uint8_t max_players) {
 
     std::lock_guard lock(mtx);
 
     uint32_t game_id = client_id;
 
-    auto game = std::make_unique<Game>(game_id, max_players);
+    auto game = std::make_unique<Game>(game_id, max_players, config);
 
     std::cerr << "[" << LOBBY
               << "] "
@@ -25,7 +106,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::create_new_game(
     return queues;
 }
 
-std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
+std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Lobby::join_existing_game(
         const uint32_t client_id, const uint32_t game_id, const std::string& username) {
 
     std::lock_guard lock(mtx);
@@ -39,7 +120,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
                      "Game "
                   << (int)game_id << " not found." << std::endl;
         static Queue<GameCommand> dummy_command;
-        static Queue<WorldSnapshot> dummy_snapshot;
+        static Queue<std::variant<WorldSnapshotDTO, RaceDTO>> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 
@@ -49,7 +130,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshot>&> Lobby::join_existing_game(
         std::cerr << "[" << LOBBY << "] "
                   << "Game with ID: " << game_id << " is full." << std::endl;
         static Queue<GameCommand> dummy_command;
-        static Queue<WorldSnapshot> dummy_snapshot;
+        static Queue<std::variant<WorldSnapshotDTO, RaceDTO>> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 

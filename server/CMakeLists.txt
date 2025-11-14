@@ -17,7 +17,6 @@ target_sources(taller_server
     sender.cpp
     server.cpp
     server_protocol.cpp
-    world_snapshot.cpp
     world_utils.cpp
     PUBLIC
     # .h files
@@ -38,6 +37,6 @@ target_sources(taller_server
     server_config.h
     server_protocol.h
     world_creation_exception.h
-    world_snapshot.h
+    
     world_utils.h
     )

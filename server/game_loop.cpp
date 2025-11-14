@@ -11,8 +11,9 @@
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                   const uint8_t max_players):
+                   const uint8_t max_players, const ServerConfig& config):
         max_players(max_players),
+        config(config),
         game_monitor(game_monitor),
         command_queue(command_queue),
         world(b2Vec2(0.0f, 0.0f)),
@@ -61,7 +62,7 @@ bool GameLoop::is_empty() const { return players.empty(); }
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
 
-    players.try_emplace(client_id, client_id, username, world);
+    players.try_emplace(client_id, client_id, username, world, config);
 
     std::cerr << "[" << GAME_LOOP << "] "
               << "Player with ID: " << client_id
@@ -80,11 +81,14 @@ void GameLoop::process_commands() {
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
     if (auto car = game_command.get_data<car_dto>()) {
-
         uint32_t client_id = game_command.get_client_id();
+        car_dto car_config = car->get();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.set_car_configuration(car->get());
+            it->second.set_car_configuration(car_config);
+            std::string model = it->second.get_car().model;
+            std::cout << "Player with ID: " << it->second.get_client_id()
+                      << " has car model set to: " << model << std::endl;
             it->second.set_in_game();
         }
     }
@@ -120,13 +124,14 @@ void GameLoop::handle_command(const GameCommand& game_command) {
 
 void GameLoop::update_positions() {
 
-    WorldSnapshot world_snapshot;
-    world_snapshot.reserve(players.size());
+    WorldSnapshotDTO world_snapshot;
 
     for (auto& [client_id, player]: players) {
 
         player.update_car_position();
-        world_snapshot.add_car_position(player.get_car_position());
+        car_dto car = player.get_car();
+        PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
+        world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
     game_monitor.broadcast(world_snapshot);
@@ -144,18 +149,26 @@ void GameLoop::run() {
 
     try {
 
+        const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
+        const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
+
         while (should_keep_running()) {
+
+            //load_races
+
 
             process_commands();
 
             if (all_player_in_game()) {
 
+                //start races
+
                 update_positions();
                 world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                std::this_thread::sleep_for(std::chrono::milliseconds(16));
+                std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
             } else {
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::this_thread::sleep_for(std::chrono::milliseconds(waiting_frame_ms));
             }
         }
     } catch (const ClosedQueue&) {}

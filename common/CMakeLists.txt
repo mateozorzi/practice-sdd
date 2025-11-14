@@ -11,6 +11,8 @@ target_sources(taller_common
     resolver.cpp
     resolvererror.cpp
     socket.cpp
+    world_snapshot_dto.cpp
+    race_dto.cpp
     PUBLIC
     # .h files
     car_catalogue_dto.h
@@ -29,4 +31,7 @@ target_sources(taller_common
 
     lobby_dto.h
     car_dto.h
+    world_snapshot_dto.h
+    race_dto.h
+    checkpoint_dto.h
     )

@@ -34,6 +34,8 @@ ServerConfig ConfigLoader::load_yaml(const std::string& filepath) {
             YAML::Node server = app["server"];
             serverConfig.app.server.command_queue_capacity =
                     server["command_queue_capacity"].as<int>();
+            serverConfig.app.server.snapshot_queue_capacity =
+                    server["snapshot_queue_capacity"].as<int>();
             serverConfig.app.server.waiting_for_players_fps =
                     server["waiting_for_players_fps"].as<float>();
 

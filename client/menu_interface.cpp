@@ -30,7 +30,7 @@ bool MenuInterface::car_selection(PlayerDTO& player){
 
     std::cout << "Received car catalogue of size: " << static_cast<int>(catalogue.size) << std::endl;
     SelectCars sc(catalogue);
-    sc.showMaximized();
+    sc.show();
 
     bool car_selection = false;
 

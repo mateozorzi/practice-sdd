@@ -10,6 +10,7 @@
 #include "../common/movement_dto.h"
 
 #include "car.h"
+#include "server_config.h"
 
 
 class Player {
@@ -26,9 +27,12 @@ public:
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    explicit Player(uint32_t client_id, const std::string& username, b2World& world);
+    explicit Player(uint32_t client_id, const std::string& username, b2World& world,
+                    const ServerConfig& config);
 
     uint32_t get_client_id() const;
+    const std::string& get_username() const;
+    const car_dto get_car() const;
     b2Body* get_car_body() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
