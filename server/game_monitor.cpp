@@ -7,11 +7,15 @@
 #include "../common/constants.h"
 
 
+GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
+
 Queue<WorldSnapshotDTO>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<WorldSnapshotDTO>>(100);
+    auto queue_pointer = std::make_unique<Queue<WorldSnapshotDTO>>(
+        static_cast<size_t>(config.app.server.snapshot_queue_capacity)
+    );
     Queue<WorldSnapshotDTO>& queue_reference = *queue_pointer;
 
     snapshot_queues[client_id] = std::move(queue_pointer);
@@ -59,11 +63,28 @@ void GameMonitor::remove_client(const uint32_t client_id) {
         snapshot_queues.erase(it);
 }
 
+
+void GameMonitor::stop() {
+
+    std::lock_guard lock(mtx);
+
+    for (auto& [client_id, snapshot_queue]: snapshot_queues) {
+
+        try {
+
+            snapshot_queue->close();
+        } catch (const std::exception&) {}
+    }
+
+    snapshot_queues.clear();
+}
+
+
 GameMonitor::~GameMonitor() {
 
     try {
 
-        snapshot_queues.clear();
+        stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME_MONITOR << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();

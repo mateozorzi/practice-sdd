@@ -3,6 +3,7 @@
 #include "../common/car_dto.h"
 #include "../common/lobby_dto.h"
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 
 void ClientProtocol::send_username(const std::string& username) {
@@ -34,11 +35,24 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     send_buffer();
 }
 
+void ClientProtocol::change_username(const LobbyDTO& lobby) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
+    add_string_to_buffer(lobby.lobby_name);
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
+    send_buffer();
+}
+
 void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    send_buffer();
+}
+
+void ClientProtocol::send_exit(const LobbyDTO& lobby) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     send_buffer();
 }
 
@@ -136,3 +150,19 @@ LobbyDTO ClientProtocol::receive_lobby_action(){
 }
 
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
+
+nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
+    // Send request for JSON file
+    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_JSON_FILE));
+    add_string_to_buffer(file_path);
+    send_buffer();
+
+    // Receive JSON content as string
+    std::string json_content = recv_string();
+
+    std::cout << "LOADING JSON: " << file_path << "\n";
+    std::cout << "JSON SIZE: " << json_content.size() << "\n";
+
+    // Parse and return JSON
+    return nlohmann::json::parse(json_content);
+}

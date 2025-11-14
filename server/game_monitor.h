@@ -11,6 +11,7 @@
 #include "../common/queue.h"
 
 #include "game_command.h"
+#include "server_config.h"
 #include "../common/world_snapshot_dto.h"
 
 
@@ -19,18 +20,20 @@ class GameMonitor {
 
     std::mutex mtx;
     std::unordered_map<uint32_t, std::unique_ptr<Queue<WorldSnapshotDTO>>> snapshot_queues;
+    const ServerConfig& config;
 
 
 public:
     GameMonitor(const GameMonitor&) = delete;
     GameMonitor& operator=(const GameMonitor&) = delete;
 
-    GameMonitor() = default;
+    explicit GameMonitor(const ServerConfig& config);
 
     Queue<WorldSnapshotDTO>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
     void broadcast(const WorldSnapshotDTO& world_snapshot);
     void remove_client(uint32_t client_id);
+    void stop();
 
     ~GameMonitor();
 };

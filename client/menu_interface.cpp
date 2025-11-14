@@ -337,13 +337,11 @@ PlayerDTO MenuInterface::lobby(){
 
     bool menu_closed = false;
 
-    //QEventLoop loop;
-
     // Conectás la señal del lobby con el cliente
     QObject::connect(&l, &Lobby::input_username, [&](const QString &name){
         username = name.toStdString();
 
-        protocol.send_username(username);
+        protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));            
         client_id = protocol.receive_id(); // wait for server response
         player.username = username;
         player.id = client_id;
@@ -378,7 +376,9 @@ PlayerDTO MenuInterface::lobby(){
     // exit signal
     QObject::connect(&l, &Lobby::game_close, [&]() {
         // client close the game
+        protocol.send_exit(LobbyDTO(LobbyAction::EXIT_GAME));
         player.id = -1;
+
         l.close();
         app.quit();
     });

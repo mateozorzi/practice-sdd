@@ -10,12 +10,13 @@ app:
     server:
         # default_server_port: 8080
         command_queue_capacity: 500
+        snapshot_queue_capacity: 100
         waiting_for_players_fps: 5.0
         world:
             pixels_per_meter: 30.0
             collisions:
                 liberty_city:
-                    blocks_file: "server/resources/world/polygons_liberty_city.json"
+                    blocks_file: "server/resources/world/blocks_liberty_city.json"
                     bridges_file: "server/resources/world/bridges_liberty_city.json"
                     decorations_file: "server/resources/world/decorations_liberty_city.json"
                 san_andreas:

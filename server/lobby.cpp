@@ -3,6 +3,8 @@
 #include <utility>
 
 
+Lobby::Lobby(const ServerConfig& config): config(config) {}
+
 std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::create_new_game(
         const uint32_t client_id, const std::string& username, const uint8_t max_players) {
 
@@ -10,7 +12,7 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::create_new_game(
 
     uint32_t game_id = client_id;
 
-    auto game = std::make_unique<Game>(game_id, max_players);
+    auto game = std::make_unique<Game>(game_id, max_players, config);
 
     std::cerr << "[" << LOBBY
               << "] "
@@ -19,7 +21,6 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::create_new_game(
               << " | (Owner has the same id): " << client_id << std::endl;
 
     auto queues = game->add_player(client_id, username);
-    player_to_game[client_id] = game_id;
     games.emplace(game_id, std::move(game));
 
 
@@ -55,7 +56,6 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::join_existing_ga
     }
 
     auto queues = game.add_player(client_id, username);
-    player_to_game[client_id] = game_id;
 
     return queues;
 }
@@ -63,8 +63,6 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Lobby::join_existing_ga
 LobbyCatalogueDTO Lobby::list_games() {
 
     std::lock_guard lock(mtx);
-
-    reap();
 
     std::vector<LobbyDTO> lobby_dtos;
 
@@ -75,7 +73,19 @@ LobbyCatalogueDTO Lobby::list_games() {
 
 void Lobby::reap() {
 
-    // TODO: remove finished games
+    std::lock_guard lock(mtx);
+
+    for (auto it = games.begin(); it != games.end();) {
+
+        Game& game = *it->second;
+        if (game.is_empty()) {
+            std::cerr << "[" << LOBBY << "] "
+                      << "Game with ID: " << (int)it->first << " is now empty, removing it." << std::endl;
+            it = games.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
@@ -84,23 +94,12 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
 
     const auto it = games.find(game_id);
 
-    if (it == games.end()) {
-        std::cerr << "[" << LOBBY << "] "
-                  << "Tried to remove player with ID: " << client_id
-                  << " but the game with ID: " << (int)game_id << " was not found." << std::endl;
+    if (it == games.end())
         return;
-    }
 
     Game& game = *it->second;
     game.remove_player(client_id);
     std::cerr << "[" << LOBBY << "] "
               << "Player with ID: " << client_id << " removed from game with ID: " << (int)game_id
               << std::endl;
-
-    if (game.is_empty()) {
-
-        std::cerr << "[" << LOBBY << "] "
-                  << "Game with ID: " << (int)game_id << " is now empty, removing it." << std::endl;
-        games.erase(it);
-    }
 }

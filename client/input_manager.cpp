@@ -74,6 +74,8 @@ bool InputManager::handle_movement() {
     return true;
 }
 
+bool InputManager::is_moving() const { return w || a || s || d; }
+
 InputManager::~InputManager() {
     if (sender.is_alive()) {
         sender.stop();

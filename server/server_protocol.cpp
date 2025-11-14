@@ -1,6 +1,8 @@
 #include "server_protocol.h"
 
 #include <string>
+#include <fstream>
+#include <sstream>
 
 #include "../common/constants.h"
 #include <iostream>
@@ -68,6 +70,8 @@ GameCommandDTO ServerProtocol::receive_game_command() {
         case ClientAction::GET_CAR_CATALOGUE:
         case ClientAction::DISCONNECT:
             return GameCommandDTO(client_action);
+        case ClientAction::GET_JSON_FILE:
+            return GameCommandDTO(client_action, recv_string());
         default:
             return GameCommandDTO(ClientAction::DISCONNECT);
     }
@@ -121,5 +125,21 @@ void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalog
 
     for (const auto& lobby: lobby_catalogue.lobbies) add_uint32_to_buffer(lobby.lobby_id);
 
+    send_buffer();
+}
+
+void ServerProtocol::send_json_file(const std::string& file_path) {
+    std::ifstream file(file_path);
+    if (!file.is_open()) {
+        // Send empty JSON object if file doesn't exist
+        add_string_to_buffer("{}");
+        send_buffer();
+        return;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string json_content = buffer.str();
+    add_string_to_buffer(json_content);
     send_buffer();
 }

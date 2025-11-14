@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include "../common/car_position_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
@@ -37,6 +39,8 @@ public:
     void ask_for_lobbies(const LobbyDTO& lobby);
     void send_action_lobby(const LobbyDTO& lobby);
     void send_car_selection(const car_dto& car);
+    void change_username(const LobbyDTO& lobby);
+    void send_exit(const LobbyDTO& lobby);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
     void ask_for_catalogue();
@@ -47,6 +51,7 @@ public:
     uint32_t receive_id();
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();
+    nlohmann::json get_json(const std::string& file_path);
 };
 
 #endif

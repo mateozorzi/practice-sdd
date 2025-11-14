@@ -6,6 +6,7 @@
 #include "../common/thread.h"
 
 #include "lobby.h"
+#include "server_config.h"
 #include "server_protocol.h"
 
 
@@ -16,8 +17,10 @@ class Receiver final: public Thread {
     Lobby& lobby;
     uint32_t client_id;
     Queue<GameCommand>& command_queue;
+    const ServerConfig& config;
 
     void handle_get_car_catalogue();
+    void handle_get_json_file(const std::string& file_path);
 
 
 public:
@@ -25,7 +28,7 @@ public:
     Receiver& operator=(const Receiver&) = delete;
 
     explicit Receiver(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
-                      Queue<GameCommand>& command_queue);
+                      Queue<GameCommand>& command_queue, const ServerConfig& config);
 
     void run() override;
     void stop() override;

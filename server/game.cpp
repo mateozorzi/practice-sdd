@@ -4,11 +4,13 @@
 #include "game.h"
 
 
-Game::Game(const uint32_t game_id, const uint8_t max_players):
+Game::Game(const uint32_t game_id, const uint8_t max_players, const ServerConfig& config):
         max_players(max_players),
         game_id(game_id),
-        command_queue(500),
-        game_loop(game_monitor, command_queue, max_players) {}
+        config(config),
+        command_queue(static_cast<size_t>(config.app.server.command_queue_capacity)),
+        game_monitor(config),
+        game_loop(game_monitor, command_queue, max_players, config) {}
 
 
 bool Game::is_full() const { return game_loop.is_full(); }
@@ -31,7 +33,6 @@ std::pair<Queue<GameCommand>&, Queue<WorldSnapshotDTO>&> Game::add_player(
 
 void Game::remove_player(const uint32_t client_id) {
 
-    game_monitor.unregister_client(client_id);
     game_loop.remove_player(client_id);
     std::cerr << "[" << GAME << "] "
             << "Removing player with ID: " << client_id << std::endl;
@@ -44,6 +45,7 @@ void Game::stop() {
     game_loop.join();
 
     command_queue.close();
+    game_monitor.stop();
 
     std::cerr << "[" << GAME << "] "
             << "Game with ID: " << game_id << " stopped." << std::endl;

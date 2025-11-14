@@ -12,6 +12,7 @@
 #include "collision_listener.h"
 #include "game_monitor.h"
 #include "player.h"
+#include "server_config.h"
 
 
 constexpr float GAME_STEP = 1.0f / 60.0f;
@@ -23,6 +24,7 @@ class GameLoop final: public Thread {
 
 
     const uint8_t max_players;
+    const ServerConfig& config;
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
     b2World world;
@@ -45,7 +47,7 @@ public:
     GameLoop& operator=(const GameLoop&) = delete;
 
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                      uint8_t max_players);
+                      uint8_t max_players, const ServerConfig& config);
 
     void run() override;
     void stop() override;

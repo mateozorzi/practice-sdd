@@ -11,7 +11,8 @@ enum class LobbyAction : uint8_t {
     LEAVE_LOBBY = 0x03,
     START_LOBBY = 0x04,
     EXIT_GAME = 0x05,
-    INFO_LOBBY = 0x06
+    INFO_LOBBY = 0x06,
+    CHANGE_USERNAME = 0x07
 
 };
 
@@ -34,6 +35,9 @@ struct LobbyDTO {
             action(act), lobby_id(id), lobby_name(""), max_players(0) {}
 
     explicit LobbyDTO(LobbyAction act): action(act), lobby_id(-1), lobby_name(""), max_players(0) {}
+
+    LobbyDTO(LobbyAction act, const std::string& name):
+            action(act), lobby_id(-1), lobby_name(name), max_players(0) {}
 
     explicit LobbyDTO(const int id):
             action(LobbyAction::INFO_LOBBY), lobby_id(id), lobby_name(""), max_players(0) {}

@@ -34,6 +34,7 @@ public:
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
     void send_world_snapshot(const WorldSnapshotDTO& world_snapshot);
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
+    void send_json_file(const std::string& file_path);
 };
 
 

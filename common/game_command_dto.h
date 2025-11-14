@@ -16,7 +16,7 @@
 
 struct GameCommandDTO {
     ClientAction client_action;
-    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto> command_data;
+    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto, std::string> command_data;
 
     GameCommandDTO() 
     : client_action(ClientAction::DISCONNECT), 
