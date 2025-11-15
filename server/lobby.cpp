@@ -87,13 +87,13 @@ void Lobby::initialize_races() {
 }
 
 std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Lobby::create_new_game(
-        const uint32_t client_id, const std::string& username, const uint8_t max_players, const std::string& name) {
+        const uint32_t client_id, const std::string& username, const uint8_t max_players, const std::string& name, RaceCatalogueDTO& selected) {
 
     std::lock_guard lock(mtx);
 
     uint32_t game_id = client_id;
 
-    auto game = std::make_unique<Game>(game_id, max_players, config, name);
+    auto game = std::make_unique<Game>(game_id, max_players, config, name, selected);
 
     std::cerr << "[" << LOBBY
               << "] "

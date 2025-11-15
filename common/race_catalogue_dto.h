@@ -11,7 +11,7 @@ struct RaceCatalogueDTO {
     std::vector<RaceDTO> races;
 
 
-    RaceCatalogueDTO() : size(0), races({}) {}
+    RaceCatalogueDTO() : size(0), races() {}
 
     RaceCatalogueDTO(const std::vector<RaceDTO>& races) :
             size(static_cast<uint8_t>(races.size())), races(races) {}

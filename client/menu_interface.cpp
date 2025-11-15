@@ -76,6 +76,7 @@ bool MenuInterface::select_races(){
     QObject::connect(&sr, &RaceSelector::confirm_races, [&](std::vector<RaceDTO> races) {
         //send to server the races selected
         std::cout << "Races selected for the lobby: " << races.size() << std::endl;
+        protocol.send_races_selection(races);
         sr.close();
         loop.quit();
     });
@@ -108,12 +109,18 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         std::string lobby_name = cl.get_lobby_name().toStdString();
         int max_players = cl.get_number_players();
         std::cout <<player.username<< " creating lobby: " << lobby_name << " with max players: " << max_players << std::endl;
-        LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
-        protocol.send_create_lobby(lobby);
+        LobbyDTO lobby(LobbyAction::CREATE_LOBBY, player.id, lobby_name, max_players);
         cl.close();
-
+        
         //select races ui
-        //closed = select_races();
+        closed = select_races();
+
+        if (closed){
+            loop.quit();
+            return;
+        }
+        
+        protocol.send_create_lobby(lobby);
 
         //closed = waiting_room(true, lobby);
 
@@ -317,8 +324,6 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
         cg.hide();
         
         bool close_menu = false;
-
-        close_menu = select_races();
         
         close_menu = create_lobby(player);
 

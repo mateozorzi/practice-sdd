@@ -11,13 +11,14 @@
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                   const uint8_t max_players, const ServerConfig& config):
+                   const uint8_t max_players, const ServerConfig& config, RaceCatalogueDTO& selected) :
         max_players(max_players),
         config(config),
         game_monitor(game_monitor),
         command_queue(command_queue),
         world(b2Vec2(0.0f, 0.0f)),
-        collision_listener(players) {
+        collision_listener(players),
+        selected_races(selected) {
 
     world.SetContactListener(&collision_listener);
 
@@ -40,6 +41,14 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
             throw WorldCreationException(std::string("Could not add collision bodies: ") +
                                          std::string(e.what()));
         }
+    }
+
+    //cout info races
+    std::cout << "Selected races: " << std::endl;
+    for (const auto& race : selected_races.races) {
+        std::cout << " - " << race.name << " in " << race.city << " with "
+                  << static_cast<int>(race.size_checkpoints) << " checkpoints and "
+                  << static_cast<int>(race.laps) << " laps." << std::endl;
     }
 }
 
@@ -157,8 +166,6 @@ void GameLoop::run() {
         const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
 
         while (should_keep_running()) {
-
-            //load_races
 
 
             process_commands();

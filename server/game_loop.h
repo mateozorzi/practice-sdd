@@ -13,6 +13,7 @@
 #include "game_monitor.h"
 #include "player.h"
 #include "server_config.h"
+#include "../common/race_catalogue_dto.h"
 
 
 constexpr float GAME_STEP = 1.0f / 60.0f;
@@ -31,6 +32,7 @@ class GameLoop final: public Thread {
     std::unordered_map<uint32_t, Player> players;
     CollisionListener collision_listener;
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
+    RaceCatalogueDTO& selected_races;
 
     void process_commands();
     void handle_car_selection(const GameCommand& game_command);
@@ -47,7 +49,7 @@ public:
     GameLoop& operator=(const GameLoop&) = delete;
 
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                      uint8_t max_players, const ServerConfig& config);
+                      uint8_t max_players, const ServerConfig& config, RaceCatalogueDTO& selected);
 
     void run() override;
     void stop() override;
