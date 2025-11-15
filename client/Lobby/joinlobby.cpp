@@ -20,21 +20,33 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies){
     ui->lobbytable->clear();
 
     ui->lobbytable->setRowCount(lobbies.size);
-    ui->lobbytable->setColumnCount(2);
     QStringList colLabels;
-    colLabels <<"id"<<"action";
+    colLabels <<"id"<<"name"<<"active players"<<"max players"<<"action";
+    ui->lobbytable->setColumnCount(colLabels.size());
     ui->lobbytable->setHorizontalHeaderLabels(colLabels);
     ui->lobbytable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->lobbytable->horizontalHeader()->setVisible(true);
     ui->lobbytable->verticalHeader()->setVisible(false);
 
-    for (int i = 0; i < lobbies.size; ++i){
-        QTableWidgetItem *item = new QTableWidgetItem();
+    for (int i = 0; i < lobbies.size; ++i) {
+        const auto& lobby = lobbies.lobbies[i];
 
-        item->setText(QString::number(lobbies.lobbies[i].lobby_id));
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->lobbytable->setItem(i, 0, item);
+        QTableWidgetItem* items[] = {
+                new QTableWidgetItem(QString::number(lobby.lobby_id)),
+                new QTableWidgetItem(QString::fromStdString(lobby.lobby_name)),
+                new QTableWidgetItem(QString::number(lobby.active_players)),
+                new QTableWidgetItem(QString::number(lobby.max_players))
+        };
 
+        for (auto* item : items) {
+            item->setTextAlignment(Qt::AlignCenter);
+        }
+
+        for (int col = 0; col < 4; ++col) {
+            ui->lobbytable->setItem(i, col, items[col]);
+        }
+
+        // Botón de Join
         QPushButton *joinButton = new QPushButton("Join");
         joinButton->setStyleSheet("QPushButton {"
                                   "    background-color: #28a745;"
@@ -44,13 +56,12 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies){
                                   "    border-radius: 4px;"
                                   "    font-weight: bold;"
                                   "}");
-        LobbyDTO currentLobby = lobbies.lobbies[i];
-        connect(joinButton, &QPushButton::clicked, this, [this, currentLobby]() {
-            this->on_join_lobby(currentLobby);
-        });
-        ui->lobbytable->setCellWidget(i, 1, joinButton);
-    }
 
+        connect(joinButton, &QPushButton::clicked, this, [this, lobby]() {
+            this->on_join_lobby(lobby);
+        });
+        ui->lobbytable->setCellWidget(i, 4, joinButton);
+    }
 }
 
 void JoinLobby::join_denied(){

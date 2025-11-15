@@ -34,4 +34,5 @@ target_sources(taller_common
     world_snapshot_dto.h
     race_dto.h
     checkpoint_dto.h
+    race_catalogue_dto.h
     )

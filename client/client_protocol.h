@@ -16,6 +16,7 @@
 #include "../common/lobbies_catalogue_dto.h"
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
+#include "../common/race_catalogue_dto.h"
 
 enum class ServerResponse {
 
@@ -28,6 +29,7 @@ enum class ServerResponse {
 };
 
 class ClientProtocol final: public CommonProtocol {
+
 
 public:
     ClientProtocol(const ClientProtocol& other) = delete;
@@ -50,6 +52,9 @@ public:
     LobbyCatalogueDTO receive_lobby_catalogue();
     LobbyDTO receive_lobby_info();
     LobbyDTO receive_lobby_action();
+    LobbyDTO receive_lobby();
+    RaceDTO receive_race();
+    RaceCatalogueDTO receive_race_catalogue();
     uint32_t receive_id();
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();

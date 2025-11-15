@@ -4,6 +4,7 @@
 #include "../common/lobby_dto.h"
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
+#include "../common/race_catalogue_dto.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <variant>
@@ -133,15 +134,60 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue(){
     return CarCatalogueDTO(std::move(cars));
 }
 
+LobbyDTO ClientProtocol::receive_lobby(){
+    const uint8_t action_byte = recv_uint8();
+    std::cout<<"Received lobby action byte: "<<static_cast<int>(action_byte)<<std::endl;
+    const uint32_t lobby_id = recv_uint32();
+    std::cout<<"Received lobby ID: "<<static_cast<int>(lobby_id)<<std::endl;
+    const std::string lobby_name = recv_string();
+    std::cout<<"Received lobby name: "<<lobby_name<<std::endl;
+    const uint8_t max_players = recv_uint8();
+    std::cout<<"Received lobby max players: "<<static_cast<int>(max_players)<<std::endl;
+    const uint8_t active_players = recv_uint8();
+    std::cout<<"Received lobby active players: "<<static_cast<int>(active_players)<<std::endl;
+
+    LobbyAction action = static_cast<LobbyAction>(action_byte);
+
+    return LobbyDTO(action, lobby_id, lobby_name, max_players, active_players);
+}
+
 LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue(){
     uint8_t size = recv_uint8();
+    std::cout<<"Received lobby catalogue of size: "<<static_cast<int>(size)<<std::endl;
     std::vector<LobbyDTO> lobbies;
     for (uint8_t i = 0; i < size; ++i) {
-        uint32_t lobby_id = recv_uint32();
-
-        lobbies.push_back(LobbyDTO(lobby_id));
+        LobbyDTO lobby = receive_lobby();
+        lobbies.push_back(lobby);
+        std::cout<<"Received lobby: "<<lobby.lobby_name<<std::endl;
     }
     return LobbyCatalogueDTO(std::move(lobbies));
+}
+
+RaceDTO ClientProtocol::receive_race(){
+    const std::string name = recv_string();
+    const std::string city = recv_string();
+    const uint8_t size_checkpoints = recv_uint8();
+    std::vector<CheckpointDTO> checkpoints;
+    for(uint8_t i =0; i < size_checkpoints; ++i){
+        const uint8_t id = recv_uint8();
+        const char orientation = static_cast<char>(recv_string()[0]);
+        const uint16_t x = recv_uint16();
+        const uint16_t y = recv_uint16();
+        const uint8_t width = recv_uint8();
+        const uint8_t height = recv_uint8();
+        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
+    }
+    const uint8_t laps = recv_uint8();
+    return RaceDTO(name, city, std::move(checkpoints), laps);
+}
+
+RaceCatalogueDTO ClientProtocol::receive_race_catalogue(){
+    uint8_t size = recv_uint8();
+    std::vector<RaceDTO> races;
+    for (uint8_t i = 0; i < size; ++i) {
+        races.push_back(receive_race());
+    }
+    return RaceCatalogueDTO(std::move(races));
 }
 
 LobbyDTO ClientProtocol::receive_lobby_info(){
