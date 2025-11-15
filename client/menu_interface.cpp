@@ -114,6 +114,11 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         
         //select races ui
         closed = select_races();
+
+        if (closed){
+            loop.quit();
+            return;
+        }
         
         protocol.send_create_lobby(lobby);
 
