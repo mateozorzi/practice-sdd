@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "../common/race_catalogue_dto.h"
+
 enum class LobbyAction : uint8_t {
 
     CREATE_LOBBY = 0x00,
@@ -13,7 +15,8 @@ enum class LobbyAction : uint8_t {
     EXIT_GAME = 0x05,
     INFO_LOBBY = 0x06,
     CHANGE_USERNAME = 0x07,
-    LIST_RACES = 0x08
+    LIST_RACES = 0x08,
+    SEND_RACE_SELECTION = 0x09
 
 };
 
@@ -24,6 +27,7 @@ struct LobbyDTO {
     std::string lobby_name;
     uint8_t max_players;
     uint8_t active_players;
+    RaceCatalogueDTO selected_races;
 
 
     LobbyDTO(): action(LobbyAction::CREATE_LOBBY), lobby_id(-1), lobby_name(""), max_players(0), active_players(0) {}
@@ -34,6 +38,9 @@ struct LobbyDTO {
 
     explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name, const uint8_t max_p, const uint8_t active_p):
         action(act), lobby_id(id), lobby_name(name), max_players(max_p), active_players(active_p) {}
+
+    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name, const uint8_t max_p, const uint8_t active_p, const RaceCatalogueDTO& races):
+        action(act), lobby_id(id), lobby_name(name), max_players(max_p), active_players(active_p), selected_races(races) {}
 
     // join Lobby, start, leave
     explicit LobbyDTO(LobbyAction act, const uint32_t id):

@@ -19,6 +19,8 @@ class ServerProtocol final: public CommonProtocol {
     void add_player_to_buffer(const PlayerDTO& player);
     PlayerDTO receive_username();
     car_dto receive_car_selection();
+    RaceDTO receive_race();
+    RaceCatalogueDTO receive_races();
     MovementDTO receive_movement();
     void add_race_to_buffer(const RaceDTO& race);
     void add_checkpoint_to_buffer(const CheckpointDTO& checkpoint);

@@ -36,10 +36,15 @@ LobbyDTO ServerProtocol::receive_lobby_info() {
     const uint32_t lobby_id = recv_uint32();
     const std::string lobby_name = recv_string();
     const uint8_t max_players = recv_uint8();
+    const uint8_t active_players = recv_uint8();
+
+    RaceCatalogueDTO selected_races = receive_races();
+
 
     LobbyAction action = static_cast<LobbyAction>(action_byte);
+    std::cout<<"Received lobby info with action: "<<static_cast<int>(action_byte)<<std::endl;
 
-    return LobbyDTO(action, lobby_id, lobby_name, max_players);
+    return LobbyDTO(action, lobby_id, lobby_name, max_players, active_players, selected_races);
 }
 
 MovementDTO ServerProtocol::receive_movement() {
@@ -98,6 +103,34 @@ car_dto ServerProtocol::receive_car_selection() {
     const std::string model = recv_string();
 
     return car_dto(model, 0, 0, 0, 0);
+}
+
+RaceDTO ServerProtocol::receive_race(){
+    const std::string name = recv_string();
+    const std::string city = recv_string();
+    const uint8_t size_checkpoints = recv_uint8();
+    std::vector<CheckpointDTO> checkpoints;
+    for(uint8_t i =0; i < size_checkpoints; ++i){
+        const uint8_t id = recv_uint8();
+        const char orientation = static_cast<char>(recv_string()[0]);
+        const uint16_t x = recv_uint16();
+        const uint16_t y = recv_uint16();
+        const uint8_t width = recv_uint8();
+        const uint8_t height = recv_uint8();
+        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
+    }
+    const uint8_t laps = recv_uint8();
+    return RaceDTO(name, city, std::move(checkpoints), laps);
+}
+
+RaceCatalogueDTO ServerProtocol::receive_races(){
+    uint8_t size = recv_uint8();
+    std::vector<RaceDTO> races;
+    for (uint8_t i = 0; i < size; ++i) {
+        races.push_back(receive_race());
+    }
+
+    return RaceCatalogueDTO(std::move(races));
 }
 
 void ServerProtocol::send_client_id(const uint32_t client_id) {

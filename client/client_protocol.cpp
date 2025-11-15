@@ -15,6 +15,8 @@ void ClientProtocol::ask_for_race_catalogue(){
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -36,6 +38,8 @@ void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -44,6 +48,8 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -52,6 +58,8 @@ void ClientProtocol::change_username(const LobbyDTO& lobby) {
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -60,11 +68,18 @@ void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
 void ClientProtocol::send_exit(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -72,6 +87,37 @@ void ClientProtocol::send_car_selection(const car_dto& car){
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_SELECTION));
     add_string_to_buffer(car.model);
     send_buffer();
+}
+
+void ClientProtocol::send_race(const RaceDTO& race){
+    add_string_to_buffer(race.name);
+    add_string_to_buffer(race.city);
+    add_uint8_to_buffer(race.size_checkpoints);
+    for (const auto& c : race.checkpoints){
+        add_uint8_to_buffer(c.id);
+        add_string_to_buffer(std::string(1, c.orientation));
+        add_uint16_to_buffer(c.x);
+        add_uint16_to_buffer(c.y);
+        add_uint8_to_buffer(c.width);
+        add_uint8_to_buffer(c.height);
+    }
+    add_uint8_to_buffer(race.laps);
+}
+
+void ClientProtocol::send_races_selection(const std::vector<RaceDTO>& races){
+    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::SEND_RACE_SELECTION));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    uint8_t size = static_cast<uint8_t>(races.size());
+    add_uint8_to_buffer(size);
+    for (const auto& race : races) {
+        send_race(race);
+    }
+
+    send_buffer();
+
 }
 
 CarPositionDTO ClientProtocol::receive_car_position() {

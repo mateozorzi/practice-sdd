@@ -2,16 +2,17 @@
 
 
 #include "game.h"
+#include "../common/race_catalogue_dto.h"
 
 
-Game::Game(const uint32_t game_id, const uint8_t max_players, const ServerConfig& config, std::string name) :
+Game::Game(const uint32_t game_id, const uint8_t max_players, const ServerConfig& config, std::string name, RaceCatalogueDTO& selected):
         max_players(max_players),
         game_id(game_id),
         config(config),
         name(std::move(name)),
         command_queue(static_cast<size_t>(config.app.server.command_queue_capacity)),
         game_monitor(config),
-        game_loop(game_monitor, command_queue, max_players, config) {}
+        game_loop(game_monitor, command_queue, max_players, config, selected) {}
 
 
 bool Game::is_full() const { return game_loop.is_full(); }

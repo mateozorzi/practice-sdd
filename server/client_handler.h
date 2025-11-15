@@ -7,6 +7,7 @@
 
 #include "../common/constants.h"
 #include "../common/socket.h"
+#include "../common/race_catalogue_dto.h"
 
 #include "receiver.h"
 #include "sender.h"
@@ -24,12 +25,14 @@ class ClientHandler final: public Thread {
     std::string username = "Player";
     uint32_t game_id = 0;
     bool is_in_lobby = true;
+    RaceCatalogueDTO selected_races;
 
     void launch_lobby();
 
     void update_player_username(const std::string& actual_username);
     void list_active_games();
     void list_load_races();
+    void select_races(const LobbyDTO& lobby_dto);
 
     void exit_lobby_and_play(Queue<GameCommand>& command_queue, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue);
     void create_new_game(uint32_t client_id, uint8_t max_players, const std::string& lobby_name);
