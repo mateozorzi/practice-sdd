@@ -9,6 +9,14 @@
 #include <nlohmann/json.hpp>
 #include <variant>
 
+void ClientProtocol::ask_for_race_catalogue(){
+    std::cout<<"Requesting race catalogue from server..."<<std::endl;
+    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::LIST_RACES));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
+    send_buffer();
+}
 
 void ClientProtocol::send_username(const std::string& username) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_USERNAME));
@@ -187,6 +195,8 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue(){
     for (uint8_t i = 0; i < size; ++i) {
         races.push_back(receive_race());
     }
+    std::cout<<"Received race catalogue of size: "<<static_cast<int>(size)<<std::endl;
+
     return RaceCatalogueDTO(std::move(races));
 }
 

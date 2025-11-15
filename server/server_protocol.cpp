@@ -164,6 +164,7 @@ void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
         add_race_to_buffer(race);
     }
     send_buffer();
+    std::cout<<"Sent races catalogue of size: "<<static_cast<int>(races.size)<<std::endl;
 }
 
 void ServerProtocol::send_json_file(const std::string& file_path) {

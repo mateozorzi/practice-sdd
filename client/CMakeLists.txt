@@ -23,6 +23,7 @@ target_sources(taller_client
     Lobby/waitingroom.cpp
     lobbyreceiver.cpp
     menu_interface.cpp
+    Lobby/raceselector.cpp
     sounds.cpp
 
     ${QRC_FILES}
@@ -46,6 +47,7 @@ target_sources(taller_client
     Lobby/createlobby.h
     Lobby/joinlobby.h
     Lobby/waitingroom.h
+    Lobby/raceselector.h
     lobbyreceiver.h
 
 

@@ -39,6 +39,7 @@ void ClientHandler::launch_lobby() {
                     join_existing_game(client_id, lobby_dto.lobby_id);
                     break;
                 case LobbyAction::LIST_RACES:
+                    std::cout<<"Client with ID: " << client_id << " requested races catalogue." << std::endl;
                     list_load_races();
                     break;
                 case LobbyAction::LEAVE_LOBBY:
@@ -109,7 +110,7 @@ void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t 
 
 void ClientHandler::list_load_races() {
     RaceCatalogueDTO races = lobby.list_races();
-
+    std::cout<<"Loaded "<<static_cast<int>(races.size)<<" races from lobby."<<std::endl;
     server_protocol.send_races_catalogue(races);
     std::cerr << "[" << CLIENT_HANDLER << "] " << "Sent races catalogue to client with ID: " << client_id
         << std::endl;
