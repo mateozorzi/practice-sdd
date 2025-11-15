@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "../common/lobbies_catalogue_dto.h"
-
+#include "../common/race_catalogue_dto.h"
 #include "game.h"
 #include "server_config.h"
 
@@ -33,12 +33,15 @@ public:
     explicit Lobby(const ServerConfig& config);
 
     std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> create_new_game(
-            uint32_t client_id, const std::string& username, uint8_t max_players);
+            uint32_t client_id, const std::string& username, uint8_t max_players, const std::string& name);
     std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> join_existing_game(
             uint32_t client_id, uint32_t game_id, const std::string& username);
     LobbyCatalogueDTO list_games();
     void reap();
     void remove_player(uint32_t client_id, uint32_t game_id);
+
+    RaceCatalogueDTO list_races();
+    
 
     ~Lobby() = default;
 };

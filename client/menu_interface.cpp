@@ -11,6 +11,7 @@
 #include "Lobby/joinlobby.h"
 #include "Lobby/waitingroom.h"
 #include "lobbyreceiver.h"
+#include "Lobby/raceselector.h"
 #include <QString>
 #include <QEventLoop>
 #include "../common/car_dto.h"
@@ -60,6 +61,38 @@ bool MenuInterface::car_selection(PlayerDTO& player){
     return car_selection;
 }
 
+bool MenuInterface::select_races(){
+    protocol.ask_for_race_catalogue();
+    RaceCatalogueDTO races = protocol.receive_race_catalogue();
+    
+    RaceSelector sr(races);
+    sr.show();
+
+    bool closed = false;
+
+    QEventLoop loop;
+
+    //confirm signal
+    QObject::connect(&sr, &RaceSelector::confirm_races, [&](std::vector<RaceDTO> races) {
+        //send to server the races selected
+        std::cout << "Races selected for the lobby: " << races.size() << std::endl;
+        sr.close();
+        loop.quit();
+    });
+
+    //close menu signal
+    QObject::connect(&sr, &RaceSelector::close_menu, [&]() {
+        closed = true;
+        loop.quit();
+    });
+
+    loop.exec();
+
+    return closed;
+
+
+}
+
 bool MenuInterface::create_lobby(PlayerDTO& player) {
     //create lobby ui
     CreateLobby cl;
@@ -78,6 +111,10 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, 1, lobby_name, max_players);
         protocol.send_create_lobby(lobby);
         cl.close();
+
+        //select races ui
+        //closed = select_races();
+
         //closed = waiting_room(true, lobby);
 
         loop.quit();
@@ -280,6 +317,8 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
         cg.hide();
         
         bool close_menu = false;
+
+        close_menu = select_races();
         
         close_menu = create_lobby(player);
 

@@ -119,13 +119,52 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot)
     send_buffer();
 }
 
+void ServerProtocol::send_lobby(const LobbyDTO& lobby_dto) {
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
+    add_uint32_to_buffer(lobby_dto.lobby_id);
+    add_string_to_buffer(lobby_dto.lobby_name);
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.max_players));
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.active_players));
+}
+
 void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue) {
 
     add_uint8_to_buffer(lobby_catalogue.size);
 
-    for (const auto& lobby: lobby_catalogue.lobbies) add_uint32_to_buffer(lobby.lobby_id);
+    for (const auto& lobby: lobby_catalogue.lobbies) {
+        send_lobby(lobby);
+    }
 
     send_buffer();
+}
+
+void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint){
+    add_uint8_to_buffer(checkpoint.id);
+    add_string_to_buffer(std::string(1, checkpoint.orientation));
+    add_uint16_to_buffer(checkpoint.x);
+    add_uint16_to_buffer(checkpoint.y);
+    add_uint8_to_buffer(checkpoint.width);
+    add_uint8_to_buffer(checkpoint.height);
+}
+
+void ServerProtocol::add_race_to_buffer(const RaceDTO& race){
+    add_string_to_buffer(race.name);
+    add_string_to_buffer(race.city);
+    add_uint8_to_buffer(race.size_checkpoints);
+    for (auto& c : race.checkpoints){
+        add_checkpoint_to_buffer(c);
+    }
+    add_uint8_to_buffer(race.laps);
+}
+
+void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
+    add_uint8_to_buffer(races.size);
+    
+    for (const auto& race: races.races) {
+        add_race_to_buffer(race);
+    }
+    send_buffer();
+    std::cout<<"Sent races catalogue of size: "<<static_cast<int>(races.size)<<std::endl;
 }
 
 void ServerProtocol::send_json_file(const std::string& file_path) {

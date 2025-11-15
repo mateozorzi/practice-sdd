@@ -59,6 +59,10 @@ bool GameLoop::is_full() const { return players.size() >= max_players; }
 
 bool GameLoop::is_empty() const { return players.empty(); }
 
+uint8_t GameLoop::get_active_players() const {
+    return static_cast<uint8_t>(players.size());
+}
+
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
 

@@ -56,6 +56,7 @@ public:
 
     bool is_full() const;
     bool is_empty() const;
+    uint8_t get_active_players() const;
 
     void add_player(uint32_t client_id, const std::string& username);
 

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include "../common/race_catalogue_dto.h"
+
 
 Lobby::Lobby(const ServerConfig& config): config(config) {
     initialize_races();
@@ -85,13 +87,13 @@ void Lobby::initialize_races() {
 }
 
 std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Lobby::create_new_game(
-        const uint32_t client_id, const std::string& username, const uint8_t max_players) {
+        const uint32_t client_id, const std::string& username, const uint8_t max_players, const std::string& name) {
 
     std::lock_guard lock(mtx);
 
     uint32_t game_id = client_id;
 
-    auto game = std::make_unique<Game>(game_id, max_players, config);
+    auto game = std::make_unique<Game>(game_id, max_players, config, name);
 
     std::cerr << "[" << LOBBY
               << "] "
@@ -145,7 +147,8 @@ LobbyCatalogueDTO Lobby::list_games() {
 
     std::vector<LobbyDTO> lobby_dtos;
 
-    for (const auto& [game_id, game_ptr]: games) lobby_dtos.emplace_back(game_id);
+    for (const auto& [game_id, game_ptr]: games) lobby_dtos.emplace_back(LobbyAction::INFO_LOBBY,game_id, 
+                                                                        game_ptr->get_name(), game_ptr->get_max_players(), game_ptr->get_active_players());
 
     return LobbyCatalogueDTO(std::move(lobby_dtos));
 }
@@ -182,3 +185,10 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
               << "Player with ID: " << client_id << " removed from game with ID: " << (int)game_id
               << std::endl;
 }
+
+RaceCatalogueDTO Lobby::list_races(){
+    std::lock_guard lock(mtx);
+
+    return RaceCatalogueDTO(std::move(races));
+}
+
