@@ -20,18 +20,18 @@ SDLManager::SDLManager():
     set_map();
     set_sprite();
     set_minimap();
+    load_decorations_rects("/server/resources/world/decorations_liberty_city.json");
 }
 
 void SDLManager::set_map() {
     // Cargar imagen de fondo (circuito)
-    const SDL2pp::Surface background_surface(
-            DATA_PATH "/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+    const SDL2pp::Surface background_surface("client/assets/sprites/Game Boy _ GBC - Grand Theft "
+                                             "Auto - Backgrounds - Liberty City.png");
     map = SDL2pp::Texture(renderer, background_surface);
 }
 
 void SDLManager::set_sprite() {
-    SDL2pp::Surface sprite_cars(DATA_PATH
-                                "/Mobile - Grand Theft Auto 4 - Miscellaneous - Cars.png");
+    SDL2pp::Surface sprite_cars("client/assets/sprites/cars.png");
     const Uint32 color_key = SDL_MapRGB(sprite_cars.Get()->format, 163, 163, 13);
     sprite_cars.SetColorKey(true, color_key);
     sprite = SDL2pp::Texture(renderer, sprite_cars);
@@ -85,7 +85,7 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(sprite.value(), sprite_rect,
-                  SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 64, 64),
+                  SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 84, 84),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     sounds.play_engine_sound(is_moving);
