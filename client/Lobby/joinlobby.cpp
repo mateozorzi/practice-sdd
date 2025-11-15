@@ -21,10 +21,11 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies){
 
     ui->lobbytable->setRowCount(lobbies.size);
     QStringList colLabels;
-    colLabels <<"id"<<"name"<<"active players"<<"max players"<<"action";
+    colLabels <<"Id"<<"Name"<<"Active Players"<<"Max players"<<"Action";
     ui->lobbytable->setColumnCount(colLabels.size());
     ui->lobbytable->setHorizontalHeaderLabels(colLabels);
     ui->lobbytable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->lobbytable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->lobbytable->horizontalHeader()->setVisible(true);
     ui->lobbytable->verticalHeader()->setVisible(false);
 
