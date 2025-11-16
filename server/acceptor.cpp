@@ -37,11 +37,9 @@ void Acceptor::run() {
 
 void Acceptor::reap() {
 
-    // lobby.reap();
     clients.remove_if([](const std::unique_ptr<ClientHandler>& client) {
         if (!client->is_alive()) {
 
-            client->stop();
             client->join();
             std::cout << "[" << ACCEPTOR << "] " << "Reaping dead client." << std::endl;
             return true;

@@ -35,7 +35,8 @@ std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> 
 
 void Game::remove_player(const uint32_t client_id) {
 
-    game_loop.remove_player(client_id);
+    game_monitor.remove_client(client_id);
+
     std::cerr << "[" << GAME << "] "
             << "Removing player with ID: " << client_id << std::endl;
 }
