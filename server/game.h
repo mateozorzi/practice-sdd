@@ -43,6 +43,8 @@ public:
     uint8_t get_max_players() const;
     uint8_t get_active_players() const;
 
+    bool has_started() const;
+
     void stop();
 
     ~Game();

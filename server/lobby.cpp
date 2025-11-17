@@ -147,8 +147,11 @@ LobbyCatalogueDTO Lobby::list_games() {
 
     std::vector<LobbyDTO> lobby_dtos;
 
-    for (const auto& [game_id, game_ptr]: games) lobby_dtos.emplace_back(LobbyAction::INFO_LOBBY,game_id, 
-                                                                        game_ptr->get_name(), game_ptr->get_max_players(), game_ptr->get_active_players());
+    for (const auto& [game_id, game_ptr]: games) {
+
+        if (!game_ptr->has_started())
+            lobby_dtos.emplace_back(LobbyAction::INFO_LOBBY,game_id, game_ptr->get_name(), game_ptr->get_max_players(), game_ptr->get_active_players());
+    }
 
     return LobbyCatalogueDTO(std::move(lobby_dtos));
 }
