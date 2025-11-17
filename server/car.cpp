@@ -46,7 +46,12 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
     fixture.friction = config.friction;
     fixture.restitution = config.restitution;
 
-    body->CreateFixture(&fixture);
+    b2Fixture* car_fixture = body->CreateFixture(&fixture);
+
+    b2Filter filter;
+    filter.categoryBits = CATEGORY_CAR_GROUND;
+    filter.maskBits = MASK_CAR_GROUND;
+    car_fixture->SetFilterData(filter);
 }
 
 void Car::set_position_for_race(const CheckpointDTO& start_position){
@@ -167,7 +172,7 @@ CarPositionDTO Car::get_position_dto() const {
     if (angle_degrees >= 360)
         angle_degrees = 0;
 
-    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees);
+    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, car_layer);
 }
 
 
@@ -197,4 +202,28 @@ CarLayer Car::get_layer() const {
 void Car::set_layer(CarLayer layer) {
 
     car_layer = layer;
+
+    b2Fixture* fixture = body->GetFixtureList();
+
+    if (fixture) {
+    
+        b2Filter filter = fixture->GetFilterData();
+        switch (layer) {
+
+            case CarLayer::ON_GROUND:
+                filter.categoryBits = CATEGORY_CAR_GROUND;
+                filter.maskBits = MASK_CAR_GROUND;
+                break;
+            case CarLayer::ON_BRIDGE:
+                filter.categoryBits = CATEGORY_CAR_BRIDGE;
+                filter.maskBits = MASK_CAR_BRIDGE;
+                break;
+            case CarLayer::UNDER_BRIDGE:
+                filter.categoryBits = CATEGORY_CAR_UNDER;
+                filter.maskBits = MASK_CAR_UNDER;
+                break;
+        }
+        
+        fixture->SetFilterData(filter);
+    }
 }
