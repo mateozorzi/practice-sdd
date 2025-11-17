@@ -75,3 +75,17 @@ void Player::set_car_configuration(const car_dto& car_configuration) {
     if (car)
         car->set_configuration(car_configuration);
 }
+
+CarLayer Player::get_car_layer() const {
+
+    if (car)
+        return car->get_layer();
+    
+    return CarLayer::ON_GROUND;
+}
+
+void Player::set_car_layer(CarLayer layer) {
+
+    if (car)
+        car->set_layer(layer);
+}

@@ -44,6 +44,32 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
+    auto on_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/on_bridge_sensors_liberty_city.json");
+    for (const auto& p: on_bridge_sensors) {
+        try {
+            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE);
+            if (!added) {
+                std::cout << "On bridge sensor of size " << p.size() << " omitted\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Error adding on bridge sensor: ") +
+                            std::string(e.what()));
+        }
+    }
+
+    auto under_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/under_bridge_sensors_liberty_city.json");
+    for (const auto& p: under_bridge_sensors) {
+        try {
+            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE);
+            if (!added) {
+                std::cout << "Under bridge sensor of size " << p.size() << " omitted\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Error adding under bridge sensor: ") +
+                            std::string(e.what()));
+        }
+    }
+
     //cout info races
     std::cout << "Selected races: " << std::endl;
     for (const auto& race : selected_races.races) {

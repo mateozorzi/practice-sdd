@@ -188,3 +188,13 @@ void Car::set_configuration(const car_dto& car_configuration) {
     // Need to check which model of car the client wants here.
     //(void)car_configuration;  // To avoid unused parameter warning
 }
+
+CarLayer Car::get_layer() const {
+
+    return car_layer;
+}
+
+void Car::set_layer(CarLayer layer) {
+
+    car_layer = layer;
+}

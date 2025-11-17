@@ -45,6 +45,9 @@ public:
     void set_in_game();
 
     void set_car_configuration(const car_dto& car_configuration);
+
+    CarLayer get_car_layer() const;
+    void set_car_layer(CarLayer layer);
 };
 
 

@@ -54,6 +54,12 @@ uint8_t Game::get_active_players() const {
 }
 
 
+bool Game::has_started() const {
+
+    return game_loop.is_alive();
+}
+
+
 void Game::stop() {
 
     game_loop.stop();
