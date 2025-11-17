@@ -25,15 +25,6 @@ constexpr uint16_t MASK_CAR_UNDER = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATE
 constexpr uint16_t MASK_SENSOR = CATEGORY_CAR_GROUND | CATEGORY_CAR_BRIDGE | CATEGORY_CAR_UNDER;
 
 
-
-enum class CarLayer {
-
-    ON_GROUND,
-    ON_BRIDGE,
-    UNDER_BRIDGE
-};
-
-
 struct CarConfig {
 
     float width;

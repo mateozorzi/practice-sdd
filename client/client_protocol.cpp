@@ -126,7 +126,8 @@ CarPositionDTO ClientProtocol::receive_car_position() {
     const uint32_t x_position = recv_uint32();
     const uint32_t y_position = recv_uint32();
     const uint32_t angle = recv_uint32();
-    return CarPositionDTO(client_id, x_position, y_position, angle);
+    const uint8_t layer = recv_uint8();
+    return CarPositionDTO(client_id, x_position, y_position, angle, static_cast<CarLayer>(layer));
 }
 
 std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {

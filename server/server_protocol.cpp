@@ -14,6 +14,7 @@ void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_positi
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
+    add_uint8_to_buffer(static_cast<uint8_t>(car_position_dto.layer));
 }
 
 void ServerProtocol::add_player_to_buffer(const PlayerDTO& player){

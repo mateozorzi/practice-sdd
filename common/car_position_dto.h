@@ -5,17 +5,24 @@
 #include <cstdint>
 
 
-struct CarPositionDTO {
+enum class CarLayer : uint8_t {
 
+    ON_GROUND = 0,
+    ON_BRIDGE = 1,
+    UNDER_BRIDGE = 2
+};
+
+struct CarPositionDTO {
 
     uint32_t client_id;
     uint32_t x_position;
     uint32_t y_position;
     uint32_t angle;
+    CarLayer layer;
 
 
     explicit CarPositionDTO(uint32_t client_id = 0, uint32_t x_position = 0,
-                            uint32_t y_position = 0, uint32_t angle = 0);
+                            uint32_t y_position = 0, uint32_t angle = 0, const CarLayer layer = CarLayer::ON_GROUND);
 };
 
 

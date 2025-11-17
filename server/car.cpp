@@ -150,7 +150,7 @@ CarPositionDTO Car::get_position_dto() const {
     if (angle_degrees >= 360)
         angle_degrees = 0;
 
-    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees);
+    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, car_layer);
 }
 
 
