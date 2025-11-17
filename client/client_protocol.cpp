@@ -157,14 +157,16 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
     return world_snapshot;
 }
 
-std::variant<WorldSnapshotDTO, RaceDTO> ClientProtocol::receive_update() {
+std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> ClientProtocol::receive_update() {
     const uint8_t update_type = recv_uint8();
     if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
         WorldSnapshotDTO world_snapshot = receive_update_positions();
         return world_snapshot;
-    } else {//(update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
-        //not imeplemented
-        return RaceDTO();
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
+        RaceDTO race = receive_race();
+        return race;
+    } else { //update_type == SEND_FINISH_RACE
+        return std::monostate{};
     }
 }
 

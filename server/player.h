@@ -21,6 +21,7 @@ class Player {
     uint16_t health;
     uint16_t races_won;
     bool in_game;
+    bool in_race;
 
 
 public:
@@ -43,6 +44,10 @@ public:
 
     bool is_in_game() const;
     void set_in_game();
+
+    void start_race();
+    bool is_in_race() const;
+    void finish_race();
 
     void set_car_configuration(const car_dto& car_configuration);
 

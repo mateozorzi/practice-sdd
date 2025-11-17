@@ -12,11 +12,12 @@
 #include "car_dto.h"
 #include "movement_dto.h"
 #include "player_dto.h"
+#include "player_race_stats_dto.h"
 
 
 struct GameCommandDTO {
     ClientAction client_action;
-    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto, std::string> command_data;
+    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto, std::string, PlayerRaceStatsDTO> command_data;
 
     GameCommandDTO() 
     : client_action(ClientAction::DISCONNECT), 

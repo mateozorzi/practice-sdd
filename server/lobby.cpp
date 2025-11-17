@@ -86,7 +86,7 @@ void Lobby::initialize_races() {
     }
 }
 
-std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Lobby::create_new_game(
+std::pair<Queue<GameCommand>&, Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>&> Lobby::create_new_game(
         const uint32_t client_id, const std::string& username, const uint8_t max_players, const std::string& name, RaceCatalogueDTO& selected) {
 
     std::lock_guard lock(mtx);
@@ -108,7 +108,7 @@ std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> 
     return queues;
 }
 
-std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> Lobby::join_existing_game(
+std::pair<Queue<GameCommand>&, Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>&> Lobby::join_existing_game(
         const uint32_t client_id, const uint32_t game_id, const std::string& username) {
 
     std::lock_guard lock(mtx);
@@ -122,7 +122,7 @@ std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> 
                      "Game "
                   << (int)game_id << " not found." << std::endl;
         static Queue<GameCommand> dummy_command;
-        static Queue<std::variant<WorldSnapshotDTO, RaceDTO>> dummy_snapshot;
+        static Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 
@@ -132,7 +132,7 @@ std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> 
         std::cerr << "[" << LOBBY << "] "
                   << "Game with ID: " << game_id << " is full." << std::endl;
         static Queue<GameCommand> dummy_command;
-        static Queue<std::variant<WorldSnapshotDTO, RaceDTO>> dummy_snapshot;
+        static Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>> dummy_snapshot;
         return {dummy_command, dummy_snapshot};
     }
 

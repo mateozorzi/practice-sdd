@@ -14,6 +14,7 @@
 #include "player.h"
 #include "server_config.h"
 #include "../common/race_catalogue_dto.h"
+#include "../common/leaderboard_dto.h"
 
 
 constexpr float GAME_STEP = 1.0f / 60.0f;
@@ -33,16 +34,23 @@ class GameLoop final: public Thread {
     CollisionListener collision_listener;
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
     RaceCatalogueDTO& selected_races;
+    std::vector<LeaderboardDTO> leaderboards;
+    LeaderboardDTO actual_race;
+    LeaderboardDTO final_leaderboard;
 
     void process_commands();
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
+    void handle_finish_race(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);
     void update_positions();
+    void start_race(const RaceDTO& race);
     void send_race(const RaceDTO& race);
+    void send_finish_race_timeout();
 
     bool all_player_in_game() const;
+    bool all_player_finish_race() const;
 
 
 public:

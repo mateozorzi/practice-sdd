@@ -152,6 +152,18 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot)
     send_buffer();
 }
 
+void ServerProtocol::send_race_update(const RaceDTO& race){    
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
+
+    add_race_to_buffer(race);
+    send_buffer();
+}
+
+void ServerProtocol::send_finish_race_timeout() {
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE_FINISHED));
+    send_buffer();
+}
+
 void ServerProtocol::send_lobby(const LobbyDTO& lobby_dto) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
     add_uint32_to_buffer(lobby_dto.lobby_id);

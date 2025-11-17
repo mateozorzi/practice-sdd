@@ -9,7 +9,8 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         car(std::make_unique<Car>(client_id, world, config)),
         health(config.app.server.world.physics.car.health),
         races_won(0),
-        in_game(false) {}
+        in_game(false),
+        in_race(false) {}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -26,6 +27,18 @@ void Player::set_position_for_race(const CheckpointDTO& start_position) {
 
     if (car)
         car->set_position_for_race(start_position);
+}
+
+void Player::start_race(){
+    in_race = true;
+}
+
+bool Player::is_in_race() const {
+    return in_race;
+}
+
+void Player::finish_race(){
+    in_race = false;
 }
 
 const std::string& Player::get_username() const { return username; }

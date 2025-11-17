@@ -62,7 +62,7 @@ public:
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();
     nlohmann::json get_json(const std::string& file_path);
-    std::variant<WorldSnapshotDTO, RaceDTO> receive_update();
+    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> receive_update();
 };
 
 #endif

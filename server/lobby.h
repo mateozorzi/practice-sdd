@@ -32,9 +32,9 @@ public:
 
     explicit Lobby(const ServerConfig& config);
 
-    std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> create_new_game(
+    std::pair<Queue<GameCommand>&, Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>&> create_new_game(
             uint32_t client_id, const std::string& username, uint8_t max_players, const std::string& name, RaceCatalogueDTO& selected);
-    std::pair<Queue<GameCommand>&, Queue<std::variant<WorldSnapshotDTO, RaceDTO>>&> join_existing_game(
+    std::pair<Queue<GameCommand>&, Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>&> join_existing_game(
             uint32_t client_id, uint32_t game_id, const std::string& username);
     LobbyCatalogueDTO list_games();
     void reap();
