@@ -243,10 +243,9 @@ void GameLoop::start_race(const RaceDTO& race){
     //sleep 10 seconds?
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     
-    //setting the positions of the players at the start line (first checkpoint)
-    CheckpointDTO start_position = race.checkpoints[0];
     for (auto& [client_id, player]: players) {
-        player.set_position_for_race(start_position);
+        //setting the positions of the players at the start line (first checkpoint)
+        player.set_position_for_race(race.checkpoints);
         player.start_race();
     }
     

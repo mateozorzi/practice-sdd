@@ -34,7 +34,7 @@ public:
     uint32_t get_client_id() const;
     const std::string& get_username() const;
     const car_dto get_car() const;
-    void set_position_for_race(const CheckpointDTO& start_position);
+    void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     b2Body* get_car_body() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);

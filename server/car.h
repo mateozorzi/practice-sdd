@@ -73,7 +73,7 @@ public:
 
     explicit Car(uint32_t client_id, b2World& world, const ServerConfig& server_config);
 
-    void set_position_for_race(const CheckpointDTO& start_position);
+    void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
 
     void handle_movement(const MovementDTO& movement_dto);
     void update_position();

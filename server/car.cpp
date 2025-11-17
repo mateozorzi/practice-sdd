@@ -54,17 +54,34 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
     car_fixture->SetFilterData(filter);
 }
 
-void Car::set_position_for_race(const CheckpointDTO& start_position){
+void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
+    CheckpointDTO start_position = checkpoints[0];
+    CheckpointDTO second_position = checkpoints[1];
+
+    //cars are placed in the first checkpoint, but facing the second one
+    
     float start_x = static_cast<float>(start_position.x) / PIXELS_PER_METER;
     float start_y = static_cast<float>(start_position.y) / PIXELS_PER_METER;
     float angle = 0.0f;
-    if (start_position.orientation == HORIZONTAL){
-        angle = 0.0f;
-    } else { //vertical e intersection
-        angle = b2_pi / 2.0f;
-       
-    }
 
+    //first checkpoint is horizontal
+    if (start_position.orientation == HORIZONTAL) {
+        //second checkpoint is above or below
+
+        if (second_position.y > start_position.y) { //above
+            angle = b2_pi / 2.0f;
+        } else { //below
+            angle = 3.0f * b2_pi / 2.0f;
+        }
+    } else { //first checkpoint is vertical
+        //second checkpoint is to the left or right
+        if (second_position.x < start_position.x) { //left
+            angle = b2_pi;
+        } else { //right
+            angle = 0.0f;
+        }
+    }
+    
     body->SetTransform(
         b2Vec2(
             start_x,
