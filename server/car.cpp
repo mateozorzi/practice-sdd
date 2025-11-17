@@ -68,17 +68,29 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
     if (start_position.orientation == HORIZONTAL) {
         //second checkpoint is above or below
 
-        if (second_position.y > start_position.y) { //above
+        if (second_position.y >= start_position.y) { //above
             angle = b2_pi / 2.0f;
         } else { //below
             angle = 3.0f * b2_pi / 2.0f;
         }
-    } else { //first checkpoint is vertical
+    } else if (start_position.orientation == VERTICAL) { //first checkpoint is vertical
         //second checkpoint is to the left or right
-        if (second_position.x < start_position.x) { //left
+        if (second_position.x <= start_position.x) { //left
             angle = b2_pi;
         } else { //right
             angle = 0.0f;
+        }
+    } else { //first checkpoint in intersection
+        if (second_position.y > start_position.y) { //above
+            angle = b2_pi / 2.0f;
+        } else if (second_position.y < start_position.y) { //below
+            angle = 3.0f * b2_pi / 2.0f;
+        } else {//same y, must be left or right
+            if (second_position.x < start_position.x) { //left
+                angle = b2_pi;
+            } else { //right
+                angle = 0.0f;
+            }
         }
     }
     
