@@ -23,7 +23,7 @@ b2Body* Player::get_car_body() const {
     return nullptr;
 }
 
-void Player::set_position_for_race(std::vector<CheckpointDTO>& checkpoints) {
+void Player::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
 
     if (car)
         car->set_position_for_race(checkpoints);

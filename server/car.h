@@ -9,6 +9,7 @@
 #include "../common/movement_dto.h"
 #include "../common/checkpoint_dto.h"
 #include "server_config.h"
+#include <vector>
 
 
 constexpr uint16_t CATEGORY_GROUND = 0x0001;
