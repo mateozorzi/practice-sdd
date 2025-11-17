@@ -60,7 +60,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
     auto on_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/on_bridge_sensors_liberty_city.json");
     for (const auto& p: on_bridge_sensors) {
         try {
-            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE);
+            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
             if (!added) {
                 std::cout << "On bridge sensor of size " << p.size() << " omitted\n";
             }
@@ -73,7 +73,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
     auto under_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/under_bridge_sensors_liberty_city.json");
     for (const auto& p: under_bridge_sensors) {
         try {
-            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE);
+            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
             if (!added) {
                 std::cout << "Under bridge sensor of size " << p.size() << " omitted\n";
             }

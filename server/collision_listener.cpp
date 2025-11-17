@@ -62,12 +62,17 @@ void CollisionListener::handle_sensor_contact(b2Contact* contact, bool is_begin)
                 }
             } else {
 
-                player.set_car_layer(CarLayer::ON_GROUND);
-                std::cerr << "Player with ID: " << client_id << " is ON_GROUND" << std::endl;
+                if ((sensor_type == SensorType::ON_BRIDGE && current_car_layer == CarLayer::ON_BRIDGE) ||
+                    (sensor_type == SensorType::UNDER_BRIDGE && current_car_layer == CarLayer::UNDER_BRIDGE)) {
 
+                    player.set_car_layer(CarLayer::ON_GROUND);
+                    std::cerr << "Player with ID: " << client_id << " is ON_GROUND" << std::endl;
+                }
             }
         }
+        break;
     }
+    
 }
 
 void CollisionListener::BeginContact(b2Contact* contact) {

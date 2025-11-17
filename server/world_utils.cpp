@@ -1,3 +1,4 @@
+#include "car.h"
 #include "world_utils.h"
 
 #include <fstream>
@@ -65,7 +66,7 @@ bool WorldUtils::add_polygon_to_world(const std::vector<std::vector<int>>& polyg
 
 bool WorldUtils::add_sensor_to_world(const std::vector<std::vector<int>>& polygon, 
                                        b2World& world, 
-                                       SensorType type) {
+                                       SensorType type, const uint16_t category, const uint16_t mask) {
 
     b2Vec2 vertices[4];
     for (size_t i = 0; i < polygon.size(); i++) {
@@ -85,13 +86,16 @@ bool WorldUtils::add_sensor_to_world(const std::vector<std::vector<int>>& polygo
 
     b2Body* body = world.CreateBody(&bodyDef);
 
+    //body->GetUserData().pointer = (uintptr_t)type;
+
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &sensorShape;
     fixtureDef.isSensor = true;
 
-    fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(
-        new SensorType(type)
-    );
+    fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new SensorType(type));
+
+    fixtureDef.filter.categoryBits = category;
+    fixtureDef.filter.maskBits = mask;
 
     body->CreateFixture(&fixtureDef);
 
