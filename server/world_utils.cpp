@@ -12,7 +12,9 @@
 #include "world_creation_exception.h"
 
 bool WorldUtils::add_polygon_to_world(const std::vector<std::vector<int>>& polygon,
-                                      b2World& world) {
+                                      b2World& world, const uint16_t category,
+                                      const uint16_t mask) {
+
     if (polygon.size() < 3) {
         throw WorldCreationException("Invalid polygon vertex count: " + polygon.size());
     }
@@ -50,6 +52,9 @@ bool WorldUtils::add_polygon_to_world(const std::vector<std::vector<int>>& polyg
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.0f;
     fixtureDef.restitution = 0.0f;
+
+    fixtureDef.filter.categoryBits = category;
+    fixtureDef.filter.maskBits = mask;
 
     // Attach the fixture to the body
     body->CreateFixture(&fixtureDef);
