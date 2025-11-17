@@ -59,9 +59,12 @@ void GameLoop::remove_player(const uint32_t client_id) {
 
     if (it != players.end())
         players.erase(it);
-    
+
     game_monitor.unregister_client(client_id);
-    game_monitor.remove_client(client_id);
+
+    std::cerr << "[" << GAME_LOOP << "] "
+              << "Player with ID: " << client_id
+              << " has been removed from the Game World." << std::endl;
 }
 
 bool GameLoop::is_full() const { return players.size() >= max_players; }

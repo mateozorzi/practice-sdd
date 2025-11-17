@@ -113,6 +113,7 @@ void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t 
 }
 
 void ClientHandler::list_load_races() {
+
     RaceCatalogueDTO races = lobby.list_races();
     std::cout<<"Loaded "<<static_cast<int>(races.size)<<" races from lobby."<<std::endl;
     server_protocol.send_races_catalogue(races);
@@ -121,6 +122,7 @@ void ClientHandler::list_load_races() {
 }
 
 void ClientHandler::select_races(const LobbyDTO& lobby_dto) {
+
     selected_races = lobby_dto.selected_races;
     std::cout<<"Client with ID: " << client_id << " selected "<<static_cast<int>(selected_races.size)<<" races for the lobby."<<std::endl;
 }
@@ -128,8 +130,8 @@ void ClientHandler::select_races(const LobbyDTO& lobby_dto) {
 void ClientHandler::run() {
 
     while (should_keep_running() && is_in_lobby) {
-        try {
 
+        try {
 
             launch_lobby();
         } catch (const LibError&) {
@@ -139,8 +141,6 @@ void ClientHandler::run() {
             std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION << ": " << e.what();
         }
     }
-
-    ClientHandler::stop();
 }
 
 
