@@ -64,6 +64,7 @@ public:
     void show_screen();
     void draw_row(const std::string& sentence, int y, SDL2pp::Color color, int size_container);
     void render_stats();
+    nlohmann::json load_json_file(const std::string& path);
 };
 
 #endif

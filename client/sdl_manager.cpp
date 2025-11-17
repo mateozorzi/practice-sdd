@@ -20,7 +20,8 @@ SDLManager::SDLManager():
     set_map();
     set_sprite();
     set_minimap();
-    load_decorations_rects("/server/resources/world/decorations_liberty_city.json");
+    load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
+    load_decorations_rects(load_json_file("server/resources/world/decorations_liberty_city.json"));
 }
 
 void SDLManager::set_map() {
@@ -183,13 +184,14 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     renderer.Copy(map.value(), camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
 
-    // 3. Dibujar todos los autos con su skin correspondiente
     for (const auto& [car_player, car_pos]: cars) {
         render_player(car_pos, car_player.car.model, is_moving);
     }
 
-    // 4. Dibujar capas superiores y HUD
-    render_bridges();
+    if (my_car.layer != CarLayer::ON_BRIDGE) {
+        render_bridges();
+    }
+
     render_decorations();
 
     render_hud_health(health);
@@ -245,3 +247,15 @@ void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
 void SDLManager::load_decorations_rects(const nlohmann::json& decorations_rects_data) {
     decorations_rects = loadRects(decorations_rects_data);
 }
+
+nlohmann::json SDLManager::load_json_file(const std::string& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open JSON file: " + path);
+    }
+
+    nlohmann::json data;
+    file >> data;
+    return data;
+}
+
