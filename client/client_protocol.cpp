@@ -4,10 +4,21 @@
 #include "../common/lobby_dto.h"
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
+#include "../common/race_catalogue_dto.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <variant>
 
+void ClientProtocol::ask_for_race_catalogue(){
+    std::cout<<"Requesting race catalogue from server..."<<std::endl;
+    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::LIST_RACES));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
+    send_buffer();
+}
 
 void ClientProtocol::send_username(const std::string& username) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_USERNAME));
@@ -27,6 +38,8 @@ void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -35,6 +48,8 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -43,6 +58,8 @@ void ClientProtocol::change_username(const LobbyDTO& lobby) {
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -51,11 +68,18 @@ void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
 void ClientProtocol::send_exit(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0); //race = 0
     send_buffer();
 }
 
@@ -65,13 +89,45 @@ void ClientProtocol::send_car_selection(const car_dto& car){
     send_buffer();
 }
 
+void ClientProtocol::send_race(const RaceDTO& race){
+    add_string_to_buffer(race.name);
+    add_string_to_buffer(race.city);
+    add_uint8_to_buffer(race.size_checkpoints);
+    for (const auto& c : race.checkpoints){
+        add_uint8_to_buffer(c.id);
+        add_string_to_buffer(std::string(1, c.orientation));
+        add_uint16_to_buffer(c.x);
+        add_uint16_to_buffer(c.y);
+        add_uint8_to_buffer(c.width);
+        add_uint8_to_buffer(c.height);
+    }
+    add_uint8_to_buffer(race.laps);
+}
+
+void ClientProtocol::send_races_selection(const std::vector<RaceDTO>& races){
+    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::SEND_RACE_SELECTION));
+    add_uint32_to_buffer(0);
+    add_string_to_buffer("");
+    add_uint8_to_buffer(0);
+    add_uint8_to_buffer(0);
+    uint8_t size = static_cast<uint8_t>(races.size());
+    add_uint8_to_buffer(size);
+    for (const auto& race : races) {
+        send_race(race);
+    }
+
+    send_buffer();
+
+}
+
 CarPositionDTO ClientProtocol::receive_car_position() {
 
     const uint32_t client_id = recv_uint32();
     const uint32_t x_position = recv_uint32();
     const uint32_t y_position = recv_uint32();
     const uint32_t angle = recv_uint32();
-    return CarPositionDTO(client_id, x_position, y_position, angle);
+    const uint8_t layer = recv_uint8();
+    return CarPositionDTO(client_id, x_position, y_position, angle, static_cast<CarLayer>(layer));
 }
 
 std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
@@ -133,15 +189,62 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue(){
     return CarCatalogueDTO(std::move(cars));
 }
 
+LobbyDTO ClientProtocol::receive_lobby(){
+    const uint8_t action_byte = recv_uint8();
+    std::cout<<"Received lobby action byte: "<<static_cast<int>(action_byte)<<std::endl;
+    const uint32_t lobby_id = recv_uint32();
+    std::cout<<"Received lobby ID: "<<static_cast<int>(lobby_id)<<std::endl;
+    const std::string lobby_name = recv_string();
+    std::cout<<"Received lobby name: "<<lobby_name<<std::endl;
+    const uint8_t max_players = recv_uint8();
+    std::cout<<"Received lobby max players: "<<static_cast<int>(max_players)<<std::endl;
+    const uint8_t active_players = recv_uint8();
+    std::cout<<"Received lobby active players: "<<static_cast<int>(active_players)<<std::endl;
+
+    LobbyAction action = static_cast<LobbyAction>(action_byte);
+
+    return LobbyDTO(action, lobby_id, lobby_name, max_players, active_players);
+}
+
 LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue(){
     uint8_t size = recv_uint8();
+    std::cout<<"Received lobby catalogue of size: "<<static_cast<int>(size)<<std::endl;
     std::vector<LobbyDTO> lobbies;
     for (uint8_t i = 0; i < size; ++i) {
-        uint32_t lobby_id = recv_uint32();
-
-        lobbies.push_back(LobbyDTO(lobby_id));
+        LobbyDTO lobby = receive_lobby();
+        lobbies.push_back(lobby);
+        std::cout<<"Received lobby: "<<lobby.lobby_name<<std::endl;
     }
     return LobbyCatalogueDTO(std::move(lobbies));
+}
+
+RaceDTO ClientProtocol::receive_race(){
+    const std::string name = recv_string();
+    const std::string city = recv_string();
+    const uint8_t size_checkpoints = recv_uint8();
+    std::vector<CheckpointDTO> checkpoints;
+    for(uint8_t i =0; i < size_checkpoints; ++i){
+        const uint8_t id = recv_uint8();
+        const char orientation = static_cast<char>(recv_string()[0]);
+        const uint16_t x = recv_uint16();
+        const uint16_t y = recv_uint16();
+        const uint8_t width = recv_uint8();
+        const uint8_t height = recv_uint8();
+        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
+    }
+    const uint8_t laps = recv_uint8();
+    return RaceDTO(name, city, std::move(checkpoints), laps);
+}
+
+RaceCatalogueDTO ClientProtocol::receive_race_catalogue(){
+    uint8_t size = recv_uint8();
+    std::vector<RaceDTO> races;
+    for (uint8_t i = 0; i < size; ++i) {
+        races.push_back(receive_race());
+    }
+    std::cout<<"Received race catalogue of size: "<<static_cast<int>(size)<<std::endl;
+
+    return RaceCatalogueDTO(std::move(races));
 }
 
 LobbyDTO ClientProtocol::receive_lobby_info(){

@@ -15,6 +15,8 @@ class CollisionListener: public b2ContactListener {
 
     std::unordered_map<uint32_t, Player>& players;
 
+    void handle_sensor_contact(b2Contact* contact, bool is_begin);
+
 
 public:
     CollisionListener(const CollisionListener&) = delete;

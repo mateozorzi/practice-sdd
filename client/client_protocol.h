@@ -16,6 +16,7 @@
 #include "../common/lobbies_catalogue_dto.h"
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
+#include "../common/race_catalogue_dto.h"
 
 enum class ServerResponse {
 
@@ -29,12 +30,14 @@ enum class ServerResponse {
 
 class ClientProtocol final: public CommonProtocol {
 
+
 public:
     ClientProtocol(const ClientProtocol& other) = delete;
     ClientProtocol& operator=(const ClientProtocol& other) = delete;
 
     using CommonProtocol::CommonProtocol;
 
+    void ask_for_race_catalogue();
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
     void send_create_lobby(const LobbyDTO& lobby);
@@ -43,6 +46,8 @@ public:
     void send_car_selection(const car_dto& car);
     void change_username(const LobbyDTO& lobby);
     void send_exit(const LobbyDTO& lobby);
+    void send_race(const RaceDTO& race);
+    void send_races_selection(const std::vector<RaceDTO>& races);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
     void ask_for_catalogue();
@@ -50,6 +55,9 @@ public:
     LobbyCatalogueDTO receive_lobby_catalogue();
     LobbyDTO receive_lobby_info();
     LobbyDTO receive_lobby_action();
+    LobbyDTO receive_lobby();
+    RaceDTO receive_race();
+    RaceCatalogueDTO receive_race_catalogue();
     uint32_t receive_id();
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();

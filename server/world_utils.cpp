@@ -1,3 +1,4 @@
+#include "car.h"
 #include "world_utils.h"
 
 #include <fstream>
@@ -12,7 +13,9 @@
 #include "world_creation_exception.h"
 
 bool WorldUtils::add_polygon_to_world(const std::vector<std::vector<int>>& polygon,
-                                      b2World& world) {
+                                      b2World& world, const uint16_t category,
+                                      const uint16_t mask) {
+
     if (polygon.size() < 3) {
         throw WorldCreationException("Invalid polygon vertex count: " + polygon.size());
     }
@@ -51,11 +54,54 @@ bool WorldUtils::add_polygon_to_world(const std::vector<std::vector<int>>& polyg
     fixtureDef.friction = 0.0f;
     fixtureDef.restitution = 0.0f;
 
+    fixtureDef.filter.categoryBits = category;
+    fixtureDef.filter.maskBits = mask;
+
     // Attach the fixture to the body
     body->CreateFixture(&fixtureDef);
 
     return true;
 }
+
+
+bool WorldUtils::add_sensor_to_world(const std::vector<std::vector<int>>& polygon, 
+                                       b2World& world, 
+                                       SensorType type, const uint16_t category, const uint16_t mask) {
+
+    b2Vec2 vertices[4];
+    for (size_t i = 0; i < polygon.size(); i++) {
+        if (polygon[i].size() < 2) {
+            throw WorldCreationException("Invalid vertex format");
+        }
+        float x = pixels_to_meters(polygon[i][0]);
+        float y = pixels_to_meters(polygon[i][1]);
+        vertices[i].Set(x, y);
+    }
+
+    b2PolygonShape sensorShape;
+    sensorShape.Set(vertices, static_cast<int32>(polygon.size()));
+
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_staticBody;
+
+    b2Body* body = world.CreateBody(&bodyDef);
+
+    //body->GetUserData().pointer = (uintptr_t)type;
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &sensorShape;
+    fixtureDef.isSensor = true;
+
+    fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new SensorType(type));
+
+    fixtureDef.filter.categoryBits = category;
+    fixtureDef.filter.maskBits = mask;
+
+    body->CreateFixture(&fixtureDef);
+
+    return true;
+}
+
 
 std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_json(
         const char* jsonPath) {

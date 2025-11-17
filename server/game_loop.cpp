@@ -11,13 +11,14 @@
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                   const uint8_t max_players, const ServerConfig& config):
+                   const uint8_t max_players, const ServerConfig& config, RaceCatalogueDTO& selected) :
         max_players(max_players),
         config(config),
         game_monitor(game_monitor),
         command_queue(command_queue),
         world(b2Vec2(0.0f, 0.0f)),
-        collision_listener(players) {
+        collision_listener(players),
+        selected_races(selected) {
 
     world.SetContactListener(&collision_listener);
 
@@ -29,17 +30,65 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
             {ClientAction::DISCONNECT,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
 
-    auto polygons = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
-    for (const auto& p: polygons) {
+
+    auto on_ground_collidables = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
+    for (const auto& ground_collidable: on_ground_collidables) {
         try {
-            bool added = WorldUtils::add_polygon_to_world(p, world);
+            bool added = WorldUtils::add_polygon_to_world(ground_collidable, world, CATEGORY_GROUND, MASK_GROUND);
             if (!added) {
-                std::cout << "Polygon of size " << p.size() << " ommited\n";
+                std::cout << "On ground collidable of size " << ground_collidable.size() << " ommited\n";
             }
         } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Could not add collision bodies: ") +
+            throw WorldCreationException(std::string("Could not add on ground collidable bodies: ") +
                                          std::string(e.what()));
         }
+    }
+
+    auto on_bridge_collidables = WorldUtils::load_polygons_from_json("server/resources/world/on_bridge_collidables_liberty_city.json");
+    for (const auto& bridge_collidable: on_bridge_collidables) {
+        try {
+            bool added = WorldUtils::add_polygon_to_world(bridge_collidable, world, CATEGORY_BRIDGE, MASK_BRIDGE);
+            if (!added) {
+                std::cout << "On bridge collidable of size " << bridge_collidable.size() << " ommited\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Could not add on bridge collidable bodies: ") +
+                                         std::string(e.what()));
+        }
+    }
+
+    auto on_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/on_bridge_sensors_liberty_city.json");
+    for (const auto& p: on_bridge_sensors) {
+        try {
+            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
+            if (!added) {
+                std::cout << "On bridge sensor of size " << p.size() << " omitted\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Error adding on bridge sensor: ") +
+                            std::string(e.what()));
+        }
+    }
+
+    auto under_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/under_bridge_sensors_liberty_city.json");
+    for (const auto& p: under_bridge_sensors) {
+        try {
+            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
+            if (!added) {
+                std::cout << "Under bridge sensor of size " << p.size() << " omitted\n";
+            }
+        } catch (const std::exception& e) {
+            throw WorldCreationException(std::string("Error adding under bridge sensor: ") +
+                            std::string(e.what()));
+        }
+    }
+
+    //cout info races
+    std::cout << "Selected races: " << std::endl;
+    for (const auto& race : selected_races.races) {
+        std::cout << " - " << race.name << " in " << race.city << " with "
+                  << static_cast<int>(race.size_checkpoints) << " checkpoints and "
+                  << static_cast<int>(race.laps) << " laps." << std::endl;
     }
 }
 
@@ -50,14 +99,21 @@ void GameLoop::remove_player(const uint32_t client_id) {
 
     if (it != players.end())
         players.erase(it);
-    
+
     game_monitor.unregister_client(client_id);
-    game_monitor.remove_client(client_id);
+
+    std::cerr << "[" << GAME_LOOP << "] "
+              << "Player with ID: " << client_id
+              << " has been removed from the Game World." << std::endl;
 }
 
 bool GameLoop::is_full() const { return players.size() >= max_players; }
 
 bool GameLoop::is_empty() const { return players.empty(); }
+
+uint8_t GameLoop::get_active_players() const {
+    return static_cast<uint8_t>(players.size());
+}
 
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
@@ -153,8 +209,6 @@ void GameLoop::run() {
         const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
 
         while (should_keep_running()) {
-
-            //load_races
 
 
             process_commands();
