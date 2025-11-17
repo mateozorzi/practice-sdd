@@ -176,6 +176,25 @@ void GameLoop::run() {
             if (all_player_in_game()) {
 
                 //start races
+                
+                
+                /*int n_race = 0;
+                
+                while (n_race < selected_races.size){
+                    //first server send race to players
+                    //start timer, if 10 min passes the race is finished, send message to clients
+
+                    //second setting the positions of the players at the start line (first checkpoint)
+                    while(!all_player_finish_race()){
+                        //race logic
+    
+                        //continue updating positions, if player not finished
+                    }
+                    n_race++;
+                    //server send leaderboard to players
+
+                }*/
+                
 
                 update_positions();
                 world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);

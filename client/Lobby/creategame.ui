@@ -101,7 +101,7 @@ background-color: rgb(0, 0, 0);
 border-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
-     <string>Create Lobby</string>
+     <string>Create Game</string>
     </property>
    </widget>
    <widget class="QPushButton" name="joinlobby">
@@ -137,7 +137,7 @@ background-color: rgb(0, 0, 0);
 border-color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
-     <string>Join Lobby</string>
+     <string>Join Game</string>
     </property>
    </widget>
    <widget class="QPushButton" name="Exit">
