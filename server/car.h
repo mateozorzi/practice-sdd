@@ -10,6 +10,14 @@
 #include "server_config.h"
 
 
+enum class CarLayer {
+
+    ON_GROUND,
+    ON_BRIDGE,
+    UNDER_BRIDGE
+};
+
+
 struct CarConfig {
 
     float width;
@@ -45,6 +53,7 @@ class Car {
     bool moving_left = false;
     bool moving_right = false;
     bool is_colliding = false;
+    CarLayer car_layer = CarLayer::ON_GROUND;
 
     void detect_linear_movement();
     void detect_rotation();
@@ -57,17 +66,16 @@ public:
     explicit Car(uint32_t client_id, b2World& world, const ServerConfig& server_config);
 
     void handle_movement(const MovementDTO& movement_dto);
-
     void update_position();
-
     CarPositionDTO get_position_dto() const;
-
     const car_dto get_configuration() const;
 
     void set_collision(bool colliding);
     b2Body* get_body() const;
-
     void set_configuration(const car_dto& car_configuration);
+
+    CarLayer get_layer() const;
+    void set_layer(CarLayer car_layer);
 };
 
 #endif

@@ -43,6 +43,44 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
+    try {
+        auto bridge_sensors = WorldUtils::load_polygons_from_json(
+            "server/resources/world/bridges_liberty_city.json"
+        );
+        for (const auto& p: bridge_sensors) {
+            try {
+                bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE);
+                if (!added) {
+                    std::cout << "Bridge sensor of size " << p.size() << " omitted\n";
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Error adding bridge sensor: " << e.what() << std::endl;
+            }
+        }
+        std::cout << "Loaded " << bridge_sensors.size() << " bridge entry sensors\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Could not load bridge sensors: " << e.what() << std::endl;
+    }
+
+    try {
+        auto bridge_sensors = WorldUtils::load_polygons_from_json(
+            "server/resources/world/under_bridge_sensors_liberty_city.json"
+        );
+        for (const auto& p: bridge_sensors) {
+            try {
+                bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE);
+                if (!added) {
+                    std::cout << "Bridge sensor of size " << p.size() << " omitted\n";
+                }
+            } catch (const std::exception& e) {
+                std::cerr << "Error adding bridge sensor: " << e.what() << std::endl;
+            }
+        }
+        std::cout << "Loaded " << bridge_sensors.size() << " bridge entry sensors\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Could not load bridge sensors: " << e.what() << std::endl;
+    }
+
     //cout info races
     std::cout << "Selected races: " << std::endl;
     for (const auto& race : selected_races.races) {

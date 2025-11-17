@@ -57,6 +57,43 @@ bool WorldUtils::add_polygon_to_world(const std::vector<std::vector<int>>& polyg
     return true;
 }
 
+
+bool WorldUtils::add_sensor_to_world(const std::vector<std::vector<int>>& polygon, 
+                                       b2World& world, 
+                                       SensorType type) {
+
+    b2Vec2 vertices[4];
+    for (size_t i = 0; i < polygon.size(); i++) {
+        if (polygon[i].size() < 2) {
+            throw WorldCreationException("Invalid vertex format");
+        }
+        float x = pixels_to_meters(polygon[i][0]);
+        float y = pixels_to_meters(polygon[i][1]);
+        vertices[i].Set(x, y);
+    }
+
+    b2PolygonShape sensorShape;
+    sensorShape.Set(vertices, static_cast<int32>(polygon.size()));
+
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_staticBody;
+
+    b2Body* body = world.CreateBody(&bodyDef);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &sensorShape;
+    fixtureDef.isSensor = true;
+
+    fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(
+        new SensorType(type)
+    );
+
+    body->CreateFixture(&fixtureDef);
+
+    return true;
+}
+
+
 std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_json(
         const char* jsonPath) {
     std::vector<std::vector<std::vector<int>>> polygons;

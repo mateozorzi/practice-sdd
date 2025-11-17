@@ -30,12 +30,12 @@ void Sender::run() {
                     
                     if constexpr (std::is_same_v<T, WorldSnapshotDTO>) {
                         //WorldSnapshotDTO
-                        std::cout<< "[SENDER] Sending WorldSnapshotDTO to client: " << client_id << std::endl;
+                        //std::cout<< "[SENDER] Sending WorldSnapshotDTO to client: " << client_id << std::endl;
                         this->server_protocol.send_world_snapshot(snapshot);
                     }
                     else if constexpr (std::is_same_v<T, RaceDTO>) {
                         //RaceDTO
-                        std::cout<< "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
+                        //std::cout<< "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
                         //this->server_protocol.send_race_update(snapshot); //not implemented
                     }else{
                         std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
