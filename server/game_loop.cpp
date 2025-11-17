@@ -21,7 +21,8 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         world(b2Vec2(0.0f, 0.0f)),
         collision_listener(players),
         selected_races(selected),
-        leaderboards(), actual_race(), final_leaderboard() {
+        leaderboards(), actual_race(), final_leaderboard(),
+        race_active(false) {
 
     world.SetContactListener(&collision_listener);
 
@@ -224,10 +225,10 @@ bool GameLoop::all_player_in_game() const {
                        [](const auto& p) { return p.second.is_in_game(); });
 }
 
-bool GameLoop::all_player_finish_race() const {
+bool GameLoop::player_in_race() const {
 
-    return std::all_of(players.begin(), players.end(),
-                       [](const auto& p) { return !p.second.is_in_race(); });
+    return std::any_of(players.begin(), players.end(),
+                       [](const auto& p) { return p.second.is_in_race(); });
 }
 
 void GameLoop::send_finish_race_timeout() {
@@ -235,13 +236,12 @@ void GameLoop::send_finish_race_timeout() {
 }
 
 void GameLoop::start_race(const RaceDTO& race){    
-    const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
-    //server send race to players
-    send_race(race);
     
+    race_active = true;
+    send_race(race);
     //client can upgrade their car, 10 seconds to do it
     //sleep 10 seconds?
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     
     for (auto& [client_id, player]: players) {
         //setting the positions of the players at the start line (first checkpoint)
@@ -250,34 +250,14 @@ void GameLoop::start_race(const RaceDTO& race){
     }
     
     //set timeout, if 10 min passes the race is finished, send message to clients
-    auto race_start_time = std::chrono::steady_clock::now();
-    auto race_timeout = std::chrono::minutes(10);
+    //auto race_start_time = std::chrono::steady_clock::now();
+    //auto race_timeout = std::chrono::minutes(10);
 
     //the race start, countdown 3,2,1, go!
     //server sends countdown to players
     //sleep 3 seconds?
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
-    while(!all_player_finish_race()){
-        
-        auto current_time = std::chrono::steady_clock::now();
-        if (current_time - race_start_time >= race_timeout) {
-            send_finish_race_timeout();
-            break;
-        }
-        //race logic
-        update_positions();
-        world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-        std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
-
-    }
-
-    //all players finish the race, calculate points in actual_race leaderboard
-    //calculate points and positions
-
-    //server send leaderboard to players, actual_race
-    //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
-    //sleep to show leaderboard for some seconds, 5 seconds?
 }
 
 
@@ -285,9 +265,9 @@ void GameLoop::run() {
 
     try {
 
-        //const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
+        const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
         const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
-        
+        uint8_t current_race_index = 0;
         
         while (should_keep_running()) {
 
@@ -297,13 +277,29 @@ void GameLoop::run() {
             if (all_player_in_game()) {
 
                 //start races
-                
-                for (const RaceDTO& race : selected_races.races) {
-                    this->start_race(race);
+                if (!race_active && current_race_index < selected_races.size){
+                    start_race(selected_races.races[current_race_index]);
                 }
-
-            //send final_leaderboard and end game logic here
                 
+                if(player_in_race()){
+                    /*auto current_time = std::chrono::steady_clock::now();
+                    if (current_time - race_start_time >= race_timeout) {
+                        send_finish_race_timeout();
+                        break;
+                    }*/
+                    //race logic
+
+                    update_positions();
+                    world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
+
+                    //all players finish the race, calculate points in actual_race leaderboard
+                    //calculate points and positions
+
+                    //server send leaderboard to players, actual_race
+                    //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
+                    //sleep to show leaderboard for some seconds, 5 seconds?
+                }              
                 
             } else {
 

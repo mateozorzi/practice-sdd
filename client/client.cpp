@@ -65,7 +65,7 @@ void Client::run() {
         Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& car_queue =
                 receiver.get_car_positions_queue();
 
-        std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> snapshot = WorldSnapshotDTO();
+        std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> snapshot;
         bool has_positions = false;
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;

@@ -37,6 +37,7 @@ class GameLoop final: public Thread {
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO actual_race;
     LeaderboardDTO final_leaderboard;
+    bool race_active;
 
     void process_commands();
     void handle_car_selection(const GameCommand& game_command);
@@ -50,7 +51,7 @@ class GameLoop final: public Thread {
     void send_finish_race_timeout();
 
     bool all_player_in_game() const;
-    bool all_player_finish_race() const;
+    bool player_in_race() const;
 
 
 public:

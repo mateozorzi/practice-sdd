@@ -69,31 +69,31 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
         //second checkpoint is above or below
 
         if (second_position.y >= start_position.y) { //above
-            angle = b2_pi / 2.0f;
+            angle = b2_pi;
         } else { //below
-            angle = 3.0f * b2_pi / 2.0f;
+            angle = 0.0f;
         }
     } else if (start_position.orientation == VERTICAL) { //first checkpoint is vertical
         //second checkpoint is to the left or right
         if (second_position.x <= start_position.x) { //left
-            angle = b2_pi;
+            angle = 3.0f * b2_pi / 2.0f;
         } else { //right
-            angle = 0.0f;
+            angle = b2_pi / 2.0f;
         }
     } else { //first checkpoint in intersection
         if (second_position.y > start_position.y) { //above
-            angle = b2_pi / 2.0f;
+            angle = b2_pi;
         } else if (second_position.y < start_position.y) { //below
-            angle = 3.0f * b2_pi / 2.0f;
+            angle = 0.0f;
         } else {//same y, must be left or right
             if (second_position.x < start_position.x) { //left
-                angle = b2_pi;
+                angle = 3.0f * b2_pi / 2.0f;
             } else { //right
-                angle = 0.0f;
+                angle = b2_pi / 2.0f;
             }
         }
     }
-    
+
     body->SetTransform(
         b2Vec2(
             start_x,
@@ -109,15 +109,19 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
     switch (movement_dto.direction) {
 
         case Direction::UP:
+            std::cout<<"Player id "<<client_id<<" moving up: "<<movement_dto.isMoving<<std::endl;
             moving_up = movement_dto.isMoving;
             break;
         case Direction::DOWN:
+            std::cout<<"Player id "<<client_id<<" moving down: "<<movement_dto.isMoving<<std::endl;
             moving_down = movement_dto.isMoving;
             break;
         case Direction::LEFT:
+            std::cout<<"Player id "<<client_id<<" moving left: "<<movement_dto.isMoving<<std::endl;
             moving_left = movement_dto.isMoving;
             break;
         case Direction::RIGHT:
+            std::cout<<"Player id "<<client_id<<" moving right: "<<movement_dto.isMoving<<std::endl;
             moving_right = movement_dto.isMoving;
             break;
     }
