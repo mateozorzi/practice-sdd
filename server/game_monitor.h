@@ -32,7 +32,7 @@ public:
 
     Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
-    void broadcast(const WorldSnapshotDTO& world_snapshot);
+    void broadcast(const std::variant<WorldSnapshotDTO, RaceDTO>& info);
     void remove_client(uint32_t client_id);
     void stop();
 

@@ -40,6 +40,7 @@ class GameLoop final: public Thread {
     void handle_disconnection(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);
     void update_positions();
+    void send_race(const RaceDTO& race);
 
     bool all_player_in_game() const;
 

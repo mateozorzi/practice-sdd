@@ -22,6 +22,12 @@ b2Body* Player::get_car_body() const {
     return nullptr;
 }
 
+void Player::set_position_for_race(const CheckpointDTO& start_position) {
+
+    if (car)
+        car->set_position_for_race(start_position);
+}
+
 const std::string& Player::get_username() const { return username; }
 
 const car_dto Player::get_car() const {

@@ -39,7 +39,7 @@ void GameMonitor::unregister_client(const uint32_t client_id) {
 }
 
 
-void GameMonitor::broadcast(const WorldSnapshotDTO& world_snapshot) {
+void GameMonitor::broadcast(const std::variant<WorldSnapshotDTO, RaceDTO>& info) {
 
     std::lock_guard lock(mtx);
 
@@ -47,7 +47,7 @@ void GameMonitor::broadcast(const WorldSnapshotDTO& world_snapshot) {
 
         try {
 
-            snapshot_queue->try_push(world_snapshot);
+            snapshot_queue->try_push(info);
         } catch (const std::exception&) {}
     }
 }

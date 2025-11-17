@@ -7,6 +7,7 @@
 #include "../common/car_dto.h"
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
+#include "../common/checkpoint_dto.h"
 #include "server_config.h"
 
 
@@ -55,6 +56,8 @@ public:
     Car& operator=(const Car&) = delete;
 
     explicit Car(uint32_t client_id, b2World& world, const ServerConfig& server_config);
+
+    void set_position_for_race(const CheckpointDTO& start_position);
 
     void handle_movement(const MovementDTO& movement_dto);
 

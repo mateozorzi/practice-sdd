@@ -21,6 +21,11 @@ enum class GameLoopAction : uint8_t {
     SEND_RACE = 0x11
 };
 
+//CHECKPOINTS
+constexpr char HORIZONTAL = 'H';
+constexpr char VERTICAL = 'V';
+constexpr char INTERSECTION = 'I';
+
 // SERVER
 constexpr int MAX_PATH_LENGTH = 4096;
 constexpr char SERVER_CMD_EXIT = 'q';

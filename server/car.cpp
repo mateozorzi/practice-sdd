@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../common/constants.h"
+#include "../common/checkpoint_dto.h"
 
 Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_config):
         client_id(client_id), body(nullptr), config({
@@ -46,6 +47,27 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
     fixture.restitution = config.restitution;
 
     body->CreateFixture(&fixture);
+}
+
+void Car::set_position_for_race(const CheckpointDTO& start_position){
+    float start_x = static_cast<float>(start_position.x) / PIXELS_PER_METER;
+    float start_y = static_cast<float>(start_position.y) / PIXELS_PER_METER;
+    float angle = 0.0f;
+    if (start_position.orientation == HORIZONTAL){
+        angle = 0.0f;
+    } else { //vertical e intersection
+        angle = b2_pi / 2.0f;
+       
+    }
+
+    body->SetTransform(
+        b2Vec2(
+            start_x,
+            start_y
+        ),
+        angle
+    );
+    
 }
 
 void Car::handle_movement(const MovementDTO& movement_dto) {

@@ -8,6 +8,7 @@
 
 #include "world_creation_exception.h"
 #include "world_utils.h"
+#include "../common/checkpoint_dto.h"
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
@@ -153,6 +154,10 @@ void GameLoop::update_positions() {
     game_monitor.broadcast(world_snapshot);
 }
 
+void GameLoop::send_race(const RaceDTO& race){
+    game_monitor.broadcast(race);
+}
+
 
 bool GameLoop::all_player_in_game() const {
 
@@ -167,7 +172,7 @@ void GameLoop::run() {
 
         const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
         const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
-
+        
         while (should_keep_running()) {
 
 
@@ -177,25 +182,25 @@ void GameLoop::run() {
 
                 //start races
                 
-                
-                /*int n_race = 0;
-                
-                while (n_race < selected_races.size){
+                /*for (const RaceDTO& race : selected_races.races) {
                     //first server send race to players
+                    send_race(race);
                     //start timer, if 10 min passes the race is finished, send message to clients
 
                     //second setting the positions of the players at the start line (first checkpoint)
+                    for (auto& [client_id, player]: players) {
+                        player.set_position_for_race(start_position);
+                    }
                     while(!all_player_finish_race()){
                         //race logic
     
                         //continue updating positions, if player not finished
                     }
-                    n_race++;
                     //server send leaderboard to players
 
                 }*/
                 
-
+                
                 update_positions();
                 world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
                 std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
