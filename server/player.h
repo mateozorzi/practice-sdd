@@ -24,6 +24,7 @@ class Player {
     uint16_t races_won;
     bool in_game;
     bool in_race;
+    bool has_finish_race;
     int id_next_checkpoint;
     uint8_t n_lap;
     CheckpointDTO next;
@@ -57,6 +58,7 @@ public:
     void start_race();
     bool is_in_race() const;
     void finish_race();
+    bool has_finished_race() const;
     bool have_time_recorded() const;
     void record_time(uint32_t seconds);
     uint32_t get_recorded_time() const;

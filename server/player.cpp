@@ -15,7 +15,8 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         health(config.app.server.world.physics.car.health),
         races_won(0),
         in_game(false),
-        in_race(false),
+        in_race(false), 
+        has_finish_race(false),
         id_next_checkpoint(1),
         n_lap(1), next(), race_time(0) {}
 
@@ -41,6 +42,7 @@ void Player::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints
 
 void Player::start_race(){
     in_race = true;
+    has_finish_race = false;
     id_next_checkpoint = 1;
     n_lap = 1;
     race_time = 0;
@@ -53,10 +55,15 @@ bool Player::is_in_race() const {
 
 void Player::finish_race(){
     in_race = false;
+    has_finish_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
     race_time = 0;
     
+}
+
+bool Player::has_finished_race()const{
+    return has_finish_race;
 }
 
 bool Player::have_time_recorded() const {
