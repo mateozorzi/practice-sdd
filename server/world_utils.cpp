@@ -92,7 +92,8 @@ bool WorldUtils::add_sensor_to_world(const std::vector<std::vector<int>>& polygo
     fixtureDef.shape = &sensorShape;
     fixtureDef.isSensor = true;
 
-    fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new SensorType(type));
+    //fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(new SensorType(type));
+    fixtureDef.userData.pointer = static_cast<uintptr_t>(type);
 
     fixtureDef.filter.categoryBits = category;
     fixtureDef.filter.maskBits = mask;
