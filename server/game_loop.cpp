@@ -247,10 +247,6 @@ void GameLoop::start_race(const RaceDTO& race){
         player.start_race();
     }
     
-    //set timeout, if 10 min passes the race is finished, send message to clients
-    //auto race_start_time = std::chrono::steady_clock::now();
-    //auto race_timeout = std::chrono::minutes(10);
-
     //the race start, countdown 3,2,1, go!
     //server sends countdown to players
     //sleep 3 seconds?
@@ -398,7 +394,6 @@ void GameLoop::run() {
                 if(player_in_race()){
                     auto current_time = std::chrono::steady_clock::now();
                     
-                    // CALCULAR TIEMPO TRANSCURRIDO CORRECTAMENTE
                     auto elapsed = current_time - race_start_time;
                     uint32_t seconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
 
@@ -427,6 +422,7 @@ void GameLoop::run() {
                     
                     //create leaderboard and reset race_time to players
                     create_leaderboard(current_race_index);
+                    //send FINISH_RACE
                     
                     //server send leaderboard to players, actual_race
                     //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
@@ -438,6 +434,7 @@ void GameLoop::run() {
                     //all races finished
                     //create and send final leaderboard
                     create_final_leaderboard();
+                    
                     //sleep to show final leaderboard for some seconds, 10 seconds?
                     break;
                 }
