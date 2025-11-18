@@ -12,6 +12,7 @@
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
+#include "../common/game_update_dto.h"
 
 #include "camera.h"
 #include "menu_interface.h"
@@ -57,20 +58,20 @@ void Client::run() {
             return;
         }
         // Obtener posiciones
-        Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& car_queue =
+        Queue<GameUpdateDTO>& car_queue =
                 receiver.get_car_positions_queue();
 
-        std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> snapshot;
+        GameUpdateDTO snapshot;
         bool has_positions = false;
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;
         }
         if (has_positions) {
-            if (std::holds_alternative<WorldSnapshotDTO>(snapshot)) {
-                last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot);
-            } else if (std::holds_alternative<RaceDTO>(snapshot)) {
-                last_race_state = std::get<RaceDTO>(snapshot);
-            }else /*(std::holds_alternative<std::monostate>(snapshot))*/ {
+            if (snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+                last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
+            } else if (snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
+                last_race_state = std::get<RaceDTO>(snapshot.data);
+            }else /*(std::holds_alternative<std::monostate>(snapshot.data))*/ {
                 //race finish by timeout
             }
         }

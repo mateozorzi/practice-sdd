@@ -4,6 +4,7 @@
 #include "../common/constants.h"
 #include "../common/race_dto.h"
 #include "../common/checkpoint_dto.h"
+#include "../common/player_race_stats_dto.h"
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world,
@@ -62,12 +63,16 @@ bool Player::have_time_recorded() const {
     return false;
 }
 
-void Player::record_time(uint64_t seconds){ 
+void Player::record_time(uint32_t seconds){ 
     race_time = seconds;
 }
 
-uint64_t Player::get_recorded_time() const {
+uint32_t Player::get_recorded_time() const {
     return race_time;
+}
+
+PlayerRaceStatsDTO Player::get_race_stats() const {
+    return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
 }
 
 const std::string& Player::get_username() const { return username; }

@@ -5,18 +5,19 @@
 #include <utility>
 
 #include "../common/constants.h"
+#include "../common/leaderboard_dto.h"
 
 
 GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
 
-Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& GameMonitor::register_client(const uint32_t client_id) {
+Queue<GameUpdateDTO>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>>(
+    auto queue_pointer = std::make_unique<Queue<GameUpdateDTO>>(
         static_cast<size_t>(config.app.server.snapshot_queue_capacity)
     );
-    Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& queue_reference = *queue_pointer;
+    Queue<GameUpdateDTO>& queue_reference = *queue_pointer;
 
     snapshot_queues[client_id] = std::move(queue_pointer);
 
@@ -39,7 +40,7 @@ void GameMonitor::unregister_client(const uint32_t client_id) {
 }
 
 
-void GameMonitor::broadcast(const std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>& info) {
+void GameMonitor::broadcast(const GameUpdateDTO& info) {
 
     std::lock_guard lock(mtx);
 

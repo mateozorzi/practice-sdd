@@ -10,6 +10,7 @@
 #include "world_utils.h"
 #include "../common/checkpoint_dto.h"
 #include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
@@ -21,7 +22,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         world(b2Vec2(0.0f, 0.0f)),
         collision_listener(players),
         selected_races(selected),
-        leaderboards(), actual_race(), final_leaderboard(),
+        leaderboards(), final_leaderboard(),
         race_active(false) {
 
     world.SetContactListener(&collision_listener);
@@ -184,9 +185,7 @@ void GameLoop::handle_finish_race(const GameCommand& game_command) {
         auto it = players.find(client_id);
         if (it != players.end()) {
             it->second.finish_race();
-        }
-        //update actual_race leaderboard
-        
+        }  
     }
 
 }
@@ -210,11 +209,15 @@ void GameLoop::update_positions(const RaceDTO& race) {
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
-    game_monitor.broadcast(world_snapshot);
+    GameUpdateDTO update(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
+
+    game_monitor.broadcast(update);
 }
 
 void GameLoop::send_race(const RaceDTO& race){
-    game_monitor.broadcast(race);
+    GameUpdateDTO race_update(GameLoopAction::SEND_RACE, race);
+
+    game_monitor.broadcast(race_update);
 }
 
 
@@ -228,10 +231,6 @@ bool GameLoop::player_in_race() const {
 
     return std::any_of(players.begin(), players.end(),
                        [](const auto& p) { return p.second.is_in_race(); });
-}
-
-void GameLoop::send_finish_race_timeout() {
-    game_monitor.broadcast(std::monostate{});
 }
 
 void GameLoop::start_race(const RaceDTO& race){    
@@ -259,7 +258,16 @@ void GameLoop::start_race(const RaceDTO& race){
 
 }
 
-void GameLoop::check_race_times(uint64_t seconds){
+void GameLoop::finish_race(uint32_t timeout_time){
+    for (auto& [client_id, player] : players) {
+        if (player.is_in_race()) {
+            player.finish_race();
+            player.record_time(timeout_time);
+        }
+    }
+}
+
+void GameLoop::check_race_times(uint32_t seconds){
     //check if any player has finished the race
     for (auto& [client_id, player] : players) {
         if (!player.is_in_race() && !player.have_time_recorded()) {
@@ -267,6 +275,53 @@ void GameLoop::check_race_times(uint64_t seconds){
             player.record_time(seconds);
         }
     }
+}
+
+void GameLoop::create_leaderboard(uint8_t current_race_index){
+    //create leaderboard
+    std::vector<PlayerRaceStatsDTO> race_stats;
+    
+    //for every player, create a PlayerRaceStatsDTO
+    for (const auto& [client_id, player] : players){
+        PlayerRaceStatsDTO stats = player.get_race_stats();
+        race_stats.push_back(stats);
+    }
+
+    //sort by race_time, 
+    std::sort(race_stats.begin(), race_stats.end(),
+    [](const PlayerRaceStatsDTO& a, const PlayerRaceStatsDTO& b) {
+        return a.total_time_ms < b.total_time_ms;
+    });
+    //and assign points
+    //First place: 8 points, second: 7, third: 6, fourth: 5, fifth: 4, sixth: 3, seventh: 2, eighth: 1
+    uint8_t points = 8;
+    uint8_t position = 1;
+    for (size_t i = 0; i < race_stats.size(); ++i) {
+        race_stats[i].points = points;
+        points--;
+        race_stats[i].position = position;
+        position++;
+    }
+
+    std::string race_name = selected_races.races[current_race_index].name;
+
+    LeaderboardDTO actual(race_name, race_stats);
+
+    leaderboards.push_back(actual);
+
+    //cout debug of leaderboard
+    std::cout << "Leaderboard for race: " << race_name << std::endl;
+    for (const auto& stats : actual.players) {
+        std::cout << "Position: " << static_cast<int>(stats.position)
+                  << " | Player ID: " << stats.client_id
+                  << " | Username: " << stats.username
+                  << " | Time: " << stats.total_time_ms << " seconds"
+                  << " | Points: " << static_cast<int>(stats.points) << std::endl;
+    }
+
+    //GameUpdateDTO update(GameLoopAction::SEND_LEADERBOARD, actual);
+
+    //game_monitor.broadcast(update);
 }
 
 void GameLoop::run() {
@@ -298,19 +353,19 @@ void GameLoop::run() {
                     
                     // CALCULAR TIEMPO TRANSCURRIDO CORRECTAMENTE
                     auto elapsed = current_time - race_start_time;
-                    uint64_t seconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+                    uint32_t seconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
 
                     if (elapsed >= RACE_TIMEOUT) {
                         //race finish by timeout
                         //finish players who are still racing
-
+                        finish_race(seconds);
+                        continue;
                     }
                     /*auto current_time = std::chrono::steady_clock::now();
                     if (current_time - race_start_time >= race_timeout) {
                         send_finish_race_timeout();
                         break;
                     }*/
-                    //race logic
 
                     update_positions(selected_races.races[current_race_index]);
                     check_race_times(seconds);
@@ -322,19 +377,19 @@ void GameLoop::run() {
                 //if no player racing, race is finished -> show results and start next one.
                 if (race_active){
                     race_active = false;
-                    current_race_index++;
-
+                    
                     //show player time
                     for (const auto& [client_id, player] : players) {
                         std::cout << "Player with ID: " << client_id << " recorded time: " << player.get_recorded_time() << " seconds." << std::endl;
                     }
-
-                    //all players finish the race, calculate points in actual_race leaderboard
-                    //calculate points and positions
-    
+                    
+                    //create leaderboard and reset race_time to players
+                    create_leaderboard(current_race_index);
+                    
                     //server send leaderboard to players, actual_race
                     //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
                     //sleep to show leaderboard for some seconds, 5 seconds?
+                    current_race_index++;
                 }           
                 
             } else {

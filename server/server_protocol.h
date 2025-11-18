@@ -11,6 +11,8 @@
 
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_catalogue_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
 
 
 class ServerProtocol final: public CommonProtocol {
@@ -38,8 +40,9 @@ public:
 
     void send_client_id(uint32_t client_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
-    void send_world_snapshot(const WorldSnapshotDTO& world_snapshot);
-    void send_race_update(const RaceDTO& race);
+    void send_world_snapshot(const GameUpdateDTO& snapshot);
+    void send_race_update(const GameUpdateDTO& snapshot);
+    void send_leaderboard_update(const GameUpdateDTO& snapshot);
     void send_finish_race_timeout();
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);

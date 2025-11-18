@@ -17,6 +17,8 @@
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
 #include "../common/race_catalogue_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
 
 enum class ServerResponse {
 
@@ -62,8 +64,9 @@ public:
     uint32_t receive_id();
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();
+    LeaderboardDTO receive_leaderboard();
     nlohmann::json get_json(const std::string& file_path);
-    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> receive_update();
+    GameUpdateDTO receive_update();
 };
 
 #endif

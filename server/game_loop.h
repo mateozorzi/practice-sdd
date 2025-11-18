@@ -35,7 +35,6 @@ class GameLoop final: public Thread {
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
     RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
-    LeaderboardDTO actual_race;
     LeaderboardDTO final_leaderboard;
     bool race_active;
 
@@ -47,8 +46,9 @@ class GameLoop final: public Thread {
     void handle_command(const GameCommand& game_command);
     void update_positions(const RaceDTO& race);
     void start_race(const RaceDTO& race);
+    void finish_race(uint32_t timeout_time);
+    void create_leaderboard(uint8_t current_race_index);
     void send_race(const RaceDTO& race);
-    void send_finish_race_timeout();
 
     bool all_player_in_game() const;
     bool player_in_race() const;
@@ -70,7 +70,7 @@ public:
     bool is_empty() const;
     uint8_t get_active_players() const;
 
-    void check_race_times(uint64_t seconds);
+    void check_race_times(uint32_t seconds);
 
     void add_player(uint32_t client_id, const std::string& username);
 

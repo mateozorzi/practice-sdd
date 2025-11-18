@@ -6,6 +6,8 @@
 
 #include "../common/constants.h"
 #include <iostream>
+#include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
@@ -141,9 +143,10 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
     send_buffer();
 }
 
-void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot) {
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS));
-    add_uint8_to_buffer(world_snapshot.get_size());
+void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
+    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
+    const WorldSnapshotDTO& world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
+    add_uint8_to_buffer(world_snapshot.size);
 
     for (const auto& car_position: world_snapshot.get_car_positions()) {
         add_player_to_buffer(car_position.first);
@@ -153,10 +156,29 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot)
     send_buffer();
 }
 
-void ServerProtocol::send_race_update(const RaceDTO& race){    
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
+void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot){
+    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
 
+    const RaceDTO& race = std::get<RaceDTO>(snapshot.data);
     add_race_to_buffer(race);
+    send_buffer();
+}
+
+void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot){
+    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
+
+    const LeaderboardDTO& leaderboard = std::get<LeaderboardDTO>(snapshot.data);
+    add_string_to_buffer(leaderboard.race_name);
+    add_uint8_to_buffer(leaderboard.n_players);
+
+    for (const auto& player_stats: leaderboard.players) {
+        add_uint32_to_buffer(player_stats.client_id);
+        add_string_to_buffer(player_stats.username);
+        add_uint8_to_buffer(player_stats.position);
+        add_uint8_to_buffer(player_stats.points);
+        add_uint32_to_buffer(player_stats.total_time_ms);
+    }
+
     send_buffer();
 }
 
