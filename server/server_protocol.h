@@ -39,6 +39,8 @@ public:
     void send_client_id(uint32_t client_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
     void send_world_snapshot(const WorldSnapshotDTO& world_snapshot);
+    void send_race_update(const RaceDTO& race);
+    void send_finish_race_timeout();
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);
     void send_json_file(const std::string& file_path);

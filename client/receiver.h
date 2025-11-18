@@ -19,12 +19,12 @@ class Receiver: public Thread {
     ClientProtocol& protocol;
     GameState game_state;
     std::mutex state_mutex;
-    Queue<std::variant<WorldSnapshotDTO, RaceDTO>> car_positions_queue;
+    Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>> car_positions_queue;
 
 public:
     explicit Receiver(ClientProtocol& protocol);
     GameState get_game_state() const;
-    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& get_car_positions_queue();
+    Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& get_car_positions_queue();
     void run() override;
 };
 

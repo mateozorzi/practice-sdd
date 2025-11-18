@@ -10,6 +10,7 @@
 #include "../common/car_catalogue_dto.h"
 #include "../common/constants.h"
 #include "../common/game_command_dto.h"
+#include "../common/player_race_stats_dto.h"
 
 
 class GameCommand {
@@ -17,7 +18,7 @@ class GameCommand {
 
     uint32_t client_id;
     ClientAction client_action;
-    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto, std::string> command_data;
+    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto, std::string, PlayerRaceStatsDTO> command_data;
 
 
 public:

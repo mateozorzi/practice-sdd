@@ -8,6 +8,7 @@
 
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
+#include "../common/race_dto.h"
 
 #include "car.h"
 #include "server_config.h"
@@ -21,6 +22,13 @@ class Player {
     uint16_t health;
     uint16_t races_won;
     bool in_game;
+    bool in_race;
+    int id_next_checkpoint;
+    uint8_t n_lap;
+    CheckpointDTO next;
+
+    void update_next_checkpoint(const RaceDTO& race);
+    bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
 
 
 public:
@@ -33,15 +41,20 @@ public:
     uint32_t get_client_id() const;
     const std::string& get_username() const;
     const car_dto get_car() const;
+    void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     b2Body* get_car_body() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
-    void update_car_position();
+    void update_car_position(const RaceDTO& race);
     CarPositionDTO get_car_position() const;
     void set_car_collision(bool colliding);
 
     bool is_in_game() const;
     void set_in_game();
+
+    void start_race();
+    bool is_in_race() const;
+    void finish_race();
 
     void set_car_configuration(const car_dto& car_configuration);
 

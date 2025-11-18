@@ -7,7 +7,7 @@
 
 
 Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
-               Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& snapshot_queue):
+               Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& snapshot_queue):
         server_protocol(server_protocol),
         lobby(lobby),
         client_id(client_id),
@@ -36,8 +36,10 @@ void Sender::run() {
                     else if constexpr (std::is_same_v<T, RaceDTO>) {
                         //RaceDTO
                         //std::cout<< "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
-                        //this->server_protocol.send_race_update(snapshot); //not implemented
-                    }else{
+                        this->server_protocol.send_race_update(snapshot);
+                    }else if constexpr (std::is_same_v<T, std::monostate>) {
+                        this->server_protocol.send_finish_race_timeout();
+                    }else {
                         std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
                     }
                     //else ignore

@@ -8,6 +8,8 @@
 
 #include "world_creation_exception.h"
 #include "world_utils.h"
+#include "../common/checkpoint_dto.h"
+#include "../common/leaderboard_dto.h"
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
@@ -18,7 +20,9 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         command_queue(command_queue),
         world(b2Vec2(0.0f, 0.0f)),
         collision_listener(players),
-        selected_races(selected) {
+        selected_races(selected),
+        leaderboards(), actual_race(), final_leaderboard(),
+        race_active(false) {
 
     world.SetContactListener(&collision_listener);
 
@@ -28,7 +32,10 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
             {ClientAction::SEND_CAR_MOVEMENT,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
             {ClientAction::DISCONNECT,
-             [this](const GameCommand& game_command) { handle_disconnection(game_command); }}};
+             [this](const GameCommand& game_command) { handle_disconnection(game_command); }},
+            {ClientAction::FINISH_RACE,
+             [this](const GameCommand& game_command) { handle_finish_race(game_command); }}
+    };
 
 
     auto on_ground_collidables = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
@@ -170,6 +177,20 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
     remove_player(game_command.get_client_id());
 }
 
+void GameLoop::handle_finish_race(const GameCommand& game_command) {
+
+    if (auto stats = game_command.get_data<PlayerRaceStatsDTO>()) {
+        uint32_t client_id = game_command.get_client_id();
+        auto it = players.find(client_id);
+        if (it != players.end()) {
+            it->second.finish_race();
+        }
+        //update actual_race leaderboard
+        
+    }
+
+}
+
 void GameLoop::handle_command(const GameCommand& game_command) {
 
     const auto it = command_handlers.find(game_command.get_client_action());
@@ -178,19 +199,23 @@ void GameLoop::handle_command(const GameCommand& game_command) {
         it->second(game_command);
 }
 
-void GameLoop::update_positions() {
+void GameLoop::update_positions(const RaceDTO& race) {
 
     WorldSnapshotDTO world_snapshot;
 
     for (auto& [client_id, player]: players) {
 
-        player.update_car_position();
+        player.update_car_position(race);
         car_dto car = player.get_car();
         PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
     game_monitor.broadcast(world_snapshot);
+}
+
+void GameLoop::send_race(const RaceDTO& race){
+    game_monitor.broadcast(race);
 }
 
 
@@ -200,6 +225,41 @@ bool GameLoop::all_player_in_game() const {
                        [](const auto& p) { return p.second.is_in_game(); });
 }
 
+bool GameLoop::player_in_race() const {
+
+    return std::any_of(players.begin(), players.end(),
+                       [](const auto& p) { return p.second.is_in_race(); });
+}
+
+void GameLoop::send_finish_race_timeout() {
+    game_monitor.broadcast(std::monostate{});
+}
+
+void GameLoop::start_race(const RaceDTO& race){    
+    
+    race_active = true;
+    send_race(race);
+    //client can upgrade their car, 10 seconds to do it
+    //sleep 10 seconds?
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    
+    for (auto& [client_id, player]: players) {
+        //setting the positions of the players at the start line (first checkpoint)
+        player.set_position_for_race(race.checkpoints);
+        player.start_race();
+    }
+    
+    //set timeout, if 10 min passes the race is finished, send message to clients
+    //auto race_start_time = std::chrono::steady_clock::now();
+    //auto race_timeout = std::chrono::minutes(10);
+
+    //the race start, countdown 3,2,1, go!
+    //server sends countdown to players
+    //sleep 3 seconds?
+    //std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+}
+
 
 void GameLoop::run() {
 
@@ -207,7 +267,8 @@ void GameLoop::run() {
 
         const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
         const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
-
+        uint8_t current_race_index = 0;
+        
         while (should_keep_running()) {
 
 
@@ -216,10 +277,30 @@ void GameLoop::run() {
             if (all_player_in_game()) {
 
                 //start races
+                if (!race_active && current_race_index < selected_races.size){
+                    start_race(selected_races.races[current_race_index]);
+                }
+                
+                if(player_in_race()){
+                    /*auto current_time = std::chrono::steady_clock::now();
+                    if (current_time - race_start_time >= race_timeout) {
+                        send_finish_race_timeout();
+                        break;
+                    }*/
+                    //race logic
 
-                update_positions();
-                world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
+                    update_positions(selected_races.races[current_race_index]);
+                    world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
+
+                    //all players finish the race, calculate points in actual_race leaderboard
+                    //calculate points and positions
+
+                    //server send leaderboard to players, actual_race
+                    //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
+                    //sleep to show leaderboard for some seconds, 5 seconds?
+                }              
+                
             } else {
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(waiting_frame_ms));

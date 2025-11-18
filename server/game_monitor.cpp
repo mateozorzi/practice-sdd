@@ -9,14 +9,14 @@
 
 GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
 
-Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& GameMonitor::register_client(const uint32_t client_id) {
+Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& GameMonitor::register_client(const uint32_t client_id) {
 
     std::lock_guard lock(mtx);
 
-    auto queue_pointer = std::make_unique<Queue<std::variant<WorldSnapshotDTO, RaceDTO>>>(
+    auto queue_pointer = std::make_unique<Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>>(
         static_cast<size_t>(config.app.server.snapshot_queue_capacity)
     );
-    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& queue_reference = *queue_pointer;
+    Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& queue_reference = *queue_pointer;
 
     snapshot_queues[client_id] = std::move(queue_pointer);
 
@@ -39,7 +39,7 @@ void GameMonitor::unregister_client(const uint32_t client_id) {
 }
 
 
-void GameMonitor::broadcast(const WorldSnapshotDTO& world_snapshot) {
+void GameMonitor::broadcast(const std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>& info) {
 
     std::lock_guard lock(mtx);
 
@@ -47,7 +47,7 @@ void GameMonitor::broadcast(const WorldSnapshotDTO& world_snapshot) {
 
         try {
 
-            snapshot_queue->try_push(world_snapshot);
+            snapshot_queue->try_push(info);
         } catch (const std::exception&) {}
     }
 }
