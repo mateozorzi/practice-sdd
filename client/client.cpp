@@ -47,12 +47,7 @@ void Client::run() {
 
 
     // sld_manager its initialized here
-    // std::string chosen_map = "liberty_city";  // TODO: remove harcoded
     sdl_manager = std::make_unique<SDLManager>();
-    // sdl_manager->load_bridges_rects(protocol.get_json("server/resources/world/bridges_" +
-    // chosen_map + ".json"));
-    // sdl_manager->load_decorations_rects(protocol.get_json("server/resources/world/decorations_" +
-    // chosen_map + ".json"));
 
     std::optional<WorldSnapshotDTO> last_world_snapshot;
     std::optional<RaceDTO> last_race_state;
