@@ -62,8 +62,8 @@ public:
     void render(const PlayerDTO& player, int health,
                 const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars, bool is_moving);
     void show_screen();
-    void draw_row(const std::string& sentence, int y, SDL2pp::Color color, int size_container);
-    void render_stats();
+    void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
+    void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
     nlohmann::json load_json_file(const std::string& path);
 };
 
