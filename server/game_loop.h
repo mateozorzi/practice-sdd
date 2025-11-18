@@ -47,6 +47,7 @@ class GameLoop final: public Thread {
     void update_positions(const RaceDTO& race);
     void start_race(const RaceDTO& race);
     void finish_race(uint32_t timeout_time);
+    void create_final_leaderboard();
     void create_leaderboard(uint8_t current_race_index);
     void send_race(const RaceDTO& race);
 

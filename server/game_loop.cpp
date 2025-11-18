@@ -277,6 +277,53 @@ void GameLoop::check_race_times(uint32_t seconds){
     }
 }
 
+void GameLoop::create_final_leaderboard(){
+    std::vector<PlayerRaceStatsDTO> final_stats;
+
+    //recoplite form every leaderboard the stats of every player
+    //if PlayerRaceStatsDTO for a client_id in final stat dont exist, create it and add to final_stats
+    //if exist, sum points and total_time_ms in final stats
+    for (const auto& leaderboard : leaderboards) {
+        for (const auto& stats_race: leaderboard.players){
+            auto it = std::find_if(final_stats.begin(), final_stats.end(),
+                                   [&stats_race](const PlayerRaceStatsDTO& stats_final) {
+                                       return stats_final.client_id == stats_race.client_id;
+                                   });
+            if (it != final_stats.end()) {
+                //found, sum points and total_time_ms
+                it->points += stats_race.points;
+                it->total_time_ms += stats_race.total_time_ms;
+            } else {
+                //not found, create new PlayerRaceStatsDTO and add to final_stats
+                final_stats.emplace_back(stats_race);
+            }
+        }
+    }
+
+    //sort finals_stats by points desc, if tie, by total_time_ms asc
+    std::sort(final_stats.begin(), final_stats.end(),
+    [](const PlayerRaceStatsDTO& a, const PlayerRaceStatsDTO& b) {
+        if (a.points == b.points) {
+            return a.total_time_ms < b.total_time_ms; // Ascending order for total_time_ms
+        }
+        return a.points > b.points; // Descending order for points
+    });
+
+    //debug cout final leaderboard
+    std::cout << "\nFinal Leaderboard: " << std::endl;
+    for (const auto& stats : final_stats) {
+        std::cout << "Player ID: " << stats.client_id
+                  << " | Username: " << stats.username
+                  << " | Total Time: " << stats.total_time_ms << " seconds"
+                  << " | Total Points: " << static_cast<int>(stats.points) << std::endl;
+    }
+
+    final_leaderboard = LeaderboardDTO("Final Leaderboard", final_stats);
+
+    //GameUpdateDTO update(GameLoopAction::SEND_LEADERBOARD, final_leaderboard);
+    //game_monitor.broadcast(update);
+}
+
 void GameLoop::create_leaderboard(uint8_t current_race_index){
     //create leaderboard
     std::vector<PlayerRaceStatsDTO> race_stats;
@@ -310,7 +357,7 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
     leaderboards.push_back(actual);
 
     //cout debug of leaderboard
-    std::cout << "Leaderboard for race: " << race_name << std::endl;
+    std::cout << "\nLeaderboard for race: " << race_name << std::endl;
     for (const auto& stats : actual.players) {
         std::cout << "Position: " << static_cast<int>(stats.position)
                   << " | Player ID: " << stats.client_id
@@ -361,11 +408,6 @@ void GameLoop::run() {
                         finish_race(seconds);
                         continue;
                     }
-                    /*auto current_time = std::chrono::steady_clock::now();
-                    if (current_time - race_start_time >= race_timeout) {
-                        send_finish_race_timeout();
-                        break;
-                    }*/
 
                     update_positions(selected_races.races[current_race_index]);
                     check_race_times(seconds);
@@ -390,9 +432,15 @@ void GameLoop::run() {
                     //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
                     //sleep to show leaderboard for some seconds, 5 seconds?
                     current_race_index++;
-                }           
-                
-            } else {
+                }
+
+                if (current_race_index >= selected_races.size) {
+                    //all races finished
+                    //create and send final leaderboard
+                    create_final_leaderboard();
+                    //sleep to show final leaderboard for some seconds, 10 seconds?
+                    break;
+                }
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(waiting_frame_ms));
             }
