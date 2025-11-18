@@ -48,6 +48,7 @@ private:
     void render_layer(const std::vector<SDL2pp::Rect>& rects);
     void render_bridges();
     void render_decorations();
+    void render_checkpoints(const CheckpointDTO& checkpoint);
 
 public:
     SDLManager();
