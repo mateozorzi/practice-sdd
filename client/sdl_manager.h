@@ -38,6 +38,7 @@ private:
     std::optional<SDL2pp::Texture> minimap;
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
+    std::optional<SDL2pp::Texture> arrow;
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
@@ -49,6 +50,8 @@ private:
     void render_bridges();
     void render_decorations();
     void render_checkpoints(const CheckpointDTO& checkpoint);
+    double calculate_angle_to_checkpoint(const CarPositionDTO& player, const CheckpointDTO& checkpoint);
+    void render_hint(const CarPositionDTO& player);
 
 public:
     SDLManager();

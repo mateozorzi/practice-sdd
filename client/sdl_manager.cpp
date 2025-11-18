@@ -23,6 +23,8 @@ SDLManager::SDLManager():
     set_minimap();
     load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
     load_decorations_rects(load_json_file("server/resources/world/decorations_liberty_city.json"));
+    const SDL2pp::Surface arrow_surface("client/assets/sprites/arrow.png");
+    arrow = SDL2pp::Texture(renderer, arrow_surface);
 }
 
 void SDLManager::set_map() {
@@ -200,6 +202,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     render_hud_health(health);
     render_hud_minimap(pos_x, pos_y);
     render_stats(cars);
+    render_hint(my_car);
 
     show_screen();
 
@@ -292,4 +295,33 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
 
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
     renderer.FillRect(dst);
+}
+
+double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO &player, const CheckpointDTO &checkpoint) {
+    double dx = checkpoint.x - player.x_position;
+    double dy = checkpoint.y - player.y_position;
+
+    double angle_rad = std::atan2(dy, dx);
+    double angle_deg = angle_rad * (180.0 / M_PI);
+
+    double rotation = angle_deg - 90.0;
+    if (rotation < 0) angle_deg += 360;
+
+    return angle_deg;
+}
+
+void SDLManager::render_hint(const CarPositionDTO &player) {
+    double angle = calculate_angle_to_checkpoint(player, player.next);
+
+    SDL2pp::Rect view = camera.get_view_rect();
+
+    int car_screen_x = (player.x_position - view.x) * 1920 / view.w;
+    int car_screen_y = (player.y_position - view.y) * 1080 / view.h;
+
+    int arrow_w = 60;
+    int arrow_h = 60;
+
+    SDL2pp::Rect dst(car_screen_x - arrow_w / 2, car_screen_y - 140, arrow_w, arrow_h);
+
+    renderer.Copy(arrow.value(), SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
