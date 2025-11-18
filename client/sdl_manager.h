@@ -18,10 +18,10 @@
 #include "sounds.h"
 
 static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
-        {"Compact", SDL2pp::Rect(128, 32, 32, 32)},      {"Sport", SDL2pp::Rect(166, 104, 26, 40)},
-        {"Convertible", SDL2pp::Rect(166, 184, 26, 38)}, {"Sedan", SDL2pp::Rect(166, 264, 26, 38)},
-        {"Jeep", SDL2pp::Rect(166, 345, 32, 38)},        {"Rally", SDL2pp::Rect(166, 424, 32, 38)},
-        {"Truck", SDL2pp::Rect(203, 512, 24, 49)}};
+        {"Compact", SDL2pp::Rect(0, 0, 50, 50)},       {"Sport", SDL2pp::Rect(50, 0, 50, 50)},
+        {"Convertible", SDL2pp::Rect(100, 0, 50, 50)}, {"Sedan", SDL2pp::Rect(150, 0, 50, 50)},
+        {"Jeep", SDL2pp::Rect(200, 0, 50, 50)},        {"Rally", SDL2pp::Rect(250, 0, 50, 50)},
+        {"Truck", SDL2pp::Rect(300, 0, 50, 50)}};
 
 class SDLManager {
 private:
@@ -48,6 +48,7 @@ private:
     void render_layer(const std::vector<SDL2pp::Rect>& rects);
     void render_bridges();
     void render_decorations();
+    void render_checkpoints(const CheckpointDTO& checkpoint);
 
 public:
     SDLManager();
@@ -62,8 +63,9 @@ public:
     void render(const PlayerDTO& player, int health,
                 const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars, bool is_moving);
     void show_screen();
-    void draw_row(const std::string& sentence, int y, SDL2pp::Color color, int size_container);
-    void render_stats();
+    void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
+    void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
+    nlohmann::json load_json_file(const std::string& path);
 };
 
 #endif

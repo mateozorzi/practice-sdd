@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <map>
+#include <qforeach.h>
 
 #include <SDL2/SDL.h>
 #include <nlohmann/json.hpp>
@@ -20,18 +21,19 @@ SDLManager::SDLManager():
     set_map();
     set_sprite();
     set_minimap();
+    load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
+    load_decorations_rects(load_json_file("server/resources/world/decorations_liberty_city.json"));
 }
 
 void SDLManager::set_map() {
     // Cargar imagen de fondo (circuito)
-    const SDL2pp::Surface background_surface(
-            DATA_PATH "/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+    const SDL2pp::Surface background_surface("client/assets/sprites/Game Boy _ GBC - Grand Theft "
+                                             "Auto - Backgrounds - Liberty City.png");
     map = SDL2pp::Texture(renderer, background_surface);
 }
 
 void SDLManager::set_sprite() {
-    SDL2pp::Surface sprite_cars(DATA_PATH
-                                "/Mobile - Grand Theft Auto 4 - Miscellaneous - Cars.png");
+    SDL2pp::Surface sprite_cars("client/assets/sprites/cars.png");
     const Uint32 color_key = SDL_MapRGB(sprite_cars.Get()->format, 163, 163, 13);
     sprite_cars.SetColorKey(true, color_key);
     sprite = SDL2pp::Texture(renderer, sprite_cars);
@@ -85,7 +87,7 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(sprite.value(), sprite_rect,
-                  SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 64, 64),
+                  SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 84, 84),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     sounds.play_engine_sound(is_moving);
@@ -183,36 +185,37 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     renderer.Copy(map.value(), camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
 
-    // 3. Dibujar todos los autos con su skin correspondiente
     for (const auto& [car_player, car_pos]: cars) {
         render_player(car_pos, car_player.car.model, is_moving);
     }
 
-    // 4. Dibujar capas superiores y HUD
-    render_bridges();
+    if (my_car.layer != CarLayer::ON_BRIDGE) {
+        render_bridges();
+    }
+
     render_decorations();
+
+    render_checkpoints(my_car.next);
 
     render_hud_health(health);
     render_hud_minimap(pos_x, pos_y);
-    render_stats();
+    render_stats(cars);
 
     show_screen();
 
     SDL_Delay(10);
 }
 
-void SDLManager::draw_row(const std::string& sentence, int y, SDL2pp::Color color,
-                          int size_container) {
-    int font_size = size_container / 10;
-    int text_x = size_container + 10;
+void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,
+                          int font_size) {
     SDL2pp::Font font("client/assets/fonts/UrbanHaze.ttf", font_size);
     SDL2pp::Surface surface(font.RenderText_Blended(sentence, color));
     SDL2pp::Texture text_texture(renderer, surface);
     renderer.Copy(text_texture, SDL2pp::NullOpt,
-                  SDL2pp::Rect(text_x, y, text_texture.GetWidth(), text_texture.GetHeight()));
+                  SDL2pp::Rect(x, y, text_texture.GetWidth(), text_texture.GetHeight()));
 }
 
-void SDLManager::render_stats() {
+void SDLManager::render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars) {
     int box_w = 1920 * 4 / 5;
     int box_h = 1080 * 4 / 5;
     int box_x = (1920 - box_w) / 2;
@@ -224,16 +227,25 @@ void SDLManager::render_stats() {
     renderer.SetDrawColor(0, 0, 0, 100);
     renderer.DrawRect(stats);
 
-    // Hardcodeado (temporal)
-    std::string client_id = "Client ID: 007";
-    std::string final_time = "Tiempo final: 02:34.56";
-
     SDL2pp::Color text_color = SDL2pp::Color(255, 255, 255, 255);
 
-    int text_start_y = box_y + 10;
-    int line_spacing = (box_h / 10) + 10;
-    draw_row(client_id, text_start_y, text_color, box_x + box_w / 2);
-    draw_row(final_time, text_start_y + line_spacing, text_color, box_x + box_w / 2);
+    int margin = 20;
+    int text_x = box_x + margin;
+    int text_y = box_y + margin;
+    int font_size = box_h / 20;
+    int spacing = font_size + 10;
+
+    std::string separation = "     ";
+    std::string header = "Jugador" + separation + "Tiempo";
+
+    draw_row(header, text_x, text_y, text_color, font_size);
+
+    for (const auto& [player, car_pos]: cars) {
+        std::string name = player.username;
+        std::string time = "N/A";
+        std::string player_result = name + separation + time;
+        draw_row(player_result, text_x, text_y + spacing, text_color, font_size);
+    }
 }
 
 void SDLManager::render_decorations() { render_layer(decorations_rects); }
@@ -244,4 +256,40 @@ void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
 
 void SDLManager::load_decorations_rects(const nlohmann::json& decorations_rects_data) {
     decorations_rects = loadRects(decorations_rects_data);
+}
+
+nlohmann::json SDLManager::load_json_file(const std::string& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open JSON file: " + path);
+    }
+
+    nlohmann::json data;
+    file >> data;
+    return data;
+}
+
+void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
+    SDL2pp::Rect view = camera.get_view_rect();
+
+    SDL2pp::Rect checkpoint_rect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
+    if (!camera.on_screen(checkpoint_rect)) {
+        return;
+    }
+
+    int screen_x = (checkpoint.x - view.x) * 1920 / view.w;
+    int screen_y = (checkpoint.y - view.y) * 1080 / view.h;
+    int screen_w = checkpoint.width * 1920 / view.w;
+    int screen_h = checkpoint.height * 1080 / view.h;
+
+    SDL2pp::Rect dst(screen_x, screen_y, screen_w, screen_h);
+
+    if (checkpoint.is_finish_line) {
+        renderer.SetDrawColor(255, 255, 0, 200);
+    } else {
+        renderer.SetDrawColor(255, 0, 0, 200);
+    }
+
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.FillRect(dst);
 }

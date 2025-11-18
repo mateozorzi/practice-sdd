@@ -30,14 +30,9 @@ void CollisionListener::handle_sensor_contact(b2Contact* contact, bool is_begin)
         return;
     }
 
-    SensorType* sensor_type_ptr = reinterpret_cast<SensorType*>(
-        sensor_fixture->GetUserData().pointer
-    );
+    uintptr_t sensor_data = sensor_fixture->GetUserData().pointer;
 
-    if (!sensor_type_ptr) 
-        return;
-
-    SensorType sensor_type = *sensor_type_ptr;
+    SensorType sensor_type = static_cast<SensorType>(sensor_data);
     b2Body* car_body = car_fixture->GetBody();
     
     for (auto& [client_id, player]: players) {
@@ -69,10 +64,9 @@ void CollisionListener::handle_sensor_contact(b2Contact* contact, bool is_begin)
                     std::cerr << "Player with ID: " << client_id << " is ON_GROUND" << std::endl;
                 }
             }
+            break;
         }
-        break;
     }
-    
 }
 
 void CollisionListener::BeginContact(b2Contact* contact) {
