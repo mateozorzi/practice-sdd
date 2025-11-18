@@ -17,7 +17,7 @@ SDLManager::SDLManager():
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
         resources(renderer),
         camera(512, 288, 4640, 4672),
-        sounds(mixer) {
+        sounds(mixer, resources) {
     renderer.SetLogicalSize(1920, 1080);
     set_minimap();
     load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));

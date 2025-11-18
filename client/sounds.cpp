@@ -6,8 +6,8 @@
 
 #include "SDL2pp/Chunk.hh"
 
-Sounds::Sounds(SDL2pp::Mixer& mixer):
-        mixer(mixer), engine_sound("client/assets/sounds/sfx_car_engine.wav") {}
+Sounds::Sounds(SDL2pp::Mixer& mixer, ResourceManager& resources):
+        mixer(mixer), resources(resources) {}
 
 void Sounds::initialize_channels() {
     int current_channel = 1;
@@ -31,6 +31,7 @@ void Sounds::play_engine_sound(const bool is_moving) {
         return;
     }
 
+    SDL2pp::Chunk& engine_sound = resources.get_sound("client/assets/sounds/sfx_car_engine.wav");
     mixer.PlayChannel(player_engine_channel, engine_sound);
 
     state.last_engine_time = now;
