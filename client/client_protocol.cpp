@@ -126,8 +126,9 @@ CarPositionDTO ClientProtocol::receive_car_position() {
     const uint32_t x_position = recv_uint32();
     const uint32_t y_position = recv_uint32();
     const uint32_t angle = recv_uint32();
+    const CheckpointDTO next = receive_checkpoint();
     const uint8_t layer = recv_uint8();
-    return CarPositionDTO(client_id, x_position, y_position, angle, static_cast<CarLayer>(layer));
+    return CarPositionDTO(client_id, x_position, y_position, angle, next, static_cast<CarLayer>(layer));
 }
 
 std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
@@ -158,14 +159,16 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
     return world_snapshot;
 }
 
-std::variant<WorldSnapshotDTO, RaceDTO> ClientProtocol::receive_update() {
+std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> ClientProtocol::receive_update() {
     const uint8_t update_type = recv_uint8();
     if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
         WorldSnapshotDTO world_snapshot = receive_update_positions();
         return world_snapshot;
-    } else {//(update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
-        //not imeplemented
-        return RaceDTO();
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
+        RaceDTO race = receive_race();
+        return race;
+    } else { //update_type == SEND_FINISH_RACE
+        return std::monostate{};
     }
 }
 
@@ -218,19 +221,24 @@ LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue(){
     return LobbyCatalogueDTO(std::move(lobbies));
 }
 
+CheckpointDTO ClientProtocol::receive_checkpoint(){
+    const uint8_t id = recv_uint8();
+    const char orientation = static_cast<char>(recv_string()[0]);
+    const uint16_t x = recv_uint16();
+    const uint16_t y = recv_uint16();
+    const uint8_t width = recv_uint8();
+    const uint8_t height = recv_uint8();
+    return CheckpointDTO(id, orientation, x, y, width, height);
+}
+
 RaceDTO ClientProtocol::receive_race(){
     const std::string name = recv_string();
     const std::string city = recv_string();
     const uint8_t size_checkpoints = recv_uint8();
     std::vector<CheckpointDTO> checkpoints;
     for(uint8_t i =0; i < size_checkpoints; ++i){
-        const uint8_t id = recv_uint8();
-        const char orientation = static_cast<char>(recv_string()[0]);
-        const uint16_t x = recv_uint16();
-        const uint16_t y = recv_uint16();
-        const uint8_t width = recv_uint8();
-        const uint8_t height = recv_uint8();
-        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
+        CheckpointDTO c = receive_checkpoint();
+        checkpoints.push_back(c);
     }
     const uint8_t laps = recv_uint8();
     return RaceDTO(name, city, std::move(checkpoints), laps);

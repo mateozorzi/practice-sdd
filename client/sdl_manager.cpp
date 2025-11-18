@@ -195,6 +195,8 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     render_decorations();
 
+    render_checkpoints(my_car.next);
+
     render_hud_health(health);
     render_hud_minimap(pos_x, pos_y);
     render_stats(cars);
@@ -267,3 +269,27 @@ nlohmann::json SDLManager::load_json_file(const std::string& path) {
     return data;
 }
 
+void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
+    SDL2pp::Rect view = camera.get_view_rect();
+
+    SDL2pp::Rect checkpoint_rect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
+    if (!camera.on_screen(checkpoint_rect)) {
+        return;
+    }
+
+    int screen_x = (checkpoint.x - view.x) * 1920 / view.w;
+    int screen_y = (checkpoint.y - view.y) * 1080 / view.h;
+    int screen_w = checkpoint.width * 1920 / view.w;
+    int screen_h = checkpoint.height * 1080 / view.h;
+
+    SDL2pp::Rect dst(screen_x, screen_y, screen_w, screen_h);
+
+    if (checkpoint.is_finish_line) {
+        renderer.SetDrawColor(255, 255, 0, 200);
+    } else {
+        renderer.SetDrawColor(255, 0, 0, 200);
+    }
+
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.FillRect(dst);
+}

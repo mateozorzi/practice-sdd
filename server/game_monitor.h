@@ -20,7 +20,7 @@ class GameMonitor {
 
 
     std::mutex mtx;
-    std::unordered_map<uint32_t, std::unique_ptr<Queue<std::variant<WorldSnapshotDTO, RaceDTO>>>> snapshot_queues;
+    std::unordered_map<uint32_t, std::unique_ptr<Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>>> snapshot_queues;
     const ServerConfig& config;
 
 
@@ -30,9 +30,9 @@ public:
 
     explicit GameMonitor(const ServerConfig& config);
 
-    Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& register_client(uint32_t client_id);
+    Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
-    void broadcast(const WorldSnapshotDTO& world_snapshot);
+    void broadcast(const std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>& info);
     void remove_client(uint32_t client_id);
     void stop();
 

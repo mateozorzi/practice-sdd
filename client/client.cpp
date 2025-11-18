@@ -57,10 +57,10 @@ void Client::run() {
             return;
         }
         // Obtener posiciones
-        Queue<std::variant<WorldSnapshotDTO, RaceDTO>>& car_queue =
+        Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& car_queue =
                 receiver.get_car_positions_queue();
 
-        std::variant<WorldSnapshotDTO, RaceDTO> snapshot = WorldSnapshotDTO();
+        std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> snapshot;
         bool has_positions = false;
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;
@@ -68,8 +68,10 @@ void Client::run() {
         if (has_positions) {
             if (std::holds_alternative<WorldSnapshotDTO>(snapshot)) {
                 last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot);
-            } else {
+            } else if (std::holds_alternative<RaceDTO>(snapshot)) {
                 last_race_state = std::get<RaceDTO>(snapshot);
+            }else /*(std::holds_alternative<std::monostate>(snapshot))*/ {
+                //race finish by timeout
             }
         }
 
@@ -78,6 +80,7 @@ void Client::run() {
         if (last_world_snapshot.has_value()) {
             car_positions = last_world_snapshot.value().get_car_positions();
         }
+        //std::cout << "[Client] next checkpoint id for player " << player.id << ": " << static_cast<int>(car_positions[0].second.next.id) << std::endl;
 
         sdl_manager->render(player, health, car_positions, input_manager.is_moving());
     }

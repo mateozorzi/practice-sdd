@@ -9,11 +9,11 @@
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
-
     add_uint32_to_buffer(car_position_dto.client_id);
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
     add_uint32_to_buffer(car_position_dto.angle);
+    add_checkpoint_to_buffer(car_position_dto.next);
     add_uint8_to_buffer(static_cast<uint8_t>(car_position_dto.layer));
 }
 
@@ -150,6 +150,18 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot)
         add_car_position_to_buffer(car_position.second);
     }
 
+    send_buffer();
+}
+
+void ServerProtocol::send_race_update(const RaceDTO& race){    
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
+
+    add_race_to_buffer(race);
+    send_buffer();
+}
+
+void ServerProtocol::send_finish_race_timeout() {
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE_FINISHED));
     send_buffer();
 }
 

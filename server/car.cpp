@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../common/constants.h"
+#include "../common/checkpoint_dto.h"
 
 Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_config):
         client_id(client_id), body(nullptr), config({
@@ -51,6 +52,64 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
     filter.categoryBits = CATEGORY_CAR_GROUND;
     filter.maskBits = MASK_CAR_GROUND;
     car_fixture->SetFilterData(filter);
+}
+
+void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
+    CheckpointDTO start_position = checkpoints[0];
+    CheckpointDTO second_position = checkpoints[1];
+
+    //cars are placed in the first checkpoint, but facing the second one
+    
+    float start_x = static_cast<float>(start_position.x) / PIXELS_PER_METER;
+    float start_y = static_cast<float>(start_position.y) / PIXELS_PER_METER;
+    float angle = 0.0f;
+
+    //first checkpoint is horizontal
+    if (start_position.orientation == HORIZONTAL) {
+        //second checkpoint is above or below
+
+        if (second_position.y >= start_position.y) { //above
+            angle = b2_pi;
+            start_y -= 1.0f;
+        } else { //below
+            angle = 0.0f;
+            start_y += 1.0f;
+        }
+    } else if (start_position.orientation == VERTICAL) { //first checkpoint is vertical
+        //second checkpoint is to the left or right
+        if (second_position.x <= start_position.x) { //left
+            angle = 3.0f * b2_pi / 2.0f;
+            start_x += 1.0f;
+        } else { //right
+            angle = b2_pi / 2.0f;
+            start_x -= 1.0f;
+        }
+    } else { //first checkpoint in intersection
+        if (second_position.y > start_position.y) { //above
+            angle = b2_pi;
+            start_y -= 1.0f;
+        } else if (second_position.y < start_position.y) { //below
+            angle = 0.0f;
+            start_y += 1.0f;
+        } else {//same y, must be left or right
+            if (second_position.x < start_position.x) { //left
+                angle = 3.0f * b2_pi / 2.0f;
+                start_x += 1.0f;
+            } else { //right
+                angle = b2_pi / 2.0f;
+                start_x -= 1.0f;
+            }
+        }
+    }
+
+    body->SetTransform(
+        b2Vec2(
+            start_x,
+            start_y
+        ),
+        angle
+    );
+    
 }
 
 void Car::handle_movement(const MovementDTO& movement_dto) {
@@ -150,7 +209,7 @@ CarPositionDTO Car::get_position_dto() const {
     if (angle_degrees >= 360)
         angle_degrees = 0;
 
-    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, car_layer);
+    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, CheckpointDTO(), car_layer);
 }
 
 

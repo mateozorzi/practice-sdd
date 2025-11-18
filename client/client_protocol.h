@@ -50,6 +50,7 @@ public:
     void send_races_selection(const std::vector<RaceDTO>& races);
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
+    CheckpointDTO receive_checkpoint();
     void ask_for_catalogue();
     CarCatalogueDTO receive_car_catalogue();
     LobbyCatalogueDTO receive_lobby_catalogue();
@@ -62,7 +63,7 @@ public:
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();
     nlohmann::json get_json(const std::string& file_path);
-    std::variant<WorldSnapshotDTO, RaceDTO> receive_update();
+    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> receive_update();
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include "ui_raceselector.h"
 #include "../../common/race_catalogue_dto.h"
 #include "../../common/race_dto.h"
+#include <QMessageBox>
 
 
 RaceSelector::RaceSelector(RaceCatalogueDTO& races, QWidget* parent):
@@ -144,6 +145,12 @@ void RaceSelector::on_pushButton_2_clicked()
 
 void RaceSelector::on_pushButton_clicked()
 {
+    //selected_races size >= 1
+    if(selected_races.size() < 1){
+        QMessageBox::warning(this, "Error", "There must be at least one race selected.");
+        return;
+    }
+
     emit confirm_races(selected_races);
 }
 
