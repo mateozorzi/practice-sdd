@@ -14,6 +14,7 @@ target_sources(taller_client
     camera.cpp
     input_manager.cpp
     sdl_manager.cpp
+    resource_manager.cpp
 
     Lobby/lobby.cpp
     Lobby/selectcars.cpp
@@ -39,6 +40,7 @@ target_sources(taller_client
     input_manager.h
     sdl_manager.h
     sounds.h
+    resource_manager.cpp
 
     Lobby/lobby.h
     Lobby/selectcars.h
