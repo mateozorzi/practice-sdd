@@ -87,7 +87,7 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(sprite.value(), sprite_rect,
-                  SDL2pp::Rect(car_screen_x - 32, car_screen_y - 32, 84, 84),
+                  SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     sounds.play_engine_sound(is_moving);
@@ -277,8 +277,8 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
         return;
     }
 
-    int screen_x = (checkpoint.x - view.x) * 1920 / view.w;
-    int screen_y = (checkpoint.y - view.y) * 1080 / view.h;
+    int screen_x = ((checkpoint.x - checkpoint.width / 2) - view.x) * 1920 / view.w;
+    int screen_y = ((checkpoint.y - checkpoint.height / 2) - view.y) * 1080 / view.h;
     int screen_w = checkpoint.width * 1920 / view.w;
     int screen_h = checkpoint.height * 1080 / view.h;
 
