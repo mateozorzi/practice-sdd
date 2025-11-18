@@ -15,6 +15,7 @@
 #include "common/player_dto.h"
 
 #include "camera.h"
+#include "resource_manager.h"
 #include "sounds.h"
 
 static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
@@ -31,14 +32,13 @@ private:
     SDL2pp::Mixer mixer;
     SDL2pp::Window window;
     SDL2pp::Renderer renderer;
+    ResourceManager resources;
     Camera camera;
     Sounds sounds;
-    std::optional<SDL2pp::Texture> map;
     std::optional<SDL2pp::Texture> sprite;
     std::optional<SDL2pp::Texture> minimap;
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
-    std::optional<SDL2pp::Texture> arrow;
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
@@ -59,8 +59,6 @@ public:
     void load_bridges_rects(const nlohmann::json& bridges_rects_data);
     void load_decorations_rects(const nlohmann::json& decorations_rects_data);
 
-    void set_map();
-    void set_sprite();
     void set_minimap();
     void clear_screen();
     void render(const PlayerDTO& player, int health,

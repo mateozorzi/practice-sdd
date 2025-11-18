@@ -15,30 +15,13 @@ SDLManager::SDLManager():
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080,
                SDL_WINDOW_RESIZABLE),
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
+        resources(renderer),
         camera(512, 288, 4640, 4672),
         sounds(mixer) {
     renderer.SetLogicalSize(1920, 1080);
-    set_map();
-    set_sprite();
     set_minimap();
     load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
     load_decorations_rects(load_json_file("server/resources/world/decorations_liberty_city.json"));
-    const SDL2pp::Surface arrow_surface("client/assets/sprites/arrow.png");
-    arrow = SDL2pp::Texture(renderer, arrow_surface);
-}
-
-void SDLManager::set_map() {
-    // Cargar imagen de fondo (circuito)
-    const SDL2pp::Surface background_surface("client/assets/sprites/Game Boy _ GBC - Grand Theft "
-                                             "Auto - Backgrounds - Liberty City.png");
-    map = SDL2pp::Texture(renderer, background_surface);
-}
-
-void SDLManager::set_sprite() {
-    SDL2pp::Surface sprite_cars("client/assets/sprites/cars.png");
-    const Uint32 color_key = SDL_MapRGB(sprite_cars.Get()->format, 163, 163, 13);
-    sprite_cars.SetColorKey(true, color_key);
-    sprite = SDL2pp::Texture(renderer, sprite_cars);
 }
 
 void SDLManager::set_minimap() {
@@ -47,7 +30,8 @@ void SDLManager::set_minimap() {
     minimap = SDL2pp::Texture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                               minimap_width, minimap_height);
     renderer.SetTarget(minimap.value());
-    renderer.Copy(map.value(), SDL2pp::Rect(0, 0, 4640, 4672),
+    SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+    renderer.Copy(map, SDL2pp::Rect(0, 0, 4640, 4672),
                   SDL2pp::Rect(0, 0, minimap_width, minimap_height));
     renderer.SetTarget();
 }
@@ -88,7 +72,8 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     }
 
     // Usar solo sprite vertical y rotarlo con SDL
-    renderer.Copy(sprite.value(), sprite_rect,
+    SDL2pp::Texture& cars = resources.get_texture("client/assets/sprites/cars-no-background.png");
+    renderer.Copy(cars, sprite_rect,
                   SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
@@ -154,7 +139,8 @@ void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
         const int dh = src_rect.h * screen_h / view.h;
         const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
-        renderer.Copy(map.value(), src_rect, dst_rect);
+        SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+        renderer.Copy(map, src_rect, dst_rect);
     }
 }
 
@@ -185,7 +171,8 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     update_camera(pos_x, pos_y);
     clear_screen();
 
-    renderer.Copy(map.value(), camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
+    SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+    renderer.Copy(map, camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
 
     for (const auto& [car_player, car_pos]: cars) {
         render_player(car_pos, car_player.car.model, is_moving);
@@ -211,9 +198,10 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
 void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,
                           int font_size) {
-    SDL2pp::Font font("client/assets/fonts/UrbanHaze.ttf", font_size);
-    SDL2pp::Surface surface(font.RenderText_Blended(sentence, color));
-    SDL2pp::Texture text_texture(renderer, surface);
+
+    SDL2pp::Texture& text_texture =
+        resources.get_text(sentence, "client/assets/fonts/UrbanHaze.ttf", font_size, color);
+
     renderer.Copy(text_texture, SDL2pp::NullOpt,
                   SDL2pp::Rect(x, y, text_texture.GetWidth(), text_texture.GetHeight()));
 }
@@ -298,13 +286,13 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
 }
 
 double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO &player, const CheckpointDTO &checkpoint) {
-    double dx = checkpoint.x - player.x_position;
-    double dy = checkpoint.y - player.y_position;
+    const double dx = checkpoint.x - player.x_position;
+    const double dy = checkpoint.y - player.y_position;
 
-    double angle_rad = std::atan2(dy, dx);
+    const double angle_rad = std::atan2(dy, dx);
     double angle_deg = angle_rad * (180.0 / M_PI);
 
-    double rotation = angle_deg - 90.0;
+    const double rotation = angle_deg - 90.0;
     if (rotation < 0) angle_deg += 360;
 
     return angle_deg;
@@ -315,13 +303,14 @@ void SDLManager::render_hint(const CarPositionDTO &player) {
 
     SDL2pp::Rect view = camera.get_view_rect();
 
-    int car_screen_x = (player.x_position - view.x) * 1920 / view.w;
-    int car_screen_y = (player.y_position - view.y) * 1080 / view.h;
+    const int car_screen_x = (player.x_position - view.x) * 1920 / view.w;
+    const int car_screen_y = (player.y_position - view.y) * 1080 / view.h;
 
-    int arrow_w = 60;
-    int arrow_h = 60;
+    const int arrow_w = 60;
+    const int arrow_h = 60;
 
     SDL2pp::Rect dst(car_screen_x - arrow_w / 2, car_screen_y - 140, arrow_w, arrow_h);
 
-    renderer.Copy(arrow.value(), SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
+    SDL2pp::Texture& arrow = resources.get_texture("client/assets/sprites/arrow.png");
+    renderer.Copy(arrow, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
