@@ -51,7 +51,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
-    auto on_bridge_collidables = WorldUtils::load_polygons_from_json("server/resources/world/on_bridge_collidables_liberty_city.json");
+    auto on_bridge_collidables = WorldUtils::load_polygons_from_json("server/resources/world/collidables/on_bridge_collidables_liberty_city.json");
     for (const auto& bridge_collidable: on_bridge_collidables) {
         try {
             bool added = WorldUtils::add_polygon_to_world(bridge_collidable, world, CATEGORY_BRIDGE, MASK_BRIDGE);
@@ -64,7 +64,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
-    auto on_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/on_bridge_sensors_liberty_city.json");
+    auto on_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/sensors/on_bridge_sensors_liberty_city.json");
     for (const auto& p: on_bridge_sensors) {
         try {
             bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
@@ -77,7 +77,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
-    auto under_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/under_bridge_sensors_liberty_city.json");
+    auto under_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/sensors/under_bridge_sensors_liberty_city.json");
     for (const auto& p: under_bridge_sensors) {
         try {
             bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
