@@ -5,6 +5,7 @@
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
 #include "../common/race_catalogue_dto.h"
+#include "../common/game_update_dto.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <variant>
@@ -159,17 +160,37 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
     return world_snapshot;
 }
 
-std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> ClientProtocol::receive_update() {
+LeaderboardDTO ClientProtocol::receive_leaderboard(){
+    std::string race_name = recv_string();
+    uint8_t n_players = recv_uint8();
+    std::vector<PlayerRaceStatsDTO> players;
+    for (uint8_t i = 0; i < n_players; ++i) {
+        uint32_t client_id = recv_uint32();
+        std::string username = recv_string();
+        uint8_t position = recv_uint8();
+        uint8_t points = recv_uint8();
+        uint32_t total_time_ms = recv_uint32();
+        players.emplace_back(client_id, username, position, points, total_time_ms);
+    }
+    return LeaderboardDTO(race_name, players);
+
+}
+
+GameUpdateDTO ClientProtocol::receive_update() {
+    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO> data;
     const uint8_t update_type = recv_uint8();
     if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
-        WorldSnapshotDTO world_snapshot = receive_update_positions();
-        return world_snapshot;
+        data = receive_update_positions();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
-        RaceDTO race = receive_race();
-        return race;
+        data = receive_race();
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_LEADERBOARD)) {
+        data = receive_leaderboard();
     } else { //update_type == SEND_FINISH_RACE
-        return std::monostate{};
+        data = std::monostate{};
     }
+
+    GameUpdateDTO update(static_cast<GameLoopAction>(update_type), data);
+    return update;
 }
 
 

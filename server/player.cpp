@@ -4,6 +4,7 @@
 #include "../common/constants.h"
 #include "../common/race_dto.h"
 #include "../common/checkpoint_dto.h"
+#include "../common/player_race_stats_dto.h"
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world,
@@ -16,7 +17,7 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         in_game(false),
         in_race(false),
         id_next_checkpoint(1),
-        n_lap(1), next() {}
+        n_lap(1), next(), race_time(0) {}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -53,6 +54,25 @@ void Player::finish_race(){
     in_race = false;
     id_next_checkpoint = 1;
     n_lap = 1;
+}
+
+bool Player::have_time_recorded() const {
+    if (race_time > 0){
+        return true;
+    }
+    return false;
+}
+
+void Player::record_time(uint32_t seconds){ 
+    race_time = seconds;
+}
+
+uint32_t Player::get_recorded_time() const {
+    return race_time;
+}
+
+PlayerRaceStatsDTO Player::get_race_stats() const {
+    return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
 }
 
 const std::string& Player::get_username() const { return username; }

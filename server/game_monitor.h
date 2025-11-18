@@ -14,13 +14,15 @@
 #include "server_config.h"
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
 
 
 class GameMonitor {
 
 
     std::mutex mtx;
-    std::unordered_map<uint32_t, std::unique_ptr<Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>>> snapshot_queues;
+    std::unordered_map<uint32_t, std::unique_ptr<Queue<GameUpdateDTO>>> snapshot_queues;
     const ServerConfig& config;
 
 
@@ -30,9 +32,9 @@ public:
 
     explicit GameMonitor(const ServerConfig& config);
 
-    Queue<std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>>& register_client(uint32_t client_id);
+    Queue<GameUpdateDTO>& register_client(uint32_t client_id);
     void unregister_client(uint32_t client_id);
-    void broadcast(const std::variant<std::monostate, WorldSnapshotDTO, RaceDTO>& info);
+    void broadcast(const GameUpdateDTO& info);
     void remove_client(uint32_t client_id);
     void stop();
 
