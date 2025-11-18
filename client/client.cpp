@@ -26,7 +26,7 @@ Client::Client(const std::string& hostname, const std::string& servname):
         client_id(0) {}
 
 void Client::run() {
-    // lobby ui
+    // lobby ui a
     PlayerDTO player = menu.lobby();
     if (static_cast<int>(player.id) == -1) {
         exit(0);
