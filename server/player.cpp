@@ -43,6 +43,7 @@ void Player::start_race(){
     in_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
+    race_time = 0;
 
 }
 
@@ -54,6 +55,8 @@ void Player::finish_race(){
     in_race = false;
     id_next_checkpoint = 1;
     n_lap = 1;
+    race_time = 0;
+    
 }
 
 bool Player::have_time_recorded() const {
