@@ -85,6 +85,7 @@ void Client::run() {
         if (last_world_snapshot.has_value()) {
             car_positions = last_world_snapshot.value().get_car_positions();
         }
+        //std::cout << "[Client] next checkpoint id for player " << player.id << ": " << static_cast<int>(car_positions[0].second.next.id) << std::endl;
 
         sdl_manager->render(player, health, car_positions, input_manager.is_moving());
     }

@@ -199,13 +199,13 @@ void GameLoop::handle_command(const GameCommand& game_command) {
         it->second(game_command);
 }
 
-void GameLoop::update_positions() {
+void GameLoop::update_positions(const RaceDTO& race) {
 
     WorldSnapshotDTO world_snapshot;
 
     for (auto& [client_id, player]: players) {
 
-        player.update_car_position();
+        player.update_car_position(race);
         car_dto car = player.get_car();
         PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
         world_snapshot.add_car_position(player_dto, player.get_car_position());
@@ -289,7 +289,7 @@ void GameLoop::run() {
                     }*/
                     //race logic
 
-                    update_positions();
+                    update_positions(selected_races.races[current_race_index]);
                     world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
                     std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
 

@@ -70,26 +70,34 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
 
         if (second_position.y >= start_position.y) { //above
             angle = b2_pi;
+            start_y -= 1.0f;
         } else { //below
             angle = 0.0f;
+            start_y += 1.0f;
         }
     } else if (start_position.orientation == VERTICAL) { //first checkpoint is vertical
         //second checkpoint is to the left or right
         if (second_position.x <= start_position.x) { //left
             angle = 3.0f * b2_pi / 2.0f;
+            start_x += 1.0f;
         } else { //right
             angle = b2_pi / 2.0f;
+            start_x -= 1.0f;
         }
     } else { //first checkpoint in intersection
         if (second_position.y > start_position.y) { //above
             angle = b2_pi;
+            start_y -= 1.0f;
         } else if (second_position.y < start_position.y) { //below
             angle = 0.0f;
+            start_y += 1.0f;
         } else {//same y, must be left or right
             if (second_position.x < start_position.x) { //left
                 angle = 3.0f * b2_pi / 2.0f;
+                start_x += 1.0f;
             } else { //right
                 angle = b2_pi / 2.0f;
+                start_x -= 1.0f;
             }
         }
     }
@@ -109,19 +117,15 @@ void Car::handle_movement(const MovementDTO& movement_dto) {
     switch (movement_dto.direction) {
 
         case Direction::UP:
-            std::cout<<"Player id "<<client_id<<" moving up: "<<movement_dto.isMoving<<std::endl;
             moving_up = movement_dto.isMoving;
             break;
         case Direction::DOWN:
-            std::cout<<"Player id "<<client_id<<" moving down: "<<movement_dto.isMoving<<std::endl;
             moving_down = movement_dto.isMoving;
             break;
         case Direction::LEFT:
-            std::cout<<"Player id "<<client_id<<" moving left: "<<movement_dto.isMoving<<std::endl;
             moving_left = movement_dto.isMoving;
             break;
         case Direction::RIGHT:
-            std::cout<<"Player id "<<client_id<<" moving right: "<<movement_dto.isMoving<<std::endl;
             moving_right = movement_dto.isMoving;
             break;
     }
@@ -205,7 +209,7 @@ CarPositionDTO Car::get_position_dto() const {
     if (angle_degrees >= 360)
         angle_degrees = 0;
 
-    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, car_layer);
+    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, CheckpointDTO(), car_layer);
 }
 
 

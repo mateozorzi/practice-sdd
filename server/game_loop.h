@@ -45,7 +45,7 @@ class GameLoop final: public Thread {
     void handle_disconnection(const GameCommand& game_command);
     void handle_finish_race(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);
-    void update_positions();
+    void update_positions(const RaceDTO& race);
     void start_race(const RaceDTO& race);
     void send_race(const RaceDTO& race);
     void send_finish_race_timeout();
