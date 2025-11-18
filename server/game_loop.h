@@ -70,6 +70,8 @@ public:
     bool is_empty() const;
     uint8_t get_active_players() const;
 
+    void check_race_times(uint64_t seconds);
+
     void add_player(uint32_t client_id, const std::string& username);
 
     ~GameLoop() override;

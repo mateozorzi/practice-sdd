@@ -204,7 +204,6 @@ void GameLoop::update_positions(const RaceDTO& race) {
     WorldSnapshotDTO world_snapshot;
 
     for (auto& [client_id, player]: players) {
-
         player.update_car_position(race);
         car_dto car = player.get_car();
         PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
@@ -260,6 +259,15 @@ void GameLoop::start_race(const RaceDTO& race){
 
 }
 
+void GameLoop::check_race_times(uint64_t seconds){
+    //check if any player has finished the race
+    for (auto& [client_id, player] : players) {
+        if (!player.is_in_race() && !player.have_time_recorded()) {
+            std::cout << "Player with ID: " << client_id << " has finished the race in " << seconds << " seconds." << std::endl;
+            player.record_time(seconds);
+        }
+    }
+}
 
 void GameLoop::run() {
 
@@ -268,6 +276,9 @@ void GameLoop::run() {
         const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
         const int waiting_frame_ms = static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
         uint8_t current_race_index = 0;
+
+        static constexpr auto RACE_TIMEOUT = std::chrono::minutes(10);
+        std::chrono::steady_clock::time_point race_start_time; 
         
         while (should_keep_running()) {
 
@@ -279,9 +290,21 @@ void GameLoop::run() {
                 //start races
                 if (!race_active && current_race_index < selected_races.size){
                     start_race(selected_races.races[current_race_index]);
+                    race_start_time = std::chrono::steady_clock::now();
                 }
                 
                 if(player_in_race()){
+                    auto current_time = std::chrono::steady_clock::now();
+                    
+                    // CALCULAR TIEMPO TRANSCURRIDO CORRECTAMENTE
+                    auto elapsed = current_time - race_start_time;
+                    uint64_t seconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+                    if (elapsed >= RACE_TIMEOUT) {
+                        //race finish by timeout
+                        //finish players who are still racing
+
+                    }
                     /*auto current_time = std::chrono::steady_clock::now();
                     if (current_time - race_start_time >= race_timeout) {
                         send_finish_race_timeout();
@@ -290,23 +313,36 @@ void GameLoop::run() {
                     //race logic
 
                     update_positions(selected_races.races[current_race_index]);
+                    check_race_times(seconds);
                     world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));  
+                    continue;
+                }
+                
+                //if no player racing, race is finished -> show results and start next one.
+                if (race_active){
+                    race_active = false;
+                    current_race_index++;
+
+                    //show player time
+                    for (const auto& [client_id, player] : players) {
+                        std::cout << "Player with ID: " << client_id << " recorded time: " << player.get_recorded_time() << " seconds." << std::endl;
+                    }
 
                     //all players finish the race, calculate points in actual_race leaderboard
                     //calculate points and positions
-
+    
                     //server send leaderboard to players, actual_race
                     //push_back actual race into leaderboards, update final_leaderboard and reset actual_race
                     //sleep to show leaderboard for some seconds, 5 seconds?
-                }              
+                }           
                 
             } else {
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(waiting_frame_ms));
             }
         }
-    } catch (const ClosedQueue&) {}
+    }catch (const ClosedQueue&) {}
 }
 
 
