@@ -182,12 +182,18 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
     renderer.Copy(map, camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
 
-    for (const auto& [car_player, car_pos]: cars) {
-        render_player(car_pos, car_player.car.model, is_moving);
+    for (const auto& [car_player, car_pos] : cars) {
+        if (car_pos.layer != CarLayer::ON_BRIDGE) {
+            render_player(car_pos, car_player.car.model, is_moving);
+        }
     }
 
-    if (my_car.layer != CarLayer::ON_BRIDGE) {
-        render_bridges();
+    render_bridges();
+
+    for (const auto& [car_player, car_pos] : cars) {
+        if (car_pos.layer == CarLayer::ON_BRIDGE) {
+            render_player(car_pos, car_player.car.model, is_moving);
+        }
     }
 
     render_decorations();
