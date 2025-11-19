@@ -5,6 +5,7 @@
 #include "../common/race_dto.h"
 #include "../common/checkpoint_dto.h"
 #include "../common/player_race_stats_dto.h"
+#include "../common/player_dto.h"
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world,
@@ -18,7 +19,7 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         in_race(false), 
         has_finish_race(false),
         id_next_checkpoint(1),
-        n_lap(1), next(), race_time(0) {}
+        n_lap(1), next(), race_time(0), dead(false) {}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -46,6 +47,7 @@ void Player::start_race(){
     id_next_checkpoint = 1;
     n_lap = 1;
     race_time = 0;
+    dead = false;
 
 }
 
@@ -93,6 +95,14 @@ const car_dto Player::get_car() const {
         return car->get_configuration();
     }
     return empty_car;
+}
+
+bool Player::is_dead() const {
+    return dead;
+}
+
+PlayerDTO Player::get_info() const {
+    return PlayerDTO(username, client_id, get_car(), health, dead);
 }
 
 
@@ -147,6 +157,11 @@ void Player::update_car_position(const RaceDTO& race) {
     if (car){
         car->update_position();
         //update race conditions
+
+        if (health == 0 && !dead){
+            finish_race();
+            dead = true;
+        }
 
         //check if player reached next checkpoint
         CarPositionDTO actual = car->get_position_dto();

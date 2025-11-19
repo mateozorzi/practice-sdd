@@ -10,6 +10,7 @@
 #include "../common/movement_dto.h"
 #include "../common/race_dto.h"
 #include "../common/player_race_stats_dto.h"
+#include "../common/player_dto.h"
 
 #include "car.h"
 #include "server_config.h"
@@ -29,6 +30,7 @@ class Player {
     uint8_t n_lap;
     CheckpointDTO next;
     uint32_t race_time;
+    bool dead;
 
     void update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
@@ -62,6 +64,10 @@ public:
     bool have_time_recorded() const;
     void record_time(uint32_t seconds);
     uint32_t get_recorded_time() const;
+
+    bool is_dead() const;
+
+    PlayerDTO get_info() const;
 
     PlayerRaceStatsDTO get_race_stats() const;
 

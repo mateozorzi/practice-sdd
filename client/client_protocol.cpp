@@ -146,7 +146,9 @@ PlayerDTO ClientProtocol::receive_player(){
     const uint32_t id = recv_uint32();
     const std::string car_model = recv_string();
     car_dto car(car_model);
-    return PlayerDTO(username, id, car);
+    const uint16_t health = recv_uint16();
+    const bool dead = static_cast<bool>(recv_uint8());
+    return PlayerDTO(username, id, car, health, dead);
 }
 
 WorldSnapshotDTO ClientProtocol::receive_update_positions() {

@@ -24,6 +24,8 @@ void ServerProtocol::add_player_to_buffer(const PlayerDTO& player){
     add_string_to_buffer(player.username);
     add_uint32_to_buffer(player.id);
     add_string_to_buffer(player.car.model);
+    add_uint16_to_buffer(player.health);
+    add_uint8_to_buffer(static_cast<uint8_t>(player.dead));
 }
 
 PlayerDTO ServerProtocol::receive_username() {

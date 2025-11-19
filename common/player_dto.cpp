@@ -3,9 +3,9 @@
 #include "car_dto.h"
 
 
-PlayerDTO::PlayerDTO(const std::string& username, const uint32_t id, const car_dto& car):
-        username(username), id(id), car(car) {}
+PlayerDTO::PlayerDTO(const std::string& username, const uint32_t id, const car_dto& car, uint16_t health, bool dead):
+        username(username), id(id), car(car), health(health), dead(dead) {}
 
-PlayerDTO::PlayerDTO(const std::string& username): username(username), id(0), car(car_dto()) {}
+PlayerDTO::PlayerDTO(const std::string& username): username(username), id(0), car(car_dto()), health(-1), dead(false) {}
 
-PlayerDTO::PlayerDTO(): username(""), id(0), car(car_dto()) {}
+PlayerDTO::PlayerDTO(): username(""), id(0), car(car_dto()), health(-1), dead(false) {}

@@ -231,7 +231,7 @@ void GameLoop::update_positions(const RaceDTO& race) {
     for (auto& [client_id, player]: players) {
         player.update_car_position(race);
         car_dto car = player.get_car();
-        PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
+        PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
