@@ -32,6 +32,7 @@ class Player {
     CheckpointDTO next;
     uint32_t race_time;
     bool dead;
+    uint16_t base_health;
 
     void update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);

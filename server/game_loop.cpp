@@ -288,6 +288,17 @@ void GameLoop::finish_race(uint32_t timeout_time){
     }
 }
 
+void GameLoop::check_alive_players(uint32_t race_timeout_ms){
+    //check if any player is dead
+    for (auto& [client_id, player] : players) {
+        if (player.is_dead() && player.is_in_race()) {
+            std::cout << "Player with ID: " << client_id << " has died during the race." << std::endl;
+            player.finish_race();
+            player.record_time(race_timeout_ms);
+        }
+    }
+}
+
 void GameLoop::check_race_times(uint32_t seconds){
     //check if any player has finished the race
     for (auto& [client_id, player] : players) {
@@ -432,6 +443,7 @@ void GameLoop::run() {
                         continue;
                     }
 
+                    check_alive_players(RACE_TIMEOUT_MS);
                     update_positions(selected_races.races[current_race_index]);
                     check_race_times(seconds);
                     world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);

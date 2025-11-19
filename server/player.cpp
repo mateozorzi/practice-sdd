@@ -20,7 +20,8 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         in_race(false), 
         has_finish_race(false),
         id_next_checkpoint(1),
-        n_lap(1), next(), race_time(0), dead(false) {}
+        n_lap(1), next(), race_time(0), dead(false),
+        base_health(health) {}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -49,6 +50,7 @@ void Player::start_race(){
     n_lap = 1;
     race_time = 0;
     dead = false;
+    health = base_health;
 
 }
 
@@ -62,7 +64,6 @@ void Player::finish_race(){
     id_next_checkpoint = 1;
     n_lap = 1;
     race_time = 0;
-    
 }
 
 bool Player::has_finished_race()const{
