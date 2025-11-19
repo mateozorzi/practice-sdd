@@ -57,4 +57,14 @@ constexpr float PIXELS_PER_METER = 30.0f;
     // TODO: replace with command line parameter
 constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/resources/world/blocks_liberty_city.json";
 
+
+//cars
+constexpr std::string_view CAR_COMPACT = "Compact";
+constexpr std::string_view CAR_SPORT = "Sport";
+constexpr std::string_view CAR_CONVERTIBLE = "Convertible";
+constexpr std::string_view CAR_SEDAN = "Sedan";
+constexpr std::string_view CAR_JEEP = "Jeep";
+constexpr std::string_view CAR_RALLY = "Rally";
+constexpr std::string_view CAR_TRUCK = "Truck";
+
 #endif

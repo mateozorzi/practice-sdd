@@ -64,35 +64,35 @@ app:
             compact:
                 health: 100
                 handling: 90
-                acceleration: 80 
-                speed: 100
+                acceleration: 3
+                speed: 6
             sport:
-                health: 80
-                handling: 95
-                acceleration: 100
-                speed: 150
-            convertible:
-                health: 85
-                handling: 90
-                acceleration: 95
-                speed: 140
-            sedan:
                 health: 90
-                handling: 85
-                acceleration: 75 
-                speed: 120
-            jeep:
-                health: 150
-                handling: 70
-                acceleration: 60 
-                speed: 85
-            rally:
+                handling: 95
+                acceleration: 7
+                speed: 10
+            convertible:
                 health: 120
-                handling: 80
-                acceleration: 70 
-                speed: 110
-            truck:
+                handling: 90
+                acceleration: 7
+                speed: 7
+            sedan:
+                health: 180
+                handling: 85
+                acceleration: 10
+                speed: 3
+            jeep:
                 health: 200
+                handling: 70
+                acceleration: 7
+                speed: 5
+            rally:
+                health: 180
+                handling: 80
+                acceleration: 5
+                speed: 5
+            truck:
+                health: 300
                 handling: 50
-                acceleration: 40 
-                speed: 80
+                acceleration: 2
+                speed: 3

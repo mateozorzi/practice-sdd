@@ -92,7 +92,7 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
 
     for (const auto& car: car_catalogue_dto.cars) {
         add_string_to_buffer(car.model);
-        add_uint8_to_buffer(car.health);
+        add_uint16_to_buffer(car.health);
         add_uint8_to_buffer(car.handling);
         add_uint8_to_buffer(car.speed);
         add_uint8_to_buffer(car.acceleration);

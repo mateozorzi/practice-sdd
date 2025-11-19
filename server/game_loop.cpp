@@ -143,6 +143,28 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
+CarClientConfig GameLoop::get_car_config(const ServerConfig& config, car_dto model) {
+    std::string car_model = model.model;
+    if (car_model == CAR_COMPACT) {
+        return config.app.client.cars.compact;
+    } else if (car_model == CAR_SPORT) {
+        return config.app.client.cars.sport;
+    } else if (car_model == CAR_CONVERTIBLE) {
+        return config.app.client.cars.convertible;
+    } else if (car_model == CAR_SEDAN) {
+        return config.app.client.cars.sedan;
+    } else if (car_model == CAR_JEEP) {
+        return config.app.client.cars.jeep;
+    } else if (car_model == CAR_RALLY) {
+        return config.app.client.cars.rally;
+    } else if (car_model == CAR_TRUCK) {
+        return config.app.client.cars.truck;
+    } else {
+        //default car
+        return config.app.client.cars.compact;
+    }
+}
+
 
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
@@ -151,7 +173,9 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
         car_dto car_config = car->get();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.set_car_configuration(car_config);
+            //depend on car_condfig.model set the car configuration from config
+            CarClientConfig cars_attribute = get_car_config(config, car_config);
+            it->second.set_car_configuration(car_config, cars_attribute);
             std::string model = it->second.get_car().model;
             std::cout << "Player with ID: " << it->second.get_client_id()
                       << " has car model set to: " << model << std::endl;

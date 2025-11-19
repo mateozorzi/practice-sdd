@@ -83,7 +83,7 @@ public:
 
     void set_collision(bool colliding);
     b2Body* get_body() const;
-    void set_configuration(const car_dto& car_configuration);
+    void set_configuration(const car_dto& car_configuration, const CarClientConfig& car_config);
 
     CarLayer get_layer() const;
     void set_layer(CarLayer car_layer);

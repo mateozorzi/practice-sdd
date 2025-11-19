@@ -65,7 +65,7 @@ public:
 
     PlayerRaceStatsDTO get_race_stats() const;
 
-    void set_car_configuration(const car_dto& car_configuration);
+    void set_car_configuration(const car_dto& car_configuration, const CarClientConfig& car);
 
     CarLayer get_car_layer() const;
     void set_car_layer(CarLayer layer);
