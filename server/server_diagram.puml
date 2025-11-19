@@ -1,0 +1,49 @@
+@startuml
+
+' Simplified server diagram — only essential classes and relations
+class Server
+class Lobby
+class Game
+class GameLoop
+class ClientHandler
+class Sender
+class Receiver
+class ServerProtocol
+class Player
+class Car
+class CommandQueue <<Queue<GameCommand>>>
+class SnapshotQueue <<Queue<GameUpdateDTO>>>
+class GameMonitor
+class Acceptor
+
+' Core relationships
+Server *-- "1" Lobby
+Server *-- "1" Acceptor
+
+Lobby *-- "0..*" Game
+Game *-- "1" GameLoop
+Game *-- "1" GameMonitor
+GameLoop *-- "0..*" Player
+Player *-- "1" Car
+
+' Queues and flow
+Game *-- CommandQueue : owns
+Receiver --> CommandQueue : push
+GameLoop --> CommandQueue : pop
+
+GameMonitor *-- "0..*" SnapshotQueue: owns, push
+Sender --> SnapshotQueue : pop
+GameLoop --> GameMonitor : broadcast
+Sender --> ServerProtocol : uses
+Receiver --> ServerProtocol : uses
+
+' Acceptor creates client handlers
+Acceptor *-- "0..*" ClientHandler : "creates"
+
+
+' Client & IO
+ClientHandler --> Lobby
+ClientHandler *-- Sender
+ClientHandler *-- Receiver
+
+@enduml
