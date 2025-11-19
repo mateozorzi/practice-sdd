@@ -3,7 +3,7 @@ file(GLOB QRC_FILES "Lobby/*.qrc")
 
 file(GLOB UI_FILES "Lobby/*.ui")
 
-target_sources(taller_client
+target_sources(nfs_client
     PRIVATE
     # .cpp files
     main.cpp

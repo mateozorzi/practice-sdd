@@ -4,7 +4,7 @@ file(GLOB QRC_FILES "EditorMapas/*.qrc")
 # Busca archivos .ui (si los tienes)
 file(GLOB UI_FILES "EditorMapas/*.ui")
 
-target_sources(game_editor
+target_sources(nfs_editor
     PRIVATE
     # .cpp files
     EditorMapas/main.cpp

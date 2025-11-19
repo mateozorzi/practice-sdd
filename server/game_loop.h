@@ -73,6 +73,7 @@ public:
     uint8_t get_active_players() const;
 
     void check_race_times(uint32_t seconds);
+    void check_alive_players(uint32_t race_timeout_ms);
 
     void add_player(uint32_t client_id, const std::string& username);
 
