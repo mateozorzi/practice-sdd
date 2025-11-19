@@ -1,0 +1,63 @@
+@startuml client_render_class_diagram
+
+left to right direction
+skinparam classAttributeIconSize 0
+
+' Classes involved in rendering and input
+class Client {
+  - client_id: uint32_t
+  - sdl_manager: SDLManager*
+  - protocol: ClientProtocol
+  - receiver: Receiver
+  - input_manager: InputManager
+  + run(): void
+}
+
+class Receiver {
+  - protocol: ClientProtocol&
+  - car_positions_queue: Queue<GameUpdateDTO>&
+  + start(): void
+  + stop(): void
+}
+
+class Sender {
+  - protocol: ClientProtocol&
+  - events_queue: Queue<MovementDTO>
+  + add_event(MovementDTO): void
+  + run(): void
+}
+
+class InputManager {
+  - sender: Sender
+  + handle_movement(): bool
+  + is_moving(): bool
+}
+
+class SDLManager {
+  - renderer: Renderer
+  - resources: ResourceManager
+  - camera: Camera
+  + render(...): void
+  + show_screen(): void
+}
+
+
+class ClientProtocol {
+  + send_movement(MovementDTO): void
+  + receive_game_update(): GameUpdateDTO
+}
+
+
+' Relationships (ownership / uses)
+Client *-- SDLManager : owns
+Client *-- Receiver : owns
+Client *-- InputManager : owns
+
+Sender --> "Queue<MovementDTO> events_queue" : push
+Receiver --> "Queue<GameUpdateDTO>" : pops
+
+InputManager *-- Sender : owns
+Sender --> ClientProtocol : uses
+Receiver --> ClientProtocol : uses
+
+@enduml
