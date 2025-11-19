@@ -6,6 +6,7 @@
 #include "../common/race_dto.h"
 #include "../common/race_catalogue_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/upgrade_dto.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <variant>
@@ -31,6 +32,15 @@ void ClientProtocol::send_movement(const MovementDTO& movement) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_MOVEMENT));
     add_uint8_to_buffer(static_cast<uint8_t>(movement.direction));
     add_uint8_to_buffer(static_cast<uint8_t>(movement.isMoving ? 1 : 0));
+    send_buffer();
+}
+
+void ClientProtocol::send_upgrade(const UpgradeDTO& upgrade){
+    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::UPGRADE_CAR));
+    add_uint8_to_buffer(upgrade.handling_increase);
+    add_uint8_to_buffer(upgrade.speed_increase);
+    add_uint8_to_buffer(upgrade.acceleration_increase);
+    add_uint16_to_buffer(upgrade.health_increase);
     send_buffer();
 }
 
@@ -146,7 +156,9 @@ PlayerDTO ClientProtocol::receive_player(){
     const uint32_t id = recv_uint32();
     const std::string car_model = recv_string();
     CarDTO car(car_model);
-    return PlayerDTO(username, id, car);
+    const uint16_t health = recv_uint16();
+    const bool dead = static_cast<bool>(recv_uint8());
+    return PlayerDTO(username, id, car, health, dead);
 }
 
 WorldSnapshotDTO ClientProtocol::receive_update_positions() {

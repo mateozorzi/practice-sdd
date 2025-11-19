@@ -19,6 +19,7 @@
 #include "../common/race_catalogue_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/upgrade_dto.h"
 
 enum class ServerResponse {
 
@@ -42,6 +43,7 @@ public:
     void ask_for_race_catalogue();
     void send_username(const std::string& username);
     void send_movement(const MovementDTO& movement);
+    void send_upgrade(const UpgradeDTO& upgrade);
     void send_create_lobby(const LobbyDTO& lobby);
     void ask_for_lobbies(const LobbyDTO& lobby);
     void send_action_lobby(const LobbyDTO& lobby);

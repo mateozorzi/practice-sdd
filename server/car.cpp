@@ -5,6 +5,7 @@
 
 #include "../common/constants.h"
 #include "../common/checkpoint_dto.h"
+#include "../common/upgrade_dto.h"
 
 Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_config):
         client_id(client_id), body(nullptr), config({
@@ -23,7 +24,7 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
             .turn_torque = server_config.app.server.world.physics.car.turn_torque,
             .mass = server_config.app.server.world.physics.car.mass,
             .health = server_config.app.server.world.physics.car.health
-        }) {
+        }), handling(0) {
 
     b2BodyDef body_definition;
     body_definition.type = b2_dynamicBody;
@@ -223,8 +224,19 @@ const CarDTO Car::get_configuration() const {
     return car_configuration;
 }
 
+
 float remap(float value, float inMin, float inMax, float outMin, float outMax) {
     return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
+}
+void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
+    config.max_speed += upgrade.speed_increase;
+    config.acceleration += upgrade.acceleration_increase;
+
+    // Recalculate turn torque and drift factor based on new handling
+    handling += upgrade.handling_increase;
+    config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
+    config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
+
 }
 
 void Car::set_configuration(const CarDTO& car_configuration, const CarClientConfig& car) {
@@ -233,13 +245,11 @@ void Car::set_configuration(const CarDTO& car_configuration, const CarClientConf
 
     config.max_speed = car.speed;
     config.acceleration = car.acceleration;
-    config.turn_torque = remap(car.handling, 30.0f, 100.0f, 0.010f, 0.028f);
+    handling = car.handling;
+    config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
     std::cout<<"Turn torque set to: "<<config.turn_torque<<std::endl;
-    config.drift_factor = remap(car.handling, 30.0f, 100.0f, 0.40f, 0.00f);
+    config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
     std::cout<<"Drift factor set to: "<<config.drift_factor<<std::endl;
-    //0.05
-    // Need to check which model of car the client wants here.
-    //(void)car_configuration;  // To avoid unused parameter warning
 }
 
 CarLayer Car::get_layer() const {

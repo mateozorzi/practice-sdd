@@ -10,6 +10,7 @@
 #include "../common/checkpoint_dto.h"
 #include "server_config.h"
 #include <vector>
+#include "../common/upgrade_dto.h"
 
 
 constexpr uint16_t CATEGORY_GROUND = 0x0001;
@@ -63,6 +64,7 @@ class Car {
     bool moving_right = false;
     bool is_colliding = false;
     CarLayer car_layer = CarLayer::ON_GROUND;
+    uint8_t handling;
 
     void detect_linear_movement();
     void detect_rotation();
@@ -80,6 +82,7 @@ public:
     void update_position();
     CarPositionDTO get_position_dto() const;
     const CarDTO get_configuration() const;
+    void upgrade_configuration(const UpgradeDTO& upgrade);
 
     void set_collision(bool colliding);
     b2Body* get_body() const;

@@ -36,8 +36,8 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
             {ClientAction::DISCONNECT,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }},
-            {ClientAction::FINISH_RACE,
-             [this](const GameCommand& game_command) { handle_finish_race(game_command); }}
+            {ClientAction::UPGRADE_CAR,
+             [this](const GameCommand& game_command) { handle_upgrade_car(game_command); }}
     };
 
 
@@ -204,16 +204,15 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
     remove_player(game_command.get_client_id());
 }
 
-void GameLoop::handle_finish_race(const GameCommand& game_command) {
-
-    if (auto stats = game_command.get_data<PlayerRaceStatsDTO>()) {
+void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
+    auto upgrade = game_command.get_data<UpgradeDTO>();
+    if (upgrade) {
         uint32_t client_id = game_command.get_client_id();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.finish_race();
-        }  
+            it->second.set_upgrade(upgrade->get());
+        }
     }
-
 }
 
 void GameLoop::handle_command(const GameCommand& game_command) {
@@ -231,7 +230,7 @@ void GameLoop::update_positions(const RaceDTO& race) {
     for (auto& [client_id, player]: players) {
         player.update_car_position(race);
         CarDTO car = player.get_car();
-        PlayerDTO player_dto(player.get_username(), player.get_client_id(), player.get_car());
+        PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
