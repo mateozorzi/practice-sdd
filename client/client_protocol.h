@@ -45,7 +45,7 @@ public:
     void send_create_lobby(const LobbyDTO& lobby);
     void ask_for_lobbies(const LobbyDTO& lobby);
     void send_action_lobby(const LobbyDTO& lobby);
-    void send_car_selection(const car_dto& car);
+    void send_car_selection(const CarDTO& car);
     void change_username(const LobbyDTO& lobby);
     void send_exit(const LobbyDTO& lobby);
     void send_race(const RaceDTO& race);

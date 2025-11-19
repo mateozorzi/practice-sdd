@@ -43,7 +43,7 @@ public:
 
     uint32_t get_client_id() const;
     const std::string& get_username() const;
-    const car_dto get_car() const;
+    const CarDTO get_car() const;
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     b2Body* get_car_body() const;
 
@@ -65,7 +65,7 @@ public:
 
     PlayerRaceStatsDTO get_race_stats() const;
 
-    void set_car_configuration(const car_dto& car_configuration, const CarClientConfig& car);
+    void set_car_configuration(const CarDTO& car_configuration, const CarClientConfig& car);
 
     CarLayer get_car_layer() const;
     void set_car_layer(CarLayer layer);

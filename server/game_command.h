@@ -18,7 +18,7 @@ class GameCommand {
 
     uint32_t client_id;
     ClientAction client_action;
-    std::variant<std::monostate, MovementDTO, PlayerDTO, car_dto, std::string, PlayerRaceStatsDTO> command_data;
+    std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO> command_data;
 
 
 public:

@@ -101,11 +101,11 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
     send_buffer();
 }
 
-car_dto ServerProtocol::receive_car_selection() {
+CarDTO ServerProtocol::receive_car_selection() {
 
     const std::string model = recv_string();
 
-    return car_dto(model, 0, 0, 0, 0);
+    return CarDTO(model, 0, 0, 0, 0);
 }
 
 RaceDTO ServerProtocol::receive_race(){

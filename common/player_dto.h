@@ -13,9 +13,9 @@ struct PlayerDTO {
 
     std::string username;
     uint32_t id;
-    car_dto car;
+    CarDTO car;
 
-    PlayerDTO(const std::string& username, const uint32_t id, const car_dto& car);
+    PlayerDTO(const std::string& username, const uint32_t id, const CarDTO& car);
     explicit PlayerDTO(const std::string& username);
     PlayerDTO();
 };

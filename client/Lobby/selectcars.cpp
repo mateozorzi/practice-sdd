@@ -13,7 +13,7 @@ SelectCars::SelectCars(CarCatalogueDTO& catalogue, QWidget* parent):
         QMainWindow(parent)
         , ui(new Ui::SelectCars)
         , catalogue(catalogue)
-        , actual_car(car_dto())
+        , actual_car(CarDTO())
 {
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
@@ -90,13 +90,13 @@ void SelectCars::value_format(){
     ui->Carinfo->setStyleSheet(style);
 }
 
-car_dto SelectCars::inspect_catalogue() {
+CarDTO SelectCars::inspect_catalogue() {
     int maxHealth = 0;
     int maxHandling = 0;
     int maxAcceleration = 0;
     int maxSpeed = 0;
 
-    for (const car_dto& car : catalogue.cars) {
+    for (const CarDTO& car : catalogue.cars) {
         maxHealth = std::max(maxHealth, (int)car.health);
         maxHandling = std::max(maxHandling, (int)car.handling);
         maxAcceleration = std::max(maxAcceleration, (int)car.acceleration);
@@ -108,10 +108,10 @@ car_dto SelectCars::inspect_catalogue() {
     uint8_t Acceleration = static_cast<uint8_t>(maxAcceleration);
     uint8_t Speed = static_cast<uint8_t>(maxSpeed);
 
-    return car_dto("Normalized", Health, Handling, Speed, Acceleration);
+    return CarDTO("Normalized", Health, Handling, Speed, Acceleration);
 }
 
-car_dto SelectCars::normalize_value_car(const car_dto& car, const car_dto& normalized) {
+CarDTO SelectCars::normalize_value_car(const CarDTO& car, const CarDTO& normalized) {
     int health_normalized = 0;
     int handling_normalized = 0;
     int accelaration_normalized = 0;
@@ -138,10 +138,10 @@ car_dto SelectCars::normalize_value_car(const car_dto& car, const car_dto& norma
     uint8_t acceleration = static_cast<uint8_t>(accelaration_normalized);
     uint8_t speed = static_cast<uint8_t>(speed_normalized);
 
-    return car_dto(car.model, health, handling, speed, acceleration);
+    return CarDTO(car.model, health, handling, speed, acceleration);
 }
 
-void SelectCars::onCarChosen(const car_dto& car){
+void SelectCars::onCarChosen(const CarDTO& car){
     actual_car = car;
     ui->Carinfo->clearContents();
 
@@ -157,8 +157,8 @@ void SelectCars::onCarChosen(const car_dto& car){
     nameItem->setBackground(QColor(240, 240, 255));
     ui->Carinfo->setItem(0, 0, nameItem);
 
-    car_dto normalized = inspect_catalogue();
-    car_dto car_normalized = normalize_value_car(car, normalized);
+    CarDTO normalized = inspect_catalogue();
+    CarDTO car_normalized = normalize_value_car(car, normalized);
 
 
     ui->Carinfo->setCellWidget(1, 0, createProgressBar(car_normalized.health));
@@ -219,7 +219,7 @@ void SelectCars::set_market(){
     ui->img_cars->setIconSize(QSize(120, 120));
     ui->img_cars->clear();
 
-    for (const car_dto& car : catalogue.cars) {
+    for (const CarDTO& car : catalogue.cars) {
         QListWidgetItem* item = new QListWidgetItem();
 
         QString path = ":/cars/images/" + QString::fromStdString(car.model) + ".png";

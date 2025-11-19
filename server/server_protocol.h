@@ -20,7 +20,7 @@ class ServerProtocol final: public CommonProtocol {
     void add_car_position_to_buffer(const CarPositionDTO& car_position_dto);
     void add_player_to_buffer(const PlayerDTO& player);
     PlayerDTO receive_username();
-    car_dto receive_car_selection();
+    CarDTO receive_car_selection();
     RaceDTO receive_race();
     RaceCatalogueDTO receive_races();
     MovementDTO receive_movement();

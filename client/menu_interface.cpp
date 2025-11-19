@@ -38,7 +38,7 @@ bool MenuInterface::car_selection(PlayerDTO& player){
     QEventLoop loop;
 
     //confirm signal, the client select the car
-    QObject::connect(&sc, &SelectCars::confirm_car, [&](const car_dto& car) {
+    QObject::connect(&sc, &SelectCars::confirm_car, [&](const CarDTO& car) {
         // client confirm the car selection
         player.car = car;
         std::cout << "Car selected: " << player.car.model << std::endl;
@@ -374,7 +374,7 @@ PlayerDTO MenuInterface::lobby(){
     Lobby l;
     l.show();
 
-    PlayerDTO player("", -1, car_dto());
+    PlayerDTO player("", -1, CarDTO());
 
     std::string username;
     uint32_t client_id = -1;

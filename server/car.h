@@ -79,11 +79,11 @@ public:
     void handle_movement(const MovementDTO& movement_dto);
     void update_position();
     CarPositionDTO get_position_dto() const;
-    const car_dto get_configuration() const;
+    const CarDTO get_configuration() const;
 
     void set_collision(bool colliding);
     b2Body* get_body() const;
-    void set_configuration(const car_dto& car_configuration, const CarClientConfig& car_config);
+    void set_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config);
 
     CarLayer get_layer() const;
     void set_layer(CarLayer car_layer);

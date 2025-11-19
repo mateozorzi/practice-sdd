@@ -218,8 +218,8 @@ void Car::set_collision(bool colliding) { is_colliding = colliding; }
 b2Body* Car::get_body() const { return body; }
 
 
-const car_dto Car::get_configuration() const {
-    car_dto car_configuration(model);
+const CarDTO Car::get_configuration() const {
+    CarDTO car_configuration(model);
     return car_configuration;
 }
 
@@ -227,7 +227,7 @@ float remap(float value, float inMin, float inMax, float outMin, float outMax) {
     return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
 }
 
-void Car::set_configuration(const car_dto& car_configuration, const CarClientConfig& car) {
+void Car::set_configuration(const CarDTO& car_configuration, const CarClientConfig& car) {
     std::cout<<"Setting car configuration for player id: "<<client_id<<" model: "<<car_configuration.model<<std::endl;
     model = car_configuration.model;
 
