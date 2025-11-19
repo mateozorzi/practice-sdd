@@ -90,8 +90,8 @@ PlayerRaceStatsDTO Player::get_race_stats() const {
 
 const std::string& Player::get_username() const { return username; }
 
-const car_dto Player::get_car() const {
-    car_dto empty_car;
+const CarDTO Player::get_car() const {
+    CarDTO empty_car;
     if (car) {
         return car->get_configuration();
     }
@@ -211,7 +211,7 @@ bool Player::is_in_game() const { return in_game; }
 void Player::set_in_game() { in_game = true; }
 
 
-void Player::set_car_configuration(const car_dto& car_configuration, const CarClientConfig& car_config) {
+void Player::set_car_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config) {
     if (car){
         health = static_cast<uint16_t>(car_config.health);
         car->set_configuration(car_configuration, car_config);

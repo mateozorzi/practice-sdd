@@ -143,7 +143,7 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
-CarClientConfig GameLoop::get_car_config(const ServerConfig& config, car_dto model) {
+CarClientConfig GameLoop::get_car_config(const ServerConfig& config, CarDTO model) {
     std::string car_model = model.model;
     if (car_model == CAR_COMPACT) {
         return config.app.client.cars.compact;
@@ -168,9 +168,9 @@ CarClientConfig GameLoop::get_car_config(const ServerConfig& config, car_dto mod
 
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
-    if (auto car = game_command.get_data<car_dto>()) {
+    if (auto car = game_command.get_data<CarDTO>()) {
         uint32_t client_id = game_command.get_client_id();
-        car_dto car_config = car->get();
+        CarDTO car_config = car->get();
         auto it = players.find(client_id);
         if (it != players.end()) {
             //depend on car_condfig.model set the car configuration from config
@@ -229,7 +229,7 @@ void GameLoop::update_positions(const RaceDTO& race) {
 
     for (auto& [client_id, player]: players) {
         player.update_car_position(race);
-        car_dto car = player.get_car();
+        CarDTO car = player.get_car();
         PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }

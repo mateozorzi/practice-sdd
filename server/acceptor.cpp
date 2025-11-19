@@ -53,11 +53,8 @@ void Acceptor::reap() {
 
 void Acceptor::clear() {
 
-    for (auto& client: clients) {
-
-        client->stop();
+    for (auto& client: clients)
         client->join();
-    }
 
     clients.clear();
 }

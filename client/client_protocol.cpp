@@ -94,7 +94,7 @@ void ClientProtocol::send_exit(const LobbyDTO& lobby) {
     send_buffer();
 }
 
-void ClientProtocol::send_car_selection(const car_dto& car){
+void ClientProtocol::send_car_selection(const CarDTO& car){
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_SELECTION));
     add_string_to_buffer(car.model);
     send_buffer();
@@ -155,7 +155,7 @@ PlayerDTO ClientProtocol::receive_player(){
     const std::string& username = recv_string();
     const uint32_t id = recv_uint32();
     const std::string car_model = recv_string();
-    car_dto car(car_model);
+    CarDTO car(car_model);
     const uint16_t health = recv_uint16();
     const bool dead = static_cast<bool>(recv_uint8());
     return PlayerDTO(username, id, car, health, dead);
@@ -213,14 +213,14 @@ void ClientProtocol::ask_for_catalogue(){
 
 CarCatalogueDTO ClientProtocol::receive_car_catalogue(){
     uint8_t size = recv_uint8();
-    std::vector<car_dto> cars;
+    std::vector<CarDTO> cars;
     for (uint8_t i = 0; i < size; ++i) {
         std::string model = recv_string();
         uint16_t health = recv_uint16();
         uint8_t handling = recv_uint8();
         uint8_t speed = recv_uint8();
         uint8_t acceleration = recv_uint8();
-        cars.push_back(car_dto(model, health, handling, speed, acceleration));
+        cars.push_back(CarDTO(model, health, handling, speed, acceleration));
     }
     return CarCatalogueDTO(std::move(cars));
 }

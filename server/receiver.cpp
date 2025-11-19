@@ -19,7 +19,7 @@ Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t
 
 void Receiver::handle_get_car_catalogue() {
 
-    std::vector<car_dto> cars = {
+    std::vector<CarDTO> cars = {
         {"Compact", 
          static_cast<uint16_t>(config.app.client.cars.compact.health), 
          static_cast<uint8_t>(config.app.client.cars.compact.handling), 

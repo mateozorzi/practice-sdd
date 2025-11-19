@@ -115,11 +115,11 @@ UpgradeDTO ServerProtocol::receive_upgrade() {
     return UpgradeDTO(handling_increase, speed_increase, acceleration_increase, health_increase);
 }
 
-car_dto ServerProtocol::receive_car_selection() {
+CarDTO ServerProtocol::receive_car_selection() {
 
     const std::string model = recv_string();
 
-    return car_dto(model, 0, 0, 0, 0);
+    return CarDTO(model, 0, 0, 0, 0);
 }
 
 RaceDTO ServerProtocol::receive_race(){

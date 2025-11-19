@@ -15,7 +15,7 @@ class SelectCars: public QMainWindow {
 
 signals:
     void back_to_lobby();
-    void confirm_car(const car_dto& car);
+    void confirm_car(const CarDTO& car);
 
 public:
     explicit SelectCars(CarCatalogueDTO& catalogue, QWidget* parent = nullptr);
@@ -34,16 +34,16 @@ private:
     Ui::SelectCars* ui;
     QGraphicsScene* scene;
     CarCatalogueDTO catalogue;
-    car_dto actual_car;
+    CarDTO actual_car;
 
-    void onCarChosen(const car_dto& car);
+    void onCarChosen(const CarDTO& car);
 
     void set_market();
 
     QString getProgressBarStyle(const int value);
     QWidget* createProgressBar(uint8_t value);
-    car_dto inspect_catalogue();
-    car_dto normalize_value_car(const car_dto& car, const car_dto& normalized);
+    CarDTO inspect_catalogue();
+    CarDTO normalize_value_car(const CarDTO& car, const CarDTO& normalized);
 };
 
 #endif  // SELECTCARS_H
