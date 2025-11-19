@@ -374,11 +374,7 @@ PlayerDTO MenuInterface::lobby(){
     Lobby l;
     l.show();
 
-<<<<<<< HEAD
-    PlayerDTO player("", -1, car_dto(), -1,false);
-=======
-    PlayerDTO player("", -1, CarDTO());
->>>>>>> 3537910685233e9b5fef4c822a4e2144b3e53e68
+    PlayerDTO player("", -1, CarDTO(), -1,false);
 
     std::string username;
     uint32_t client_id = -1;

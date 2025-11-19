@@ -8,7 +8,7 @@ app:
         max_cars_per_match: 8
         wait_time_between_races_seconds: 24.0
     server:
-        # default_server_port: 8080
+        default_server_port: "8080"
         command_queue_capacity: 500
         snapshot_queue_capacity: 100
         waiting_for_players_fps: 5.0
