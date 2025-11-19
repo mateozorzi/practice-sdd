@@ -11,6 +11,7 @@
 #include "../common/race_dto.h"
 #include "../common/player_race_stats_dto.h"
 #include "../common/player_dto.h"
+#include "../common/upgrade_dto.h"
 
 #include "car.h"
 #include "server_config.h"
@@ -66,6 +67,8 @@ public:
     uint32_t get_recorded_time() const;
 
     bool is_dead() const;
+
+    void set_upgrade(const UpgradeDTO& upgrade);
 
     PlayerDTO get_info() const;
 

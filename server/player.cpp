@@ -6,6 +6,7 @@
 #include "../common/checkpoint_dto.h"
 #include "../common/player_race_stats_dto.h"
 #include "../common/player_dto.h"
+#include "../common/upgrade_dto.h"
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world,
@@ -99,6 +100,15 @@ const car_dto Player::get_car() const {
 
 bool Player::is_dead() const {
     return dead;
+}
+
+void Player::set_upgrade(const UpgradeDTO& upgrade){
+    if (car){
+        if (upgrade.health_increase > 0){
+            health += upgrade.health_increase;
+        }
+        car->upgrade_configuration(upgrade);
+    }
 }
 
 PlayerDTO Player::get_info() const {

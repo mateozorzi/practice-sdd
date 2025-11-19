@@ -42,7 +42,7 @@ class GameLoop final: public Thread {
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
-    void handle_finish_race(const GameCommand& game_command);
+    void handle_upgrade_car(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);
     void update_positions(const RaceDTO& race);
     void start_race(const RaceDTO& race);

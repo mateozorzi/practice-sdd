@@ -13,6 +13,7 @@
 #include "../common/race_catalogue_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/upgrade_dto.h"
 
 
 class ServerProtocol final: public CommonProtocol {
@@ -24,6 +25,7 @@ class ServerProtocol final: public CommonProtocol {
     RaceDTO receive_race();
     RaceCatalogueDTO receive_races();
     MovementDTO receive_movement();
+    UpgradeDTO receive_upgrade();
     void add_race_to_buffer(const RaceDTO& race);
     void add_checkpoint_to_buffer(const CheckpointDTO& checkpoint);
     void send_lobby(const LobbyDTO& lobby_dto);

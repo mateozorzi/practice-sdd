@@ -8,6 +8,7 @@
 #include <iostream>
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/upgrade_dto.h"
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
@@ -77,6 +78,8 @@ GameCommandDTO ServerProtocol::receive_game_command() {
             return GameCommandDTO(client_action, receive_movement());
         case ClientAction::SEND_CAR_SELECTION:
             return GameCommandDTO(client_action, receive_car_selection());
+        case ClientAction::UPGRADE_CAR:
+            return GameCommandDTO(client_action, receive_upgrade());
         case ClientAction::GET_CAR_CATALOGUE:
         case ClientAction::DISCONNECT:
             return GameCommandDTO(client_action);
@@ -101,6 +104,15 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
     }
 
     send_buffer();
+}
+
+UpgradeDTO ServerProtocol::receive_upgrade() {
+    const uint8_t handling_increase = recv_uint8();
+    const uint8_t speed_increase = recv_uint8();
+    const uint8_t acceleration_increase = recv_uint8();
+    const uint16_t health_increase = recv_uint16();
+
+    return UpgradeDTO(handling_increase, speed_increase, acceleration_increase, health_increase);
 }
 
 car_dto ServerProtocol::receive_car_selection() {
