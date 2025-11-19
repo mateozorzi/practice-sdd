@@ -223,10 +223,21 @@ const car_dto Car::get_configuration() const {
     return car_configuration;
 }
 
-void Car::set_configuration(const car_dto& car_configuration) {
+float remap(float value, float inMin, float inMax, float outMin, float outMax) {
+    return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
+}
+
+void Car::set_configuration(const car_dto& car_configuration, const CarClientConfig& car) {
     std::cout<<"Setting car configuration for player id: "<<client_id<<" model: "<<car_configuration.model<<std::endl;
     model = car_configuration.model;
 
+    config.max_speed = car.speed;
+    config.acceleration = car.acceleration;
+    config.turn_torque = remap(car.handling, 30.0f, 100.0f, 0.010f, 0.028f);
+    std::cout<<"Turn torque set to: "<<config.turn_torque<<std::endl;
+    config.drift_factor = remap(car.handling, 30.0f, 100.0f, 0.40f, 0.00f);
+    std::cout<<"Drift factor set to: "<<config.drift_factor<<std::endl;
+    //0.05
     // Need to check which model of car the client wants here.
     //(void)car_configuration;  // To avoid unused parameter warning
 }

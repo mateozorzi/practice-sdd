@@ -7,12 +7,12 @@
 
 struct car_dto {
     std::string model;
-    uint8_t health;
+    uint16_t health;
     uint8_t handling;
     uint8_t speed;
     uint8_t acceleration;
 
-    car_dto(const std::string& name, uint8_t health, uint8_t handling, uint8_t speed,
+    car_dto(const std::string& name, uint16_t health, uint8_t handling, uint8_t speed,
             uint8_t acceleration):
             model(name),
             health(health),

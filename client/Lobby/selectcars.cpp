@@ -5,6 +5,7 @@
 #include "../../common/car_catalogue_dto.h"
 #include <QLabel>
 #include <QProgressBar>
+#include <iostream>
 
 #define MAX_IMG 64
 
@@ -102,7 +103,7 @@ car_dto SelectCars::inspect_catalogue() {
         maxSpeed = std::max(maxSpeed, (int)car.speed);
     }
 
-    uint8_t Health = static_cast<uint8_t>(maxHealth);
+    uint16_t Health = static_cast<uint16_t>(maxHealth);
     uint8_t Handling = static_cast<uint8_t>(maxHandling);
     uint8_t Acceleration = static_cast<uint8_t>(maxAcceleration);
     uint8_t Speed = static_cast<uint8_t>(maxSpeed);
@@ -132,7 +133,7 @@ car_dto SelectCars::normalize_value_car(const car_dto& car, const car_dto& norma
         speed_normalized = (static_cast<int>(car.speed) * 100) / static_cast<int>(normalized.speed);
     }
 
-    uint8_t health = static_cast<uint8_t>(health_normalized);
+    uint16_t health = static_cast<uint16_t>(health_normalized);
     uint8_t handling = static_cast<uint8_t>(handling_normalized);
     uint8_t acceleration = static_cast<uint8_t>(accelaration_normalized);
     uint8_t speed = static_cast<uint8_t>(speed_normalized);

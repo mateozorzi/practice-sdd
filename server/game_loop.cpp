@@ -12,6 +12,8 @@
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
 
+#define RACE_TIMEOUT_MS 600000 //10 minutes
+
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                    const uint8_t max_players, const ServerConfig& config, RaceCatalogueDTO& selected) :
@@ -141,6 +143,28 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
+CarClientConfig GameLoop::get_car_config(const ServerConfig& config, car_dto model) {
+    std::string car_model = model.model;
+    if (car_model == CAR_COMPACT) {
+        return config.app.client.cars.compact;
+    } else if (car_model == CAR_SPORT) {
+        return config.app.client.cars.sport;
+    } else if (car_model == CAR_CONVERTIBLE) {
+        return config.app.client.cars.convertible;
+    } else if (car_model == CAR_SEDAN) {
+        return config.app.client.cars.sedan;
+    } else if (car_model == CAR_JEEP) {
+        return config.app.client.cars.jeep;
+    } else if (car_model == CAR_RALLY) {
+        return config.app.client.cars.rally;
+    } else if (car_model == CAR_TRUCK) {
+        return config.app.client.cars.truck;
+    } else {
+        //default car
+        return config.app.client.cars.compact;
+    }
+}
+
 
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
@@ -149,7 +173,9 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
         car_dto car_config = car->get();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.set_car_configuration(car_config);
+            //depend on car_condfig.model set the car configuration from config
+            CarClientConfig cars_attribute = get_car_config(config, car_config);
+            it->second.set_car_configuration(car_config, cars_attribute);
             std::string model = it->second.get_car().model;
             std::cout << "Player with ID: " << it->second.get_client_id()
                       << " has car model set to: " << model << std::endl;
@@ -256,7 +282,7 @@ void GameLoop::start_race(const RaceDTO& race){
 
 void GameLoop::finish_race(uint32_t timeout_time){
     for (auto& [client_id, player] : players) {
-        if (player.is_in_race()) {
+        if (!player.has_finished_race()) {
             player.finish_race();
             player.record_time(timeout_time);
         }
@@ -266,7 +292,7 @@ void GameLoop::finish_race(uint32_t timeout_time){
 void GameLoop::check_race_times(uint32_t seconds){
     //check if any player has finished the race
     for (auto& [client_id, player] : players) {
-        if (!player.is_in_race() && !player.have_time_recorded()) {
+        if (player.has_finished_race()) {
             std::cout << "Player with ID: " << client_id << " has finished the race in " << seconds << " seconds." << std::endl;
             player.record_time(seconds);
         }
@@ -340,10 +366,13 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
     uint8_t points = 8;
     uint8_t position = 1;
     for (size_t i = 0; i < race_stats.size(); ++i) {
-        race_stats[i].points = points;
-        points--;
         race_stats[i].position = position;
         position++;
+        if (race_stats[i].total_time_ms >= RACE_TIMEOUT_MS) {
+            continue; //skip players who did not finish the race
+        }
+        race_stats[i].points = points;
+        points--;
     }
 
     std::string race_name = selected_races.races[current_race_index].name;

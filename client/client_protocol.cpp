@@ -204,7 +204,7 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue(){
     std::vector<car_dto> cars;
     for (uint8_t i = 0; i < size; ++i) {
         std::string model = recv_string();
-        uint8_t health = recv_uint8();
+        uint16_t health = recv_uint16();
         uint8_t handling = recv_uint8();
         uint8_t speed = recv_uint8();
         uint8_t acceleration = recv_uint8();
