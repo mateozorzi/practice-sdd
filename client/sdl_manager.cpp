@@ -17,7 +17,8 @@ SDLManager::SDLManager():
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
         resources(renderer),
         camera(512, 288, 4640, 4672),
-        sounds(mixer, resources) {
+        sounds(mixer, resources),
+        animations(renderer, camera, resources) {
     renderer.SetLogicalSize(1920, 1080);
     set_minimap();
     load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
@@ -149,6 +150,8 @@ void SDLManager::render_bridges() { render_layer(bridges_rects); }
 void SDLManager::render(const PlayerDTO& player, const int health,
                         const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars,
                         const bool is_moving) {
+    iteration_counter++;
+
     CarPositionDTO my_car;
     bool found = false;
 
@@ -167,6 +170,11 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     const uint32_t pos_x = my_car.x_position;
     const uint32_t pos_y = my_car.y_position;
+
+    if (!animations.is_explosion_active(iteration_counter)) {
+        animations.start_explosion(iteration_counter,
+                                   SDL2pp::Point(pos_x, pos_y));
+    }
 
     update_camera(pos_x, pos_y);
     clear_screen();
@@ -191,8 +199,9 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     render_stats(cars);
     render_hint(my_car);
 
-    show_screen();
+    animations.render_explosion(iteration_counter);
 
+    show_screen();
     SDL_Delay(10);
 }
 

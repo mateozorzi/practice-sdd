@@ -15,6 +15,7 @@ target_sources(taller_client
     input_manager.cpp
     sdl_manager.cpp
     resource_manager.cpp
+    animations.cpp
 
     Lobby/lobby.cpp
     Lobby/selectcars.cpp
@@ -40,7 +41,8 @@ target_sources(taller_client
     input_manager.h
     sdl_manager.h
     sounds.h
-    resource_manager.cpp
+    resource_manager.h
+    animations.h
 
     Lobby/lobby.h
     Lobby/selectcars.h

@@ -8,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "animations.h"
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
@@ -35,10 +36,12 @@ private:
     ResourceManager resources;
     Camera camera;
     Sounds sounds;
+    Animations animations;
     std::optional<SDL2pp::Texture> sprite;
     std::optional<SDL2pp::Texture> minimap;
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
+    int iteration_counter = 0;
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
