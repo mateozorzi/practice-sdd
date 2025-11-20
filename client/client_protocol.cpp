@@ -192,8 +192,8 @@ LeaderboardDTO ClientProtocol::receive_leaderboard(){
         std::string username = recv_string();
         uint8_t position = recv_uint8();
         uint8_t points = recv_uint8();
-        uint32_t total_time_ms = recv_uint32();
-        players.emplace_back(client_id, username, position, points, total_time_ms);
+        uint32_t total_time = recv_uint32();
+        players.emplace_back(client_id, username, position, points, total_time);
     }
     return LeaderboardDTO(race_name, players);
 

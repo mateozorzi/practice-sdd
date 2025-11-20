@@ -190,7 +190,7 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot){
         add_string_to_buffer(player_stats.username);
         add_uint8_to_buffer(player_stats.position);
         add_uint8_to_buffer(player_stats.points);
-        add_uint32_to_buffer(player_stats.total_time_ms);
+        add_uint32_to_buffer(player_stats.total_time);
     }
 
     send_buffer();
