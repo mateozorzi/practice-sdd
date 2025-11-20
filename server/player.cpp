@@ -258,7 +258,7 @@ void Player::apply_collision_damage(uint16_t damage) {
     } else {
 
         health = 0;
-        std::cout << "Player with ID: " << client_id << "Has been destroyed!" << std::endl;
+        std::cout << "Player with ID: " << client_id << " Has been destroyed!" << std::endl;
     }
 }
 
