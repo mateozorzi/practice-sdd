@@ -9,6 +9,9 @@
 #include "../common/car_position_dto.h"
 #include "../common/movement_dto.h"
 #include "../common/race_dto.h"
+#include "../common/player_race_stats_dto.h"
+#include "../common/player_dto.h"
+#include "../common/upgrade_dto.h"
 
 #include "car.h"
 #include "server_config.h"
@@ -23,9 +26,13 @@ class Player {
     uint16_t races_won;
     bool in_game;
     bool in_race;
+    bool has_finish_race;
     int id_next_checkpoint;
     uint8_t n_lap;
     CheckpointDTO next;
+    uint32_t race_time;
+    bool dead;
+    uint16_t base_health;
 
     void update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
@@ -40,7 +47,7 @@ public:
 
     uint32_t get_client_id() const;
     const std::string& get_username() const;
-    const car_dto get_car() const;
+    const CarDTO get_car() const;
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     b2Body* get_car_body() const;
 
@@ -55,8 +62,20 @@ public:
     void start_race();
     bool is_in_race() const;
     void finish_race();
+    bool has_finished_race() const;
+    bool have_time_recorded() const;
+    void record_time(uint32_t seconds);
+    uint32_t get_recorded_time() const;
 
-    void set_car_configuration(const car_dto& car_configuration);
+    bool is_dead() const;
+
+    void set_upgrade(const UpgradeDTO& upgrade);
+
+    PlayerDTO get_info() const;
+
+    PlayerRaceStatsDTO get_race_stats() const;
+
+    void set_car_configuration(const CarDTO& car_configuration, const CarClientConfig& car);
 
     CarLayer get_car_layer() const;
     void set_car_layer(CarLayer layer);

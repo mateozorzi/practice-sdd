@@ -13,8 +13,7 @@ enum class ClientAction : uint8_t {
     GET_CAR_CATALOGUE = 0x04,
     SEND_CAR_SELECTION = 0x05,
     GET_JSON_FILE = 0x06,
-    FINISH_RACE = 0x07,
-    SEND_UPGRADE = 0x08,
+    UPGRADE_CAR = 0x07,
 
 };
 
@@ -22,6 +21,7 @@ enum class GameLoopAction : uint8_t {
     SEND_UPDATE_POSITIONS = 0x10,
     SEND_RACE = 0x11,
     SEND_RACE_FINISHED = 0x12,
+    SEND_LEADERBOARD = 0x13,
 };
 
 //CHECKPOINTS
@@ -56,5 +56,15 @@ constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 constexpr float PIXELS_PER_METER = 30.0f;
     // TODO: replace with command line parameter
 constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/resources/world/blocks_liberty_city.json";
+
+
+//cars
+constexpr std::string_view CAR_COMPACT = "Compact";
+constexpr std::string_view CAR_SPORT = "Sport";
+constexpr std::string_view CAR_CONVERTIBLE = "Convertible";
+constexpr std::string_view CAR_SEDAN = "Sedan";
+constexpr std::string_view CAR_JEEP = "Jeep";
+constexpr std::string_view CAR_RALLY = "Rally";
+constexpr std::string_view CAR_TRUCK = "Truck";
 
 #endif

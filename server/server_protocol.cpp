@@ -6,6 +6,9 @@
 
 #include "../common/constants.h"
 #include <iostream>
+#include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
+#include "../common/upgrade_dto.h"
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
@@ -22,6 +25,8 @@ void ServerProtocol::add_player_to_buffer(const PlayerDTO& player){
     add_string_to_buffer(player.username);
     add_uint32_to_buffer(player.id);
     add_string_to_buffer(player.car.model);
+    add_uint16_to_buffer(player.health);
+    add_uint8_to_buffer(static_cast<uint8_t>(player.dead));
 }
 
 PlayerDTO ServerProtocol::receive_username() {
@@ -73,6 +78,8 @@ GameCommandDTO ServerProtocol::receive_game_command() {
             return GameCommandDTO(client_action, receive_movement());
         case ClientAction::SEND_CAR_SELECTION:
             return GameCommandDTO(client_action, receive_car_selection());
+        case ClientAction::UPGRADE_CAR:
+            return GameCommandDTO(client_action, receive_upgrade());
         case ClientAction::GET_CAR_CATALOGUE:
         case ClientAction::DISCONNECT:
             return GameCommandDTO(client_action);
@@ -90,7 +97,7 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
 
     for (const auto& car: car_catalogue_dto.cars) {
         add_string_to_buffer(car.model);
-        add_uint8_to_buffer(car.health);
+        add_uint16_to_buffer(car.health);
         add_uint8_to_buffer(car.handling);
         add_uint8_to_buffer(car.speed);
         add_uint8_to_buffer(car.acceleration);
@@ -99,11 +106,20 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
     send_buffer();
 }
 
-car_dto ServerProtocol::receive_car_selection() {
+UpgradeDTO ServerProtocol::receive_upgrade() {
+    const uint8_t handling_increase = recv_uint8();
+    const uint8_t speed_increase = recv_uint8();
+    const uint8_t acceleration_increase = recv_uint8();
+    const uint16_t health_increase = recv_uint16();
+
+    return UpgradeDTO(handling_increase, speed_increase, acceleration_increase, health_increase);
+}
+
+CarDTO ServerProtocol::receive_car_selection() {
 
     const std::string model = recv_string();
 
-    return car_dto(model, 0, 0, 0, 0);
+    return CarDTO(model, 0, 0, 0, 0);
 }
 
 RaceDTO ServerProtocol::receive_race(){
@@ -141,9 +157,10 @@ void ServerProtocol::send_client_id(const uint32_t client_id) {
     send_buffer();
 }
 
-void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot) {
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS));
-    add_uint8_to_buffer(world_snapshot.get_size());
+void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
+    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
+    const WorldSnapshotDTO& world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
+    add_uint8_to_buffer(world_snapshot.size);
 
     for (const auto& car_position: world_snapshot.get_car_positions()) {
         add_player_to_buffer(car_position.first);
@@ -153,10 +170,29 @@ void ServerProtocol::send_world_snapshot(const WorldSnapshotDTO& world_snapshot)
     send_buffer();
 }
 
-void ServerProtocol::send_race_update(const RaceDTO& race){    
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
+void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot){
+    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
 
+    const RaceDTO& race = std::get<RaceDTO>(snapshot.data);
     add_race_to_buffer(race);
+    send_buffer();
+}
+
+void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot){
+    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
+
+    const LeaderboardDTO& leaderboard = std::get<LeaderboardDTO>(snapshot.data);
+    add_string_to_buffer(leaderboard.race_name);
+    add_uint8_to_buffer(leaderboard.n_players);
+
+    for (const auto& player_stats: leaderboard.players) {
+        add_uint32_to_buffer(player_stats.client_id);
+        add_string_to_buffer(player_stats.username);
+        add_uint8_to_buffer(player_stats.position);
+        add_uint8_to_buffer(player_stats.points);
+        add_uint32_to_buffer(player_stats.total_time_ms);
+    }
+
     send_buffer();
 }
 

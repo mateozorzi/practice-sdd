@@ -1,0 +1,25 @@
+@startuml editor_state_diagram
+
+left to right direction
+
+' State diagram showing which window opens with each action
+
+[*] --> Editormenu
+Editormenu --> [*] : Exit
+
+Editormenu : UI -> editormenu.ui
+Editormenu --> Editor       : Create
+Editormenu --> SelectCircuit: Editor
+
+Editor : UI -> editor.ui
+Editor --> Editormenu   : Exit
+Editor --> Creador         : Select a city
+
+SelectCircuit : UI -> selectcircuit.ui
+SelectCircuit --> Creador : Select a create circuit
+SelectCircuit --> Editormenu: Exit
+
+Creador : UI -> creador.ui
+Creador --> Editormenu     : Done / Exit
+
+@enduml

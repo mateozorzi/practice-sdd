@@ -18,6 +18,9 @@
 #include "../common/race_dto.h"
 #include "../common/race_catalogue_dto.h"
 #include "common/client_event_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/game_update_dto.h"
+#include "../common/upgrade_dto.h"
 
 enum class ServerResponse {
 
@@ -44,11 +47,13 @@ public:
     void handle_move(const MovementDTO& dto);
 
     void handle_buy(const BuyUpgradeDTO &dto);
+    //void send_movement(const MovementDTO& movement);
+    //void send_upgrade(const UpgradeDTO& upgrade);
 
     void send_create_lobby(const LobbyDTO& lobby);
     void ask_for_lobbies(const LobbyDTO& lobby);
     void send_action_lobby(const LobbyDTO& lobby);
-    void send_car_selection(const car_dto& car);
+    void send_car_selection(const CarDTO& car);
     void change_username(const LobbyDTO& lobby);
     void send_exit(const LobbyDTO& lobby);
     void send_race(const RaceDTO& race);
@@ -67,8 +72,9 @@ public:
     uint32_t receive_id();
     WorldSnapshotDTO receive_update_positions();
     PlayerDTO receive_player();
+    LeaderboardDTO receive_leaderboard();
     nlohmann::json get_json(const std::string& file_path);
-    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO> receive_update();
+    GameUpdateDTO receive_update();
 };
 
 #endif

@@ -1,10 +1,11 @@
-target_sources(taller_common
+target_sources(nfs_common
     PRIVATE
     # .cpp files
     car_catalogue_dto.cpp
     car_position_dto.cpp
     common_protocol.cpp
     foo.cpp
+    movement_dto.cpp
     liberror.cpp
     player_dto.cpp
     resolver.cpp
@@ -20,6 +21,7 @@ target_sources(taller_common
     common_protocol.h
     game_command_dto.h
     foo.h
+    movement_dto.h
     liberror.h
     player_dto.h
     queue.h
@@ -38,4 +40,5 @@ target_sources(taller_common
 
     player_race_stats_dto.h
     leaderboard_dto.h
+    game_update_dto.h
     )

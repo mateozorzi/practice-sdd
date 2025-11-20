@@ -1,0 +1,37 @@
+@startuml client_lobby_states
+
+
+' State diagram for the Lobby UI (client/Lobby)
+
+[*] --> Lobby : start
+Lobby : UI -> lobby.ui
+Lobby --> creategame : Confirm username (valid)
+Lobby --> [*] : Exit
+
+creategame : UI -> creategame.ui
+creategame --> CreateLobby : Create Game
+creategame --> JoinLobby : Join Game
+creategame --> Lobby : Exit
+
+
+CreateLobby : UI -> createlobby.ui
+CreateLobby --> RaceSelector : Create
+CreateLobby --> creategame : Exit
+
+
+RaceSelector --> SelectCars : Create Game
+RaceSelector --> CreateLobby : Exit
+
+
+
+JoinLobby : UI -> joinlobby.ui
+JoinLobby --> creategame : Exit
+JoinLobby --> SelectCars : Join
+
+SelectCars : UI -> selectcars.ui
+SelectCars --> [*] : Confirm car selection
+SelectCars --> creategame : Exit
+
+
+@enduml
+

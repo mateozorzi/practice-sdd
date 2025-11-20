@@ -4,6 +4,9 @@
 #include "../common/constants.h"
 #include "../common/race_dto.h"
 #include "../common/checkpoint_dto.h"
+#include "../common/player_race_stats_dto.h"
+#include "../common/player_dto.h"
+#include "../common/upgrade_dto.h"
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world,
@@ -14,9 +17,11 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         health(config.app.server.world.physics.car.health),
         races_won(0),
         in_game(false),
-        in_race(false),
+        in_race(false), 
+        has_finish_race(false),
         id_next_checkpoint(1),
-        n_lap(1), next() {}
+        n_lap(1), next(), race_time(0), dead(false),
+        base_health(health) {}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -40,8 +45,12 @@ void Player::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints
 
 void Player::start_race(){
     in_race = true;
+    has_finish_race = false;
     id_next_checkpoint = 1;
     n_lap = 1;
+    race_time = 0;
+    dead = false;
+    health = base_health;
 
 }
 
@@ -51,18 +60,60 @@ bool Player::is_in_race() const {
 
 void Player::finish_race(){
     in_race = false;
+    has_finish_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
+    race_time = 0;
+}
+
+bool Player::has_finished_race()const{
+    return has_finish_race;
+}
+
+bool Player::have_time_recorded() const {
+    if (race_time > 0){
+        return true;
+    }
+    return false;
+}
+
+void Player::record_time(uint32_t seconds){ 
+    race_time = seconds;
+}
+
+uint32_t Player::get_recorded_time() const {
+    return race_time;
+}
+
+PlayerRaceStatsDTO Player::get_race_stats() const {
+    return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
 }
 
 const std::string& Player::get_username() const { return username; }
 
-const car_dto Player::get_car() const {
-    car_dto empty_car;
+const CarDTO Player::get_car() const {
+    CarDTO empty_car;
     if (car) {
         return car->get_configuration();
     }
     return empty_car;
+}
+
+bool Player::is_dead() const {
+    return dead;
+}
+
+void Player::set_upgrade(const UpgradeDTO& upgrade){
+    if (car){
+        if (upgrade.health_increase > 0){
+            health += upgrade.health_increase;
+        }
+        car->upgrade_configuration(upgrade);
+    }
+}
+
+PlayerDTO Player::get_info() const {
+    return PlayerDTO(username, client_id, get_car(), health, dead);
 }
 
 
@@ -118,6 +169,11 @@ void Player::update_car_position(const RaceDTO& race) {
         car->update_position();
         //update race conditions
 
+        if (health == 0 && !dead){
+            finish_race();
+            dead = true;
+        }
+
         //check if player reached next checkpoint
         CarPositionDTO actual = car->get_position_dto();
         uint32_t x = actual.x_position;
@@ -156,9 +212,11 @@ bool Player::is_in_game() const { return in_game; }
 void Player::set_in_game() { in_game = true; }
 
 
-void Player::set_car_configuration(const car_dto& car_configuration) {
-    if (car)
-        car->set_configuration(car_configuration);
+void Player::set_car_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config) {
+    if (car){
+        health = static_cast<uint16_t>(car_config.health);
+        car->set_configuration(car_configuration, car_config);
+    }
 }
 
 CarLayer Player::get_car_layer() const {

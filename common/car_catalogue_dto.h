@@ -10,10 +10,10 @@
 struct CarCatalogueDTO {
 
 
-    const std::vector<car_dto> cars;
+    const std::vector<CarDTO> cars;
     const uint8_t size;
 
-    explicit CarCatalogueDTO(std::vector<car_dto> cars = {});
+    explicit CarCatalogueDTO(std::vector<CarDTO> cars = {});
 };
 
 

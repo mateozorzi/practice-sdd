@@ -1,0 +1,46 @@
+@startuml client_render_class_diagram
+
+left to right direction
+skinparam classAttributeIconSize 0
+
+' Classes involved in rendering and input
+class Client {
+}
+
+class Receiver {
+}
+
+class Sender {
+
+}
+
+class InputManager {
+
+}
+
+class SDLManager {
+
+}
+
+
+class ClientProtocol {
+
+}
+
+class MenuInterface
+
+
+' Relationships (ownership / uses)
+Client *-- MenuInterface : owns
+Client *-- SDLManager : owns
+Client *-- Receiver : owns
+Client *-- InputManager : owns
+
+Sender --> "Queue<MovementDTO> events_queue" : push
+Receiver --> "Queue<GameUpdateDTO>" : pops
+
+InputManager *-- Sender : owns
+Sender --> ClientProtocol : uses
+Receiver --> ClientProtocol : uses
+
+@enduml
