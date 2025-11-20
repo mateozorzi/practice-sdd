@@ -1,0 +1,13 @@
+//
+// Created by mksledesma on 11/20/25.
+//
+
+#ifndef TP_TALLER_DE_PROGRAMACION_NEED_FOR_SPEED_GAME_H
+#define TP_TALLER_DE_PROGRAMACION_NEED_FOR_SPEED_GAME_H
+
+
+class game {
+};
+
+
+#endif //TP_TALLER_DE_PROGRAMACION_NEED_FOR_SPEED_GAME_H
