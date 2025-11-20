@@ -24,7 +24,6 @@ bool Animations::is_explosion_active(int current_it) {
 
 void Animations::render_explosion(int current_it) {
     if (!explosion.has_value()) {
-        std::cout << "Hola" << std::endl;
         return;
     }
 

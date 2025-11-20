@@ -18,7 +18,8 @@ SDLManager::SDLManager():
         resources(renderer),
         camera(512, 288, 4640, 4672),
         sounds(mixer, resources),
-        animations(renderer, camera, resources) {
+        animations(renderer, camera, resources),
+        shop(renderer, mixer, resources, sounds, 1920, 1080, "client/assets/fonts/UrbanHaze.ttf") {
     renderer.SetLogicalSize(1920, 1080);
     set_minimap();
     load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
@@ -207,6 +208,9 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     animations.render_explosion(iteration_counter);
 
+    shop.render(100, Car::DEFAULT);
+
+
     show_screen();
     SDL_Delay(10);
 }
@@ -273,6 +277,10 @@ nlohmann::json SDLManager::load_json_file(const std::string& path) {
     nlohmann::json data;
     file >> data;
     return data;
+}
+
+std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
+    return shop.interact_button(x, y, time);
 }
 
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {

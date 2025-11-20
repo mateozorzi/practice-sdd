@@ -10,10 +10,8 @@
 #include <SDL2pp/SDL2pp.hh>
 
 #include "../common/car_position_dto.h"
-#include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 
-#include "camera.h"
 #include "menu_interface.h"
 
 Client::Client(const std::string& hostname, const std::string& servname):
@@ -21,7 +19,7 @@ Client::Client(const std::string& hostname, const std::string& servname):
         sdl_manager(nullptr),
         protocol(client_socket),
         receiver(protocol),
-        input_manager(protocol),
+        input_manager( *sdl_manager, protocol),
         menu(protocol),
         client_id(0) {}
 

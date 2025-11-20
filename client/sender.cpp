@@ -1,5 +1,7 @@
 #include "sender.h"
 
+#include "common/client_event_dto.h"
+
 Sender::Sender(ClientProtocol& protocol): protocol(protocol) {}
 
 void Sender::run() {
@@ -12,11 +14,11 @@ void Sender::run() {
     }
 }
 
-void Sender::add_event(const MovementDTO movement) { events_queue.try_push(movement); }
+void Sender::add_event(const ClientEventDTO& event) { events_queue.try_push(event); }
 
 void Sender::send_event() {
-    const MovementDTO movement = events_queue.pop();
-    protocol.send_movement(movement);
+    const ClientEventDTO event = events_queue.pop();
+    protocol.send_event(event);
 }
 
 void Sender::close_queue() {

@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "resource_manager.h"
 #include "sounds.h"
+#include "upgrade_shop.h"
 
 static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
         {"Compact", SDL2pp::Rect(0, 0, 50, 50)},       {"Sport", SDL2pp::Rect(50, 0, 50, 50)},
@@ -37,7 +38,7 @@ private:
     Camera camera;
     Sounds sounds;
     Animations animations;
-    std::optional<SDL2pp::Texture> sprite;
+    UpgradeShop shop;
     std::optional<SDL2pp::Texture> minimap;
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
@@ -70,6 +71,7 @@ public:
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
     nlohmann::json load_json_file(const std::string& path);
+    std::optional<ButtonType> interact_button(int x, int y, int time);
 };
 
 #endif

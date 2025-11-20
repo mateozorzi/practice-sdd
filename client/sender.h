@@ -4,15 +4,16 @@
 #include "common/thread.h"
 
 #include "client_protocol.h"
+#include "common/client_event_dto.h"
 
 class Sender: public Thread {
     ClientProtocol& protocol;
-    Queue<MovementDTO> events_queue;
+    Queue<ClientEventDTO> events_queue;
     std::mutex queue_mutex;
 
 public:
     explicit Sender(ClientProtocol& protocol);
-    void add_event(MovementDTO event);
+    void add_event(const ClientEventDTO& event);
     void send_event();
     void close_queue();
     void run() override;

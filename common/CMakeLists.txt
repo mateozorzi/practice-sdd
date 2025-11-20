@@ -5,7 +5,6 @@ target_sources(taller_common
     car_position_dto.cpp
     common_protocol.cpp
     foo.cpp
-    movement_dto.cpp
     liberror.cpp
     player_dto.cpp
     resolver.cpp
@@ -13,6 +12,7 @@ target_sources(taller_common
     socket.cpp
     world_snapshot_dto.cpp
     race_dto.cpp
+    movement_dto.cpp
     PUBLIC
     # .h files
     car_catalogue_dto.h
@@ -20,7 +20,6 @@ target_sources(taller_common
     common_protocol.h
     game_command_dto.h
     foo.h
-    movement_dto.h
     liberror.h
     player_dto.h
     queue.h
@@ -28,6 +27,7 @@ target_sources(taller_common
     resolvererror.h
     socket.h
     thread.h
+    movement_dto.h
 
     lobby_dto.h
     car_dto.h

@@ -7,7 +7,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
-enum ButtonType { Health, Speed, Acceleration, Driveability };
+#include "resource_manager.h"
+#include "sounds.h"
+
+enum ButtonType { Health, Speed, Acceleration, Driveability, None };
 
 struct ShopButton {
     SDL2pp::Rect rect;
@@ -28,6 +31,9 @@ enum class Car { DEFAULT };
 class UpgradeShop {
 private:
     SDL2pp::Renderer& renderer;
+    SDL2pp::Mixer& mixer;
+    ResourceManager& resources;
+    Sounds& sounds;
     SDL2pp::SDLTTF ttf;
     SDL2pp::Font font;
 
@@ -38,19 +44,18 @@ private:
     bool isOpen;
     int window_width;
     int window_height;
-
+    ButtonType touched_button_type = None;
+    ButtonType last_touched_button_type = None;
 public:
-    UpgradeShop(SDL2pp::Renderer& renderer, int window_width, int window_height,
+    UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources, Sounds& sounds, int window_width, int window_height,
                 const std::string& font_path =
                         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
 
     void set_shop_info(const ShopInfoDTO& info);
-
     void render(int player_time, Car player_car);
-
     bool is_shop_open() const;
-
     void toggle_shop();
+    std::optional<ButtonType> interact_button(int x, int y, int time);
 };
 
 
