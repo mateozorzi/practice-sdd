@@ -347,10 +347,18 @@ void GameLoop::create_final_leaderboard(){
         return a.points > b.points; // Descending order for points
     });
 
+    //add positions to final_stats
+    uint8_t position = 1;
+    for (size_t i = 0; i < final_stats.size(); ++i) {
+        final_stats[i].position = position;
+        position++;
+    }
+
     //debug cout final leaderboard
     std::cout << "\nFinal Leaderboard: " << std::endl;
     for (const auto& stats : final_stats) {
-        std::cout << "Player ID: " << stats.client_id
+        std::cout << "Position: " << static_cast<int>(stats.position)
+                  << " | Player ID: " << stats.client_id
                   << " | Username: " << stats.username
                   << " | Total Time: " << stats.total_time << " seconds"
                   << " | Total Points: " << static_cast<int>(stats.points) << std::endl;
@@ -385,6 +393,7 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
         race_stats[i].position = position;
         position++;
         if (race_stats[i].total_time >= RACE_TIMEOUT_SEG) {
+            race_stats[i].points = 0;
             continue; //skip players who did not finish the race
         }
         race_stats[i].points = points;
