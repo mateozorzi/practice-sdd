@@ -10,11 +10,9 @@
 #include <SDL2pp/SDL2pp.hh>
 
 #include "../common/car_position_dto.h"
-#include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 #include "../common/game_update_dto.h"
 
-#include "camera.h"
 #include "menu_interface.h"
 
 Client::Client(const std::string& hostname, const std::string& servname):
@@ -22,12 +20,12 @@ Client::Client(const std::string& hostname, const std::string& servname):
         sdl_manager(nullptr),
         protocol(client_socket),
         receiver(protocol),
-        input_manager(protocol),
+        input_manager( *sdl_manager, protocol),
         menu(protocol),
         client_id(0) {}
 
 void Client::run() {
-    // lobby ui
+    // lobby ui a
     PlayerDTO player = menu.lobby();
     if (static_cast<int>(player.id) == -1) {
         exit(0);

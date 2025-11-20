@@ -11,6 +11,7 @@
 #include "server_config.h"
 #include <vector>
 #include "../common/upgrade_dto.h"
+#include "../common/client_event_dto.h"
 
 
 constexpr uint16_t CATEGORY_GROUND = 0x0001;
@@ -87,6 +88,7 @@ public:
     void set_collision(bool colliding);
     b2Body* get_body() const;
     void set_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config);
+    void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
     CarLayer get_layer() const;
     void set_layer(CarLayer car_layer);

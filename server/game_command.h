@@ -12,6 +12,8 @@
 #include "../common/game_command_dto.h"
 #include "../common/player_race_stats_dto.h"
 #include "../common/upgrade_dto.h"
+#include "../common/client_event_dto.h"
+#include "../common/movement_dto.h"
 
 
 class GameCommand {
@@ -19,7 +21,7 @@ class GameCommand {
 
     uint32_t client_id;
     ClientAction client_action;
-    std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO, UpgradeDTO> command_data;
+    std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO, BuyUpgradeDTO> command_data;
 
 
 public:

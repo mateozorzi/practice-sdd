@@ -12,6 +12,7 @@ target_sources(nfs_common
     socket.cpp
     world_snapshot_dto.cpp
     race_dto.cpp
+    movement_dto.cpp
     PUBLIC
     # .h files
     car_catalogue_dto.h
@@ -26,6 +27,7 @@ target_sources(nfs_common
     resolvererror.h
     socket.h
     thread.h
+    movement_dto.h
 
     lobby_dto.h
     car_dto.h

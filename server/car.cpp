@@ -6,6 +6,7 @@
 #include "../common/constants.h"
 #include "../common/checkpoint_dto.h"
 #include "../common/upgrade_dto.h"
+#include "../common/client_event_dto.h"
 
 Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_config):
         client_id(client_id), body(nullptr), config({
@@ -250,6 +251,27 @@ void Car::set_configuration(const CarDTO& car_configuration, const CarClientConf
     std::cout<<"Turn torque set to: "<<config.turn_torque<<std::endl;
     config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
     std::cout<<"Drift factor set to: "<<config.drift_factor<<std::endl;
+}
+
+void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config){
+    if (upgrade.upgrade == ButtonType::Speed){
+        std::cout<<"Upgrading speed for player id: "<<client_id<<std::endl;
+        std::cout<<"Current speed: "<<config.max_speed<<std::endl;
+        config.max_speed += static_cast<float>(game_config.speed_upgrade);
+        std::cout<<"New speed: "<<config.max_speed<<std::endl;
+    } else if (upgrade.upgrade == ButtonType::Acceleration){
+        std::cout<<"Upgrading acceleration for player id: "<<client_id<<std::endl;
+        std::cout<<"Current acceleration: "<<config.acceleration<<std::endl;
+        config.acceleration += static_cast<float>(game_config.acceleration_upgrade);
+        std::cout<<"New acceleration: "<<config.acceleration<<std::endl;
+    } else if (upgrade.upgrade == ButtonType::Handling){
+        std::cout<<"Upgrading handling for player id: "<<client_id<<std::endl;
+        std::cout<<"Current handling: "<<handling<<std::endl;
+        handling += static_cast<float>(game_config.handling_upgrade);
+        std::cout<<"New handling: "<<handling<<std::endl;
+        config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
+        config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
+    }
 }
 
 CarLayer Car::get_layer() const {

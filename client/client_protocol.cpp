@@ -11,6 +11,9 @@
 #include <nlohmann/json.hpp>
 #include <variant>
 
+#include "upgrade_shop.h"
+#include "common/client_event_dto.h"
+
 void ClientProtocol::ask_for_race_catalogue(){
     std::cout<<"Requesting race catalogue from server..."<<std::endl;
     add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::LIST_RACES));
@@ -22,25 +25,33 @@ void ClientProtocol::ask_for_race_catalogue(){
     send_buffer();
 }
 
+void ClientProtocol::send_event(const ClientEventDTO& event) {
+    std::visit([this](const auto& d) {
+        using T = std::decay_t<decltype(d)>;
+        if constexpr (std::is_same_v<T, MovementDTO>) {
+            handle_move(d);
+        } else if constexpr (std::is_same_v<T, BuyUpgradeDTO>) {
+            handle_buy(d);
+        }
+    }, event);
+}
+
+void ClientProtocol::handle_move(const MovementDTO& dto) {
+    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_MOVEMENT));
+    add_uint8_to_buffer(static_cast<uint8_t>(dto.direction));
+    add_uint8_to_buffer(static_cast<uint8_t>(dto.isMoving ? 1 : 0));
+    send_buffer();
+}
+
+void ClientProtocol::handle_buy(const BuyUpgradeDTO& dto) {
+    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_UPGRADE));
+    add_uint8_to_buffer(static_cast<uint8_t>(dto.upgrade));
+    send_buffer();
+}
+
 void ClientProtocol::send_username(const std::string& username) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_USERNAME));
     add_string_to_buffer(username);
-    send_buffer();
-}
-
-void ClientProtocol::send_movement(const MovementDTO& movement) {
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_MOVEMENT));
-    add_uint8_to_buffer(static_cast<uint8_t>(movement.direction));
-    add_uint8_to_buffer(static_cast<uint8_t>(movement.isMoving ? 1 : 0));
-    send_buffer();
-}
-
-void ClientProtocol::send_upgrade(const UpgradeDTO& upgrade){
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::UPGRADE_CAR));
-    add_uint8_to_buffer(upgrade.handling_increase);
-    add_uint8_to_buffer(upgrade.speed_increase);
-    add_uint8_to_buffer(upgrade.acceleration_increase);
-    add_uint16_to_buffer(upgrade.health_increase);
     send_buffer();
 }
 

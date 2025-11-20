@@ -1,13 +1,18 @@
 #include "upgrade_shop.h"
 
-UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, int window_width, int window_height,
-                         const std::string& font_path):
+#include <optional>
+
+UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources, Sounds& sounds, int window_width, int window_height,
+                         const std::string& font_path) :
         renderer(renderer),
+        mixer(mixer),
+        resources(resources),
+        sounds(sounds),
         font(font_path, 18),
         shop_rect((window_width - window_width * 3 / 4) / 2,
                   (window_height - window_height * 3 / 4) / 2, window_width * 3 / 4,
                   window_height * 3 / 4),
-        isOpen(false),
+        isOpen(true),
         window_width(window_width),
         window_height(window_height) {
 
@@ -20,8 +25,8 @@ UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, int window_width, int windo
     int button_height = shop_height / 8;
     int button_spacing = shop_height / 20;
 
-    std::string buttons_text[4] = {"Health", "Speed", "Acceleration", "Driveability"};
-    ButtonType buttons_type[4] = {Health, Speed, Acceleration, Driveability};
+    std::string buttons_text[4] = {"Health", "Speed", "Acceleration", "Handling"};
+    ButtonType buttons_type[4] = {Health, Speed, Acceleration, Handling};
 
     int start_y = shop_rect.y + shop_height / 4;  // Empieza 1/4 de altura de la ventana de tienda
     int button_x = shop_rect.x + (shop_width - button_width) / 2;  // Centrar horizontalmente
@@ -45,8 +50,8 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
             case Acceleration:
                 button.cost = info.acceleration;
                 break;
-            case Driveability:
-                button.cost = info.driveability;
+            case Handling:
+                button.cost = info.handling;
                 break;
             default:
                 break;
@@ -130,3 +135,28 @@ void UpgradeShop::render(int player_time, Car player_car) {
 bool UpgradeShop::is_shop_open() const { return isOpen; }
 
 void UpgradeShop::toggle_shop() { isOpen = !isOpen; }
+
+std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
+    SDL2pp::Point point{x, y};
+    touched_button_type = ButtonType::None;
+
+    for (const ShopButton& btn: buttons) {
+        if (btn.rect.Contains(point)) {
+            touched_button_type = btn.type;
+
+            if (time < btn.cost) {
+                return std::nullopt;
+            }
+
+            last_touched_button_type = btn.type;
+
+            return btn.type;
+        }
+    }
+    if (touched_button_type == ButtonType::None) {
+        last_touched_button_type = ButtonType::None;
+    }
+
+    return std::nullopt;
+}
+

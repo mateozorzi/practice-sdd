@@ -1,6 +1,6 @@
 #include "input_manager.h"
 
-InputManager::InputManager(ClientProtocol& protocol): sender(protocol) { sender.start(); }
+InputManager::InputManager(SDLManager& sdl, ClientProtocol& protocol): sdl(sdl), sender(protocol) { sender.start(); }
 
 bool InputManager::try_move(bool& movement, const MovementDTO move) {
     if (!movement) {
@@ -55,6 +55,67 @@ bool InputManager::handle_keyup(const SDL_Event& event) {
             return false;
     }
 }
+
+bool InputManager::handle_click(const SDL_Event &event, int time) {
+    if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT && !click_buy) {
+        click_buy = true;
+
+        int mouse_x = event.button.x;
+        int mouse_y = event.button.y;
+
+        auto opt_button = sdl.interact_button(mouse_x, mouse_y, time);
+        if (opt_button.has_value()) {
+            ButtonType button = opt_button.value();
+            switch (button) {
+                case Acceleration:
+                    sender.add_event(BuyUpgradeDTO{Acceleration});
+                    break;
+                case Handling:
+                    sender.add_event(BuyUpgradeDTO{Handling});
+                    break;
+                case Health:
+                    sender.add_event(BuyUpgradeDTO{Health});
+                    break;
+                case Speed:
+                    sender.add_event(BuyUpgradeDTO{Speed});
+                    break;
+                default:
+                    break;
+            }
+        }
+        return true;
+    }
+    if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT && click_buy) {
+        click_buy = false;
+        return true;
+    }
+    return false;
+}
+
+bool InputManager::handle_shop_movement(const SDL_Event &event, int time) {
+    if (event.type == SDL_MOUSEMOTION) {
+        int mouse_x = event.motion.x;
+        int mouse_y = event.motion.y;
+
+        sdl.interact_button(mouse_x, mouse_y, time);
+        return true;
+    }
+    return false;
+}
+
+bool InputManager::handle_buy_events(int time) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT)
+            return false;
+        if (handle_click(event, time))
+            continue;
+        if (handle_shop_movement(event, time))
+            continue;
+    }
+    return true;
+}
+
 
 bool InputManager::handle_movement() {
     SDL_Event event;

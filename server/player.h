@@ -15,6 +15,8 @@
 
 #include "car.h"
 #include "server_config.h"
+#include "../common/client_event_dto.h"
+#include "server_config.h"
 
 
 class Player {
@@ -69,7 +71,7 @@ public:
 
     bool is_dead() const;
 
-    void set_upgrade(const UpgradeDTO& upgrade);
+    void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
     PlayerDTO get_info() const;
 

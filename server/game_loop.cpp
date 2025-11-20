@@ -11,6 +11,7 @@
 #include "../common/checkpoint_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/client_event_dto.h"
 
 #define RACE_TIMEOUT_MS 600000 //10 minutes
 
@@ -36,7 +37,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
              [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
             {ClientAction::DISCONNECT,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }},
-            {ClientAction::UPGRADE_CAR,
+            {ClientAction::SEND_UPGRADE,
              [this](const GameCommand& game_command) { handle_upgrade_car(game_command); }}
     };
 
@@ -205,12 +206,12 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
 }
 
 void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
-    auto upgrade = game_command.get_data<UpgradeDTO>();
+    auto upgrade = game_command.get_data<BuyUpgradeDTO>();
     if (upgrade) {
         uint32_t client_id = game_command.get_client_id();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.set_upgrade(upgrade->get());
+            it->second.set_upgrade(upgrade->get(), config.app.game.upgrades);
         }
     }
 }
@@ -261,10 +262,15 @@ bool GameLoop::player_in_race() const {
 void GameLoop::start_race(const RaceDTO& race){    
     
     race_active = true;
-    send_race(race);
+
     //client can upgrade their car, 10 seconds to do it
     //sleep 10 seconds?
-    //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
+    game_monitor.broadcast(shop_update);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
+
+    send_race(race);
     
     for (auto& [client_id, player]: players) {
         //setting the positions of the players at the start line (first checkpoint)
@@ -428,6 +434,7 @@ void GameLoop::run() {
                 if (!race_active && current_race_index < selected_races.size){
                     start_race(selected_races.races[current_race_index]);
                     race_start_time = std::chrono::steady_clock::now();
+                    continue;
                 }
                 
                 if(player_in_race()){
