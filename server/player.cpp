@@ -65,7 +65,6 @@ void Player::finish_race(){
     has_finish_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
-    race_time = 0;
 }
 
 bool Player::has_finished_race()const{
@@ -106,7 +105,7 @@ const CarDTO Player::get_car() const {
 }
 
 bool Player::is_dead() const {
-    return dead;
+    return health <= 0;
 }
 
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config){
@@ -229,7 +228,10 @@ void Player::set_in_game() { in_game = true; }
 
 void Player::set_car_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config) {
     if (car){
+        std::cout << "[Player] Setting car configuration for player " << client_id << ": " << car_configuration.model << std::endl;
+        base_health = static_cast<uint16_t>(car_config.health);
         health = static_cast<uint16_t>(car_config.health);
+        std::cout << "[Player] Setting base health for player " << client_id << ": " << health << std::endl;
         car->set_configuration(car_configuration, car_config);
     }
 }
