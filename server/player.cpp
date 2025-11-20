@@ -23,7 +23,7 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& world,
         has_finish_race(false),
         id_next_checkpoint(1),
         n_lap(1), next(), race_time(0), dead(false),
-        base_health(health) {}
+        base_health(health), penalty(false) {}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -81,6 +81,10 @@ bool Player::have_time_recorded() const {
 
 void Player::record_time(uint32_t seconds){ 
     race_time = seconds;
+    if(penalty){
+        race_time += 10;
+        penalty = false;
+    }
 }
 
 uint32_t Player::get_recorded_time() const {
@@ -115,7 +119,12 @@ void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game
         }else{
             car->set_upgrade(upgrade, game_config);
         }
+
+        if(!penalty){
+            penalty = true;
+        }
     }
+
 }
 
 PlayerDTO Player::get_info() const {
