@@ -7,6 +7,11 @@ app:
         min_cars_per_match: 2
         max_cars_per_match: 8
         wait_time_between_races_seconds: 24.0
+        upgrades:
+            health_upgrade: 50
+            speed_upgrade: 3
+            acceleration_upgrade: 5
+            handling_upgrade: 30
     server:
         default_server_port: "8080"
         command_queue_capacity: 500

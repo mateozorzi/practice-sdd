@@ -9,8 +9,7 @@
 
 #include "resource_manager.h"
 #include "sounds.h"
-
-enum ButtonType { Health, Speed, Acceleration, Driveability, None };
+#include "../common/client_event_dto.h"
 
 struct ShopButton {
     SDL2pp::Rect rect;
@@ -23,7 +22,7 @@ struct ShopInfoDTO {
     int health;
     int speed;
     int acceleration;
-    int driveability;
+    int handling;
 };
 
 enum class Car { DEFAULT };

@@ -70,8 +70,8 @@ bool InputManager::handle_click(const SDL_Event &event, int time) {
                 case Acceleration:
                     sender.add_event(BuyUpgradeDTO{Acceleration});
                     break;
-                case Driveability:
-                    sender.add_event(BuyUpgradeDTO{Driveability});
+                case Handling:
+                    sender.add_event(BuyUpgradeDTO{Handling});
                     break;
                 case Health:
                     sender.add_event(BuyUpgradeDTO{Health});

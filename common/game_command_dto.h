@@ -14,11 +14,12 @@
 #include "player_dto.h"
 #include "player_race_stats_dto.h"
 #include "upgrade_dto.h"
+#include "../common/client_event_dto.h"
 
 
 struct GameCommandDTO {
     ClientAction client_action;
-    std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO, UpgradeDTO> command_data;
+    std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO, BuyUpgradeDTO> command_data;
 
     GameCommandDTO() 
     : client_action(ClientAction::DISCONNECT), 

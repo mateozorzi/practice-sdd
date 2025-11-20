@@ -9,6 +9,8 @@
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
 #include "../common/upgrade_dto.h"
+#include "../common/client_event_dto.h"
+#include "../common/movement_dto.h"
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
@@ -78,7 +80,7 @@ GameCommandDTO ServerProtocol::receive_game_command() {
             return GameCommandDTO(client_action, receive_movement());
         case ClientAction::SEND_CAR_SELECTION:
             return GameCommandDTO(client_action, receive_car_selection());
-        case ClientAction::UPGRADE_CAR:
+        case ClientAction::SEND_UPGRADE:
             return GameCommandDTO(client_action, receive_upgrade());
         case ClientAction::GET_CAR_CATALOGUE:
         case ClientAction::DISCONNECT:
@@ -106,13 +108,11 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
     send_buffer();
 }
 
-UpgradeDTO ServerProtocol::receive_upgrade() {
-    const uint8_t handling_increase = recv_uint8();
-    const uint8_t speed_increase = recv_uint8();
-    const uint8_t acceleration_increase = recv_uint8();
-    const uint16_t health_increase = recv_uint16();
+BuyUpgradeDTO ServerProtocol::receive_upgrade() {
+    const uint8_t upgrade = recv_uint8();
+    const ButtonType upgrade_type = static_cast<ButtonType>(upgrade);
 
-    return UpgradeDTO(handling_increase, speed_increase, acceleration_increase, health_increase);
+    return BuyUpgradeDTO{upgrade_type};
 }
 
 CarDTO ServerProtocol::receive_car_selection() {

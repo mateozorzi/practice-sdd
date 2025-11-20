@@ -25,8 +25,8 @@ UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, Resou
     int button_height = shop_height / 8;
     int button_spacing = shop_height / 20;
 
-    std::string buttons_text[4] = {"Health", "Speed", "Acceleration", "Driveability"};
-    ButtonType buttons_type[4] = {Health, Speed, Acceleration, Driveability};
+    std::string buttons_text[4] = {"Health", "Speed", "Acceleration", "Handling"};
+    ButtonType buttons_type[4] = {Health, Speed, Acceleration, Handling};
 
     int start_y = shop_rect.y + shop_height / 4;  // Empieza 1/4 de altura de la ventana de tienda
     int button_x = shop_rect.x + (shop_width - button_width) / 2;  // Centrar horizontalmente
@@ -50,8 +50,8 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
             case Acceleration:
                 button.cost = info.acceleration;
                 break;
-            case Driveability:
-                button.cost = info.driveability;
+            case Handling:
+                button.cost = info.handling;
                 break;
             default:
                 break;

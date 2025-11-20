@@ -4,7 +4,6 @@ target_sources(nfs_common
     car_catalogue_dto.cpp
     car_position_dto.cpp
     common_protocol.cpp
-    foo.cpp
     movement_dto.cpp
     liberror.cpp
     player_dto.cpp
@@ -20,7 +19,6 @@ target_sources(nfs_common
     car_position_dto.h
     common_protocol.h
     game_command_dto.h
-    foo.h
     movement_dto.h
     liberror.h
     player_dto.h

@@ -7,6 +7,8 @@
 #include "../common/player_race_stats_dto.h"
 #include "../common/player_dto.h"
 #include "../common/upgrade_dto.h"
+#include "../common/client_event_dto.h"
+#include "server_config.h"
 
 
 Player::Player(uint32_t client_id, const std::string& username, b2World& world,
@@ -103,12 +105,16 @@ bool Player::is_dead() const {
     return dead;
 }
 
-void Player::set_upgrade(const UpgradeDTO& upgrade){
+void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config){
     if (car){
-        if (upgrade.health_increase > 0){
-            health += upgrade.health_increase;
+        if(upgrade.upgrade == ButtonType::Health){
+            std::cout<<"Upgrading health for player id: "<<client_id<<std::endl;
+            std::cout<<"Current health: "<<health<<std::endl;
+            health += game_config.health_upgrade;
+            std::cout<<"New health: "<<health<<std::endl;
+        }else{
+            car->set_upgrade(upgrade, game_config);
         }
-        car->upgrade_configuration(upgrade);
     }
 }
 

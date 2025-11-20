@@ -86,6 +86,13 @@ struct WorldConfig {
     struct PhysicsConfig physics;
 };
 
+struct UpgradeConfig {
+    float health_upgrade;
+    float speed_upgrade;
+    float acceleration_upgrade;
+    float handling_upgrade;
+};
+
 // game = both server and client
 struct GameConfig {
     float game_fps;
@@ -95,6 +102,7 @@ struct GameConfig {
     unsigned int min_cars_per_match;
     unsigned int max_cars_per_match;
     float wait_time_between_races_seconds;
+    struct UpgradeConfig upgrades;
 };
 
 struct ClientSpecificConfig {

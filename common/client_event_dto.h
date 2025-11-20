@@ -2,15 +2,12 @@
 #define EVENT_DTO_H
 #include <variant>
 
-enum class Direction { UP = 1, DOWN = 2, LEFT = 3, RIGHT = 4 };
+#include "movement_dto.h"
 
-struct MovementDTO {
-    Direction direction;
-    bool isMoving;
-};
+enum ButtonType { Health, Speed, Acceleration, Handling, None };
 
 struct BuyUpgradeDTO {
-    const ButtonType upgrade;
+    ButtonType upgrade;
 };
 
 using ClientEventDTO = std::variant<MovementDTO, BuyUpgradeDTO>;

@@ -17,7 +17,7 @@
 #include "../common/world_snapshot_dto.h"
 #include "../common/race_dto.h"
 #include "../common/race_catalogue_dto.h"
-#include "common/client_event_dto.h"
+#include "../common/client_event_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
 #include "../common/upgrade_dto.h"
@@ -47,8 +47,6 @@ public:
     void handle_move(const MovementDTO& dto);
 
     void handle_buy(const BuyUpgradeDTO &dto);
-    //void send_movement(const MovementDTO& movement);
-    //void send_upgrade(const UpgradeDTO& upgrade);
 
     void send_create_lobby(const LobbyDTO& lobby);
     void ask_for_lobbies(const LobbyDTO& lobby);

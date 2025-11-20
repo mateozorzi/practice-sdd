@@ -13,7 +13,7 @@ enum class ClientAction : uint8_t {
     GET_CAR_CATALOGUE = 0x04,
     SEND_CAR_SELECTION = 0x05,
     GET_JSON_FILE = 0x06,
-    UPGRADE_CAR = 0x07,
+    SEND_UPGRADE = 0x07,
 
 };
 
@@ -22,6 +22,7 @@ enum class GameLoopAction : uint8_t {
     SEND_RACE = 0x11,
     SEND_RACE_FINISHED = 0x12,
     SEND_LEADERBOARD = 0x13,
+    START_SHOP = 0x14,
 };
 
 //CHECKPOINTS

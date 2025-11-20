@@ -45,21 +45,13 @@ void ClientProtocol::handle_move(const MovementDTO& dto) {
 
 void ClientProtocol::handle_buy(const BuyUpgradeDTO& dto) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_UPGRADE));
-    add_uint8_to_buffer(dto.upgrade);
+    add_uint8_to_buffer(static_cast<uint8_t>(dto.upgrade));
+    send_buffer();
 }
 
 void ClientProtocol::send_username(const std::string& username) {
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_USERNAME));
     add_string_to_buffer(username);
-    send_buffer();
-}
-
-void ClientProtocol::send_upgrade(const UpgradeDTO& upgrade){
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::UPGRADE_CAR));
-    add_uint8_to_buffer(upgrade.handling_increase);
-    add_uint8_to_buffer(upgrade.speed_increase);
-    add_uint8_to_buffer(upgrade.acceleration_increase);
-    add_uint16_to_buffer(upgrade.health_increase);
     send_buffer();
 }
 
