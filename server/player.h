@@ -82,6 +82,9 @@ public:
 
     CarLayer get_car_layer() const;
     void set_car_layer(CarLayer layer);
+
+    void apply_collision_damage(uint16_t damage);
+    uint16_t get_health() const;
 };
 
 
