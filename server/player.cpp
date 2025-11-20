@@ -247,3 +247,20 @@ void Player::set_car_layer(CarLayer layer) {
     if (car)
         car->set_layer(layer);
 }
+
+void Player::apply_collision_damage(uint16_t damage) {
+
+    if (health > damage) {
+
+        health -= damage;
+    } else {
+
+        health = 0;
+        std::cout << "Player with ID: " << client_id << "Has been destroyed!" << std::endl;
+    }
+}
+
+uint16_t Player::get_health() const {
+
+    return health;
+}
