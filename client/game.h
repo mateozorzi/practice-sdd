@@ -1,13 +1,63 @@
-//
-// Created by mksledesma on 11/20/25.
-//
+#ifndef GAME_H
+#define GAME_H
+#include "client_protocol.h"
+#include "game_phase.h"
+#include "game_state.h"
+#include "input_manager.h"
+#include "receiver.h"
+#include "sdl_manager.h"
+#include "../server/receiver.h"
 
-#ifndef TP_TALLER_DE_PROGRAMACION_NEED_FOR_SPEED_GAME_H
-#define TP_TALLER_DE_PROGRAMACION_NEED_FOR_SPEED_GAME_H
+class Game {
+private:
+    ClientProtocol&& protocol;
+    SDLManager sdl;
+    InputManager input_handler;
+    Receiver receiver;
+    LocalInfo game_state;
+    std::unique_ptr<GamePhase> phase;
+    bool keep_running;
 
+    friend class GamePhase;
+    friend class WaitingForGamePhase;
+    friend class UpgradePhase;
+    friend class RacePhase;
+    friend class StatsPhase;
 
-class game {
+    void reset_events();
+
+    void detect_events(const WorldSnapshotDTO& snapshot);
+
+    void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
+
+    /*
+    void handle_waiting_events();
+    bool update_waiting();
+    void show_waiting(const int& it);
+    */
+
+    void handle_upgrade_events();
+    bool update_upgrade();
+    void show_upgrade(const int& it);
+
+    void handle_race_events();
+    bool update_race();
+    void show_race(const int& it);
+
+    /*
+    void handle_stats_events();
+    bool update_stats();
+    void show_stats(const int& it);
+    */
+
+    void change_phase(std::unique_ptr<GamePhase> new_phase);
+
+    void update_player(const PlayerDTO &player, const CarPositionDTO &car);
+
+public:
+    explicit Game(Lobby& lobby);
+    void run();
+    ~Game();
 };
 
-
-#endif //TP_TALLER_DE_PROGRAMACION_NEED_FOR_SPEED_GAME_H
+#endif

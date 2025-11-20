@@ -56,6 +56,7 @@ public:
     bool is_shop_open() const;
     void toggle_shop();
     std::optional<ButtonType> interact_button(int x, int y, int time);
+    void close_shop();
 };
 
 

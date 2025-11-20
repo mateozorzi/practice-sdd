@@ -1,4 +1,5 @@
 #include "game_phase.h"
+#include <memory>
 
 #include "game.h"
 
@@ -23,20 +24,22 @@ void GamePhase::run() {
 
 void GamePhase::change_phase(int last_it) {
     if (game.game_state.phase == Phase::WAITING_PLAYERS) {
-        game.change_phase(WaitingForGamePhase{game, 0});
+        game.change_phase(std::make_unique<WaitingForGamePhase>{game, 0});
     } else if (game.game_state.phase == Phase::UPGRADE) {
-        game.change_phase(UpgradePhase{game, 0});
+        game.change_phase(std::make_unique<UpgradePhase>{game, 0});
     } else if (game.game_state.phase == Phase::RACE) {
-        game.change_phase(RacePhase{game, last_it});
+        game.change_phase(std::make_unique<RacePhase>{game, last_it});
     } else if (game.game_state.phase == Phase::STATS) {
-        game.change_phase(StatsPhase{game, last_it});
+        game.change_phase(std::make_unique<StatsPhase>{game, last_it});
     }
 }
 
+/*
 WaitingForGamePhase::WaitingForGamePhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
 void WaitingForGamePhase::handle_game_events() { game.handle_waiting_events(); }
 bool WaitingForGamePhase::update_game_state() { return game.update_waiting(); }
 void WaitingForGamePhase::show_game(const int &it) { game.show_waiting(it); }
+*/
 
 UpgradePhase::UpgradePhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
 void UpgradePhase::handle_game_events() { game.handle_upgrade_events(); }
@@ -48,11 +51,12 @@ void RacePhase::handle_game_events() { game.handle_race_events(); }
 bool RacePhase::update_game_state() { return game.update_race(); }
 void RacePhase::show_game(const int &it) { game.show_race(it); }
 
+/*
 StatsPhase::StatsPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
 void StatsPhase::handle_game_events() { game.handle_stats_events(); }
 bool StatsPhase::update_game_state() { return game.update_stats(); }
 void StatsPhase::show_game(const int &it) { game.show_stats(); }
-
+*/
 
 
 
