@@ -8,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "animations.h"
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
@@ -17,6 +18,7 @@
 #include "camera.h"
 #include "resource_manager.h"
 #include "sounds.h"
+#include "upgrade_shop.h"
 
 static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
         {"Compact", SDL2pp::Rect(0, 0, 50, 50)},       {"Sport", SDL2pp::Rect(50, 0, 50, 50)},
@@ -35,10 +37,12 @@ private:
     ResourceManager resources;
     Camera camera;
     Sounds sounds;
-    std::optional<SDL2pp::Texture> sprite;
+    Animations animations;
+    UpgradeShop shop;
     std::optional<SDL2pp::Texture> minimap;
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
+    int iteration_counter = 0;
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
@@ -67,6 +71,7 @@ public:
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
     nlohmann::json load_json_file(const std::string& path);
+    std::optional<ButtonType> interact_button(int x, int y, int time);
 };
 
 #endif

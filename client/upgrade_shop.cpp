@@ -1,13 +1,18 @@
 #include "upgrade_shop.h"
 
-UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, int window_width, int window_height,
-                         const std::string& font_path):
+#include <optional>
+
+UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources, Sounds& sounds, int window_width, int window_height,
+                         const std::string& font_path) :
         renderer(renderer),
+        mixer(mixer),
+        resources(resources),
+        sounds(sounds),
         font(font_path, 18),
         shop_rect((window_width - window_width * 3 / 4) / 2,
                   (window_height - window_height * 3 / 4) / 2, window_width * 3 / 4,
                   window_height * 3 / 4),
-        isOpen(false),
+        isOpen(true),
         window_width(window_width),
         window_height(window_height) {
 
@@ -130,3 +135,28 @@ void UpgradeShop::render(int player_time, Car player_car) {
 bool UpgradeShop::is_shop_open() const { return isOpen; }
 
 void UpgradeShop::toggle_shop() { isOpen = !isOpen; }
+
+std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
+    SDL2pp::Point point{x, y};
+    touched_button_type = ButtonType::None;
+
+    for (const ShopButton& btn: buttons) {
+        if (btn.rect.Contains(point)) {
+            touched_button_type = btn.type;
+
+            if (time < btn.cost) {
+                return std::nullopt;
+            }
+
+            last_touched_button_type = btn.type;
+
+            return btn.type;
+        }
+    }
+    if (touched_button_type == ButtonType::None) {
+        last_touched_button_type = ButtonType::None;
+    }
+
+    return std::nullopt;
+}
+
