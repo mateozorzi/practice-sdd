@@ -4,7 +4,6 @@
 #include <optional>
 #include <cstdint>
 #include <unordered_map>
-#include <set>
 
 #include <box2d/box2d.h>
 
@@ -13,7 +12,6 @@
 class CollisionListener: public b2ContactListener {
 
     std::unordered_map<uint32_t, Player>& players;
-    std::set<b2Contact*> processed_collisions;
 
     std::optional<std::reference_wrapper<Player>> find_player_by_body(const b2Body& body);
     void update_car_collision_state(const b2Contact& contact, bool is_colliding);

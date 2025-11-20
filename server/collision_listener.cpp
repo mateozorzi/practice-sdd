@@ -144,7 +144,7 @@ void CollisionListener::handle_collision(b2Contact& contact) {
     }
 
     if (player_a_ptr) handle_static_collision(player_a_ptr->get(), body_a, relative_speed);
-    else if (player_b_ptr) handle_static_collision(player_b_ptr->get(), body_a, relative_speed);
+    else if (player_b_ptr) handle_static_collision(player_b_ptr->get(), body_b, relative_speed);
 }
 
 
@@ -170,7 +170,6 @@ void CollisionListener::EndContact(b2Contact* contact) {
     }
 
     update_car_collision_state(*contact, false);
-    processed_collisions.erase(contact);
 }
 
 void CollisionListener::PreSolve(b2Contact* contact, const b2Manifold*) {
@@ -178,6 +177,5 @@ void CollisionListener::PreSolve(b2Contact* contact, const b2Manifold*) {
     if (!contact || contact->GetFixtureA()->IsSensor() || contact->GetFixtureB()->IsSensor())
         return;
 
-    if (processed_collisions.insert(contact).second)
-        handle_collision(*contact);
+    handle_collision(*contact);
 }
