@@ -13,7 +13,7 @@
 #include "../common/upgrade_dto.h"
 #include "../common/client_event_dto.h"
 
-
+// Collision filtering
 constexpr uint16_t CATEGORY_GROUND = 0x0001;
 constexpr uint16_t CATEGORY_BRIDGE = 0x0002;
 constexpr uint16_t CATEGORY_CAR_GROUND = 0x0004;
@@ -67,6 +67,8 @@ class Car {
     CarLayer car_layer = CarLayer::ON_GROUND;
     uint8_t handling;
 
+    float remap(float value, float inMin, float inMax, float outMin, float outMax);
+
     void detect_linear_movement();
     void detect_rotation();
     void detect_drifting();
@@ -82,15 +84,19 @@ public:
     void handle_movement(const MovementDTO& movement_dto);
     void update_position();
     CarPositionDTO get_position_dto() const;
+
     const CarDTO get_configuration() const;
+
+    b2Body* get_body() const;
+
+    CarLayer get_layer() const;
+
     void upgrade_configuration(const UpgradeDTO& upgrade);
 
     void set_collision(bool colliding);
-    b2Body* get_body() const;
     void set_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config);
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
-    CarLayer get_layer() const;
     void set_layer(CarLayer car_layer);
 };
 
