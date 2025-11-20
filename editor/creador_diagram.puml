@@ -1,0 +1,41 @@
+@startuml creador_class_diagram
+
+left to right direction
+
+' State diagram showing which window opens with each action
+
+class Creador{
+    +Creador(Qstring path, Qstring mask)
+    +Creador(Race r)
+    -add_checkpoint(...)
+    -delete_checkpoint(...)
+    -update_map(...)
+
+}
+class Coordinates{
+    +add_checkpoint(...)
+    +delete_checkpoint(...)
+    +export_checkpoints(...)
+}
+class Checkpoint{
+    +Checkpoint(...)
+    +contains(...)
+}
+struct Race{
+    +int id;
+    +QString name
+    +QString city
+    +QString map
+    +QString mask
+    +int n_checkpoints
+    +Coordinates checkpoints
+    +int n_laps
+    }
+class Messages
+
+Creador -->"1"Coordinates : has
+Coordinates *-- "0..*" Checkpoint : contains
+Creador -->"0..1" Race
+Creador -->"1" Messages : uses
+
+@enduml

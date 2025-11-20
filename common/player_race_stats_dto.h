@@ -9,13 +9,13 @@ struct PlayerRaceStatsDTO {
     std::string username;
     uint8_t position;
     uint8_t points;
-    uint32_t total_time_ms;
+    uint32_t total_time;
 
     PlayerRaceStatsDTO(uint32_t client_id, const std::string& username,
-                       uint8_t position, uint8_t points, uint32_t total_time_ms)
+                       uint8_t position, uint8_t points, uint32_t total_time)
         : client_id(client_id), username(username),
           position(position), points(points),
-          total_time_ms(total_time_ms) {}
+          total_time(total_time) {}
 };
 
 #endif

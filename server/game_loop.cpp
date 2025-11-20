@@ -13,7 +13,7 @@
 #include "../common/game_update_dto.h"
 #include "../common/client_event_dto.h"
 
-#define RACE_TIMEOUT_MS 600000 //10 minutes
+#define RACE_TIMEOUT_SEG 600 //10 minutes
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
@@ -328,9 +328,9 @@ void GameLoop::create_final_leaderboard(){
                                        return stats_final.client_id == stats_race.client_id;
                                    });
             if (it != final_stats.end()) {
-                //found, sum points and total_time_ms
+                //found, sum points and total_time
                 it->points += stats_race.points;
-                it->total_time_ms += stats_race.total_time_ms;
+                it->total_time += stats_race.total_time;
             } else {
                 //not found, create new PlayerRaceStatsDTO and add to final_stats
                 final_stats.emplace_back(stats_race);
@@ -342,7 +342,7 @@ void GameLoop::create_final_leaderboard(){
     std::sort(final_stats.begin(), final_stats.end(),
     [](const PlayerRaceStatsDTO& a, const PlayerRaceStatsDTO& b) {
         if (a.points == b.points) {
-            return a.total_time_ms < b.total_time_ms; // Ascending order for total_time_ms
+            return a.total_time < b.total_time; // Ascending order for total_time
         }
         return a.points > b.points; // Descending order for points
     });
@@ -352,7 +352,7 @@ void GameLoop::create_final_leaderboard(){
     for (const auto& stats : final_stats) {
         std::cout << "Player ID: " << stats.client_id
                   << " | Username: " << stats.username
-                  << " | Total Time: " << stats.total_time_ms << " seconds"
+                  << " | Total Time: " << stats.total_time << " seconds"
                   << " | Total Points: " << static_cast<int>(stats.points) << std::endl;
     }
 
@@ -375,7 +375,7 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
     //sort by race_time, 
     std::sort(race_stats.begin(), race_stats.end(),
     [](const PlayerRaceStatsDTO& a, const PlayerRaceStatsDTO& b) {
-        return a.total_time_ms < b.total_time_ms;
+        return a.total_time < b.total_time;
     });
     //and assign points
     //First place: 8 points, second: 7, third: 6, fourth: 5, fifth: 4, sixth: 3, seventh: 2, eighth: 1
@@ -384,7 +384,7 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
     for (size_t i = 0; i < race_stats.size(); ++i) {
         race_stats[i].position = position;
         position++;
-        if (race_stats[i].total_time_ms >= RACE_TIMEOUT_MS) {
+        if (race_stats[i].total_time >= RACE_TIMEOUT_SEG) {
             continue; //skip players who did not finish the race
         }
         race_stats[i].points = points;
@@ -403,7 +403,7 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
         std::cout << "Position: " << static_cast<int>(stats.position)
                   << " | Player ID: " << stats.client_id
                   << " | Username: " << stats.username
-                  << " | Time: " << stats.total_time_ms << " seconds"
+                  << " | Time: " << stats.total_time << " seconds"
                   << " | Points: " << static_cast<int>(stats.points) << std::endl;
     }
 
@@ -450,7 +450,7 @@ void GameLoop::run() {
                         continue;
                     }
 
-                    check_alive_players(RACE_TIMEOUT_MS);
+                    check_alive_players(RACE_TIMEOUT_SEG);
                     update_positions(selected_races.races[current_race_index]);
                     check_race_times(seconds);
                     world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
