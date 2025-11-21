@@ -22,8 +22,6 @@ signals:
 private slots:
     void on_pushButton_clicked();
 
-    void on_tableRaces_cellDoubleClicked(int row, int column);
-
 
 private:
     Ui::SelectCircuit *ui;
@@ -34,6 +32,7 @@ private:
     void fill_table();
     void read_info_races(const QStringList& races);
     void fill_races_info();
+    void select_race(const Race& race);
 };
 
 #endif // SELECTCIRCUIT_H

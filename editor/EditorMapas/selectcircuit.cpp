@@ -22,11 +22,12 @@ void SelectCircuit::fill_table(){
 
     //races names
     QStringList races_names = dir.entryList(QStringList() << "*.csv", QDir::Files);
+    qDebug() << "size: "<<races_names.size();
 
     ui->tableRaces->clear();
     ui->tableRaces->setRowCount(races_names.length());
 
-    QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Actions"};
+    QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Open", "Delete"};
     ui->tableRaces->setColumnCount(col.size());
     ui->tableRaces->setHorizontalHeaderLabels(col);
 
@@ -51,6 +52,15 @@ void SelectCircuit::fill_races_info(){
         ui->tableRaces->setItem(id, 2, new QTableWidgetItem(QString::number(n_c)));
         ui->tableRaces->setItem(id, 3, new QTableWidgetItem(QString::number(n_l)));
 
+        QPushButton* open_btn = new QPushButton("Open");
+        open_btn->setStyleSheet("background-color: green; color: white; font-weight: bold;min-height: 12px;");
+
+        connect(open_btn, &QPushButton::clicked, this, [this, r]() {
+            select_race(r);
+        });
+
+        ui->tableRaces->setCellWidget(id, 4, open_btn);
+
         QPushButton* btn = new QPushButton("Delete");
         btn->setStyleSheet("background-color: red; color: white; font-weight: bold;min-height: 12px;");
 
@@ -58,7 +68,7 @@ void SelectCircuit::fill_races_info(){
             delete_race(name);
         });
 
-        ui->tableRaces->setCellWidget(id, 4, btn);
+        ui->tableRaces->setCellWidget(id, 5, btn);
     }
 }
 
@@ -153,36 +163,10 @@ void SelectCircuit::delete_race(const QString& race_name){
     }
 }
 
-void SelectCircuit::on_tableRaces_cellDoubleClicked(int row, int column)
+void SelectCircuit::select_race(const Race& race)
 {
-    if(column != 0){
-        //no click in a race name
-        return;
-    }
-
-    //open the race, initialize the checkpoints, can edit the race again
-    QTableWidgetItem* cell = ui->tableRaces->item(row,column);
-    QString race_name = cell->text();
-
-    int cont = 0;
-    bool found = false;
-
-    for (const Race& r : races) {
-        if (race_name == r.name) {
-            found = true;
-            break;
-        }
-        cont++;
-    }
-
-    if (!found) {
-        return;
-    }
-
-    Race race_click = races[cont];
-
     this->hide();
-    Creador *c = new Creador(race_click);
+    Creador *c = new Creador(race);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(c, &Creador::close_w, this, [this]() {

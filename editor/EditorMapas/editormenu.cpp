@@ -32,7 +32,7 @@ void EditorMenu::on_pushButton_2_clicked()
         this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
 
@@ -46,6 +46,7 @@ QString EditorMenu::find_races_path() {
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cdUp();
     qDebug() << "path: "<<dir.path();
+    dir.cdUp();
     while (true) {
         if (dir.exists("server")) {
             dir.cd("server");
@@ -83,6 +84,6 @@ void EditorMenu::on_pushButton_clicked()
         this->show();
     });
 
-    c->show();
+    c->showMaximized();
 }
 
