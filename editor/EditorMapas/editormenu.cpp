@@ -46,7 +46,7 @@ QString EditorMenu::find_races_path() {
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cdUp();
     qDebug() << "path: "<<dir.path();
-    dir.cdUp();
+    //dir.cdUp();
     while (true) {
         if (dir.exists("server")) {
             dir.cd("server");
