@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <iostream>
+#include <QListWidget>
 
 #define MAX_IMG 64
 
@@ -215,6 +216,9 @@ void SelectCars::set_market(){
     ui->img_cars->setWrapping(true);
     ui->img_cars->setResizeMode(QListWidget::Adjust);
     ui->img_cars->setVerticalScrollMode(QListWidget::ScrollPerPixel);
+    ui->img_cars->setSelectionMode(QListWidget::SingleSelection);
+    ui->img_cars->setDragDropMode(QListWidget::NoDragDrop);
+    ui->img_cars->setMovement(QListWidget::Static);
     ui->img_cars->setSpacing(20);
     ui->img_cars->setIconSize(QSize(120, 120));
     ui->img_cars->clear();

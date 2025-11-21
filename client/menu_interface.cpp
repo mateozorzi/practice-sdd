@@ -31,7 +31,7 @@ bool MenuInterface::car_selection(PlayerDTO& player){
 
     std::cout << "Received car catalogue of size: " << static_cast<int>(catalogue.size) << std::endl;
     SelectCars sc(catalogue);
-    sc.show();
+    sc.showMaximized();
 
     bool car_selection = false;
 
@@ -66,7 +66,7 @@ bool MenuInterface::select_races(){
     RaceCatalogueDTO races = protocol.receive_race_catalogue();
     
     RaceSelector sr(races);
-    sr.show();
+    sr.showMaximized();
 
     bool closed = false;
 
@@ -97,7 +97,7 @@ bool MenuInterface::select_races(){
 bool MenuInterface::create_lobby(PlayerDTO& player) {
     //create lobby ui
     CreateLobby cl;
-    cl.show();
+    cl.showMaximized();
 
     bool closed = false;
 
@@ -151,7 +151,7 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     
     // join lobby ui
     JoinLobby jl(lobbies);
-    jl.show();
+    jl.showMaximized();
 
     bool closed = false;
 
@@ -311,7 +311,7 @@ bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
 
 bool MenuInterface::lobby_create(PlayerDTO& player) {
     creategame cg;
-    cg.show();
+    cg.showMaximized();
 
     bool closed = false;
     bool owner = false;
@@ -372,7 +372,7 @@ PlayerDTO MenuInterface::lobby(){
     QApplication app(fake_argc, fake_argv);
     
     Lobby l;
-    l.show();
+    l.showMaximized();
 
     PlayerDTO player("", -1, CarDTO(), -1,false);
 
