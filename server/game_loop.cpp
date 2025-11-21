@@ -263,11 +263,10 @@ void GameLoop::start_race(const RaceDTO& race){
     
     race_active = true;
 
-    //client can upgrade their car, 10 seconds to do it
-    //sleep 10 seconds?
-    GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
-    game_monitor.broadcast(shop_update);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    //future implementation
+    //GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
+    //game_monitor.broadcast(shop_update);
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 
 
     send_race(race);
@@ -366,6 +365,7 @@ void GameLoop::create_final_leaderboard(){
 
     final_leaderboard = LeaderboardDTO("Final Leaderboard", final_stats);
 
+    //future implementation
     //GameUpdateDTO update(GameLoopAction::SEND_LEADERBOARD, final_leaderboard);
     //game_monitor.broadcast(update);
 }
@@ -416,6 +416,7 @@ void GameLoop::create_leaderboard(uint8_t current_race_index){
                   << " | Points: " << static_cast<int>(stats.points) << std::endl;
     }
 
+    //future implementation
     //GameUpdateDTO update(GameLoopAction::SEND_LEADERBOARD, actual);
 
     //game_monitor.broadcast(update);

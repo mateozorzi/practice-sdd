@@ -208,7 +208,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     animations.render_explosion(iteration_counter);
 
-    shop.render(100, Car::DEFAULT);
+    //shop.render(100, Car::DEFAULT);
 
 
     show_screen();
