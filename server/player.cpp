@@ -65,6 +65,7 @@ void Player::finish_race(){
     has_finish_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
+    //car->reset_car_velocity();
 }
 
 bool Player::has_finished_race()const{

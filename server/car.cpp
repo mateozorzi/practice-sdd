@@ -321,3 +321,11 @@ void Car::set_layer(CarLayer layer) {
         fixture->SetFilterData(filter);
     }
 }
+
+void Car::reset_car_velocity() {
+    // Resetear velocidad lineal a cero
+    body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+    
+    // Resetear velocidad angular a cero
+    body->SetAngularVelocity(0.0f);
+}
