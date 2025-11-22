@@ -171,7 +171,7 @@ void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
 }
 
 void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot){
-    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
 
     const RaceDTO& race = std::get<RaceDTO>(snapshot.data);
     add_race_to_buffer(race);

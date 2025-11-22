@@ -42,7 +42,47 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
     };
 
 
-    auto on_ground_collidables = WorldUtils::load_polygons_from_json(POLYGONS_LIBERTY_CITY.data());
+    //cout info races
+    std::cout << "Selected races: " << std::endl;
+    for (const auto& race : selected_races.races) {
+        std::cout << " - " << race.name << " in " << race.city << " with "
+                  << static_cast<int>(race.size_checkpoints) << " checkpoints and "
+                  << static_cast<int>(race.laps) << " laps." << std::endl;
+    }
+}
+
+std::string obtain_polygons_path(const std::string& city) {
+    return ("server/resources/world/collidables/on_ground_collidables_" + city + ".json");
+}
+
+std::string obtain_collidables_bridges_path(const std::string& city) {
+    return ("server/resources/world/collidables/on_bridge_collidables_" + city + ".json");
+}
+
+std::string obtain_collidables_sensors_bridge_path(const std::string& city) {
+    return ("server/resources/world/sensors/on_bridge_sensors_" + city + ".json");
+}
+
+std::string obtain_sensors_ground_path(const std::string& city) {
+    return ("server/resources/world/sensors/under_bridge_sensors_" + city + ".json");
+}
+
+void GameLoop::load_map_configuration(const std::string& city) {
+    std::string modified_city = city;
+    std::transform(modified_city.begin(), modified_city.end(), 
+                   modified_city.begin(), ::tolower);
+    for (auto& c : modified_city) {
+        if (c == ' ') {
+            c = '_';
+        }
+    }
+
+    std::string polygons_blocks = obtain_polygons_path(modified_city);
+    std::string collidables_bridges = obtain_collidables_bridges_path(modified_city);
+    std::string sensors_bridge = obtain_collidables_sensors_bridge_path(modified_city);
+    std::string sensors_ground = obtain_sensors_ground_path(modified_city);
+    
+    auto on_ground_collidables = WorldUtils::load_polygons_from_json(polygons_blocks.c_str());
     for (const auto& ground_collidable: on_ground_collidables) {
         try {
             bool added = WorldUtils::add_polygon_to_world(ground_collidable, world, CATEGORY_GROUND, MASK_GROUND);
@@ -54,8 +94,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                                          std::string(e.what()));
         }
     }
-
-    auto on_bridge_collidables = WorldUtils::load_polygons_from_json("server/resources/world/collidables/on_bridge_collidables_liberty_city.json");
+    auto on_bridge_collidables = WorldUtils::load_polygons_from_json(collidables_bridges.c_str());
     for (const auto& bridge_collidable: on_bridge_collidables) {
         try {
             bool added = WorldUtils::add_polygon_to_world(bridge_collidable, world, CATEGORY_BRIDGE, MASK_BRIDGE);
@@ -68,7 +107,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
-    auto on_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/sensors/on_bridge_sensors_liberty_city.json");
+    auto on_bridge_sensors = WorldUtils::load_polygons_from_json(sensors_bridge.c_str());
     for (const auto& p: on_bridge_sensors) {
         try {
             bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
@@ -81,7 +120,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         }
     }
 
-    auto under_bridge_sensors = WorldUtils::load_polygons_from_json("server/resources/world/sensors/under_bridge_sensors_liberty_city.json");
+    auto under_bridge_sensors = WorldUtils::load_polygons_from_json(sensors_ground.c_str());
     for (const auto& p: under_bridge_sensors) {
         try {
             bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
@@ -92,14 +131,6 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
             throw WorldCreationException(std::string("Error adding under bridge sensor: ") +
                             std::string(e.what()));
         }
-    }
-
-    //cout info races
-    std::cout << "Selected races: " << std::endl;
-    for (const auto& race : selected_races.races) {
-        std::cout << " - " << race.name << " in " << race.city << " with "
-                  << static_cast<int>(race.size_checkpoints) << " checkpoints and "
-                  << static_cast<int>(race.laps) << " laps." << std::endl;
     }
 }
 
@@ -242,7 +273,7 @@ void GameLoop::update_positions(const RaceDTO& race) {
 
 void GameLoop::send_race(const RaceDTO& race){
     GameUpdateDTO race_update(GameLoopAction::SEND_RACE, race);
-
+    std::cout<< "Sending race: " << race.name << std::endl;
     game_monitor.broadcast(race_update);
 }
 
@@ -259,6 +290,15 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
+void GameLoop::map_configuration(const std::string& city){
+    //clear previous world
+    WorldUtils::cleanup_world(world);
+    std::cout<<"Previous world cleaned up."<<std::endl;
+    //load new world
+    load_map_configuration(city);
+    std::cout<<"New world loaded for city: "<<city<<std::endl;
+}
+
 void GameLoop::start_race(const RaceDTO& race){    
     
     race_active = true;
@@ -270,6 +310,8 @@ void GameLoop::start_race(const RaceDTO& race){
 
 
     send_race(race);
+
+    map_configuration(race.city);
     
     for (auto& [client_id, player]: players) {
         //setting the positions of the players at the start line (first checkpoint)
@@ -442,6 +484,7 @@ void GameLoop::run() {
 
                 //start races
                 if (!race_active && current_race_index < selected_races.size){
+                    std::cout<< "Starting race: " << selected_races.races[current_race_index].name << std::endl;
                     start_race(selected_races.races[current_race_index]);
                     race_start_time = std::chrono::steady_clock::now();
                     continue;

@@ -59,18 +59,24 @@ void Client::run() {
         Queue<GameUpdateDTO>& car_queue =
                 receiver.get_car_positions_queue();
 
-        GameUpdateDTO snapshot;
         bool has_positions = false;
+        std::vector<GameUpdateDTO> snapshots;
+        GameUpdateDTO snapshot;
+
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;
+            snapshots.push_back(snapshot); 
         }
-        if (has_positions) {
-            if (snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-                last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
-            } else if (snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
-                last_race_state = std::get<RaceDTO>(snapshot.data);
-            }else /*(std::holds_alternative<std::monostate>(snapshot.data))*/ {
-                //race finish by timeout
+        if (has_positions) { 
+            for(auto& snapshot : snapshots){
+                if (snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+                    last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
+                } else if (snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
+                    last_race_state = std::get<RaceDTO>(snapshot.data);
+                    sdl_manager->load_city(last_race_state.value().city);
+                }else /*(std::holds_alternative<std::monostate>(snapshot.data))*/ {
+                    //race finish by timeout
+                }
             }
         }
 

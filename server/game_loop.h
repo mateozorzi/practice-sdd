@@ -55,6 +55,9 @@ class GameLoop final: public Thread {
     bool all_player_in_game() const;
     bool player_in_race() const;
 
+    void load_map_configuration(const std::string& city);
+    void map_configuration(const std::string& city);
+
 
 public:
     GameLoop(const GameLoop&) = delete;

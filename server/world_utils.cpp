@@ -155,3 +155,23 @@ std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_json(
 float WorldUtils::meters_to_pixels(const float meters) { return meters * PIXELS_PER_METER; }
 
 float WorldUtils::pixels_to_meters(const float pixels) { return pixels / PIXELS_PER_METER; }
+
+void WorldUtils::cleanup_world(b2World& world) {
+    std::vector<b2Body*> bodiesToDestroy;
+    
+    // Primero recolectar todos los bodies estáticos
+    b2Body* body = world.GetBodyList();
+    while (body != nullptr) {
+        if (body->GetType() == b2_staticBody) {
+            bodiesToDestroy.push_back(body);
+        }
+        body = body->GetNext();
+    }
+    
+    // Luego destruirlos
+    for (b2Body* bodyToDestroy : bodiesToDestroy) {
+        world.DestroyBody(bodyToDestroy);
+    }
+    
+    std::cout << "Cleaned up " << bodiesToDestroy.size() << " static bodies" << std::endl;
+}

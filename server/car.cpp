@@ -56,6 +56,13 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
     car_fixture->SetFilterData(filter);
 }
 
+
+float Car::remap(float value, float inMin, float inMax, float outMin, float outMax) {
+
+    return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
+}
+
+
 void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
     CheckpointDTO start_position = checkpoints[0];
     CheckpointDTO second_position = checkpoints[1];
@@ -111,26 +118,6 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
         ),
         angle
     );
-    
-}
-
-void Car::handle_movement(const MovementDTO& movement_dto) {
-
-    switch (movement_dto.direction) {
-
-        case Direction::UP:
-            moving_up = movement_dto.isMoving;
-            break;
-        case Direction::DOWN:
-            moving_down = movement_dto.isMoving;
-            break;
-        case Direction::LEFT:
-            moving_left = movement_dto.isMoving;
-            break;
-        case Direction::RIGHT:
-            moving_right = movement_dto.isMoving;
-            break;
-    }
 }
 
 
@@ -152,7 +139,7 @@ void Car::detect_linear_movement() {
     if (current_speed > config.max_speed) {
 
         float scale = config.max_speed / current_speed;
-        b2Vec2 limited_velocity(velocity.x * scale, velocity.y * scale);
+        b2Vec2 limited_velocity(scale * velocity);
         body->SetLinearVelocity(limited_velocity);
     }
 }
@@ -182,6 +169,25 @@ void Car::detect_drifting() {
     body->ApplyLinearImpulseToCenter(lateral_impulse, true);
 }
 
+
+void Car::handle_movement(const MovementDTO& movement_dto) {
+
+    switch (movement_dto.direction) {
+
+        case Direction::UP:
+            moving_up = movement_dto.isMoving;
+            break;
+        case Direction::DOWN:
+            moving_down = movement_dto.isMoving;
+            break;
+        case Direction::LEFT:
+            moving_left = movement_dto.isMoving;
+            break;
+        case Direction::RIGHT:
+            moving_right = movement_dto.isMoving;
+            break;
+    }
+}
 
 void Car::update_position() {
 
@@ -215,21 +221,24 @@ CarPositionDTO Car::get_position_dto() const {
 }
 
 
-void Car::set_collision(bool colliding) { is_colliding = colliding; }
-
-b2Body* Car::get_body() const { return body; }
-
-
 const CarDTO Car::get_configuration() const {
+
     CarDTO car_configuration(model);
     return car_configuration;
 }
 
 
-float remap(float value, float inMin, float inMax, float outMin, float outMax) {
-    return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
+b2Body* Car::get_body() const { return body; }
+
+
+CarLayer Car::get_layer() const {
+
+    return car_layer;
 }
+
+
 void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
+
     config.max_speed += upgrade.speed_increase;
     config.acceleration += upgrade.acceleration_increase;
 
@@ -240,7 +249,12 @@ void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
 
 }
 
+
+void Car::set_collision(bool colliding) { is_colliding = colliding; }
+
+
 void Car::set_configuration(const CarDTO& car_configuration, const CarClientConfig& car) {
+
     std::cout<<"Setting car configuration for player id: "<<client_id<<" model: "<<car_configuration.model<<std::endl;
     model = car_configuration.model;
 
@@ -253,18 +267,22 @@ void Car::set_configuration(const CarDTO& car_configuration, const CarClientConf
     std::cout<<"Drift factor set to: "<<config.drift_factor<<std::endl;
 }
 
-void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config){
-    if (upgrade.upgrade == ButtonType::Speed){
+void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
+
+    if (upgrade.upgrade == ButtonType::Speed) {
+
         std::cout<<"Upgrading speed for player id: "<<client_id<<std::endl;
         std::cout<<"Current speed: "<<config.max_speed<<std::endl;
         config.max_speed += static_cast<float>(game_config.speed_upgrade);
         std::cout<<"New speed: "<<config.max_speed<<std::endl;
-    } else if (upgrade.upgrade == ButtonType::Acceleration){
+    } else if (upgrade.upgrade == ButtonType::Acceleration) {
+
         std::cout<<"Upgrading acceleration for player id: "<<client_id<<std::endl;
         std::cout<<"Current acceleration: "<<config.acceleration<<std::endl;
         config.acceleration += static_cast<float>(game_config.acceleration_upgrade);
         std::cout<<"New acceleration: "<<config.acceleration<<std::endl;
-    } else if (upgrade.upgrade == ButtonType::Handling){
+    } else if (upgrade.upgrade == ButtonType::Handling) {
+
         std::cout<<"Upgrading handling for player id: "<<client_id<<std::endl;
         std::cout<<"Current handling: "<<handling<<std::endl;
         handling += static_cast<float>(game_config.handling_upgrade);
@@ -274,10 +292,6 @@ void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_co
     }
 }
 
-CarLayer Car::get_layer() const {
-
-    return car_layer;
-}
 
 void Car::set_layer(CarLayer layer) {
 

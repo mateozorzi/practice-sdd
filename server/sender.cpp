@@ -32,7 +32,7 @@ void Sender::run() {
                     this->server_protocol.send_world_snapshot(variant_snapshot);
                 }else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_RACE){
                     //RaceDTO
-                    //std::cout<< "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
+                    std::cout<< "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
                     this->server_protocol.send_race_update(variant_snapshot);
                 }else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD){
                     this->server_protocol.send_leaderboard_update(variant_snapshot);
