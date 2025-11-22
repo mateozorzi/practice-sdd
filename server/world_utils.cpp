@@ -1,6 +1,5 @@
 #include <fstream>
 #include <iostream>
-#include <string>
 #include <nlohmann/json.hpp>
 
 
@@ -40,7 +39,7 @@ float WorldUtils::meters_to_pixels(const float meters) const { return meters * P
 float WorldUtils::pixels_to_meters(const float pixels) const { return pixels / PIXELS_PER_METER; }
 
 
-std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_file(const char* file_path) {
+std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_file(const std::string& file_path) {
 
     std::ifstream file(file_path);
     if (!file)

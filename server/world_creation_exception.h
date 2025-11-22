@@ -1,3 +1,7 @@
+#ifndef WORLD_CREATION_EXCEPTION_H
+#define WORLD_CREATION_EXCEPTION_H
+
+
 #include <stdexcept>
 #include <string>
 
@@ -10,3 +14,6 @@ public:
 
     explicit WorldCreationException(const std::string& message): std::runtime_error(message) {}
 };
+
+
+#endif

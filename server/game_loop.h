@@ -9,6 +9,7 @@
 #include "../common/game_command_dto.h"
 #include "../common/thread.h"
 
+#include "city.h"
 #include "collision_listener.h"
 #include "game_monitor.h"
 #include "player.h"
@@ -30,6 +31,7 @@ class GameLoop final: public Thread {
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
     b2World world;
+    City city_world;
     std::unordered_map<uint32_t, Player> players;
     CollisionListener collision_listener;
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
@@ -55,7 +57,6 @@ class GameLoop final: public Thread {
     bool all_player_in_game() const;
     bool player_in_race() const;
 
-    void load_map_configuration(const std::string& city);
     void map_configuration(const std::string& city);
 
 
