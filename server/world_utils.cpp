@@ -69,7 +69,7 @@ std::vector<std::vector<std::vector<int>>> WorldUtils::load_polygons_from_file(c
 }
 
 
-bool WorldUtils::add_collidable(const std::vector<std::vector<int>>& polygon, const uint16_t category, const uint16_t mask) {
+void WorldUtils::add_collidable(const std::vector<std::vector<int>>& polygon, const uint16_t category, const uint16_t mask) {
 
     auto vertices = obtain_b2_vertices(polygon);
 
@@ -86,11 +86,9 @@ bool WorldUtils::add_collidable(const std::vector<std::vector<int>>& polygon, co
     fdef.filter.maskBits = mask;
 
     body->CreateFixture(&fdef);
-
-    return true;
 }
 
-bool WorldUtils::add_sensor(const std::vector<std::vector<int>>& polygon, const SensorType type, const uint16_t category, const uint16_t mask) {
+void WorldUtils::add_sensor(const std::vector<std::vector<int>>& polygon, const SensorType type, const uint16_t category, const uint16_t mask) {
 
     auto vertices = obtain_b2_vertices(polygon);
 
@@ -109,8 +107,6 @@ bool WorldUtils::add_sensor(const std::vector<std::vector<int>>& polygon, const 
     fdef.filter.maskBits = mask;
 
     body->CreateFixture(&fdef);
-
-    return true;
 }
 
 

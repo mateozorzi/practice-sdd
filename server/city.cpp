@@ -7,6 +7,9 @@
 #include <iostream>
 
 
+City::City(b2World& world) : world(world), utils(world) {}
+
+
 std::string City::normalize_city_name(const std::string& city_name) const {
 
     std::string modified_city_name = city_name;
@@ -37,22 +40,14 @@ std::string City::obtain_under_bridge_sensors_path(const std::string& city_name)
     return "server/resources/world/sensors/under_bridge_sensors_" + city_name + ".json";
 }
 
-void City::load_collidables(
-        b2World& world,
-        const std::string& file,
-        uint16_t category,
-        uint16_t mask
-) {
-
-    WorldUtils utils(world);
+void City::load_collidables(const std::string& file, uint16_t category, uint16_t mask) {
 
     auto polygons = utils.load_polygons_from_file(file.c_str());
 
-    for (const auto& poly : polygons) {
+    for (const auto& polygon: polygons) {
         try {
 
-            bool added = utils.add_collidable(poly, category, mask);
-            (void)added; // Should remove later!
+            utils.add_collidable(polygon, category, mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding collidable: " + std::string(e.what()));
@@ -60,23 +55,14 @@ void City::load_collidables(
     }
 }
 
-void City::load_sensors(
-        b2World& world,
-        const std::string& file,
-        SensorType type,
-        uint16_t category,
-        uint16_t mask
-) {
-
-    WorldUtils utils(world);
+void City::load_sensors(const std::string& file, SensorType type, uint16_t category, uint16_t mask) {
 
     auto sensors = utils.load_polygons_from_file(file.c_str());
 
     for (const auto& poly : sensors) {
         try {
 
-            bool added = utils.add_sensor(poly, type, category, mask);
-            (void)added; // Should remove later!
+            utils.add_sensor(poly, type, category, mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding sensor: " + std::string(e.what()));
@@ -85,9 +71,7 @@ void City::load_sensors(
 }
 
 
-void City::cleanup_city(b2World& world) {
-
-    WorldUtils utils(world);
+void City::cleanup_city() {
 
     utils.cleanup();
 
@@ -95,17 +79,17 @@ void City::cleanup_city(b2World& world) {
 }
 
 
-void City::load_city(b2World& world, const std::string& city_name) {
+void City::load_city(const std::string& city_name) {
 
     std::string city_normalized_name = normalize_city_name(city_name);
 
-    cleanup_city(world);
+    cleanup_city();
 
-    load_collidables(world, obtain_ground_collidables_path(city_normalized_name), CATEGORY_GROUND, MASK_GROUND);
-    load_collidables(world, obtain_bridge_collidables_path(city_normalized_name), CATEGORY_BRIDGE, MASK_BRIDGE);
+    load_collidables(obtain_ground_collidables_path(city_normalized_name), CATEGORY_GROUND, MASK_GROUND);
+    load_collidables(obtain_bridge_collidables_path(city_normalized_name), CATEGORY_BRIDGE, MASK_BRIDGE);
 
-    load_sensors(world, obtain_on_bridge_sensors_path(city_normalized_name), SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
-    load_sensors(world, obtain_under_bridge_sensors_path(city_normalized_name), SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
+    load_sensors(obtain_on_bridge_sensors_path(city_normalized_name), SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
+    load_sensors(obtain_under_bridge_sensors_path(city_normalized_name), SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
 
     std::cout << "[CITY] Loaded world for city: " << city_name << std::endl << std::endl;
 }

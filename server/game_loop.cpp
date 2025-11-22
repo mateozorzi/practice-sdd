@@ -22,6 +22,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         game_monitor(game_monitor),
         command_queue(command_queue),
         world(b2Vec2(0.0f, 0.0f)),
+        city_world(world),
         collision_listener(players),
         selected_races(selected),
         leaderboards(), final_leaderboard(),
@@ -225,7 +226,7 @@ bool GameLoop::player_in_race() const {
 void GameLoop::map_configuration(const std::string& city){
 
 
-    city_world.load_city(world, city);
+    city_world.load_city(city);
 }
 
 void GameLoop::start_race(const RaceDTO& race){    

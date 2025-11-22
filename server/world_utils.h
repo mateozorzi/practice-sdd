@@ -31,8 +31,8 @@ public:
 
     std::vector<std::vector<std::vector<int>>> load_polygons_from_file(const std::string& file_path);
 
-    bool add_collidable(const std::vector<std::vector<int>>& polygon, uint16_t category, uint16_t mask);
-    bool add_sensor (const std::vector<std::vector<int>>& polygon, SensorType type, uint16_t category, uint16_t mask);
+    void add_collidable(const std::vector<std::vector<int>>& polygon, uint16_t category, uint16_t mask);
+    void add_sensor (const std::vector<std::vector<int>>& polygon, SensorType type, uint16_t category, uint16_t mask);
 
     void cleanup();
 };
