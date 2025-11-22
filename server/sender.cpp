@@ -36,9 +36,12 @@ void Sender::run() {
                     this->server_protocol.send_race_update(variant_snapshot);
                 }else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD){
                     this->server_protocol.send_leaderboard_update(variant_snapshot);
-                }else {
-                    std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
+                }else if (std::holds_alternative<std::monostate>(variant_snapshot.data)){
+                    //if data is type monostate, send gameloopaction
+                    this->server_protocol.send_game_action(variant_snapshot);
+                
                 }
+                //std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
 
             } catch (const ClosedQueue&) {
 

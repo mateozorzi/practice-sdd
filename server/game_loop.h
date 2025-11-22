@@ -58,6 +58,7 @@ class GameLoop final: public Thread {
     bool player_in_race() const;
 
     void map_configuration(const std::string& city);
+    void shop_phase();
 
 
 public:

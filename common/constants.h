@@ -23,6 +23,7 @@ enum class GameLoopAction : uint8_t {
     SEND_RACE_FINISHED = 0x12,
     SEND_LEADERBOARD = 0x13,
     START_SHOP = 0x14,
+    CLOSE_SHOP = 0x15,
 };
 
 //CHECKPOINTS
