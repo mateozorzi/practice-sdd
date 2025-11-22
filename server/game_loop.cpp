@@ -229,15 +229,20 @@ void GameLoop::map_configuration(const std::string& city){
     city_world.load_city(city);
 }
 
+void GameLoop::shop_phase(){
+    //future implementation
+    GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
+    game_monitor.broadcast(shop_update);
+    //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    GameUpdateDTO shop_close (GameLoopAction::CLOSE_SHOP, std::monostate{});
+    game_monitor.broadcast(shop_close);
+}
+
 void GameLoop::start_race(const RaceDTO& race){    
     
     race_active = true;
 
-    //future implementation
-    //GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
-    //game_monitor.broadcast(shop_update);
-    //std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-
+    shop_phase();
 
     send_race(race);
 

@@ -30,17 +30,17 @@ class ServerProtocol final: public CommonProtocol {
     void add_race_to_buffer(const RaceDTO& race);
     void add_checkpoint_to_buffer(const CheckpointDTO& checkpoint);
     void send_lobby(const LobbyDTO& lobby_dto);
-
-
-public:
+    
+    
+    public:
     ServerProtocol(const ServerProtocol&) = delete;
     ServerProtocol& operator=(const ServerProtocol&) = delete;
-
+    
     using CommonProtocol::CommonProtocol;
-
+    
     LobbyDTO receive_lobby_info();
     GameCommandDTO receive_game_command();
-
+    
     void send_client_id(uint32_t client_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
     void send_world_snapshot(const GameUpdateDTO& snapshot);
@@ -50,6 +50,7 @@ public:
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);
     void send_json_file(const std::string& file_path);
+    void send_game_action(const GameUpdateDTO& game_action);
 };
 
 

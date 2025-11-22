@@ -264,3 +264,8 @@ void ServerProtocol::send_json_file(const std::string& file_path) {
     add_string_to_buffer(json_content);
     send_buffer();
 }
+
+void ServerProtocol::send_game_action(const GameUpdateDTO& game_action) {
+    add_uint8_to_buffer(static_cast<uint8_t>(game_action.gameloop_action));
+    send_buffer();
+}
