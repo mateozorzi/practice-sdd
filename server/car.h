@@ -98,6 +98,7 @@ public:
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
     void set_layer(CarLayer car_layer);
+    void reset_car_velocity();
 };
 
 #endif
