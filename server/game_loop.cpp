@@ -81,11 +81,15 @@ void GameLoop::load_map_configuration(const std::string& city) {
     std::string collidables_bridges = obtain_collidables_bridges_path(modified_city);
     std::string sensors_bridge = obtain_collidables_sensors_bridge_path(modified_city);
     std::string sensors_ground = obtain_sensors_ground_path(modified_city);
+
+    WorldUtils utils(world);
+
     
-    auto on_ground_collidables = WorldUtils::load_polygons_from_json(polygons_blocks.c_str());
+    
+    auto on_ground_collidables = utils.load_polygons_from_file(polygons_blocks.c_str());
     for (const auto& ground_collidable: on_ground_collidables) {
         try {
-            bool added = WorldUtils::add_polygon_to_world(ground_collidable, world, CATEGORY_GROUND, MASK_GROUND);
+            bool added = utils.add_collidable(ground_collidable, CATEGORY_GROUND, MASK_GROUND);
             if (!added) {
                 std::cout << "On ground collidable of size " << ground_collidable.size() << " ommited\n";
             }
@@ -94,10 +98,10 @@ void GameLoop::load_map_configuration(const std::string& city) {
                                          std::string(e.what()));
         }
     }
-    auto on_bridge_collidables = WorldUtils::load_polygons_from_json(collidables_bridges.c_str());
+    auto on_bridge_collidables = utils.load_polygons_from_file(collidables_bridges.c_str());
     for (const auto& bridge_collidable: on_bridge_collidables) {
         try {
-            bool added = WorldUtils::add_polygon_to_world(bridge_collidable, world, CATEGORY_BRIDGE, MASK_BRIDGE);
+            bool added = utils.add_collidable(bridge_collidable, CATEGORY_BRIDGE, MASK_BRIDGE);
             if (!added) {
                 std::cout << "On bridge collidable of size " << bridge_collidable.size() << " ommited\n";
             }
@@ -107,12 +111,12 @@ void GameLoop::load_map_configuration(const std::string& city) {
         }
     }
 
-    auto on_bridge_sensors = WorldUtils::load_polygons_from_json(sensors_bridge.c_str());
-    for (const auto& p: on_bridge_sensors) {
+    auto on_bridge_sensors = utils.load_polygons_from_file(sensors_bridge.c_str());
+    for (const auto& on_bridge_sensor: on_bridge_sensors) {
         try {
-            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
+            bool added = utils.add_sensor(on_bridge_sensor, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
             if (!added) {
-                std::cout << "On bridge sensor of size " << p.size() << " omitted\n";
+                std::cout << "On bridge sensor of size " << on_bridge_sensor.size() << " omitted\n";
             }
         } catch (const std::exception& e) {
             throw WorldCreationException(std::string("Error adding on bridge sensor: ") +
@@ -120,12 +124,12 @@ void GameLoop::load_map_configuration(const std::string& city) {
         }
     }
 
-    auto under_bridge_sensors = WorldUtils::load_polygons_from_json(sensors_ground.c_str());
-    for (const auto& p: under_bridge_sensors) {
+    auto under_bridge_sensors = utils.load_polygons_from_file(sensors_ground.c_str());
+    for (const auto& under_bridge_sensor: under_bridge_sensors) {
         try {
-            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
+            bool added = utils.add_sensor(under_bridge_sensor, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
             if (!added) {
-                std::cout << "Under bridge sensor of size " << p.size() << " omitted\n";
+                std::cout << "Under bridge sensor of size " << under_bridge_sensor.size() << " omitted\n";
             }
         } catch (const std::exception& e) {
             throw WorldCreationException(std::string("Error adding under bridge sensor: ") +
@@ -291,8 +295,10 @@ bool GameLoop::player_in_race() const {
 }
 
 void GameLoop::map_configuration(const std::string& city){
-    //clear previous world
-    WorldUtils::cleanup_world(world);
+
+    WorldUtils utils(world);
+
+    utils.cleanup();
     std::cout<<"Previous world cleaned up."<<std::endl;
     //load new world
     load_map_configuration(city);

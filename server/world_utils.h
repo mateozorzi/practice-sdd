@@ -1,6 +1,9 @@
-#include <vector>
+#ifndef WORLD_UTILS_H
+#define WORLD_UTILS_h
 
-#include "box2d/b2_world.h"
+
+#include <vector>
+#include <box2d/box2d.h>
 
 
 enum class SensorType {
@@ -12,15 +15,26 @@ enum class SensorType {
 
 class WorldUtils {
 
+    b2World& world;
+
+    std::array<b2Vec2, 4> obtain_b2_vertices(const std::vector<std::vector<int>>& polygon) const;
+
+    float meters_to_pixels(float meters) const;
+    float pixels_to_meters(float pixels) const;
 
 public:
     WorldUtils(const WorldUtils&) = delete;
     WorldUtils& operator=(const WorldUtils&) = delete;
 
-    static std::vector<std::vector<std::vector<int>>> load_polygons_from_json(const char* jsonPath);
-    static bool add_polygon_to_world(const std::vector<std::vector<int>>& polygon, b2World& world, uint16_t category, uint16_t mask);
-    static bool add_sensor_to_world(const std::vector<std::vector<int>>& polygon, b2World& world, SensorType type, uint16_t category, uint16_t mask);
-    static float meters_to_pixels(const float meters);
-    static float pixels_to_meters(const float pixels);
-    static void cleanup_world(b2World& world);
+    explicit WorldUtils(b2World& world);
+
+    std::vector<std::vector<std::vector<int>>> load_polygons_from_file(const char* file_path);
+
+    bool add_collidable(const std::vector<std::vector<int>>& polygon, uint16_t category, uint16_t mask);
+    bool add_sensor (const std::vector<std::vector<int>>& polygon, SensorType type, uint16_t category, uint16_t mask);
+
+    void cleanup();
 };
+
+
+#endif
