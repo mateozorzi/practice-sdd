@@ -64,7 +64,16 @@ install_dependencies() {
         libsdl2-dev \
         libsdl2-image-dev \
         libsdl2-ttf-dev \
-        libsdl2-mixer-dev
+
+    print_info "Instalando dependencias de SDL2_mixer"
+    sudo apt install -y \
+        libopus-dev \
+        libopusfile-dev \
+        libxmp-dev \
+        libfluidsynth-dev \
+        fluidsynth \
+        libwavpack-dev \
+        libfreetype-dev
 
     print_info "Instalando Box2D..."
     sudo apt install -y libbox2d-dev
@@ -101,7 +110,7 @@ verify_dependencies() {
     done
     
     # Verificar librerías con pkg-config
-    for lib in sdl2 SDL2_image SDL2_ttf SDL2_mixer jsoncpp yaml-cpp; do
+    for lib in sdl2 SDL2_image SDL2_ttf jsoncpp yaml-cpp; do
         if ! pkg-config --exists $lib; then
             missing_deps+=("$lib")
         fi
