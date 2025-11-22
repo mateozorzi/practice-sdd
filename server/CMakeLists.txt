@@ -3,6 +3,7 @@ target_sources(nfs_server
     # .cpp files
     acceptor.cpp
     car.cpp
+    city.cpp
     client_handler.cpp
     collision_listener.cpp
     config_loader.cpp
@@ -22,6 +23,7 @@ target_sources(nfs_server
     # .h files
     acceptor.h
     car.h
+    city.h
     client_handler.h
     collision_listener.h
     config_loader.h
@@ -37,6 +39,5 @@ target_sources(nfs_server
     server_config.h
     server_protocol.h
     world_creation_exception.h
-    
     world_utils.h
     )

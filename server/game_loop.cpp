@@ -7,7 +7,6 @@
 #include "../common/constants.h"
 
 #include "world_creation_exception.h"
-#include "world_utils.h"
 #include "../common/checkpoint_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
@@ -65,73 +64,6 @@ std::string obtain_collidables_sensors_bridge_path(const std::string& city) {
 
 std::string obtain_sensors_ground_path(const std::string& city) {
     return ("server/resources/world/sensors/under_bridge_sensors_" + city + ".json");
-}
-
-void GameLoop::load_map_configuration(const std::string& city) {
-    std::string modified_city = city;
-    std::transform(modified_city.begin(), modified_city.end(), 
-                   modified_city.begin(), ::tolower);
-    for (auto& c : modified_city) {
-        if (c == ' ') {
-            c = '_';
-        }
-    }
-
-    std::string polygons_blocks = obtain_polygons_path(modified_city);
-    std::string collidables_bridges = obtain_collidables_bridges_path(modified_city);
-    std::string sensors_bridge = obtain_collidables_sensors_bridge_path(modified_city);
-    std::string sensors_ground = obtain_sensors_ground_path(modified_city);
-    
-    auto on_ground_collidables = WorldUtils::load_polygons_from_json(polygons_blocks.c_str());
-    for (const auto& ground_collidable: on_ground_collidables) {
-        try {
-            bool added = WorldUtils::add_polygon_to_world(ground_collidable, world, CATEGORY_GROUND, MASK_GROUND);
-            if (!added) {
-                std::cout << "On ground collidable of size " << ground_collidable.size() << " ommited\n";
-            }
-        } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Could not add on ground collidable bodies: ") +
-                                         std::string(e.what()));
-        }
-    }
-    auto on_bridge_collidables = WorldUtils::load_polygons_from_json(collidables_bridges.c_str());
-    for (const auto& bridge_collidable: on_bridge_collidables) {
-        try {
-            bool added = WorldUtils::add_polygon_to_world(bridge_collidable, world, CATEGORY_BRIDGE, MASK_BRIDGE);
-            if (!added) {
-                std::cout << "On bridge collidable of size " << bridge_collidable.size() << " ommited\n";
-            }
-        } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Could not add on bridge collidable bodies: ") +
-                                         std::string(e.what()));
-        }
-    }
-
-    auto on_bridge_sensors = WorldUtils::load_polygons_from_json(sensors_bridge.c_str());
-    for (const auto& p: on_bridge_sensors) {
-        try {
-            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::ON_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
-            if (!added) {
-                std::cout << "On bridge sensor of size " << p.size() << " omitted\n";
-            }
-        } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Error adding on bridge sensor: ") +
-                            std::string(e.what()));
-        }
-    }
-
-    auto under_bridge_sensors = WorldUtils::load_polygons_from_json(sensors_ground.c_str());
-    for (const auto& p: under_bridge_sensors) {
-        try {
-            bool added = WorldUtils::add_sensor_to_world(p, world, SensorType::UNDER_BRIDGE, CATEGORY_SENSOR, MASK_SENSOR);
-            if (!added) {
-                std::cout << "Under bridge sensor of size " << p.size() << " omitted\n";
-            }
-        } catch (const std::exception& e) {
-            throw WorldCreationException(std::string("Error adding under bridge sensor: ") +
-                            std::string(e.what()));
-        }
-    }
 }
 
 
@@ -291,12 +223,9 @@ bool GameLoop::player_in_race() const {
 }
 
 void GameLoop::map_configuration(const std::string& city){
-    //clear previous world
-    WorldUtils::cleanup_world(world);
-    std::cout<<"Previous world cleaned up."<<std::endl;
-    //load new world
-    load_map_configuration(city);
-    std::cout<<"New world loaded for city: "<<city<<std::endl;
+
+
+    city_world.load_city(world, city);
 }
 
 void GameLoop::start_race(const RaceDTO& race){    
