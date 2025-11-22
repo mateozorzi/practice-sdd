@@ -22,4 +22,5 @@ public:
     static bool add_sensor_to_world(const std::vector<std::vector<int>>& polygon, b2World& world, SensorType type, uint16_t category, uint16_t mask);
     static float meters_to_pixels(const float meters);
     static float pixels_to_meters(const float pixels);
+    static void cleanup_world(b2World& world);
 };

@@ -43,6 +43,10 @@ private:
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
     int iteration_counter = 0;
+    std::string map_name;
+    std::string decoration;
+    std::string bridges;
+
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
@@ -72,6 +76,8 @@ public:
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
     nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);
+
+    void load_city(std::string& city_name);
 };
 
 #endif

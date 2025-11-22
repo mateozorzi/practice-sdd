@@ -202,6 +202,7 @@ LeaderboardDTO ClientProtocol::receive_leaderboard(){
 GameUpdateDTO ClientProtocol::receive_update() {
     std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO> data;
     const uint8_t update_type = recv_uint8();
+    //std::cout << "[ClientProtocol] Receiving game update of type: " << static_cast<int>(update_type) << std::endl;
     if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
         data = receive_update_positions();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {

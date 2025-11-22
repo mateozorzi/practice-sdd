@@ -21,9 +21,9 @@ SDLManager::SDLManager():
         animations(renderer, camera, resources),
         shop(renderer, mixer, resources, sounds, 1920, 1080, "client/assets/fonts/UrbanHaze.ttf") {
     renderer.SetLogicalSize(1920, 1080);
-    set_minimap();
-    load_bridges_rects(load_json_file("server/resources/world/bridges_liberty_city.json"));
-    load_decorations_rects(load_json_file("server/resources/world/decorations_liberty_city.json"));
+    //set_minimap();
+    //load_bridges_rects(load_json_file(bridges));
+    //load_decorations_rects(load_json_file(decoration));
 }
 
 void SDLManager::set_minimap() {
@@ -32,7 +32,8 @@ void SDLManager::set_minimap() {
     minimap = SDL2pp::Texture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                               minimap_width, minimap_height);
     renderer.SetTarget(minimap.value());
-    SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+    std::cout << "Cargando minimap de " << map_name << std::endl;
+    SDL2pp::Texture& map = resources.get_texture(map_name);
     renderer.Copy(map, SDL2pp::Rect(0, 0, 4640, 4672),
                   SDL2pp::Rect(0, 0, minimap_width, minimap_height));
     renderer.SetTarget();
@@ -141,7 +142,7 @@ void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
         const int dh = src_rect.h * screen_h / view.h;
         const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
-        SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+        SDL2pp::Texture& map = resources.get_texture(map_name);
         renderer.Copy(map, src_rect, dst_rect);
     }
 }
@@ -180,7 +181,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     update_camera(pos_x, pos_y);
     clear_screen();
 
-    SDL2pp::Texture& map = resources.get_texture("client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png");
+    SDL2pp::Texture& map = resources.get_texture(map_name);
     renderer.Copy(map, camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
 
     for (const auto& [car_player, car_pos] : cars) {
@@ -336,4 +337,24 @@ void SDLManager::render_hint(const CarPositionDTO &player) {
 
     SDL2pp::Texture& arrow = resources.get_texture("client/assets/sprites/arrow.png");
     renderer.Copy(arrow, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
+}
+
+void SDLManager::load_city(std::string& city_name) {
+    //todo en minusculas
+    
+    map_name = "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - " + city_name + ".png";
+    
+    std::string city_name_lower = city_name;
+    std::transform(city_name_lower.begin(), city_name_lower.end(), 
+                   city_name_lower.begin(), ::tolower);
+    //separate city_name lower with _
+    std::replace(city_name_lower.begin(), city_name_lower.end(), ' ', '_');
+    decoration = "server/resources/world/decorations_" + city_name_lower + ".json";
+    bridges = "server/resources/world/bridges_" + city_name_lower + ".json";
+
+    set_minimap();
+    load_bridges_rects(load_json_file(bridges));
+    load_decorations_rects(load_json_file(decoration));
+
+
 }
