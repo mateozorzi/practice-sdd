@@ -8,8 +8,8 @@
 #include "../common/upgrade_dto.h"
 #include "../common/client_event_dto.h"
 
-Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_config):
-        client_id(client_id), body(nullptr), config({
+Car::Car(const uint32_t client_id, b2World& box2d_world, const ServerConfig& server_config):
+        client_id(client_id), box2d_body(nullptr), config({
             .width = server_config.app.server.world.sprites.car.width,
             .height = server_config.app.server.world.sprites.car.height,
             .density = server_config.app.server.world.physics.car.density,
@@ -27,33 +27,33 @@ Car::Car(const uint32_t client_id, b2World& world, const ServerConfig& server_co
             .health = server_config.app.server.world.physics.car.health
         }), handling(0) {
 
-    b2BodyDef body_definition;
-    body_definition.type = b2_dynamicBody;
-    body_definition.position.Set(
+    b2BodyDef box2d_body_definition;
+    box2d_body_definition.type = b2_dynamicBody;
+    box2d_body_definition.position.Set(
         server_config.app.server.world.positions.race_start.meters_x,
         server_config.app.server.world.positions.race_start.meters_y
     );
-    body_definition.angle = b2_pi / 2.0f;
-    body_definition.linearDamping = config.linear_damping;
-    body_definition.angularDamping = config.angular_damping;
+    box2d_body_definition.angle = b2_pi / 2.0f;
+    box2d_body_definition.linearDamping = config.linear_damping;
+    box2d_body_definition.angularDamping = config.angular_damping;
 
-    body = world.CreateBody(&body_definition);
+    box2d_body = box2d_world.CreateBody(&box2d_body_definition);
 
-    b2PolygonShape shape;
-    shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
+    b2PolygonShape box2d_polygon_shape;
+    box2d_polygon_shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
 
-    b2FixtureDef fixture;
-    fixture.shape = &shape;
-    fixture.density = config.density;
-    fixture.friction = config.friction;
-    fixture.restitution = config.restitution;
+    b2FixtureDef box2d_fixture_definition;
+    box2d_fixture_definition.shape = &box2d_polygon_shape;
+    box2d_fixture_definition.density = config.density;
+    box2d_fixture_definition.friction = config.friction;
+    box2d_fixture_definition.restitution = config.restitution;
 
-    b2Fixture* car_fixture = body->CreateFixture(&fixture);
+    b2Fixture* box2d_fixture = box2d_body->CreateFixture(&box2d_fixture_definition);
 
-    b2Filter filter;
-    filter.categoryBits = CATEGORY_CAR_GROUND;
-    filter.maskBits = MASK_CAR_GROUND;
-    car_fixture->SetFilterData(filter);
+    b2Filter box2d_filter;
+    box2d_filter.categoryBits = CATEGORY_CAR_GROUND;
+    box2d_filter.maskBits = MASK_CAR_GROUND;
+    box2d_fixture->SetFilterData(box2d_filter);
 }
 
 
@@ -111,7 +111,7 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
         }
     }
 
-    body->SetTransform(
+    box2d_body->SetTransform(
         b2Vec2(
             start_x,
             start_y
@@ -123,50 +123,50 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
 
 void Car::detect_linear_movement() {
 
-    b2Vec2 forward_vector = body->GetWorldVector(b2Vec2(0.0f, 1.0f));
+    b2Vec2 forward_vector = box2d_body->GetWorldVector(b2Vec2(0.0f, 1.0f));
 
-    b2Vec2 force = body->GetMass() * config.acceleration * forward_vector;
+    b2Vec2 force = box2d_body->GetMass() * config.acceleration * forward_vector;
 
     if (moving_up)
-        body->ApplyForceToCenter(-force, true);
+        box2d_body->ApplyForceToCenter(-force, true);
 
     if (moving_down)
-        body->ApplyForceToCenter(config.breaking_factor * force, true);
+        box2d_body->ApplyForceToCenter(config.breaking_factor * force, true);
 
-    b2Vec2 velocity = body->GetLinearVelocity();
+    b2Vec2 velocity = box2d_body->GetLinearVelocity();
     float current_speed = velocity.Length();
 
     if (current_speed > config.max_speed) {
 
         float scale = config.max_speed / current_speed;
         b2Vec2 limited_velocity(scale * velocity);
-        body->SetLinearVelocity(limited_velocity);
+        box2d_body->SetLinearVelocity(limited_velocity);
     }
 }
 
 void Car::detect_rotation() {
 
-    b2Vec2 velocity = body->GetLinearVelocity();
+    b2Vec2 velocity = box2d_body->GetLinearVelocity();
     float current_speed = velocity.Length();
 
     if (current_speed > config.min_turn_speed) {
 
         if (moving_left)
-            body->ApplyTorque(-config.turn_torque, true);
+            box2d_body->ApplyTorque(-config.turn_torque, true);
         if (moving_right)
-            body->ApplyTorque(config.turn_torque, true);
+            box2d_body->ApplyTorque(config.turn_torque, true);
     }
 }
 
 void Car::detect_drifting() {
 
-    b2Vec2 right_vector = body->GetWorldVector(b2Vec2(1.0f, 0.0f));
-    b2Vec2 velocity = body->GetLinearVelocity();
+    b2Vec2 right_vector = box2d_body->GetWorldVector(b2Vec2(1.0f, 0.0f));
+    b2Vec2 velocity = box2d_body->GetLinearVelocity();
 
     b2Vec2 lateral_velocity = b2Dot(velocity, right_vector) * right_vector;
-    b2Vec2 lateral_impulse = -config.drift_factor * body->GetMass() * lateral_velocity;
+    b2Vec2 lateral_impulse = -config.drift_factor * box2d_body->GetMass() * lateral_velocity;
 
-    body->ApplyLinearImpulseToCenter(lateral_impulse, true);
+    box2d_body->ApplyLinearImpulseToCenter(lateral_impulse, true);
 }
 
 
@@ -200,8 +200,8 @@ void Car::update_position() {
 
 CarPositionDTO Car::get_position_dto() const {
 
-    b2Vec2 position_meters = body->GetPosition();
-    float angle_radians = body->GetAngle();
+    b2Vec2 position_meters = box2d_body->GetPosition();
+    float angle_radians = box2d_body->GetAngle();
 
     uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * PIXELS_PER_METER);
     uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * PIXELS_PER_METER);
@@ -228,7 +228,7 @@ const CarDTO Car::get_configuration() const {
 }
 
 
-b2Body* Car::get_body() const { return body; }
+b2Body* Car::get_body() const { return box2d_body; }
 
 
 CarLayer Car::get_layer() const {
@@ -297,7 +297,7 @@ void Car::set_layer(CarLayer layer) {
 
     car_layer = layer;
 
-    b2Fixture* fixture = body->GetFixtureList();
+    b2Fixture* fixture = box2d_body->GetFixtureList();
 
     if (fixture) {
     
@@ -324,8 +324,8 @@ void Car::set_layer(CarLayer layer) {
 
 void Car::reset_car_velocity() {
     // Resetear velocidad lineal a cero
-    body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+    box2d_body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
     
     // Resetear velocidad angular a cero
-    body->SetAngularVelocity(0.0f);
+    box2d_body->SetAngularVelocity(0.0f);
 }

@@ -45,7 +45,7 @@ public:
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    explicit Player(uint32_t client_id, const std::string& username, b2World& world,
+    explicit Player(uint32_t client_id, const std::string& username, b2World& box2d_world,
                     const ServerConfig& config);
 
     uint32_t get_client_id() const;

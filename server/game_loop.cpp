@@ -21,14 +21,13 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         config(config),
         game_monitor(game_monitor),
         command_queue(command_queue),
-        world(b2Vec2(0.0f, 0.0f)),
-        city_world(world),
+        box2d_world(b2Vec2(0.0f, 0.0f)),
+        city_loader(box2d_world),
         collision_listener(players),
         selected_races(selected),
-        leaderboards(), final_leaderboard(),
         race_active(false) {
 
-    world.SetContactListener(&collision_listener);
+    box2d_world.SetContactListener(&collision_listener);
 
     command_handlers = {
             {ClientAction::SEND_CAR_SELECTION,
@@ -93,7 +92,7 @@ uint8_t GameLoop::get_active_players() const {
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
 
-    players.try_emplace(client_id, client_id, username, world, config);
+    players.try_emplace(client_id, client_id, username, box2d_world, config);
 
     std::cerr << "[" << GAME_LOOP << "] "
               << "Player with ID: " << client_id
@@ -223,10 +222,10 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city){
+void GameLoop::map_configuration(const std::string& city_name){
 
 
-    city_world.load_city(city);
+    city_loader.load_city(city_name);
 }
 
 void GameLoop::shop_phase(){
@@ -441,7 +440,7 @@ void GameLoop::run() {
                     check_alive_players(static_cast<uint32_t>(RACE_TIMEOUT_SEG));
                     update_positions(selected_races.races[current_race_index]);
                     check_race_times(seconds);
-                    world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+                    box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
                     std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));  
                     continue;
                 }

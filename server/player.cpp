@@ -11,11 +11,11 @@
 #include "server_config.h"
 
 
-Player::Player(uint32_t client_id, const std::string& username, b2World& world,
+Player::Player(uint32_t client_id, const std::string& username, b2World& box2d_world,
                const ServerConfig& config):
         client_id(client_id),
         username(username),
-        car(std::make_unique<Car>(client_id, world, config)),
+        car(std::make_unique<Car>(client_id, box2d_world, config)),
         health(config.app.server.world.physics.car.health),
         races_won(0),
         in_game(false),

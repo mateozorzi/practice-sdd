@@ -55,7 +55,7 @@ struct CarConfig {
 class Car {
 
     uint32_t client_id;
-    b2Body* body;
+    b2Body* box2d_body;
     CarConfig config;
     std::string model;
 
@@ -77,7 +77,7 @@ public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;
 
-    explicit Car(uint32_t client_id, b2World& world, const ServerConfig& server_config);
+    explicit Car(uint32_t client_id, b2World& box2d_world, const ServerConfig& server_config);
 
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
 

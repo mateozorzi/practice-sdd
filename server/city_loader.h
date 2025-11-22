@@ -2,13 +2,13 @@
 #define CITY_H
 
 
-#include "world_utils.h"
+#include "city_utils.h"
 
 
-class City {
+class CityLoader {
 
-    b2World& world;
-    WorldUtils utils;
+    b2World& box2d_world;
+    CityUtils city_utils;
     std::string normalize_city_name(const std::string& city_name) const;
 
     std::string obtain_ground_collidables_path(const std::string& city_name) const;
@@ -22,10 +22,10 @@ class City {
     void cleanup_city();
 
 public:
-    City(const City&) = delete;
-    City& operator=(const City&) = delete;
+    CityLoader(const CityLoader&) = delete;
+    CityLoader& operator=(const CityLoader&) = delete;
 
-    explicit City(b2World& world);
+    explicit CityLoader(b2World& box2d_world);
 
     void load_city(const std::string& city_name);
 };
