@@ -16,15 +16,10 @@ WaitingRoom::WaitingRoom(const bool is_owner, const LobbyDTO& lobby, QWidget* pa
 
 WaitingRoom::~WaitingRoom() { delete ui; }
 
-void WaitingRoom::on_start_clicked()
-{
+void WaitingRoom::on_start_clicked() {
     emit start_lobby();
     this->close();
 }
 
 
-void WaitingRoom::on_exit_clicked()
-{
-    emit close_menu();
-}
-
+void WaitingRoom::on_exit_clicked() { emit close_menu(); }

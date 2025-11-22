@@ -2,25 +2,26 @@
 #define CLIENT_PROTOCOL_H
 
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <nlohmann/json.hpp>
-#include <variant>
 
-#include "upgrade_shop.h"
+#include "../common/car_catalogue_dto.h"
 #include "../common/car_position_dto.h"
+#include "../common/client_event_dto.h"
 #include "../common/common_protocol.h"
 #include "../common/constants.h"
-#include "../common/car_catalogue_dto.h"
-#include "../common/lobby_dto.h"
-#include "../common/lobbies_catalogue_dto.h"
-#include "../common/world_snapshot_dto.h"
-#include "../common/race_dto.h"
-#include "../common/race_catalogue_dto.h"
-#include "../common/client_event_dto.h"
-#include "../common/leaderboard_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_dto.h"
+#include "../common/race_catalogue_dto.h"
+#include "../common/race_dto.h"
 #include "../common/upgrade_dto.h"
+#include "../common/world_snapshot_dto.h"
+
+#include "upgrade_shop.h"
 
 enum class ServerResponse {
 
@@ -46,7 +47,7 @@ public:
     void send_event(const ClientEventDTO& event);
     void handle_move(const MovementDTO& dto);
 
-    void handle_buy(const BuyUpgradeDTO &dto);
+    void handle_buy(const BuyUpgradeDTO& dto);
 
     void send_create_lobby(const LobbyDTO& lobby);
     void ask_for_lobbies(const LobbyDTO& lobby);

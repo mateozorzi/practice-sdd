@@ -3,6 +3,7 @@
 
 
 #include <cstdint>
+
 #include "checkpoint_dto.h"
 
 
@@ -23,10 +24,10 @@ struct CarPositionDTO {
     CarLayer layer;
 
 
-   
     explicit CarPositionDTO(uint32_t client_id = 0, uint32_t x_position = 0,
-                            uint32_t y_position = 0, uint32_t angle = 0, const CheckpointDTO& next = CheckpointDTO(), const CarLayer layer = CarLayer::ON_GROUND);
-
+                            uint32_t y_position = 0, uint32_t angle = 0,
+                            const CheckpointDTO& next = CheckpointDTO(),
+                            const CarLayer layer = CarLayer::ON_GROUND);
 };
 
 

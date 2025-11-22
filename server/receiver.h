@@ -2,6 +2,8 @@
 #define RECEIVER_H
 
 
+#include <string>
+
 #include "../common/constants.h"
 #include "../common/thread.h"
 

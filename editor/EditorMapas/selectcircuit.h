@@ -2,18 +2,18 @@
 #define SELECTCIRCUIT_H
 
 #include <QMainWindow>
+
 #include "race.h"
 
 namespace Ui {
 class SelectCircuit;
 }
 
-class SelectCircuit : public QMainWindow
-{
+class SelectCircuit: public QMainWindow {
     Q_OBJECT
 
 public:
-    SelectCircuit(const QString& path, QWidget *parent = nullptr);
+    explicit SelectCircuit(const QString& path, QWidget* parent = nullptr);
     ~SelectCircuit();
 
 signals:
@@ -24,7 +24,7 @@ private slots:
 
 
 private:
-    Ui::SelectCircuit *ui;
+    Ui::SelectCircuit* ui;
     QVector<Race> races;
     QString path_races;
 
@@ -35,4 +35,4 @@ private:
     void select_race(const Race& race);
 };
 
-#endif // SELECTCIRCUIT_H
+#endif  // SELECTCIRCUIT_H

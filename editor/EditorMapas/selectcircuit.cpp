@@ -1,28 +1,25 @@
 #include "selectcircuit.h"
-#include "ui_selectcircuit.h"
 
 #include <QDir>
 #include <QMouseEvent>
-#include "race.h"
-#include "creador.h"
 
-SelectCircuit::SelectCircuit(const QString& path, QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::SelectCircuit)
-    , path_races(path)
-{
+#include "creador.h"
+#include "race.h"
+#include "ui_selectcircuit.h"
+
+SelectCircuit::SelectCircuit(const QString& path, QWidget* parent):
+        QMainWindow(parent), ui(new Ui::SelectCircuit), path_races(path) {
     ui->setupUi(this);
 
     fill_table();
-
 }
 
-void SelectCircuit::fill_table(){
+void SelectCircuit::fill_table() {
     QDir dir(path_races);
 
-    //races names
+    // races names
     QStringList races_names = dir.entryList(QStringList() << "*.csv", QDir::Files);
-    qDebug() << "size: "<<races_names.size();
+    qDebug() << "size: " << races_names.size();
 
     ui->tableRaces->clear();
     ui->tableRaces->setRowCount(races_names.length());
@@ -40,8 +37,8 @@ void SelectCircuit::fill_table(){
     fill_races_info();
 }
 
-void SelectCircuit::fill_races_info(){
-    for (Race& r:this->races){
+void SelectCircuit::fill_races_info() {
+    for (Race& r: this->races) {
         int id = r.id;
         QString name = r.name;
         QString city = r.city;
@@ -53,28 +50,26 @@ void SelectCircuit::fill_races_info(){
         ui->tableRaces->setItem(id, 3, new QTableWidgetItem(QString::number(n_l)));
 
         QPushButton* open_btn = new QPushButton("Open");
-        open_btn->setStyleSheet("background-color: green; color: white; font-weight: bold;min-height: 12px;");
+        open_btn->setStyleSheet(
+                "background-color: green; color: white; font-weight: bold;min-height: 12px;");
 
-        connect(open_btn, &QPushButton::clicked, this, [this, r]() {
-            select_race(r);
-        });
+        connect(open_btn, &QPushButton::clicked, this, [this, r]() { select_race(r); });
 
         ui->tableRaces->setCellWidget(id, 4, open_btn);
 
         QPushButton* btn = new QPushButton("Delete");
-        btn->setStyleSheet("background-color: red; color: white; font-weight: bold;min-height: 12px;");
+        btn->setStyleSheet(
+                "background-color: red; color: white; font-weight: bold;min-height: 12px;");
 
-        connect(btn, &QPushButton::clicked, this, [this, name]() {
-            delete_race(name);
-        });
+        connect(btn, &QPushButton::clicked, this, [this, name]() { delete_race(name); });
 
         ui->tableRaces->setCellWidget(id, 5, btn);
     }
 }
 
-void SelectCircuit::read_info_races(const QStringList& races_names){
+void SelectCircuit::read_info_races(const QStringList& races_names) {
     int id = 0;
-    for (const QString& r: races_names){
+    for (const QString& r: races_names) {
         QString filePath = path_races + "/" + r;
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly)) {
@@ -90,7 +85,7 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
         QString map = images[0];
         QString mask = images[1];
 
-        QString info = in.readLine(); //skip header City,n_laps
+        QString info = in.readLine();  // skip header City,n_laps
 
         info = in.readLine();
 
@@ -101,8 +96,8 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
 
 
         QString header = in.readLine();
-        if (header.size() > 0){
-            //header skip
+        if (header.size() > 0) {
+            // header skip
         }
 
 
@@ -111,10 +106,12 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
 
         while (!in.atEnd()) {
             QString line = in.readLine();
-            if (line.trimmed().isEmpty()) continue;
+            if (line.trimmed().isEmpty())
+                continue;
 
             QStringList cols = line.split(',');
-            if (cols.size() < 6) continue;
+            if (cols.size() < 6)
+                continue;
 
             int id_checkpoint = cols[0].toInt();
             char orientation = cols[1].toStdString()[0];
@@ -124,9 +121,9 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
             int width = cols[5].toInt();
 
             // QRect center in (xCenter, yCenter)
-            QRect rect(xCenter - width/2, yCenter - height/2, width, height);
+            QRect rect(xCenter - width / 2, yCenter - height / 2, width, height);
 
-            Checkpoint cp(id_checkpoint,orientation, QPoint(xCenter, yCenter), rect);
+            Checkpoint cp(id_checkpoint, orientation, QPoint(xCenter, yCenter), rect);
             checkpoints.append(cp);
             checkpointCount++;
         }
@@ -134,27 +131,24 @@ void SelectCircuit::read_info_races(const QStringList& races_names){
         file.close();
 
         // create a race
-        Race race(id, baseName, cityName,map,mask, checkpointCount, checkpoints, n_laps);
+        Race race(id, baseName, cityName, map, mask, checkpointCount, checkpoints, n_laps);
         id++;
 
         races.append(race);
     }
 }
 
-SelectCircuit::~SelectCircuit()
-{
-    delete ui;
-}
+SelectCircuit::~SelectCircuit() { delete ui; }
 
-void SelectCircuit::on_pushButton_clicked()
-{
+void SelectCircuit::on_pushButton_clicked() {
     emit close_select_race();
     this->close();
 }
 
-void SelectCircuit::delete_race(const QString& race_name){
+void SelectCircuit::delete_race(const QString& race_name) {
 
-    QString path = QCoreApplication::applicationDirPath() + "/../server/races/" + race_name + ".csv";
+    QString path =
+            QCoreApplication::applicationDirPath() + "/../server/races/" + race_name + ".csv";
     QFile file(path);
     if (file.exists()) {
         file.remove();
@@ -163,10 +157,9 @@ void SelectCircuit::delete_race(const QString& race_name){
     }
 }
 
-void SelectCircuit::select_race(const Race& race)
-{
+void SelectCircuit::select_race(const Race& race) {
     this->hide();
-    Creador *c = new Creador(race);
+    Creador* c = new Creador(race);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(c, &Creador::close_w, this, [this]() {

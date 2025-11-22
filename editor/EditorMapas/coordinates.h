@@ -1,12 +1,13 @@
 #ifndef COORDINATES_H
 #define COORDINATES_H
 
-#include <QVector>
-#include <QPoint>
 #include <QObject>
+#include <QPoint>
+#include <QVector>
+
 #include "checkpoint.h"
 
-class Coordinates{
+class Coordinates {
 private:
     QVector<Checkpoint> checkpoints;
 
@@ -19,7 +20,7 @@ private:
 
 public:
     Coordinates();
-    Coordinates(QVector<Checkpoint>& checkpoint);
+    explicit Coordinates(QVector<Checkpoint>& checkpoint);
     ~Coordinates();
 
     bool add_checkpoint(const Checkpoint& point);
@@ -30,7 +31,8 @@ public:
 
     bool enough_checkpoints();
 
-    bool export_checkpoints(const QString& name, const QString& map, const int n_laps, const QString& mask, QWidget* window);
+    bool export_checkpoints(const QString& name, const QString& map, const int n_laps,
+                            const QString& mask, QWidget* window);
 
     QVector<Checkpoint> get_checkpoints();
 
@@ -39,4 +41,4 @@ public:
     Checkpoint last_checkpoint();
 };
 
-#endif // COORDINATES_H
+#endif  // COORDINATES_H

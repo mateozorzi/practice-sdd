@@ -4,6 +4,7 @@
 
 #include "movement_dto.h"
 
+
 enum ButtonType { Health, Speed, Acceleration, Handling, None };
 
 struct BuyUpgradeDTO {
@@ -11,4 +12,6 @@ struct BuyUpgradeDTO {
 };
 
 using ClientEventDTO = std::variant<MovementDTO, BuyUpgradeDTO>;
+
+
 #endif

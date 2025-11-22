@@ -1,12 +1,13 @@
 #include "sdl_manager.h"
 
+#include <algorithm>
 #include <fstream>
 #include <map>
-#include <qforeach.h>
 
 #include <SDL2/SDL.h>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <qforeach.h>
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
@@ -21,9 +22,9 @@ SDLManager::SDLManager():
         animations(renderer, camera, resources),
         shop(renderer, mixer, resources, sounds, 1920, 1080, "client/assets/fonts/UrbanHaze.ttf") {
     renderer.SetLogicalSize(1920, 1080);
-    //set_minimap();
-    //load_bridges_rects(load_json_file(bridges));
-    //load_decorations_rects(load_json_file(decoration));
+    // set_minimap();
+    // load_bridges_rects(load_json_file(bridges));
+    // load_decorations_rects(load_json_file(decoration));
 }
 
 void SDLManager::set_minimap() {
@@ -76,8 +77,7 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
 
     // Usar solo sprite vertical y rotarlo con SDL
     SDL2pp::Texture& cars = resources.get_texture("client/assets/sprites/cars-no-background.png");
-    renderer.Copy(cars, sprite_rect,
-                  SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
+    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     sounds.play_engine_sound(is_moving);
@@ -174,8 +174,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     const uint32_t pos_y = my_car.y_position;
 
     if (!animations.is_explosion_active(iteration_counter)) {
-        animations.start_explosion(iteration_counter,
-                                   SDL2pp::Point(pos_x, pos_y));
+        animations.start_explosion(iteration_counter, SDL2pp::Point(pos_x, pos_y));
     }
 
     update_camera(pos_x, pos_y);
@@ -184,7 +183,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     SDL2pp::Texture& map = resources.get_texture(map_name);
     renderer.Copy(map, camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
 
-    for (const auto& [car_player, car_pos] : cars) {
+    for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer != CarLayer::ON_BRIDGE) {
             render_player(car_pos, car_player.car.model, is_moving);
         }
@@ -192,7 +191,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     render_bridges();
 
-    for (const auto& [car_player, car_pos] : cars) {
+    for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer == CarLayer::ON_BRIDGE) {
             render_player(car_pos, car_player.car.model, is_moving);
         }
@@ -209,7 +208,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     animations.render_explosion(iteration_counter);
 
-    //shop.render(100, Car::DEFAULT);
+    // shop.render(100, Car::DEFAULT);
 
 
     show_screen();
@@ -220,7 +219,7 @@ void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Col
                           int font_size) {
 
     SDL2pp::Texture& text_texture =
-        resources.get_text(sentence, "client/assets/fonts/UrbanHaze.ttf", font_size, color);
+            resources.get_text(sentence, "client/assets/fonts/UrbanHaze.ttf", font_size, color);
 
     renderer.Copy(text_texture, SDL2pp::NullOpt,
                   SDL2pp::Rect(x, y, text_texture.GetWidth(), text_texture.GetHeight()));
@@ -309,7 +308,8 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
     renderer.FillRect(dst);
 }
 
-double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO &player, const CheckpointDTO &checkpoint) {
+double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
+                                                 const CheckpointDTO& checkpoint) {
     const double dx = checkpoint.x - player.x_position;
     const double dy = checkpoint.y - player.y_position;
 
@@ -317,12 +317,13 @@ double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO &player, c
     double angle_deg = angle_rad * (180.0 / M_PI);
 
     const double rotation = angle_deg - 90.0;
-    if (rotation < 0) angle_deg += 360;
+    if (rotation < 0)
+        angle_deg += 360;
 
     return angle_deg;
 }
 
-void SDLManager::render_hint(const CarPositionDTO &player) {
+void SDLManager::render_hint(const CarPositionDTO& player) {
     double angle = calculate_angle_to_checkpoint(player, player.next);
 
     SDL2pp::Rect view = camera.get_view_rect();
@@ -340,14 +341,15 @@ void SDLManager::render_hint(const CarPositionDTO &player) {
 }
 
 void SDLManager::load_city(std::string& city_name) {
-    //todo en minusculas
-    
-    map_name = "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - " + city_name + ".png";
-    
+    // todo en minusculas
+
+    map_name = "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - " +
+               city_name + ".png";
+
     std::string city_name_lower = city_name;
-    std::transform(city_name_lower.begin(), city_name_lower.end(), 
-                   city_name_lower.begin(), ::tolower);
-    //separate city_name lower with _
+    std::transform(city_name_lower.begin(), city_name_lower.end(), city_name_lower.begin(),
+                   ::tolower);
+    // separate city_name lower with _
     std::replace(city_name_lower.begin(), city_name_lower.end(), ' ', '_');
     decoration = "server/resources/world/decorations_" + city_name_lower + ".json";
     bridges = "server/resources/world/bridges_" + city_name_lower + ".json";
@@ -355,6 +357,4 @@ void SDLManager::load_city(std::string& city_name) {
     set_minimap();
     load_bridges_rects(load_json_file(bridges));
     load_decorations_rects(load_json_file(decoration));
-
-
 }

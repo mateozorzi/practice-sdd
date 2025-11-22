@@ -8,13 +8,13 @@
 
 #include <nlohmann/json.hpp>
 
-#include "animations.h"
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
 #include "common/player_dto.h"
 
+#include "animations.h"
 #include "camera.h"
 #include "resource_manager.h"
 #include "sounds.h"
@@ -58,7 +58,8 @@ private:
     void render_bridges();
     void render_decorations();
     void render_checkpoints(const CheckpointDTO& checkpoint);
-    double calculate_angle_to_checkpoint(const CarPositionDTO& player, const CheckpointDTO& checkpoint);
+    double calculate_angle_to_checkpoint(const CarPositionDTO& player,
+                                         const CheckpointDTO& checkpoint);
     void render_hint(const CarPositionDTO& player);
 
 public:

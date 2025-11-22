@@ -2,6 +2,8 @@
 #define CITY_H
 
 
+#include <string>
+
 #include "city_utils.h"
 
 

@@ -3,11 +3,11 @@
 
 #include <QString>
 #include <QVector>
+
 #include "checkpoint.h"
 #include "coordinates.h"
 
-struct Race
-{
+struct Race {
 public:
     int id;
     QString name;
@@ -18,9 +18,10 @@ public:
     Coordinates checkpoints;
     int n_laps;
 
-    Race(const int id, const QString& name, const QString& city,const QString& map,
-        const QString& mask, const int n_checkpoints, QVector<Checkpoint>& checkpoints, const int n_laps);
+    Race(const int id, const QString& name, const QString& city, const QString& map,
+         const QString& mask, const int n_checkpoints, QVector<Checkpoint>& checkpoints,
+         const int n_laps);
     Race();
 };
 
-#endif // RACE_H
+#endif  // RACE_H

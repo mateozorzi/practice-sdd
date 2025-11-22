@@ -7,12 +7,11 @@ namespace Ui {
 class EditorMenu;
 }
 
-class EditorMenu : public QMainWindow
-{
+class EditorMenu: public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit EditorMenu(QWidget *parent = nullptr);
+    explicit EditorMenu(QWidget* parent = nullptr);
     ~EditorMenu();
 
 private slots:
@@ -23,9 +22,9 @@ private slots:
     void on_pushButton_clicked();
 
 private:
-    Ui::EditorMenu *ui;
+    Ui::EditorMenu* ui;
 
     QString find_races_path();
 };
 
-#endif // EDITORMENU_H
+#endif  // EDITORMENU_H

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+
 #include <box2d/box2d.h>
 
 
@@ -29,10 +30,13 @@ public:
 
     explicit CityUtils(b2World& box2d_world);
 
-    std::vector<std::vector<std::vector<int>>> load_polygons_from_file(const std::string& file_path);
+    std::vector<std::vector<std::vector<int>>> load_polygons_from_file(
+            const std::string& file_path);
 
-    void add_collidable(const std::vector<std::vector<int>>& polygon, uint16_t collision_cateogry, uint16_t collision_mask);
-    void add_sensor (const std::vector<std::vector<int>>& polygon, SensorType sensor_type, uint16_t collision_cateogry, uint16_t collision_mask);
+    void add_collidable(const std::vector<std::vector<int>>& polygon, uint16_t collision_cateogry,
+                        uint16_t collision_mask);
+    void add_sensor(const std::vector<std::vector<int>>& polygon, SensorType sensor_type,
+                    uint16_t collision_cateogry, uint16_t collision_mask);
 
     void cleanup();
 };

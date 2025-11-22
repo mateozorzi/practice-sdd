@@ -7,9 +7,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
+#include "../common/client_event_dto.h"
+
 #include "resource_manager.h"
 #include "sounds.h"
-#include "../common/client_event_dto.h"
 
 struct ShopButton {
     SDL2pp::Rect rect;
@@ -45,8 +46,10 @@ private:
     int window_height;
     ButtonType touched_button_type = None;
     ButtonType last_touched_button_type = None;
+
 public:
-    UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources, Sounds& sounds, int window_width, int window_height,
+    UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources,
+                Sounds& sounds, int window_width, int window_height,
                 const std::string& font_path =
                         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
 

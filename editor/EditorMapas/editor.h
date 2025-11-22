@@ -9,12 +9,11 @@ class Editor;
 }
 QT_END_NAMESPACE
 
-class Editor : public QMainWindow
-{
+class Editor: public QMainWindow {
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent = nullptr);
+    explicit Editor(QWidget* parent = nullptr);
     ~Editor();
 
 signals:
@@ -28,9 +27,10 @@ private slots:
     void on_mapa3_clicked();
 
     void on_Exit_clicked();
+
 private:
-    Ui::Editor *ui;
+    Ui::Editor* ui;
 };
 
 
-#endif // EDITOR_H
+#endif  // EDITOR_H

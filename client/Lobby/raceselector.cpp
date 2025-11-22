@@ -1,9 +1,11 @@
 #include "raceselector.h"
 
-#include "ui_raceselector.h"
+#include <QMessageBox>
+
 #include "../../common/race_catalogue_dto.h"
 #include "../../common/race_dto.h"
-#include <QMessageBox>
+
+#include "ui_raceselector.h"
 
 
 RaceSelector::RaceSelector(RaceCatalogueDTO& races, QWidget* parent):
@@ -18,7 +20,7 @@ RaceSelector::RaceSelector(RaceCatalogueDTO& races, QWidget* parent):
     config_select_races();
 }
 
-void RaceSelector::fill_available_races(){
+void RaceSelector::fill_available_races() {
     ui->availableRaces->clear();
 
     ui->availableRaces->setRowCount(static_cast<int>(available_races.size()));
@@ -30,21 +32,20 @@ void RaceSelector::fill_available_races(){
 
         ui->availableRaces->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(r.name)));
         ui->availableRaces->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(r.city)));
-        ui->availableRaces->setItem(i, 2, new QTableWidgetItem(QString::number(r.size_checkpoints)));
+        ui->availableRaces->setItem(i, 2,
+                                    new QTableWidgetItem(QString::number(r.size_checkpoints)));
         ui->availableRaces->setItem(i, 3, new QTableWidgetItem(QString::number(r.laps)));
 
         QPushButton* btn = new QPushButton("Add");
         btn->setStyleSheet("background-color: green; color: white; font-weight: bold;");
 
-        connect(btn, &QPushButton::clicked, this, [this, i]() {
-            select_race(i);
-        });
+        connect(btn, &QPushButton::clicked, this, [this, i]() { select_race(i); });
 
         ui->availableRaces->setCellWidget(i, 4, btn);
     }
 }
 
-void RaceSelector::config_select_races(){
+void RaceSelector::config_select_races() {
     QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Actions"};
     ui->select->setColumnCount(col.size());
     ui->select->setHorizontalHeaderLabels(col);
@@ -54,7 +55,7 @@ void RaceSelector::config_select_races(){
     ui->select->verticalHeader()->setVisible(false);
 }
 
-void RaceSelector::config_available_races(){
+void RaceSelector::config_available_races() {
     QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Actions"};
     ui->availableRaces->setColumnCount(col.size());
     ui->availableRaces->setHorizontalHeaderLabels(col);
@@ -65,7 +66,8 @@ void RaceSelector::config_available_races(){
 }
 
 void RaceSelector::select_race(int race_index) {
-    if (race_index < 0 || static_cast<size_t>(race_index) >= available_races.size()) return;
+    if (race_index < 0 || static_cast<size_t>(race_index) >= available_races.size())
+        return;
 
     RaceDTO race = available_races[race_index];
     available_races.erase(available_races.begin() + race_index);
@@ -73,11 +75,11 @@ void RaceSelector::select_race(int race_index) {
 
     refresh_available_table();
     refresh_selected_table();
-
 }
 
 void RaceSelector::delete_race(int race_index) {
-    if (race_index < 0 || static_cast<size_t>(race_index) >= selected_races.size()) return;
+    if (race_index < 0 || static_cast<size_t>(race_index) >= selected_races.size())
+        return;
 
     RaceDTO race = selected_races[race_index];
     selected_races.erase(selected_races.begin() + race_index);
@@ -98,15 +100,14 @@ void RaceSelector::refresh_available_table() {
 
         ui->availableRaces->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(r.name)));
         ui->availableRaces->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(r.city)));
-        ui->availableRaces->setItem(i, 2, new QTableWidgetItem(QString::number(r.size_checkpoints)));
+        ui->availableRaces->setItem(i, 2,
+                                    new QTableWidgetItem(QString::number(r.size_checkpoints)));
         ui->availableRaces->setItem(i, 3, new QTableWidgetItem(QString::number(r.laps)));
 
         QPushButton* btn = new QPushButton("Add");
         btn->setStyleSheet("background-color: green; color: white; font-weight: bold;");
 
-        connect(btn, &QPushButton::clicked, this, [this, i]() {
-            select_race(i);
-        });
+        connect(btn, &QPushButton::clicked, this, [this, i]() { select_race(i); });
 
         ui->availableRaces->setCellWidget(i, 4, btn);
     }
@@ -129,24 +130,18 @@ void RaceSelector::refresh_selected_table() {
         QPushButton* btn = new QPushButton("Delete");
         btn->setStyleSheet("background-color: red; color: white; font-weight: bold;");
 
-        connect(btn, &QPushButton::clicked, this, [this, i]() {
-            delete_race(i);
-        });
+        connect(btn, &QPushButton::clicked, this, [this, i]() { delete_race(i); });
 
         ui->select->setCellWidget(i, 4, btn);
     }
 }
 
-void RaceSelector::on_pushButton_2_clicked()
-{
-    emit close_menu();
-}
+void RaceSelector::on_pushButton_2_clicked() { emit close_menu(); }
 
 
-void RaceSelector::on_pushButton_clicked()
-{
-    //selected_races size >= 1
-    if(selected_races.size() < 1){
+void RaceSelector::on_pushButton_clicked() {
+    // selected_races size >= 1
+    if (selected_races.size() < 1) {
         QMessageBox::warning(this, "Error", "There must be at least one race selected.");
         return;
     }

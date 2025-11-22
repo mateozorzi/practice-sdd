@@ -1,28 +1,27 @@
 #include "coordinates.h"
 
-#include <QVector>
-#include <QPoint>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QTextStream>
-#include <QString>
 #include <QMessageBox>
-#include <QWidget>
+#include <QPoint>
+#include <QString>
 #include <QStringLiteral>
+#include <QTextStream>
+#include <QVector>
+#include <QWidget>
+
 #include "Constants.h"
 
-Coordinates::Coordinates(){}
+Coordinates::Coordinates() {}
 
-Coordinates::Coordinates(QVector<Checkpoint>& checkpoint)
-    : checkpoints(checkpoint)
-{}
+Coordinates::Coordinates(QVector<Checkpoint>& checkpoint): checkpoints(checkpoint) {}
 
-bool Coordinates::point_too_close(const Checkpoint& checkpoint){
+bool Coordinates::point_too_close(const Checkpoint& checkpoint) {
     QPoint pos = checkpoint.click;
-    for (const Checkpoint& p: checkpoints){
-        if(p.contains(pos)){
+    for (const Checkpoint& p: checkpoints) {
+        if (p.contains(pos)) {
             return true;
         }
     }
@@ -30,23 +29,23 @@ bool Coordinates::point_too_close(const Checkpoint& checkpoint){
     return false;
 }
 
-bool Coordinates::is_a_checkpoint(const Checkpoint& checkpoint){
-    //looking for a checkpoint or
-    //if is too close to another checkpoint
-    if (checkpoints.contains(checkpoint)){
+bool Coordinates::is_a_checkpoint(const Checkpoint& checkpoint) {
+    // looking for a checkpoint or
+    // if is too close to another checkpoint
+    if (checkpoints.contains(checkpoint)) {
         return true;
     }
 
-    if (point_too_close(checkpoint)){
+    if (point_too_close(checkpoint)) {
         return true;
     }
 
     return false;
 }
 
-bool Coordinates::add_checkpoint(const Checkpoint& checkpoint){
-    if (is_a_checkpoint(checkpoint)){
-        //checkpoint already exists
+bool Coordinates::add_checkpoint(const Checkpoint& checkpoint) {
+    if (is_a_checkpoint(checkpoint)) {
+        // checkpoint already exists
         return false;
     }
 
@@ -54,16 +53,16 @@ bool Coordinates::add_checkpoint(const Checkpoint& checkpoint){
     return true;
 }
 
-void Coordinates::update_id(int id_delete){
+void Coordinates::update_id(int id_delete) {
     for (int i = 0; i < checkpoints.size(); ++i) {
-        if (checkpoints[i].id > id_delete){
+        if (checkpoints[i].id > id_delete) {
             checkpoints[i].update_id();
         }
     }
 }
 
 
-Checkpoint Coordinates::delete_checkpoint(const QPoint& point){
+Checkpoint Coordinates::delete_checkpoint(const QPoint& point) {
 
     Checkpoint del = Checkpoint();
 
@@ -78,11 +77,9 @@ Checkpoint Coordinates::delete_checkpoint(const QPoint& point){
     return del;
 }
 
-bool Coordinates::enough_checkpoints(){
-    return (checkpoints.size() >= MIN_CHECKPOINTS);
-}
+bool Coordinates::enough_checkpoints() { return (checkpoints.size() >= MIN_CHECKPOINTS); }
 
-QString Coordinates::get_map_name(const QString& map){
+QString Coordinates::get_map_name(const QString& map) {
     QFileInfo fileInfo(map);
     QString filename = fileInfo.baseName();
 
@@ -93,7 +90,8 @@ QString Coordinates::get_map_name(const QString& map){
     return city;
 }
 
-bool Coordinates::export_checkpoints(const QString& name, const QString& map, const int n_laps,const QString& mask, QWidget* window){
+bool Coordinates::export_checkpoints(const QString& name, const QString& map, const int n_laps,
+                                     const QString& mask, QWidget* window) {
     QString path = QCoreApplication::applicationDirPath() + "/../server/races";
     QDir dir(path);
 
@@ -109,14 +107,12 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
     if (QFile::exists(path_race)) {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(
-        window,
-        "Warning",
-        "Already exists a race with this name. Do you want to overwrite it?",
-        QMessageBox::Yes | QMessageBox::No
-        );
+                window, "Warning",
+                "Already exists a race with this name. Do you want to overwrite it?",
+                QMessageBox::Yes | QMessageBox::No);
 
-        if (reply == QMessageBox::No){
-            //new race name (+ "_i")
+        if (reply == QMessageBox::No) {
+            // new race name (+ "_i")
             int id = 1;
             while (QFile::exists(path_race)) {
                 race_name = name + "_" + QString::number(id) + ".csv";
@@ -135,18 +131,22 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
 
     QTextStream out(&archivo);
     out << map << "," << mask << "\n";
-    out << "City"<<","<<"n_laps"<<"\n";
-    out << city <<","<<n_laps<<"\n";
-    out << "id, orientation, xCenter, yCenter, height, width,"<<"\n";
-    for (const Checkpoint& p : checkpoints){
+    out << "City"
+        << ","
+        << "n_laps"
+        << "\n";
+    out << city << "," << n_laps << "\n";
+    out << "id, orientation, xCenter, yCenter, height, width,"
+        << "\n";
+    for (const Checkpoint& p: checkpoints) {
         int id_checkpoint = p.id;
         char orientation = p.orientation;
-        QRect r= p.rect;
+        QRect r = p.rect;
         QPoint center = r.center();
         int height = r.height();
         int width = r.width();
-        out << id_checkpoint <<","<<orientation<< "," << center.x() << "," <<
-            center.y()<<","<< height<<","<<width<<"\n";
+        out << id_checkpoint << "," << orientation << "," << center.x() << "," << center.y() << ","
+            << height << "," << width << "\n";
         id_checkpoint++;
     }
 
@@ -155,16 +155,10 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
     return true;
 }
 
-QVector<Checkpoint> Coordinates::get_checkpoints(){
-    return checkpoints;
-}
+QVector<Checkpoint> Coordinates::get_checkpoints() { return checkpoints; }
 
-bool Coordinates::is_empty(){
-    return checkpoints.empty();
-}
+bool Coordinates::is_empty() { return checkpoints.empty(); }
 
-Checkpoint Coordinates::last_checkpoint(){
-    return checkpoints.back();
-}
+Checkpoint Coordinates::last_checkpoint() { return checkpoints.back(); }
 
-Coordinates::~Coordinates(){}
+Coordinates::~Coordinates() {}

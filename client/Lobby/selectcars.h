@@ -1,10 +1,11 @@
 #ifndef SELECTCARS_H
 #define SELECTCARS_H
 
-#include <QMainWindow>
 #include <QGraphicsScene>
-#include "../../common/car_dto.h"
+#include <QMainWindow>
+
 #include "../../common/car_catalogue_dto.h"
+#include "../../common/car_dto.h"
 
 namespace Ui {
 class SelectCars;
@@ -25,7 +26,6 @@ private slots:
     void value_format();
 
     void on_Exit_clicked();
-
 
 
     void on_Select_clicked();

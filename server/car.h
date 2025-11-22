@@ -2,22 +2,25 @@
 #define CAR_H
 
 
+#include <string>
+#include <vector>
+
 #include <box2d/box2d.h>
 
 #include "../common/car_dto.h"
 #include "../common/car_position_dto.h"
-#include "../common/movement_dto.h"
 #include "../common/checkpoint_dto.h"
-#include "server_config.h"
-#include <vector>
-#include "../common/upgrade_dto.h"
 #include "../common/client_event_dto.h"
+#include "../common/movement_dto.h"
+#include "../common/upgrade_dto.h"
+
+#include "server_config.h"
 
 // Collision filtering
 constexpr uint16_t CATEGORY_GROUND = 0x0001;
 constexpr uint16_t CATEGORY_BRIDGE = 0x0002;
 constexpr uint16_t CATEGORY_CAR_GROUND = 0x0004;
-constexpr uint16_t CATEGORY_CAR_BRIDGE = 0x0008; 
+constexpr uint16_t CATEGORY_CAR_BRIDGE = 0x0008;
 constexpr uint16_t CATEGORY_CAR_UNDER = 0x0010;
 constexpr uint16_t CATEGORY_SENSOR = CATEGORY_GROUND | CATEGORY_BRIDGE;
 

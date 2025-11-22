@@ -1,11 +1,12 @@
 #ifndef CREADOR_H
 #define CREADOR_H
 
+#include <QGraphicsScene>
 #include <QMainWindow>
+
+#include "checkpoint.h"
 #include "coordinates.h"
 #include "messages.h"
-#include <QGraphicsScene>
-#include "checkpoint.h"
 #include "race.h"
 
 #define NONE 0
@@ -16,20 +17,19 @@ namespace Ui {
 class Creador;
 }
 
-class Creador : public QMainWindow
-{
+class Creador: public QMainWindow {
     Q_OBJECT
 
 public:
-    Creador(const QString& path, const QString& path_mask, QWidget *parent = nullptr);
-    Creador(const Race& r, QWidget *parent = nullptr);
+    explicit Creador(const QString& path, const QString& path_mask, QWidget* parent = nullptr);
+    explicit Creador(const Race& r, QWidget* parent = nullptr);
     void set_background(const QString& path);
-    void handle_checkpoints(QMouseEvent *event);
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    void handle_checkpoints(QMouseEvent* event);
+    bool eventFilter(QObject* obj, QEvent* event) override;
     ~Creador();
 
 private:
-    Ui::Creador *ui;
+    Ui::Creador* ui;
     QGraphicsScene* scene;
     QString map;
     QString mask;
@@ -38,8 +38,8 @@ private:
     QImage mask_circuit;
     Race race;
 
-    void add_checkpoint(QMouseEvent *event);
-    void delete_checkpoint(QMouseEvent *event);
+    void add_checkpoint(QMouseEvent* event);
+    void delete_checkpoint(QMouseEvent* event);
     void update_counter();
     void update_map_add(const QPoint& pos);
     void update_map_delete(const QPoint& pos, const int id);
@@ -58,4 +58,4 @@ private slots:
     void on_Done_clicked();
 };
 
-#endif // CREADOR_H
+#endif  // CREADOR_H

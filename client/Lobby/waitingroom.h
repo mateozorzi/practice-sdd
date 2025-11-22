@@ -2,6 +2,7 @@
 #define WAITINGROOM_H
 
 #include <QMainWindow>
+
 #include "../../common/lobby_dto.h"
 
 namespace Ui {

@@ -18,6 +18,7 @@ enum class ClientAction : uint8_t {
 };
 
 enum class GameLoopAction : uint8_t {
+
     SEND_UPDATE_POSITIONS = 0x10,
     SEND_RACE = 0x11,
     SEND_RACE_FINISHED = 0x12,
@@ -26,7 +27,8 @@ enum class GameLoopAction : uint8_t {
     CLOSE_SHOP = 0x15,
 };
 
-//CHECKPOINTS
+
+// CHECKPOINTS
 constexpr char HORIZONTAL = 'H';
 constexpr char VERTICAL = 'V';
 constexpr char INTERSECTION = 'I';
@@ -56,11 +58,12 @@ constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 // WORLD
 // TODO: remove, now in yaml
 constexpr float PIXELS_PER_METER = 30.0f;
-    // TODO: replace with command line parameter
-constexpr std::string_view POLYGONS_LIBERTY_CITY = "server/resources/world/blocks_liberty_city.json";
+// TODO: replace with command line parameter
+constexpr std::string_view POLYGONS_LIBERTY_CITY =
+        "server/resources/world/blocks_liberty_city.json";
 
 
-//cars
+// cars
 constexpr std::string_view CAR_COMPACT = "Compact";
 constexpr std::string_view CAR_SPORT = "Sport";
 constexpr std::string_view CAR_CONVERTIBLE = "Convertible";

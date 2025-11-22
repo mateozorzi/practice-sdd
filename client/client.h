@@ -1,7 +1,10 @@
 #ifndef CLIENT_H
 #define CLIENT_H
+
+
 #include <QApplication>
 #include <map>
+#include <memory>
 #include <string>
 
 #include <SDL2/SDL.h>
@@ -16,7 +19,9 @@
 #include "sdl_manager.h"
 #include "sender.h"
 
+
 class Client {
+
 public:
     explicit Client(const std::string& hostname, const std::string& servname);
     void run();

@@ -5,8 +5,11 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "../common/game_command_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/race_catalogue_dto.h"
 #include "../common/thread.h"
 
 #include "city_loader.h"
@@ -14,8 +17,6 @@
 #include "game_monitor.h"
 #include "player.h"
 #include "server_config.h"
-#include "../common/race_catalogue_dto.h"
-#include "../common/leaderboard_dto.h"
 
 
 constexpr float GAME_STEP = 1.0f / 60.0f;
@@ -52,7 +53,7 @@ class GameLoop final: public Thread {
     void create_final_leaderboard();
     void create_leaderboard(uint8_t current_race_index);
     void send_race(const RaceDTO& race);
-    CarClientConfig get_car_config(const ServerConfig& config, CarDTO model);
+    CarClientConfig get_car_config(const ServerConfig& config, const CarDTO& model);
 
     bool all_player_in_game() const;
     bool player_in_race() const;

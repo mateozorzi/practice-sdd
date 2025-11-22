@@ -1,13 +1,13 @@
 #ifndef RECEIVER_H
 #define RECEIVER_H
+#include <variant>
 #include <vector>
 
+#include "../common/race_dto.h"
+#include "../common/world_snapshot_dto.h"
 #include "common/car_position_dto.h"
 #include "common/queue.h"
 #include "common/thread.h"
-#include "../common/world_snapshot_dto.h"
-#include "../common/race_dto.h"
-#include <variant>
 
 #include "client_protocol.h"
 
