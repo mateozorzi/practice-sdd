@@ -23,14 +23,6 @@ constexpr float GAME_STEP = 1.0f / 60.0f;
 constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
 
-constexpr std::string_view CAR_COMPACT = "Compact";
-constexpr std::string_view CAR_SPORT = "Sport";
-constexpr std::string_view CAR_CONVERTIBLE = "Convertible";
-constexpr std::string_view CAR_SEDAN = "Sedan";
-constexpr std::string_view CAR_JEEP = "Jeep";
-constexpr std::string_view CAR_RALLY = "Rally";
-constexpr std::string_view CAR_TRUCK = "Truck";
-
 
 class GameLoop final: public Thread {
 

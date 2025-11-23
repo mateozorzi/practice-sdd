@@ -77,49 +77,30 @@ void ClientHandler::list_active_games() {
 
 void ClientHandler::send_car_catalogue() {
 
-    std::vector<CarDTO> cars = {
-        {"Compact", static_cast<uint16_t>(server_config.physics.compact.health),
-        static_cast<uint8_t>((server_config.physics.compact.turn_torque + 
-                            server_config.physics.compact.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.compact.max_speed),
-        static_cast<uint8_t>(server_config.physics.compact.acceleration)},
+    std::vector<std::pair<std::string, CarConfig>> car_types = {
 
-        {"Sport", static_cast<uint16_t>(server_config.physics.sport.health),
-        static_cast<uint8_t>((server_config.physics.sport.turn_torque + 
-                            server_config.physics.sport.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.sport.max_speed),
-        static_cast<uint8_t>(server_config.physics.sport.acceleration)},
-
-        {"Convertible", static_cast<uint16_t>(server_config.physics.convertible.health),
-        static_cast<uint8_t>((server_config.physics.convertible.turn_torque + 
-                            server_config.physics.convertible.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.convertible.max_speed),
-        static_cast<uint8_t>(server_config.physics.convertible.acceleration)},
-
-        {"Sedan", static_cast<uint16_t>(server_config.physics.sedan.health),
-        static_cast<uint8_t>((server_config.physics.sedan.turn_torque + 
-                            server_config.physics.sedan.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.sedan.max_speed),
-        static_cast<uint8_t>(server_config.physics.sedan.acceleration)},
-
-        {"Jeep", static_cast<uint16_t>(server_config.physics.jeep.health),
-        static_cast<uint8_t>((server_config.physics.jeep.turn_torque + 
-                            server_config.physics.jeep.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.jeep.max_speed),
-        static_cast<uint8_t>(server_config.physics.jeep.acceleration)},
-
-        {"Rally", static_cast<uint16_t>(server_config.physics.rally.health),
-        static_cast<uint8_t>((server_config.physics.rally.turn_torque + 
-                            server_config.physics.rally.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.rally.max_speed),
-        static_cast<uint8_t>(server_config.physics.rally.acceleration)},
-
-        {"Truck", static_cast<uint16_t>(server_config.physics.truck.health),
-        static_cast<uint8_t>((server_config.physics.truck.turn_torque + 
-                            server_config.physics.truck.drift_factor) * 100),
-        static_cast<uint8_t>(server_config.physics.truck.max_speed),
-        static_cast<uint8_t>(server_config.physics.truck.acceleration)}
+        {std::string(CAR_COMPACT), server_config.physics.compact},
+        {std::string(CAR_SPORT), server_config.physics.sport},
+        {std::string(CAR_CONVERTIBLE), server_config.physics.convertible},
+        {std::string(CAR_SEDAN), server_config.physics.sedan},
+        {std::string(CAR_JEEP), server_config.physics.jeep},
+        {std::string(CAR_RALLY), server_config.physics.rally},
+        {std::string(CAR_TRUCK), server_config.physics.truck}
     };
+
+    std::vector<CarDTO> cars;
+    cars.reserve(car_types.size());
+
+    for (const auto& [model, car_config] : car_types) {
+
+        cars.emplace_back(
+            model,
+            static_cast<uint16_t>(car_config.health),
+            static_cast<uint8_t>((car_config.turn_torque + car_config.drift_factor) * 100),
+            static_cast<uint8_t>(car_config.max_speed),
+            static_cast<uint8_t>(car_config.acceleration)
+        );
+    }
 
     CarCatalogueDTO catalogue(std::move(cars));
     server_protocol.send_car_catalogue(catalogue);

@@ -42,6 +42,15 @@ constexpr uint16_t MASK_CAR_BRIDGE = CATEGORY_BRIDGE | CATEGORY_CAR_BRIDGE;
 constexpr uint16_t MASK_CAR_UNDER = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATEGORY_CAR_UNDER;
 constexpr uint16_t MASK_SENSOR = CATEGORY_CAR_GROUND | CATEGORY_CAR_BRIDGE | CATEGORY_CAR_UNDER;
 
+// CARS
+constexpr std::string_view CAR_COMPACT = "Compact";
+constexpr std::string_view CAR_SPORT = "Sport";
+constexpr std::string_view CAR_CONVERTIBLE = "Convertible";
+constexpr std::string_view CAR_SEDAN = "Sedan";
+constexpr std::string_view CAR_JEEP = "Jeep";
+constexpr std::string_view CAR_RALLY = "Rally";
+constexpr std::string_view CAR_TRUCK = "Truck";
+
 
 // CHECKPOINTS
 constexpr char HORIZONTAL = 'H';
