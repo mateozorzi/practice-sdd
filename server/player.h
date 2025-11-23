@@ -19,6 +19,9 @@
 #include "server_config.h"
 
 
+constexpr std::string_view PLAYER = "PLAYER";
+
+
 class Player {
 
     uint32_t client_id;
@@ -52,38 +55,33 @@ public:
     uint32_t get_client_id() const;
     const std::string& get_username() const;
     const CarDTO get_car() const;
-    void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
+    CarPositionDTO get_car_position() const;
     b2Body* get_car_body() const;
+    CarLayer get_car_layer() const;
+    uint32_t get_recorded_time() const;
+    PlayerDTO get_info() const;
+    PlayerRaceStatsDTO get_race_stats() const;
+    uint16_t get_health() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
     void update_car_position(const RaceDTO& race);
-    CarPositionDTO get_car_position() const;
     void set_car_collision(bool colliding);
+    void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
+    void set_car_layer(CarLayer layer);
+    void set_in_game();
+    void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
     bool is_in_game() const;
-    void set_in_game();
-
     void start_race();
     bool is_in_race() const;
     void finish_race();
     bool has_finished_race() const;
     bool have_time_recorded() const;
     void record_time(uint32_t seconds);
-    uint32_t get_recorded_time() const;
 
     bool is_dead() const;
 
-    void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
-
-    PlayerDTO get_info() const;
-
-    PlayerRaceStatsDTO get_race_stats() const;
-
-    CarLayer get_car_layer() const;
-    void set_car_layer(CarLayer layer);
-
     void apply_collision_damage(uint16_t damage);
-    uint16_t get_health() const;
 };
 
 

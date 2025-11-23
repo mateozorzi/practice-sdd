@@ -40,15 +40,6 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
              [this](const GameCommand& game_command) { handle_disconnection(game_command); }},
             {ClientAction::SEND_UPGRADE,
              [this](const GameCommand& game_command) { handle_upgrade_car(game_command); }}};
-
-
-    // cout info races
-    std::cout << "Selected races: " << std::endl;
-    for (const auto& race: selected_races.races) {
-        std::cout << " - " << race.name << " in " << race.city << " with "
-                  << static_cast<int>(race.size_checkpoints) << " checkpoints and "
-                  << static_cast<int>(race.laps) << " laps." << std::endl;
-    }
 }
 
 std::string obtain_polygons_path(const std::string& city) {
@@ -140,8 +131,6 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
             CarPhysicsConfig car_config = get_car_config(config, car_dto);
             it->second.create_car(car_dto, car_config, box2d_world);
             std::string model = it->second.get_car().model;
-            std::cout << "Player with ID: " << it->second.get_client_id()
-                      << " has car model set to: " << model << std::endl;
             it->second.set_in_game();
         }
     }
@@ -204,8 +193,8 @@ void GameLoop::update_positions(const RaceDTO& race) {
 }
 
 void GameLoop::send_race(const RaceDTO& race) {
+
     GameUpdateDTO race_update(GameLoopAction::SEND_RACE, race);
-    std::cout << "Sending race: " << race.name << std::endl;
     game_monitor.broadcast(race_update);
 }
 
@@ -415,8 +404,6 @@ void GameLoop::run() {
 
                 // start races
                 if (!race_active && current_race_index < selected_races.size) {
-                    std::cout << "Starting race: " << selected_races.races[current_race_index].name
-                              << std::endl;
                     start_race(selected_races.races[current_race_index]);
                     race_start_time = std::chrono::steady_clock::now();
                     continue;

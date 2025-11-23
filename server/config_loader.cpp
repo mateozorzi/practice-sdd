@@ -1,6 +1,5 @@
 #include "config_loader.h"
 
-#include <iostream>
 #include <stdexcept>
 
 #include <yaml-cpp/yaml.h>

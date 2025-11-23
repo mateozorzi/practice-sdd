@@ -1,7 +1,6 @@
 #include "server_protocol.h"
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -50,9 +49,7 @@ LobbyDTO ServerProtocol::receive_lobby_info() {
 
     RaceCatalogueDTO selected_races = receive_races();
 
-
     LobbyAction action = static_cast<LobbyAction>(action_byte);
-    std::cout << "Received lobby info with action: " << static_cast<int>(action_byte) << std::endl;
 
     return LobbyDTO(action, lobby_id, lobby_name, max_players, active_players, selected_races);
 }
@@ -242,13 +239,13 @@ void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
 }
 
 void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
+
     add_uint8_to_buffer(races.size);
 
-    for (const auto& race: races.races) {
+    for (const auto& race: races.races)
         add_race_to_buffer(race);
-    }
+    
     send_buffer();
-    std::cout << "Sent races catalogue of size: " << static_cast<int>(races.size) << std::endl;
 }
 
 void ServerProtocol::send_json_file(const std::string& file_path) {

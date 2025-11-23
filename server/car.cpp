@@ -10,8 +10,6 @@ Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, con
         box2d_body(nullptr),
         config(config),
         model(model) {
-
-    std::cout << "[Car] Creating car for player " << client_id << " model: " << model << std::endl;
     
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_dynamicBody;
@@ -43,10 +41,6 @@ Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, con
     box2d_body->GetMassData(&mass_data);
     mass_data.mass = config.mass;
     box2d_body->SetMassData(&mass_data);
-    
-    std::cout << "[Car] Car created with max_speed: " << config.max_speed 
-              << ", acceleration: " << config.acceleration 
-              << ", health: " << config.health << std::endl;
 }
 
 

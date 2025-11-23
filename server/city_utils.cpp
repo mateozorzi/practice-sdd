@@ -1,7 +1,6 @@
 #include "city_utils.h"
 
 #include <fstream>
-#include <iostream>
 
 #include <nlohmann/json.hpp>
 

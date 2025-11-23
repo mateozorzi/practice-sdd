@@ -26,12 +26,24 @@ void Player::create_car(const CarDTO& car_dto, const CarPhysicsConfig& physics_c
     base_health = static_cast<uint16_t>(physics_config.health);
     health = base_health;
 
-    std::cout << "[PLAYER] Created car for player " << client_id << ": " << car_dto.model 
-              << " with health: " << health << std::endl;
+    std::cout << "[" << PLAYER << "] Created car for player with ID: " << client_id << " | Car model: " << car_dto.model 
+              << " | HP: " << health << std::endl;
 }
 
 
 uint32_t Player::get_client_id() const { return client_id; }
+
+const std::string& Player::get_username() const { return username; }
+
+const CarDTO Player::get_car() const {
+
+    CarDTO empty_car;
+
+    if (car)
+        return car->get_configuration();
+
+    return empty_car;
+}
 
 b2Body* Player::get_car_body() const {
 
@@ -41,15 +53,38 @@ b2Body* Player::get_car_body() const {
     return nullptr;
 }
 
-void Player::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
+CarPositionDTO Player::get_car_position() const {
 
     if (car) {
-        std::cout << "[Player] next checkpoint id for player " << client_id << ": "
-                  << static_cast<int>(checkpoints[0].id) << std::endl;
-        this->next = checkpoints[0];
-        car->set_position_for_race(checkpoints);
+        CarPositionDTO actual = car->get_position_dto();
+        actual.next = this->next;
+        return actual;
     }
+    return CarPositionDTO(client_id, 0, 0, 0);
 }
+
+CarLayer Player::get_car_layer() const {
+
+    if (car)
+        return car->get_layer();
+
+    return CarLayer::ON_GROUND;
+}
+
+uint32_t Player::get_recorded_time() const { return race_time; }
+
+PlayerDTO Player::get_info() const {
+
+    return PlayerDTO(username, client_id, get_car(), health, dead);
+}
+
+PlayerRaceStatsDTO Player::get_race_stats() const {
+
+    return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
+}
+
+uint16_t Player::get_health() const { return health; }
+
 
 void Player::start_race() {
     in_race = true;
@@ -88,33 +123,7 @@ void Player::record_time(uint32_t seconds) {
     }
 }
 
-uint32_t Player::get_recorded_time() const { return race_time; }
-
-PlayerRaceStatsDTO Player::get_race_stats() const {
-    return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
-}
-
-const std::string& Player::get_username() const { return username; }
-
-const CarDTO Player::get_car() const {
-    CarDTO empty_car;
-    if (car) {
-        return car->get_configuration();
-    }
-    return empty_car;
-}
-
 bool Player::is_dead() const { return health == 0; }
-
-void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
-
-    if (car)
-        car->set_upgrade(upgrade, game_config);
-}
-
-PlayerDTO Player::get_info() const {
-    return PlayerDTO(username, client_id, get_car(), health, dead);
-}
 
 
 void Player::handle_car_movement(const MovementDTO& movement_dto) {
@@ -203,33 +212,19 @@ void Player::update_car_position(const RaceDTO& race) {
     }
 }
 
-CarPositionDTO Player::get_car_position() const {
-
-    if (car) {
-        CarPositionDTO actual = car->get_position_dto();
-        actual.next = this->next;
-        return actual;
-    }
-    return CarPositionDTO(client_id, 0, 0, 0);
-}
-
 void Player::set_car_collision(bool colliding) {
 
     if (car)
         car->set_collision(colliding);
 }
 
-bool Player::is_in_game() const { return in_game; }
+void Player::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
 
-void Player::set_in_game() { in_game = true; }
+    if (car) {
 
-
-CarLayer Player::get_car_layer() const {
-
-    if (car)
-        return car->get_layer();
-
-    return CarLayer::ON_GROUND;
+        this->next = checkpoints[0];
+        car->set_position_for_race(checkpoints);
+    }
 }
 
 void Player::set_car_layer(CarLayer layer) {
@@ -238,16 +233,21 @@ void Player::set_car_layer(CarLayer layer) {
         car->set_layer(layer);
 }
 
-void Player::apply_collision_damage(uint16_t damage) {
+void Player::set_in_game() { in_game = true; }
 
-    if (health > damage) {
+void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
-        health -= damage;
-    } else {
-
-        health = 0;
-        std::cout << "Player with ID: " << client_id << " Has been destroyed!" << std::endl;
-    }
+    if (car)
+        car->set_upgrade(upgrade, game_config);
 }
 
-uint16_t Player::get_health() const { return health; }
+
+bool Player::is_in_game() const { return in_game; }
+
+void Player::apply_collision_damage(uint16_t damage) {
+
+    if (health > damage)
+        health -= damage;
+    else
+        health = 0;
+}

@@ -87,9 +87,6 @@ void Receiver::run() {
         }
     } catch (const LibError& e) {
 
-        std::cerr << "[RECEIVER] Client " << client_id << " disconnected: " << e.what()
-                  << std::endl;
-
     } catch (const std::exception& e) {
 
         std::cerr << "[" << RECEIVER << "] " << EXCEPTION << ": " << e.what();
