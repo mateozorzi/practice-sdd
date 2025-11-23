@@ -14,9 +14,7 @@
 
 
 Player::Player(uint32_t client_id, const std::string& username):
-        client_id(client_id),
-        username(username),
-        car(nullptr) {}
+        client_id(client_id), username(username), car(nullptr) {}
 
 
 void Player::create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world) {
@@ -26,8 +24,8 @@ void Player::create_car(const CarDTO& car_dto, const CarConfig& car_config, b2Wo
     base_health = static_cast<uint16_t>(car_config.health);
     health = base_health;
 
-    std::cout << "[" << PLAYER << "] Created car for player with ID: " << client_id << " | Car model: " << car_dto.model 
-              << " | HP: " << health << std::endl;
+    std::cout << "[" << PLAYER << "] Created car for player with ID: " << client_id
+              << " | Car model: " << car_dto.model << " | HP: " << health << std::endl;
 }
 
 

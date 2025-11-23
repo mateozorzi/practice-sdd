@@ -1,10 +1,9 @@
 #ifndef CONFIG_LOADER_H
 #define CONFIG_LOADER_H
 
-#include <yaml-cpp/yaml.h>
-
 #include <string>
 
+#include <yaml-cpp/yaml.h>
 
 #include "server_config.h"
 

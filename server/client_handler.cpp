@@ -1,7 +1,9 @@
 #include "client_handler.h"
 
+#include <algorithm>
 #include <iostream>
 #include <utility>
+#include <vector>
 
 #include "../common/liberror.h"
 #include "../common/lobbies_catalogue_dto.h"
@@ -79,28 +81,23 @@ void ClientHandler::send_car_catalogue() {
 
     std::vector<CarConfig> car_types = {
 
-        {server_config.physics.compact},
-        {server_config.physics.sport},
-        {server_config.physics.convertible},
-        {server_config.physics.sedan},
-        {server_config.physics.jeep},
-        {server_config.physics.rally},
-        {server_config.physics.truck}
-    };
+            {server_config.physics.compact},     {server_config.physics.sport},
+            {server_config.physics.convertible}, {server_config.physics.sedan},
+            {server_config.physics.jeep},        {server_config.physics.rally},
+            {server_config.physics.truck}};
 
     std::vector<CarDTO> cars;
     cars.reserve(car_types.size());
 
-    for (const auto& car_config: car_types) {
-
-        cars.emplace_back(
-            car_config.model,
-            static_cast<uint16_t>(car_config.health),
-            static_cast<uint8_t>((car_config.turn_torque + car_config.drift_factor) * 100),
-            static_cast<uint8_t>(car_config.max_speed),
-            static_cast<uint8_t>(car_config.acceleration)
-        );
-    }
+    std::transform(car_types.begin(), car_types.end(), std::back_inserter(cars),
+                   [](const auto& car_config) {
+                       return CarDTO(
+                               car_config.model, static_cast<uint16_t>(car_config.health),
+                               static_cast<uint8_t>(
+                                       (car_config.turn_torque + car_config.drift_factor) * 100),
+                               static_cast<uint8_t>(car_config.max_speed),
+                               static_cast<uint8_t>(car_config.acceleration));
+                   });
 
     CarCatalogueDTO catalogue(std::move(cars));
     server_protocol.send_car_catalogue(catalogue);

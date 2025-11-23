@@ -1,5 +1,6 @@
 #include "city_utils.h"
 
+#include <algorithm>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -57,9 +58,13 @@ std::vector<std::vector<std::vector<int>>> CityUtils::load_polygons_from_file(
             throw WorldCreationException("Each polygon must have exactly 4 vertices");
 
         std::vector<std::vector<int>> polygon_vertices;
-        for (const auto& vertex: polygon) {
-            polygon_vertices.push_back({vertex[0].get<int>(), vertex[1].get<int>()});
-        }
+        polygon_vertices.reserve(polygon.size());
+
+        std::transform(polygon.begin(), polygon.end(), std::back_inserter(polygon_vertices),
+                       [](const nlohmann::json& vertex) -> std::vector<int> {
+                           return {vertex[0].template get<int>(), vertex[1].template get<int>()};
+                       });
+
         polygons.push_back(polygon_vertices);
     }
 

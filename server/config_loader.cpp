@@ -14,7 +14,7 @@ ServerConfig ConfigLoader::load_yaml(const std::string& base_path) {
         std::string physics_path = base_path + "/physics_config.yaml";
         YAML::Node physics_config = YAML::LoadFile(physics_path);
         load_physics_config(physics_config, server_config);
-    
+
         std::string world_path = base_path + "/world_config.yaml";
         YAML::Node world_config = YAML::LoadFile(world_path);
         load_world_config(world_config, server_config);
@@ -32,7 +32,7 @@ ServerConfig ConfigLoader::load_yaml(const std::string& base_path) {
 
 
 void ConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& server_config) {
-    
+
 
     if (!config["game"])
         throw std::runtime_error("Missing 'game' root node in game configuration file");
@@ -45,35 +45,30 @@ void ConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& serv
     server_config.game.max_races_per_game = game["max_races_per_game"].as<unsigned int>();
     server_config.game.min_players_per_game = game["min_players_per_game"].as<unsigned int>();
     server_config.game.max_players_per_game = game["max_players_per_game"].as<unsigned int>();
-    server_config.game.wait_time_upgrade_menu = 
-        game["wait_time_upgrade_menu"].as<unsigned int>();
-    server_config.game.wait_time_final_leaderboard = 
-        game["wait_time_final_leaderboard"].as<unsigned int>();
+    server_config.game.wait_time_upgrade_menu = game["wait_time_upgrade_menu"].as<unsigned int>();
+    server_config.game.wait_time_final_leaderboard =
+            game["wait_time_final_leaderboard"].as<unsigned int>();
 
     if (game["upgrades"]) {
 
         YAML::Node upgrades = game["upgrades"];
-        server_config.game.upgrades.health_upgrade = 
-            upgrades["health_upgrade"].as<float>();
-        server_config.game.upgrades.speed_upgrade = 
-            upgrades["speed_upgrade"].as<float>();
-        server_config.game.upgrades.acceleration_upgrade = 
-            upgrades["acceleration_upgrade"].as<float>();
-        server_config.game.upgrades.handling_upgrade = 
-            upgrades["handling_upgrade"].as<float>();
+        server_config.game.upgrades.health_upgrade = upgrades["health_upgrade"].as<float>();
+        server_config.game.upgrades.speed_upgrade = upgrades["speed_upgrade"].as<float>();
+        server_config.game.upgrades.acceleration_upgrade =
+                upgrades["acceleration_upgrade"].as<float>();
+        server_config.game.upgrades.handling_upgrade = upgrades["handling_upgrade"].as<float>();
     }
 
     if (config["server"]) {
 
         YAML::Node server = config["server"];
-        server_config.server.server_port = 
-            server["server_port"].as<unsigned short>();
-        server_config.server.command_queue_capacity = 
-            server["command_queue_capacity"].as<unsigned int>();
-        server_config.server.snapshot_queue_capacity = 
-            server["snapshot_queue_capacity"].as<unsigned int>();
-        server_config.server.waiting_for_players_fps = 
-            server["waiting_for_players_fps"].as<unsigned int>();
+        server_config.server.server_port = server["server_port"].as<unsigned short>();
+        server_config.server.command_queue_capacity =
+                server["command_queue_capacity"].as<unsigned int>();
+        server_config.server.snapshot_queue_capacity =
+                server["snapshot_queue_capacity"].as<unsigned int>();
+        server_config.server.waiting_for_players_fps =
+                server["waiting_for_players_fps"].as<unsigned int>();
     }
 }
 
@@ -96,10 +91,8 @@ void ConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& s
     if (physics["race_start"]) {
 
         YAML::Node race_start = physics["race_start"];
-        server_config.physics.positions.race_start.meters_x = 
-            race_start["meters_x"].as<float>();
-        server_config.physics.positions.race_start.meters_y = 
-            race_start["meters_y"].as<float>();
+        server_config.physics.positions.race_start.meters_x = race_start["meters_x"].as<float>();
+        server_config.physics.positions.race_start.meters_y = race_start["meters_y"].as<float>();
     }
 
     if (physics["cars"]) {
@@ -149,9 +142,8 @@ void ConfigLoader::load_world_config(const YAML::Node& config, ServerConfig& ser
         throw std::runtime_error("Missing 'world' node in world configuration file");
 
     YAML::Node world = config["world"];
-    
-    server_config.world.pixels_per_meter = 
-        world["pixels_per_meter"].as<unsigned int>();
+
+    server_config.world.pixels_per_meter = world["pixels_per_meter"].as<unsigned int>();
 
     load_city(world["liberty_city"], server_config.world.liberty_city);
     load_city(world["san_andreas"], server_config.world.san_andreas);

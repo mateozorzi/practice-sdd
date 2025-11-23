@@ -130,7 +130,6 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
             CarConfig car_config = get_car_config(config, car_dto);
             it->second.create_car(car_dto, car_config, box2d_world);
-            std::string model = it->second.get_car().model;
             it->second.set_in_game();
         }
     }
@@ -388,8 +387,7 @@ void GameLoop::run() {
     try {
 
         const int game_frame_ms = static_cast<int>(1000.0f / config.game.game_fps);
-        const int waiting_frame_ms =
-                static_cast<int>(1000.0f / 10);
+        const int waiting_frame_ms = static_cast<int>(1000.0f / 10);
         uint8_t current_race_index = 0;
 
         static constexpr auto RACE_TIMEOUT = std::chrono::minutes(10);

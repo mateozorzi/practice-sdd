@@ -10,53 +10,53 @@
 
 struct CollidableConfig {
 
-    float density; 
-    float friction; 
-    float restitution; 
+    float density;
+    float friction;
+    float restitution;
 };
 
 struct CarConfig {
 
     std::string model;
-    float width; 
-    float height; 
-    float density; 
-    float friction; 
-    float restitution; 
-    float linear_damping;   // Sliding effect after stopping moving (lower = more sliding) 
-    float angular_damping;  // The same that above, but when turning (lower = more turning) 
-    float min_turn_speed; 
-    float acceleration; 
-    float braking_factor; 
-    float max_speed; 
-    float drift_factor;     // The lower = more drifting 
-    float turn_torque; 
-    float mass; 
-    unsigned int health; 
+    float width;
+    float height;
+    float density;
+    float friction;
+    float restitution;
+    float linear_damping;   // Sliding effect after stopping moving (lower = more sliding)
+    float angular_damping;  // The same that above, but when turning (lower = more turning)
+    float min_turn_speed;
+    float acceleration;
+    float braking_factor;
+    float max_speed;
+    float drift_factor;  // The lower = more drifting
+    float turn_torque;
+    float mass;
+    unsigned int health;
 };
 
-struct RaceStartPosition { 
+struct RaceStartPosition {
 
-    float meters_x; 
-    float meters_y; 
+    float meters_x;
+    float meters_y;
 };
 
-struct PositionsConfig { 
+struct PositionsConfig {
 
-    struct RaceStartPosition race_start; 
+    struct RaceStartPosition race_start;
 };
 
 struct PhysicsConfig {
 
-    struct CollidableConfig block; 
+    struct CollidableConfig block;
     struct PositionsConfig positions;
-    struct CarConfig compact; 
-    struct CarConfig sport; 
-    struct CarConfig convertible; 
-    struct CarConfig sedan; 
-    struct CarConfig jeep; 
-    struct CarConfig rally; 
-    struct CarConfig truck; 
+    struct CarConfig compact;
+    struct CarConfig sport;
+    struct CarConfig convertible;
+    struct CarConfig sedan;
+    struct CarConfig jeep;
+    struct CarConfig rally;
+    struct CarConfig truck;
 };
 
 
@@ -91,10 +91,10 @@ struct CityLoaderConfig {
 
 struct WorldConfig {
 
-    unsigned int pixels_per_meter; 
-    struct CityLoaderConfig liberty_city; 
-    struct CityLoaderConfig san_andreas; 
-    struct CityLoaderConfig vice_city; 
+    unsigned int pixels_per_meter;
+    struct CityLoaderConfig liberty_city;
+    struct CityLoaderConfig san_andreas;
+    struct CityLoaderConfig vice_city;
 };
 
 
@@ -104,10 +104,10 @@ struct WorldConfig {
 
 struct UpgradeConfig {
 
-    float health_upgrade; 
-    float speed_upgrade; 
-    float acceleration_upgrade; 
-    float handling_upgrade; 
+    float health_upgrade;
+    float speed_upgrade;
+    float acceleration_upgrade;
+    float handling_upgrade;
 };
 
 struct GameConfig {
@@ -125,10 +125,10 @@ struct GameConfig {
 
 struct ServerSpecificConfig {
 
-    unsigned short server_port; 
-    unsigned int command_queue_capacity; 
-    unsigned int snapshot_queue_capacity; 
-    unsigned int waiting_for_players_fps; 
+    unsigned short server_port;
+    unsigned int command_queue_capacity;
+    unsigned int snapshot_queue_capacity;
+    unsigned int waiting_for_players_fps;
 };
 
 // ============================================================================
@@ -143,6 +143,6 @@ struct ServerConfig {
 
     struct GameConfig game;
     struct ServerSpecificConfig server;
-}; 
+};
 
 #endif  // SERVER_CONFIG_H

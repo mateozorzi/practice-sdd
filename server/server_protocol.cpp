@@ -241,9 +241,8 @@ void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
 
     add_uint8_to_buffer(races.size);
 
-    for (const auto& race: races.races)
-        add_race_to_buffer(race);
-    
+    for (const auto& race: races.races) add_race_to_buffer(race);
+
     send_buffer();
 }
 

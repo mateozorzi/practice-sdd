@@ -1,16 +1,15 @@
 #include "car.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
 #include "../common/constants.h"
 
-Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarConfig& config):
-        client_id(client_id),
-        box2d_body(nullptr),
-        config(config),
-        model(model) {
-    
+Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model,
+         const CarConfig& config):
+        client_id(client_id), box2d_body(nullptr), config(config), model(model) {
+
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_dynamicBody;
     box2d_body_definition.position.Set(0.0f, 0.0f);
@@ -22,20 +21,20 @@ Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, con
 
     b2PolygonShape box2d_polygon_shape;
     box2d_polygon_shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
-    
+
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
     box2d_fixture_definition.density = config.density;
     box2d_fixture_definition.friction = config.friction;
     box2d_fixture_definition.restitution = config.restitution;
-    
+
     b2Fixture* box2d_fixture = box2d_body->CreateFixture(&box2d_fixture_definition);
-    
+
     b2Filter box2d_filter;
     box2d_filter.categoryBits = CATEGORY_CAR_GROUND;
     box2d_filter.maskBits = MASK_CAR_GROUND;
     box2d_fixture->SetFilterData(box2d_filter);
-    
+
     // Set mass explicitly
     b2MassData mass_data;
     box2d_body->GetMassData(&mass_data);
@@ -245,10 +244,10 @@ void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_co
         std::cout << "Upgrading handling for player id: " << client_id << std::endl;
         std::cout << "Current turn_torque: " << config.turn_torque << std::endl;
         std::cout << "Current drift_factor: " << config.drift_factor << std::endl;
-        
+
         config.turn_torque += static_cast<float>(game_config.handling_upgrade) * 0.0001f;
         config.drift_factor = std::max(0.0f, config.drift_factor - 0.05f);
-        
+
         std::cout << "New turn_torque: " << config.turn_torque << std::endl;
         std::cout << "New drift_factor: " << config.drift_factor << std::endl;
     }
