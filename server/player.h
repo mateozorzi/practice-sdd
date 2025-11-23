@@ -50,7 +50,7 @@ public:
 
     explicit Player(uint32_t client_id, const std::string& username);
 
-    void create_car(const CarDTO& car_dto, const CarPhysicsConfig& car_config, b2World& box2d_world);
+    void create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world);
 
     uint32_t get_client_id() const;
     const std::string& get_username() const;

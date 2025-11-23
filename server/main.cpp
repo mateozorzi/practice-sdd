@@ -11,26 +11,17 @@
 
 constexpr uint8_t SUCCESS = 0;
 constexpr uint8_t ERROR = 1;
-constexpr uint8_t SERVER_PORT = 1;
-constexpr uint8_t SERVER_ARGUMENTS = 2;
 
 constexpr std::string_view SERVER_MAIN = "SERVER_MAIN";
-constexpr std::string_view ERROR_ARGUMENTS_SERVER = "1 argument is needed: <service_name or port>";
 constexpr std::string_view UNKNOWN_EXCEPTION = "Unknown exception";
 
 
-int main(const int argc, const char* const argv[]) {
-
-    if (argc != SERVER_ARGUMENTS) {
-
-        std::cerr << "[" << SERVER_MAIN << "] " << ERROR_ARGUMENTS_SERVER << std::endl;
-        return ERROR;
-    }
-
-    const std::string port = argv[SERVER_PORT];
+int main() {
 
     try {
-        ServerConfig config = ConfigLoader::load_yaml(std::string(SERVER_CONFIG_FILEPATH));
+        ServerConfig config = ConfigLoader().load_yaml(std::string(SERVER_CONFIG_FILEPATH));
+
+        const std::string port = std::to_string(config.server.server_port);
 
         Server server(port, config);
         server.run();

@@ -5,7 +5,7 @@
 
 #include "../common/constants.h"
 
-Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarPhysicsConfig& config):
+Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarConfig& config):
         client_id(client_id),
         box2d_body(nullptr),
         config(config),

@@ -10,7 +10,7 @@ Game::Game(const uint32_t game_id, const uint8_t max_players, const ServerConfig
         game_id(game_id),
         config(config),
         name(std::move(name)),
-        command_queue(static_cast<size_t>(config.app.server.command_queue_capacity)),
+        command_queue(static_cast<size_t>(config.server.command_queue_capacity)),
         game_monitor(config),
         game_loop(game_monitor, command_queue, max_players, config, selected) {}
 

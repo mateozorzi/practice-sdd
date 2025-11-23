@@ -19,11 +19,11 @@ Player::Player(uint32_t client_id, const std::string& username):
         car(nullptr) {}
 
 
-void Player::create_car(const CarDTO& car_dto, const CarPhysicsConfig& physics_config, b2World& box2d_world) {
+void Player::create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world) {
 
-    car = std::make_unique<Car>(client_id, box2d_world, car_dto.model, physics_config);
+    car = std::make_unique<Car>(client_id, box2d_world, car_dto.model, car_config);
 
-    base_health = static_cast<uint16_t>(physics_config.health);
+    base_health = static_cast<uint16_t>(car_config.health);
     health = base_health;
 
     std::cout << "[" << PLAYER << "] Created car for player with ID: " << client_id << " | Car model: " << car_dto.model 

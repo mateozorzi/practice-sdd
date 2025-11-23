@@ -351,8 +351,8 @@ void SDLManager::load_city(std::string& city_name) {
                    ::tolower);
     // separate city_name lower with _
     std::replace(city_name_lower.begin(), city_name_lower.end(), ' ', '_');
-    decoration = "server/resources/world/decorations_" + city_name_lower + ".json";
-    bridges = "server/resources/world/bridges_" + city_name_lower + ".json";
+    decoration = "server/world/decorations_" + city_name_lower + ".json";
+    bridges = "server/world/bridges_" + city_name_lower + ".json";
 
     set_minimap();
     load_bridges_rects(load_json_file(bridges));

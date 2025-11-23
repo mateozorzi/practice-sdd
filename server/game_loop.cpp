@@ -97,26 +97,26 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
-CarPhysicsConfig GameLoop::get_car_config(const ServerConfig& config, const CarDTO& car_dto) {
+CarConfig GameLoop::get_car_config(const ServerConfig& config, const CarDTO& car_dto) {
 
     std::string car_model = car_dto.model;
 
     if (car_model == CAR_COMPACT)
-        return config.app.server.world.physics.compact;
+        return config.physics.compact;
     else if (car_model == CAR_SPORT)
-        return config.app.server.world.physics.sport;
+        return config.physics.sport;
     else if (car_model == CAR_CONVERTIBLE)
-        return config.app.server.world.physics.convertible;
+        return config.physics.convertible;
     else if (car_model == CAR_SEDAN)
-        return config.app.server.world.physics.sedan;
+        return config.physics.sedan;
     else if (car_model == CAR_JEEP)
-        return config.app.server.world.physics.jeep;
+        return config.physics.jeep;
     else if (car_model == CAR_RALLY)
-        return config.app.server.world.physics.rally;
+        return config.physics.rally;
     else if (car_model == CAR_TRUCK)
-        return config.app.server.world.physics.truck;
+        return config.physics.truck;
     else
-        return config.app.server.world.physics.compact;
+        return config.physics.compact;
 }
 
 
@@ -128,7 +128,7 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
         auto it = players.find(client_id);
         if (it != players.end()) {
 
-            CarPhysicsConfig car_config = get_car_config(config, car_dto);
+            CarConfig car_config = get_car_config(config, car_dto);
             it->second.create_car(car_dto, car_config, box2d_world);
             std::string model = it->second.get_car().model;
             it->second.set_in_game();
@@ -163,7 +163,7 @@ void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
         uint32_t client_id = game_command.get_client_id();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            it->second.set_upgrade(upgrade->get(), config.app.game.upgrades);
+            it->second.set_upgrade(upgrade->get(), config.game.upgrades);
         }
     }
 }
@@ -387,9 +387,9 @@ void GameLoop::run() {
 
     try {
 
-        const int game_frame_ms = static_cast<int>(1000.0f / config.app.game.game_fps);
+        const int game_frame_ms = static_cast<int>(1000.0f / config.game.game_fps);
         const int waiting_frame_ms =
-                static_cast<int>(1000.0f / config.app.server.waiting_for_players_fps);
+                static_cast<int>(1000.0f / 10);
         uint8_t current_race_index = 0;
 
         static constexpr auto RACE_TIMEOUT = std::chrono::minutes(10);

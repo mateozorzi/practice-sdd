@@ -21,7 +21,7 @@ class Car {
 
     uint32_t client_id;
     b2Body* box2d_body;
-    CarPhysicsConfig config;
+    CarConfig config;
     std::string model;
 
     bool moving_up = false;
@@ -39,7 +39,7 @@ public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;
 
-    explicit Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarPhysicsConfig& config);
+    explicit Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarConfig& config);
 
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
 

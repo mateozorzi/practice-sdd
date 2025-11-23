@@ -23,22 +23,22 @@ std::string CityLoader::normalize_city_name(const std::string& city_name) const 
 
 std::string CityLoader::obtain_ground_collidables_path(const std::string& city_name) const {
 
-    return "server/resources/world/collidables/on_ground_collidables_" + city_name + ".json";
+    return "server/world/collidables/on_ground_collidables_" + city_name + ".json";
 }
 
 std::string CityLoader::obtain_bridge_collidables_path(const std::string& city_name) const {
 
-    return "server/resources/world/collidables/on_bridge_collidables_" + city_name + ".json";
+    return "server/world/collidables/on_bridge_collidables_" + city_name + ".json";
 }
 
 std::string CityLoader::obtain_on_bridge_sensors_path(const std::string& city_name) const {
 
-    return "server/resources/world/sensors/on_bridge_sensors_" + city_name + ".json";
+    return "server/world/sensors/on_bridge_sensors_" + city_name + ".json";
 }
 
 std::string CityLoader::obtain_under_bridge_sensors_path(const std::string& city_name) const {
 
-    return "server/resources/world/sensors/under_bridge_sensors_" + city_name + ".json";
+    return "server/world/sensors/under_bridge_sensors_" + city_name + ".json";
 }
 
 void CityLoader::load_collidables(const std::string& file, uint16_t category, uint16_t mask) {
