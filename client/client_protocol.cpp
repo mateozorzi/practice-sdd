@@ -223,12 +223,6 @@ GameUpdateDTO ClientProtocol::receive_update() {
     return update;
 }
 
-
-void ClientProtocol::ask_for_catalogue() {
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_CAR_CATALOGUE));
-    send_buffer();
-}
-
 CarCatalogueDTO ClientProtocol::receive_car_catalogue() {
     uint8_t size = recv_uint8();
     std::vector<CarDTO> cars;

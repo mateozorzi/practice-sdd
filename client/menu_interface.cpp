@@ -28,9 +28,9 @@ MenuInterface::MenuInterface(ClientProtocol& protocol): protocol(protocol) {}
 
 
 bool MenuInterface::car_selection(PlayerDTO& player) {
-    // server send market of cars
+
     std::cout << "Requesting car catalogue from server..." << std::endl;
-    protocol.ask_for_catalogue();
+
     CarCatalogueDTO catalogue = protocol.receive_car_catalogue();
 
     std::cout << "Received car catalogue of size: " << static_cast<int>(catalogue.size)

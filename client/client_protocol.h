@@ -60,7 +60,6 @@ public:
     CarPositionDTO receive_car_position();
     std::vector<CarPositionDTO> receive_car_positions();
     CheckpointDTO receive_checkpoint();
-    void ask_for_catalogue();
     CarCatalogueDTO receive_car_catalogue();
     LobbyCatalogueDTO receive_lobby_catalogue();
     LobbyDTO receive_lobby_info();

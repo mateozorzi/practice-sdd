@@ -74,11 +74,64 @@ void ClientHandler::list_active_games() {
     server_protocol.send_lobby_catalogue(lobby.list_games());
 }
 
+
+void ClientHandler::send_car_catalogue() {
+
+    std::vector<CarDTO> cars = {
+        {"Compact", static_cast<uint16_t>(server_config.physics.compact.health),
+        static_cast<uint8_t>((server_config.physics.compact.turn_torque + 
+                            server_config.physics.compact.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.compact.max_speed),
+        static_cast<uint8_t>(server_config.physics.compact.acceleration)},
+
+        {"Sport", static_cast<uint16_t>(server_config.physics.sport.health),
+        static_cast<uint8_t>((server_config.physics.sport.turn_torque + 
+                            server_config.physics.sport.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.sport.max_speed),
+        static_cast<uint8_t>(server_config.physics.sport.acceleration)},
+
+        {"Convertible", static_cast<uint16_t>(server_config.physics.convertible.health),
+        static_cast<uint8_t>((server_config.physics.convertible.turn_torque + 
+                            server_config.physics.convertible.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.convertible.max_speed),
+        static_cast<uint8_t>(server_config.physics.convertible.acceleration)},
+
+        {"Sedan", static_cast<uint16_t>(server_config.physics.sedan.health),
+        static_cast<uint8_t>((server_config.physics.sedan.turn_torque + 
+                            server_config.physics.sedan.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.sedan.max_speed),
+        static_cast<uint8_t>(server_config.physics.sedan.acceleration)},
+
+        {"Jeep", static_cast<uint16_t>(server_config.physics.jeep.health),
+        static_cast<uint8_t>((server_config.physics.jeep.turn_torque + 
+                            server_config.physics.jeep.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.jeep.max_speed),
+        static_cast<uint8_t>(server_config.physics.jeep.acceleration)},
+
+        {"Rally", static_cast<uint16_t>(server_config.physics.rally.health),
+        static_cast<uint8_t>((server_config.physics.rally.turn_torque + 
+                            server_config.physics.rally.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.rally.max_speed),
+        static_cast<uint8_t>(server_config.physics.rally.acceleration)},
+
+        {"Truck", static_cast<uint16_t>(server_config.physics.truck.health),
+        static_cast<uint8_t>((server_config.physics.truck.turn_torque + 
+                            server_config.physics.truck.drift_factor) * 100),
+        static_cast<uint8_t>(server_config.physics.truck.max_speed),
+        static_cast<uint8_t>(server_config.physics.truck.acceleration)}
+    };
+
+    CarCatalogueDTO catalogue(std::move(cars));
+    server_protocol.send_car_catalogue(catalogue);
+}
+
+
 void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                         Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
-    Receiver receiver(server_protocol, lobby, client_id, command_queue, server_config);
+    send_car_catalogue();
+    Receiver receiver(server_protocol, lobby, client_id, command_queue);
     receiver.start();
     Sender sender(server_protocol, lobby, client_id, snapshot_queue);
     sender.run();

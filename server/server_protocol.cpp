@@ -81,7 +81,6 @@ GameCommandDTO ServerProtocol::receive_game_command() {
             return GameCommandDTO(client_action, receive_car_selection());
         case ClientAction::SEND_UPGRADE:
             return GameCommandDTO(client_action, receive_upgrade());
-        case ClientAction::GET_CAR_CATALOGUE:
         case ClientAction::DISCONNECT:
             return GameCommandDTO(client_action);
         case ClientAction::GET_JSON_FILE:
