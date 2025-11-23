@@ -23,7 +23,7 @@ class Acceptor final: public Thread {
     Socket acceptor_socket;
     std::list<std::unique_ptr<ClientHandler>> clients;
     Lobby& lobby;
-    const ServerConfig& config;
+    const ServerConfig& server_config;
     uint32_t client_id = 0;
 
     void reap();

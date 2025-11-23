@@ -3,8 +3,8 @@
 #include <iostream>
 
 
-Server::Server(const std::string& port, ServerConfig config):
-        config(config), lobby(this->config), clients_acceptor(port, lobby, this->config) {}
+Server::Server(const std::string& port, const ServerConfig& server_config):
+        server_config(server_config), lobby(server_config), clients_acceptor(port, lobby, server_config) {}
 
 
 void Server::run() {

@@ -22,7 +22,7 @@ class Receiver final: public Thread {
     Lobby& lobby;
     uint32_t client_id;
     Queue<GameCommand>& command_queue;
-    const ServerConfig& config;
+    const ServerConfig& server_config;
 
     void handle_get_car_catalogue();
     void handle_get_json_file(const std::string& file_path);
@@ -33,7 +33,7 @@ public:
     Receiver& operator=(const Receiver&) = delete;
 
     explicit Receiver(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
-                      Queue<GameCommand>& command_queue, const ServerConfig& config);
+                      Queue<GameCommand>& command_queue, const ServerConfig& server_config);
 
     void run() override;
     void stop() override;

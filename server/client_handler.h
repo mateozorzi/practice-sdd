@@ -23,7 +23,7 @@ class ClientHandler final: public Thread {
     Socket peer_socket;
     ServerProtocol server_protocol;
     Lobby& lobby;
-    const ServerConfig& config;
+    const ServerConfig& server_config;
     const uint32_t client_id;
     std::string username = "Player";
     uint32_t game_id = 0;

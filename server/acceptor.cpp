@@ -6,8 +6,8 @@
 #include "../common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, Lobby& lobby, const ServerConfig& config):
-        acceptor_socket(port.c_str()), lobby(lobby), config(config) {}
+Acceptor::Acceptor(const std::string& port, Lobby& lobby, const ServerConfig& server_config):
+        acceptor_socket(port.c_str()), lobby(lobby), server_config(server_config) {}
 
 
 void Acceptor::run() {
@@ -20,7 +20,7 @@ void Acceptor::run() {
             reap();
             client_id++;
             std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(
-                    std::move(peer_socket), lobby, client_id, config);
+                    std::move(peer_socket), lobby, client_id, server_config);
             client->start();
             clients.push_back(std::move(client));
             std::cout << "[" << ACCEPTOR << "] "

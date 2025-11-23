@@ -12,7 +12,6 @@
 class ConfigLoader {
 
     void load_game_config(const YAML::Node& config, ServerConfig& server_config);
-    void load_client_car(const YAML::Node& car_node, CarClientConfig& car_config);
 
     void load_physics_config(const YAML::Node& config, ServerConfig& server_config);
     void load_car_physics(const YAML::Node& car_node, CarConfig& car_config);

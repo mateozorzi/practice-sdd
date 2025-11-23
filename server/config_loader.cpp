@@ -75,34 +75,6 @@ void ConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& serv
         server_config.server.waiting_for_players_fps = 
             server["waiting_for_players_fps"].as<unsigned int>();
     }
-
-    if (config["client"] && config["client"]["cars"]) {
-
-        YAML::Node cars = config["client"]["cars"];
-
-        if (cars["compact"]) 
-            load_client_car(cars["compact"], server_config.client.cars.compact);
-        if (cars["sport"])
-            load_client_car(cars["sport"], server_config.client.cars.sport);
-        if (cars["convertible"])
-            load_client_car(cars["convertible"], server_config.client.cars.convertible);
-        if (cars["sedan"])
-            load_client_car(cars["sedan"], server_config.client.cars.sedan);
-        if (cars["jeep"])
-            load_client_car(cars["jeep"], server_config.client.cars.jeep);
-        if (cars["rally"])
-            load_client_car(cars["rally"], server_config.client.cars.rally);
-        if (cars["truck"])
-            load_client_car(cars["truck"], server_config.client.cars.truck);
-    }
-}
-
-void ConfigLoader::load_client_car(const YAML::Node& car_node, CarClientConfig& car_config) {
-
-    car_config.health = car_node["health"].as<float>();
-    car_config.handling = car_node["handling"].as<float>();
-    car_config.acceleration = car_node["acceleration"].as<float>();
-    car_config.speed = car_node["speed"].as<float>();
 }
 
 

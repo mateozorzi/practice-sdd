@@ -130,30 +130,6 @@ struct ServerSpecificConfig {
     unsigned int waiting_for_players_fps; 
 };
 
-struct CarClientConfig {
-
-    float health; 
-    float handling; 
-    float acceleration; 
-    float speed; 
-};
-
-struct CarDefaults {
-
-    struct CarClientConfig compact; 
-    struct CarClientConfig sport; 
-    struct CarClientConfig convertible; 
-    struct CarClientConfig sedan; 
-    struct CarClientConfig jeep; 
-    struct CarClientConfig rally; 
-    struct CarClientConfig truck; 
-}; 
-
-struct ClientSpecificConfig {
-
-    struct CarDefaults cars; 
-}; 
-
 // ============================================================================
 // ROOT CONFIGURATION STRUCT
 // ============================================================================
@@ -166,7 +142,6 @@ struct ServerConfig {
 
     struct GameConfig game;
     struct ServerSpecificConfig server;
-    struct ClientSpecificConfig client;
 }; 
 
 #endif  // SERVER_CONFIG_H

@@ -19,7 +19,7 @@ constexpr std::string_view SERVER_CONFIG_FILEPATH = "server/config";
 
 class Server {
 
-    ServerConfig config;
+    const ServerConfig& server_config;
     Lobby lobby;
     Acceptor clients_acceptor;
 
@@ -30,7 +30,7 @@ public:
     Server(const Server&) = delete;
     Server& operator=(const Server&) = delete;
 
-    explicit Server(const std::string& port, ServerConfig config);
+    explicit Server(const std::string& port, const ServerConfig& config);
 
     void run();
 

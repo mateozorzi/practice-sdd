@@ -9,11 +9,11 @@
 
 
 ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id,
-                             const ServerConfig& config):
+                             const ServerConfig& server_config):
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
         lobby(lobby),
-        config(config),
+        server_config(server_config),
         client_id(client_id),
         selected_races() {}
 
@@ -78,7 +78,7 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                         Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
-    Receiver receiver(server_protocol, lobby, client_id, command_queue, config);
+    Receiver receiver(server_protocol, lobby, client_id, command_queue, server_config);
     receiver.start();
     Sender sender(server_protocol, lobby, client_id, snapshot_queue);
     sender.run();
