@@ -45,7 +45,7 @@ struct CarConfig {
     float min_turn_speed;
 
     float acceleration;
-    float breaking_factor;
+    float braking_factor;
     float max_speed;
     float drift_factor;
     float turn_torque;

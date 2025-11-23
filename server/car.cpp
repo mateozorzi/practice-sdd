@@ -11,21 +11,21 @@
 Car::Car(const uint32_t client_id, b2World& box2d_world, const ServerConfig& server_config):
         client_id(client_id),
         box2d_body(nullptr),
-        config({.width = server_config.app.server.world.sprites.car.width,
-                .height = server_config.app.server.world.sprites.car.height,
-                .density = server_config.app.server.world.physics.car.density,
-                .friction = server_config.app.server.world.physics.car.friction,
-                .restitution = server_config.app.server.world.physics.car.restitution,
-                .linear_damping = server_config.app.server.world.physics.car.linear_damping,
-                .angular_damping = server_config.app.server.world.physics.car.angular_damping,
-                .min_turn_speed = server_config.app.server.world.physics.car.min_turn_speed,
-                .acceleration = server_config.app.server.world.physics.car.acceleration,
-                .breaking_factor = server_config.app.server.world.physics.car.breaking_factor,
-                .max_speed = server_config.app.server.world.physics.car.max_speed,
-                .drift_factor = server_config.app.server.world.physics.car.drift_factor,
-                .turn_torque = server_config.app.server.world.physics.car.turn_torque,
-                .mass = server_config.app.server.world.physics.car.mass,
-                .health = server_config.app.server.world.physics.car.health}),
+        config({.width = server_config.app.server.world.physics.sport.width,
+                .height = server_config.app.server.world.physics.sport.height,
+                .density = server_config.app.server.world.physics.sport.density,
+                .friction = server_config.app.server.world.physics.sport.friction,
+                .restitution = server_config.app.server.world.physics.sport.restitution,
+                .linear_damping = server_config.app.server.world.physics.sport.linear_damping,
+                .angular_damping = server_config.app.server.world.physics.sport.angular_damping,
+                .min_turn_speed = server_config.app.server.world.physics.sport.min_turn_speed,
+                .acceleration = server_config.app.server.world.physics.sport.acceleration,
+                .braking_factor = server_config.app.server.world.physics.sport.braking_factor,
+                .max_speed = server_config.app.server.world.physics.sport.max_speed,
+                .drift_factor = server_config.app.server.world.physics.sport.drift_factor,
+                .turn_torque = server_config.app.server.world.physics.sport.turn_torque,
+                .mass = server_config.app.server.world.physics.sport.mass,
+                .health = server_config.app.server.world.physics.sport.health}),
         handling(0) {
 
     b2BodyDef box2d_body_definition;
@@ -125,7 +125,7 @@ void Car::detect_linear_movement() {
         box2d_body->ApplyForceToCenter(-force, true);
 
     if (moving_down)
-        box2d_body->ApplyForceToCenter(config.breaking_factor * force, true);
+        box2d_body->ApplyForceToCenter(config.braking_factor * force, true);
 
     b2Vec2 velocity = box2d_body->GetLinearVelocity();
     float current_speed = velocity.Length();

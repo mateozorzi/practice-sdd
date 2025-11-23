@@ -32,15 +32,6 @@ app:
                     blocks_file: "server/resources/world/blocks_vice_city.json"
                     bridges_file: "server/resources/world/bridges_vice_city.json"
                     decorations_file: "server/resources/world/decorations_vice_city.json"
-            sprites:
-                car:
-                    width: 0.366667  
-                    # 22.0f / 30.0f / 2.0f
-                    # WIDHT IN PIXELS OF THE SPRITE (22) / PIXELS PER METER (30) / CLIENT SPRITE UPSCALING (2x)
-
-                    height: 0.466667 
-                    # 28.0f / 30.0f / 2.0f
-                    # HEIGHT IN PIXELS OF THE SPRITE (29) / PIXELS PER METER (30) / CLIENT SPRITE UPSCALING (2x)
             positions:
                 race_start:
                     meters_x: 2.828
@@ -50,7 +41,9 @@ app:
                     density: 1.0
                     friction: 0.0
                     restitution: 0.0
-                car:
+                compact:
+                    width: 0.366667
+                    height: 0.466667 
                     density: 1.0
                     friction: 0.4
                     restitution: 0.0
@@ -58,12 +51,108 @@ app:
                     angular_damping: 2.5
                     min_turn_speed: 0.1
                     acceleration: 4.0
-                    breaking_factor: 0.3
+                    braking_factor: 0.3
+                    max_speed: 14.0
+                    drift_factor: 0.7
+                    turn_torque: 1.0
+                    mass: 1.0
+                    health: 100
+                sport:
+                    width: 0.400000
+                    height: 0.666667
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 1.5
+                    min_turn_speed: 0.1
+                    acceleration: 10.0
+                    braking_factor: 0.5
+                    max_speed: 50.0
+                    drift_factor: 0.8
+                    turn_torque: 0.6
+                    mass: 1.0
+                    health: 90
+                convertible:
+                    width: 0.366667
+                    height: 0.666667
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 2.5
+                    min_turn_speed: 0.1
+                    acceleration: 4.0
+                    braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.7
                     turn_torque: 0.03
                     mass: 1.0
-                    health: 100
+                    health: 95
+                sedan:
+                    width: 0.400000
+                    height: 0.666667
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 2.5
+                    min_turn_speed: 0.1
+                    acceleration: 4.0
+                    braking_factor: 0.3
+                    max_speed: 14.0
+                    drift_factor: 0.7
+                    turn_torque: 0.03
+                    mass: 1.0
+                    health: 95
+                jeep:
+                    width: 0.433333
+                    height: 0.650000
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 2.5
+                    min_turn_speed: 0.1
+                    acceleration: 4.0
+                    braking_factor: 0.3
+                    max_speed: 14.0
+                    drift_factor: 0.7
+                    turn_torque: 0.03
+                    mass: 1.0
+                    health: 95
+                rally:
+                    width: 0.366667
+                    height: 0.666667
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 2.5
+                    min_turn_speed: 0.1
+                    acceleration: 4.0
+                    braking_factor: 0.3
+                    max_speed: 14.0
+                    drift_factor: 0.7
+                    turn_torque: 0.03
+                    mass: 1.0
+                    health: 95
+                truck:
+                    width: 0.333333
+                    height: 0.800000
+                    density: 1.0
+                    friction: 0.4
+                    restitution: 0.0
+                    linear_damping: 1.0
+                    angular_damping: 2.5
+                    min_turn_speed: 0.1
+                    acceleration: 4.0
+                    braking_factor: 0.3
+                    max_speed: 14.0
+                    drift_factor: 0.2
+                    turn_torque: 0.5
+                    mass: 2.0
+                    health: 300
     client:
         cars:
             compact:

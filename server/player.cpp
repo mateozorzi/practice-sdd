@@ -18,7 +18,7 @@ Player::Player(uint32_t client_id, const std::string& username, b2World& box2d_w
         client_id(client_id),
         username(username),
         car(std::make_unique<Car>(client_id, box2d_world, config)),
-        health(config.app.server.world.physics.car.health),
+        health(config.app.server.world.physics.sport.health),
         races_won(0),
         in_game(false),
         in_race(false),

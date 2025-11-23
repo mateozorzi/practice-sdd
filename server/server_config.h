@@ -28,6 +28,9 @@ struct BlockPhysicsConfig {
 };
 
 struct CarPhysicsConfig {
+
+    float width;
+    float height;
     float density;
     float friction;
     float restitution;
@@ -35,17 +38,24 @@ struct CarPhysicsConfig {
     float angular_damping;  // The same that above, but when turning (lower = more turning)
     float min_turn_speed;
     float acceleration;
-    float breaking_factor;  // How strong the car brakes
+    float braking_factor;
     float max_speed;
-    float drift_factor;  // The lower = more drifting
+    float drift_factor;     // The lower = more drifting
     float turn_torque;
     float mass;
     int health;
 };
 
 struct PhysicsConfig {
+
     struct BlockPhysicsConfig block;
-    struct CarPhysicsConfig car;
+    struct CarPhysicsConfig compact;
+    struct CarPhysicsConfig sport;
+    struct CarPhysicsConfig convertible;
+    struct CarPhysicsConfig sedan;
+    struct CarPhysicsConfig jeep;
+    struct CarPhysicsConfig rally;
+    struct CarPhysicsConfig truck;
 };
 
 struct CoordinatesConfig {
@@ -55,15 +65,6 @@ struct CoordinatesConfig {
 
 struct PositionsConfig {
     struct CoordinatesConfig race_start;
-};
-
-struct CarSpritesConfig {
-    float width;
-    float height;
-};
-
-struct SpritesConfig {
-    struct CarSpritesConfig car;
 };
 
 struct WorldCollisionsConfig {
@@ -81,7 +82,6 @@ struct CollisionsConfig {
 struct WorldConfig {
     float pixels_per_meter;
     struct CollisionsConfig collisions;
-    struct SpritesConfig sprites;
     struct PositionsConfig positions;
     struct PhysicsConfig physics;
 };
