@@ -53,7 +53,7 @@ class GameLoop final: public Thread {
     void create_final_leaderboard();
     void create_leaderboard(uint8_t current_race_index);
     void send_race(const RaceDTO& race);
-    CarConfig get_car_config(const ServerConfig& config, const CarDTO& car_dto);
+    CarConfig get_car_config(const ServerConfig& server_config, const CarDTO& car_dto);
 
     bool all_player_in_game() const;
     bool player_in_race() const;

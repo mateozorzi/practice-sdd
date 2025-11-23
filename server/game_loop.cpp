@@ -97,26 +97,26 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
-CarConfig GameLoop::get_car_config(const ServerConfig& config, const CarDTO& car_dto) {
+CarConfig GameLoop::get_car_config(const ServerConfig& server_config, const CarDTO& car_dto) {
 
     std::string car_model = car_dto.model;
 
-    if (car_model == CAR_COMPACT)
-        return config.physics.compact;
-    else if (car_model == CAR_SPORT)
-        return config.physics.sport;
-    else if (car_model == CAR_CONVERTIBLE)
-        return config.physics.convertible;
-    else if (car_model == CAR_SEDAN)
-        return config.physics.sedan;
-    else if (car_model == CAR_JEEP)
-        return config.physics.jeep;
-    else if (car_model == CAR_RALLY)
-        return config.physics.rally;
-    else if (car_model == CAR_TRUCK)
-        return config.physics.truck;
+    if (car_model == server_config.physics.compact.model)
+        return server_config.physics.compact;
+    else if (car_model == server_config.physics.sport.model)
+        return server_config.physics.sport;
+    else if (car_model == server_config.physics.convertible.model)
+        return server_config.physics.convertible;
+    else if (car_model == server_config.physics.sedan.model)
+        return server_config.physics.sedan;
+    else if (car_model == server_config.physics.jeep.model)
+        return server_config.physics.jeep;
+    else if (car_model == server_config.physics.rally.model)
+        return server_config.physics.rally;
+    else if (car_model == server_config.physics.truck.model)
+        return server_config.physics.truck;
     else
-        return config.physics.compact;
+        return server_config.physics.compact;
 }
 
 

@@ -77,24 +77,24 @@ void ClientHandler::list_active_games() {
 
 void ClientHandler::send_car_catalogue() {
 
-    std::vector<std::pair<std::string, CarConfig>> car_types = {
+    std::vector<CarConfig> car_types = {
 
-        {std::string(CAR_COMPACT), server_config.physics.compact},
-        {std::string(CAR_SPORT), server_config.physics.sport},
-        {std::string(CAR_CONVERTIBLE), server_config.physics.convertible},
-        {std::string(CAR_SEDAN), server_config.physics.sedan},
-        {std::string(CAR_JEEP), server_config.physics.jeep},
-        {std::string(CAR_RALLY), server_config.physics.rally},
-        {std::string(CAR_TRUCK), server_config.physics.truck}
+        {server_config.physics.compact},
+        {server_config.physics.sport},
+        {server_config.physics.convertible},
+        {server_config.physics.sedan},
+        {server_config.physics.jeep},
+        {server_config.physics.rally},
+        {server_config.physics.truck}
     };
 
     std::vector<CarDTO> cars;
     cars.reserve(car_types.size());
 
-    for (const auto& [model, car_config] : car_types) {
+    for (const auto& car_config: car_types) {
 
         cars.emplace_back(
-            model,
+            car_config.model,
             static_cast<uint16_t>(car_config.health),
             static_cast<uint8_t>((car_config.turn_torque + car_config.drift_factor) * 100),
             static_cast<uint8_t>(car_config.max_speed),

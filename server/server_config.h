@@ -17,6 +17,7 @@ struct CollidableConfig {
 
 struct CarConfig {
 
+    std::string model;
     float width; 
     float height; 
     float density; 

@@ -125,6 +125,7 @@ void ConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& s
 
 void ConfigLoader::load_car_physics(const YAML::Node& car_node, CarConfig& car_config) {
 
+    car_config.model = car_node["model"].as<std::string>();
     car_config.width = car_node["width"].as<float>();
     car_config.height = car_node["height"].as<float>();
     car_config.density = car_node["density"].as<float>();
