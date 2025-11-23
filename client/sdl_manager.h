@@ -78,7 +78,7 @@ public:
     nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
-    void load_city(std::string& city_name);
+    void load_city(const std::string& city_name);
 };
 
 #endif

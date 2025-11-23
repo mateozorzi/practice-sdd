@@ -67,11 +67,11 @@ void Client::run() {
             snapshots.push_back(snapshot);
         }
         if (has_positions) {
-            for (auto& snapshot: snapshots) {
-                if (snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-                    last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
-                } else if (snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
-                    last_race_state = std::get<RaceDTO>(snapshot.data);
+            for (auto& game_update: snapshots) {
+                if (game_update.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+                    last_world_snapshot = std::get<WorldSnapshotDTO>(game_update.data);
+                } else if (game_update.gameloop_action == GameLoopAction::SEND_RACE) {
+                    last_race_state = std::get<RaceDTO>(game_update.data);
                     sdl_manager->load_city(last_race_state.value().city);
                 } else /*(std::holds_alternative<std::monostate>(snapshot.data))*/ {
                     // race finish by timeout

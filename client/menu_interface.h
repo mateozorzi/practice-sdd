@@ -16,7 +16,7 @@ public:
     bool waiting_room(const bool is_owner, const LobbyDTO& lobby);
     bool lobby_create(PlayerDTO& player);
     bool select_races();
-    bool create_lobby(PlayerDTO& player);
+    bool create_lobby(const PlayerDTO& player);
     bool join_lobby(PlayerDTO& player);
 };
 

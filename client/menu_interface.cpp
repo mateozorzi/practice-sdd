@@ -42,21 +42,15 @@ bool MenuInterface::car_selection(PlayerDTO& player) {
 
     QEventLoop loop;
 
-    // confirm signal, the client select the car
     QObject::connect(&sc, &SelectCars::confirm_car, [&](const CarDTO& car) {
-        // client confirm the car selection
         player.car = car;
         std::cout << "Car selected: " << player.car.model << std::endl;
-        // client send car_selected to server
         protocol.send_car_selection(car);
         car_selection = true;
         loop.quit();
     });
 
-
-    // exit signal, the client close the car selection menu, go back to lobby
     QObject::connect(&sc, &SelectCars::back_to_lobby, [&]() {
-        // client exit the car selection menu
         car_selection = false;
         loop.quit();
     });
@@ -67,6 +61,7 @@ bool MenuInterface::car_selection(PlayerDTO& player) {
 }
 
 bool MenuInterface::select_races() {
+
     protocol.ask_for_race_catalogue();
     RaceCatalogueDTO races = protocol.receive_race_catalogue();
 
@@ -77,16 +72,13 @@ bool MenuInterface::select_races() {
 
     QEventLoop loop;
 
-    // confirm signal
-    QObject::connect(&sr, &RaceSelector::confirm_races, [&](std::vector<RaceDTO> races) {
-        // send to server the races selected
+    QObject::connect(&sr, &RaceSelector::confirm_races, [&](const std::vector<RaceDTO>& races) {
         std::cout << "Races selected for the lobby: " << races.size() << std::endl;
         protocol.send_races_selection(races);
         sr.close();
         loop.quit();
     });
 
-    // close menu signal
     QObject::connect(&sr, &RaceSelector::close_menu, [&]() {
         closed = true;
         loop.quit();
@@ -97,8 +89,8 @@ bool MenuInterface::select_races() {
     return closed;
 }
 
-bool MenuInterface::create_lobby(PlayerDTO& player) {
-    // create lobby ui
+bool MenuInterface::create_lobby(const PlayerDTO& player) {
+
     CreateLobby cl;
     cl.showMaximized();
 
@@ -106,9 +98,7 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 
     QEventLoop loop;
 
-    // create lobby signal
     QObject::connect(&cl, &CreateLobby::create_lobby, [&]() {
-        // save info of ther lobby, and send to server
         std::string lobby_name = cl.get_lobby_name().toStdString();
         int max_players = cl.get_number_players();
         std::cout << player.username << " creating lobby: " << lobby_name
@@ -116,10 +106,10 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, player.id, lobby_name, max_players);
         cl.close();
 
-        // select races ui
         closed = select_races();
 
         if (closed) {
+
             loop.quit();
             return;
         }
@@ -131,7 +121,6 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
         loop.quit();
     });
 
-    // close menu signal
     QObject::connect(&cl, &CreateLobby::close_menu, [&]() {
         closed = true;
         loop.quit();
@@ -143,33 +132,25 @@ bool MenuInterface::create_lobby(PlayerDTO& player) {
 }
 
 bool MenuInterface::join_lobby(PlayerDTO& player) {
-    // client ask for available lobbies
+
     LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
     protocol.ask_for_lobbies(lobby_request);
     LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
     std::cout << "Received lobby catalogue of size: " << (int)lobbies.size << std::endl;
 
-
-    // join lobby ui
     JoinLobby jl(lobbies);
     jl.showMaximized();
 
     bool closed = false;
 
-
-    // server sends available lobbies
     QEventLoop loop;
 
-    // join lobby signal
     QObject::connect(&jl, &JoinLobby::join_lobby, [&](const LobbyDTO& lobby) {
-        // client select a lobby and send it to server
         std::cout << "Sent join lobby request for lobby ID: " << lobby.lobby_id << std::endl;
 
-        // wait for the server to confirm join
         LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, lobby.lobby_id);
         protocol.send_action_lobby(lobby_req);
-        // wait for server response
         // LobbyDTO lobby_info = protocol.receive_lobby_info();
 
         std::cout << player.username << " joined lobby ID: " << lobby.lobby_id << std::endl;
@@ -203,18 +184,13 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         }*/
     });
 
-    // refresh lobbies signal
     QObject::connect(&jl, &JoinLobby::refresh, [&]() {
-        // request lobbies to server and update ui
-
         std::cout << player.username << " refreshing available lobbies..." << std::endl;
 
-        // server sends available lobbies
         LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
         protocol.ask_for_lobbies(lobby_request);
         LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
 
-        // refresh table
         jl.fill_table(lobbies);
     });
 

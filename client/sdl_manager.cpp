@@ -340,7 +340,7 @@ void SDLManager::render_hint(const CarPositionDTO& player) {
     renderer.Copy(arrow, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
-void SDLManager::load_city(std::string& city_name) {
+void SDLManager::load_city(const std::string& city_name) {
     // todo en minusculas
 
     map_name = "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - " +
