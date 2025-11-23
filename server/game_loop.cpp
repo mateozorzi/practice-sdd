@@ -91,7 +91,7 @@ uint8_t GameLoop::get_active_players() const { return static_cast<uint8_t>(playe
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
 
-    players.try_emplace(client_id, client_id, username, box2d_world, config);
+    players.try_emplace(client_id, client_id, username);
 
     std::cerr << "[" << GAME_LOOP << "] "
               << "Player with ID: " << client_id << " has joined the game. | Username: " << username
@@ -106,26 +106,26 @@ void GameLoop::process_commands() {
     while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
-CarClientConfig GameLoop::get_car_config(const ServerConfig& config, const CarDTO& model) {
-    std::string car_model = model.model;
-    if (car_model == CAR_COMPACT) {
-        return config.app.client.cars.compact;
-    } else if (car_model == CAR_SPORT) {
-        return config.app.client.cars.sport;
-    } else if (car_model == CAR_CONVERTIBLE) {
-        return config.app.client.cars.convertible;
-    } else if (car_model == CAR_SEDAN) {
-        return config.app.client.cars.sedan;
-    } else if (car_model == CAR_JEEP) {
-        return config.app.client.cars.jeep;
-    } else if (car_model == CAR_RALLY) {
-        return config.app.client.cars.rally;
-    } else if (car_model == CAR_TRUCK) {
-        return config.app.client.cars.truck;
-    } else {
-        // default car
-        return config.app.client.cars.compact;
-    }
+CarPhysicsConfig GameLoop::get_car_config(const ServerConfig& config, const CarDTO& car_dto) {
+
+    std::string car_model = car_dto.model;
+
+    if (car_model == CAR_COMPACT)
+        return config.app.server.world.physics.compact;
+    else if (car_model == CAR_SPORT)
+        return config.app.server.world.physics.sport;
+    else if (car_model == CAR_CONVERTIBLE)
+        return config.app.server.world.physics.convertible;
+    else if (car_model == CAR_SEDAN)
+        return config.app.server.world.physics.sedan;
+    else if (car_model == CAR_JEEP)
+        return config.app.server.world.physics.jeep;
+    else if (car_model == CAR_RALLY)
+        return config.app.server.world.physics.rally;
+    else if (car_model == CAR_TRUCK)
+        return config.app.server.world.physics.truck;
+    else
+        return config.app.server.world.physics.compact;
 }
 
 
@@ -133,12 +133,12 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
     if (auto car = game_command.get_data<CarDTO>()) {
         uint32_t client_id = game_command.get_client_id();
-        CarDTO car_config = car->get();
+        CarDTO car_dto = car->get();
         auto it = players.find(client_id);
         if (it != players.end()) {
-            // depend on car_condfig.model set the car configuration from config
-            CarClientConfig cars_attribute = get_car_config(config, car_config);
-            it->second.set_car_configuration(car_config, cars_attribute);
+
+            CarPhysicsConfig car_config = get_car_config(config, car_dto);
+            it->second.create_car(car_dto, car_config, box2d_world);
             std::string model = it->second.get_car().model;
             std::cout << "Player with ID: " << it->second.get_client_id()
                       << " has car model set to: " << model << std::endl;

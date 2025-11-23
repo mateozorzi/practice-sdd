@@ -8,32 +8,18 @@
 #include "../common/constants.h"
 #include "../common/upgrade_dto.h"
 
-Car::Car(const uint32_t client_id, b2World& box2d_world, const ServerConfig& server_config):
+Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarPhysicsConfig& config):
         client_id(client_id),
         box2d_body(nullptr),
-        config({.width = server_config.app.server.world.physics.sport.width,
-                .height = server_config.app.server.world.physics.sport.height,
-                .density = server_config.app.server.world.physics.sport.density,
-                .friction = server_config.app.server.world.physics.sport.friction,
-                .restitution = server_config.app.server.world.physics.sport.restitution,
-                .linear_damping = server_config.app.server.world.physics.sport.linear_damping,
-                .angular_damping = server_config.app.server.world.physics.sport.angular_damping,
-                .min_turn_speed = server_config.app.server.world.physics.sport.min_turn_speed,
-                .acceleration = server_config.app.server.world.physics.sport.acceleration,
-                .braking_factor = server_config.app.server.world.physics.sport.braking_factor,
-                .max_speed = server_config.app.server.world.physics.sport.max_speed,
-                .drift_factor = server_config.app.server.world.physics.sport.drift_factor,
-                .turn_torque = server_config.app.server.world.physics.sport.turn_torque,
-                .mass = server_config.app.server.world.physics.sport.mass,
-                .health = server_config.app.server.world.physics.sport.health}),
-        handling(0) {
+        config(config),
+        model(model) {
 
+    std::cout << "[Car] Creating car for player " << client_id << " model: " << model << std::endl;
+    
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_dynamicBody;
-    box2d_body_definition.position.Set(
-            server_config.app.server.world.positions.race_start.meters_x,
-            server_config.app.server.world.positions.race_start.meters_y);
-    box2d_body_definition.angle = b2_pi / 2.0f;
+    box2d_body_definition.position.Set(0.0f, 0.0f);
+    box2d_body_definition.angle = 0.0f;
     box2d_body_definition.linearDamping = config.linear_damping;
     box2d_body_definition.angularDamping = config.angular_damping;
 
@@ -41,25 +27,29 @@ Car::Car(const uint32_t client_id, b2World& box2d_world, const ServerConfig& ser
 
     b2PolygonShape box2d_polygon_shape;
     box2d_polygon_shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
-
+    
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
     box2d_fixture_definition.density = config.density;
     box2d_fixture_definition.friction = config.friction;
     box2d_fixture_definition.restitution = config.restitution;
-
+    
     b2Fixture* box2d_fixture = box2d_body->CreateFixture(&box2d_fixture_definition);
-
+    
     b2Filter box2d_filter;
     box2d_filter.categoryBits = CATEGORY_CAR_GROUND;
     box2d_filter.maskBits = MASK_CAR_GROUND;
     box2d_fixture->SetFilterData(box2d_filter);
-}
-
-
-float Car::remap(float value, float inMin, float inMax, float outMin, float outMax) {
-
-    return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
+    
+    // Set mass explicitly
+    b2MassData mass_data;
+    box2d_body->GetMassData(&mass_data);
+    mass_data.mass = config.mass;
+    box2d_body->SetMassData(&mass_data);
+    
+    std::cout << "[Car] Car created with max_speed: " << config.max_speed 
+              << ", acceleration: " << config.acceleration 
+              << ", health: " << config.health << std::endl;
 }
 
 
@@ -228,6 +218,7 @@ b2Body* Car::get_body() const { return box2d_body; }
 CarLayer Car::get_layer() const { return car_layer; }
 
 
+/*
 void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
 
     config.max_speed += upgrade.speed_increase;
@@ -238,25 +229,11 @@ void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
     config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
     config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
 }
+*/
 
 
 void Car::set_collision(bool colliding) { is_colliding = colliding; }
 
-
-void Car::set_configuration(const CarDTO& car_configuration, const CarClientConfig& car) {
-
-    std::cout << "Setting car configuration for player id: " << client_id
-              << " model: " << car_configuration.model << std::endl;
-    model = car_configuration.model;
-
-    config.max_speed = car.speed;
-    config.acceleration = car.acceleration;
-    handling = car.handling;
-    config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
-    std::cout << "Turn torque set to: " << config.turn_torque << std::endl;
-    config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
-    std::cout << "Drift factor set to: " << config.drift_factor << std::endl;
-}
 
 void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
@@ -275,11 +252,14 @@ void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_co
     } else if (upgrade.upgrade == ButtonType::Handling) {
 
         std::cout << "Upgrading handling for player id: " << client_id << std::endl;
-        std::cout << "Current handling: " << handling << std::endl;
-        handling += static_cast<float>(game_config.handling_upgrade);
-        std::cout << "New handling: " << handling << std::endl;
-        config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
-        config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
+        std::cout << "Current turn_torque: " << config.turn_torque << std::endl;
+        std::cout << "Current drift_factor: " << config.drift_factor << std::endl;
+        
+        config.turn_torque += static_cast<float>(game_config.handling_upgrade) * 0.0001f;
+        config.drift_factor = std::max(0.0f, config.drift_factor - 0.05f);
+        
+        std::cout << "New turn_torque: " << config.turn_torque << std::endl;
+        std::cout << "New drift_factor: " << config.drift_factor << std::endl;
     }
 }
 

@@ -13,23 +13,22 @@
 #include "server_config.h"
 
 
-Player::Player(uint32_t client_id, const std::string& username, b2World& box2d_world,
-               const ServerConfig& config):
+Player::Player(uint32_t client_id, const std::string& username):
         client_id(client_id),
         username(username),
-        car(std::make_unique<Car>(client_id, box2d_world, config)),
-        health(config.app.server.world.physics.sport.health),
-        races_won(0),
-        in_game(false),
-        in_race(false),
-        has_finish_race(false),
-        id_next_checkpoint(1),
-        n_lap(1),
-        next(),
-        race_time(0),
-        dead(false),
-        base_health(health),
-        penalty(false) {}
+        car(nullptr) {}
+
+
+void Player::create_car(const CarDTO& car_dto, const CarPhysicsConfig& physics_config, b2World& box2d_world) {
+
+    car = std::make_unique<Car>(client_id, box2d_world, car_dto.model, physics_config);
+
+    base_health = static_cast<uint16_t>(physics_config.health);
+    health = base_health;
+
+    std::cout << "[PLAYER] Created car for player " << client_id << ": " << car_dto.model 
+              << " with health: " << health << std::endl;
+}
 
 
 uint32_t Player::get_client_id() const { return client_id; }
@@ -108,18 +107,9 @@ const CarDTO Player::get_car() const {
 bool Player::is_dead() const { return health == 0; }
 
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
-    if (car) {
-        if (upgrade.upgrade == ButtonType::Health) {
-            std::cout << "Upgrading health for player id: " << client_id << std::endl;
-            std::cout << "Current health: " << health << std::endl;
-            health += game_config.health_upgrade;
-            std::cout << "New health: " << health << std::endl;
-        } else {
-            car->set_upgrade(upgrade, game_config);
-        }
 
-        penalty = true;
-    }
+    if (car)
+        car->set_upgrade(upgrade, game_config);
 }
 
 PlayerDTO Player::get_info() const {
@@ -233,19 +223,6 @@ bool Player::is_in_game() const { return in_game; }
 
 void Player::set_in_game() { in_game = true; }
 
-
-void Player::set_car_configuration(const CarDTO& car_configuration,
-                                   const CarClientConfig& car_config) {
-    if (car) {
-        std::cout << "[Player] Setting car configuration for player " << client_id << ": "
-                  << car_configuration.model << std::endl;
-        base_health = static_cast<uint16_t>(car_config.health);
-        health = static_cast<uint16_t>(car_config.health);
-        std::cout << "[Player] Setting base health for player " << client_id << ": " << health
-                  << std::endl;
-        car->set_configuration(car_configuration, car_config);
-    }
-}
 
 CarLayer Player::get_car_layer() const {
 

@@ -32,34 +32,11 @@ constexpr uint16_t MASK_CAR_UNDER = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATE
 constexpr uint16_t MASK_SENSOR = CATEGORY_CAR_GROUND | CATEGORY_CAR_BRIDGE | CATEGORY_CAR_UNDER;
 
 
-struct CarConfig {
-
-    float width;
-    float height;
-    float density;
-    float friction;
-    float restitution;
-
-    float linear_damping;
-    float angular_damping;
-    float min_turn_speed;
-
-    float acceleration;
-    float braking_factor;
-    float max_speed;
-    float drift_factor;
-    float turn_torque;
-
-    float mass;
-    int health;
-};
-
-
 class Car {
 
     uint32_t client_id;
     b2Body* box2d_body;
-    CarConfig config;
+    CarPhysicsConfig config;
     std::string model;
 
     bool moving_up = false;
@@ -68,9 +45,6 @@ class Car {
     bool moving_right = false;
     bool is_colliding = false;
     CarLayer car_layer = CarLayer::ON_GROUND;
-    uint8_t handling;
-
-    float remap(float value, float inMin, float inMax, float outMin, float outMax);
 
     void detect_linear_movement();
     void detect_rotation();
@@ -80,7 +54,7 @@ public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;
 
-    explicit Car(uint32_t client_id, b2World& box2d_world, const ServerConfig& server_config);
+    explicit Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarPhysicsConfig& config);
 
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
 
@@ -94,10 +68,9 @@ public:
 
     CarLayer get_layer() const;
 
-    void upgrade_configuration(const UpgradeDTO& upgrade);
+    // void upgrade_configuration(const UpgradeDTO& upgrade);
 
     void set_collision(bool colliding);
-    void set_configuration(const CarDTO& car_configuration, const CarClientConfig& car_config);
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
     void set_layer(CarLayer car_layer);

@@ -24,18 +24,18 @@ class Player {
     uint32_t client_id;
     std::string username;
     std::unique_ptr<Car> car;
-    uint16_t health;
-    uint16_t races_won;
-    bool in_game;
-    bool in_race;
-    bool has_finish_race;
-    int id_next_checkpoint;
-    uint8_t n_lap;
+    uint16_t health = 0;
+    uint16_t races_won = 0;
+    bool in_game = false;
+    bool in_race = false;
+    bool has_finish_race = false;
+    int id_next_checkpoint = 1;
+    uint8_t n_lap = 1;
     CheckpointDTO next;
-    uint32_t race_time;
-    bool dead;
-    uint16_t base_health;
-    bool penalty;
+    uint32_t race_time = 0;
+    bool dead = false;
+    uint16_t base_health = 0;
+    bool penalty = false;
 
     void update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
@@ -45,8 +45,9 @@ public:
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    explicit Player(uint32_t client_id, const std::string& username, b2World& box2d_world,
-                    const ServerConfig& config);
+    explicit Player(uint32_t client_id, const std::string& username);
+
+    void create_car(const CarDTO& car_dto, const CarPhysicsConfig& car_config, b2World& box2d_world);
 
     uint32_t get_client_id() const;
     const std::string& get_username() const;
@@ -77,8 +78,6 @@ public:
     PlayerDTO get_info() const;
 
     PlayerRaceStatsDTO get_race_stats() const;
-
-    void set_car_configuration(const CarDTO& car_configuration, const CarClientConfig& car);
 
     CarLayer get_car_layer() const;
     void set_car_layer(CarLayer layer);
