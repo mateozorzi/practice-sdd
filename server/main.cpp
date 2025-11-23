@@ -19,22 +19,6 @@ constexpr std::string_view ERROR_ARGUMENTS_SERVER = "1 argument is needed: <serv
 constexpr std::string_view UNKNOWN_EXCEPTION = "Unknown exception";
 
 
-// TODO: delete
-void debug_print_config(const ServerConfig& config) {
-    std::cout << "DEBUG CONFIG FILE"
-              << "\n";
-    std::cout << "app.game.game_fps: " << config.app.game.game_fps << "\n";
-    std::cout << "app.server.world.pixels_per_meter: " << config.app.server.world.pixels_per_meter
-              << "\n";
-
-    std::cout << "app.server.world.collisions.liberty_city.blocks_file: "
-              << config.app.server.world.collisions.liberty_city.blocks_file << "\n";
-
-    std::cout << "app.client.cars.compact.health: " << config.app.client.cars.compact.health
-              << "\n";
-}
-
-
 int main(const int argc, const char* const argv[]) {
 
     if (argc != SERVER_ARGUMENTS) {
@@ -47,7 +31,6 @@ int main(const int argc, const char* const argv[]) {
 
     try {
         ServerConfig config = ConfigLoader::load_yaml(std::string(SERVER_CONFIG_FILEPATH));
-        debug_print_config(config);
 
         Server server(port, config);
         server.run();

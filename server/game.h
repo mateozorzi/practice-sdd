@@ -14,6 +14,9 @@
 #include "server_config.h"
 
 
+constexpr std::string_view GAME = "GAME";
+
+
 class Game {
 
 

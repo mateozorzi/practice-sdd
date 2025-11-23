@@ -14,6 +14,9 @@
 #include "server_config.h"
 
 
+constexpr std::string_view ACCEPTOR = "ACCEPTOR";
+
+
 class Acceptor final: public Thread {
 
 

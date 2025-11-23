@@ -12,6 +12,9 @@
 #include "server_protocol.h"
 
 
+constexpr std::string_view RECEIVER = "RECEIVER";
+
+
 class Receiver final: public Thread {
 
 

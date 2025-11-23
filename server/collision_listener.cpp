@@ -80,29 +80,23 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
     auto current_layer = player.get_car_layer();
 
     if (is_begin) {
+
         if (current_layer != CarLayer::ON_GROUND)
             return;
 
-        if (sensor_type == SensorType::ON_BRIDGE) {
+        if (sensor_type == SensorType::ON_BRIDGE)
             player.set_car_layer(CarLayer::ON_BRIDGE);
-            std::cerr << "Player with ID: " << player.get_client_id() << " is ON_BRIDGE"
-                      << std::endl;
-        } else if (sensor_type == SensorType::UNDER_BRIDGE) {
+        else if (sensor_type == SensorType::UNDER_BRIDGE)
             player.set_car_layer(CarLayer::UNDER_BRIDGE);
-            std::cerr << "Player with ID: " << player.get_client_id() << " is UNDER_BRIDGE"
-                      << std::endl;
-        }
     } else {
+
         bool should_reset =
                 (sensor_type == SensorType::ON_BRIDGE && current_layer == CarLayer::ON_BRIDGE) ||
                 (sensor_type == SensorType::UNDER_BRIDGE &&
                  current_layer == CarLayer::UNDER_BRIDGE);
 
-        if (should_reset) {
+        if (should_reset)
             player.set_car_layer(CarLayer::ON_GROUND);
-            std::cerr << "Player with ID: " << player.get_client_id() << " is ON_GROUND"
-                      << std::endl;
-        }
     }
 }
 
@@ -152,7 +146,6 @@ void CollisionListener::handle_collision(b2Contact& contact) {
     auto player_a_ptr = find_player_by_body(body_a);
     auto player_b_ptr = find_player_by_body(body_b);
 
-    // Two cars colliding
     if (player_a_ptr && player_b_ptr) {
 
         handle_two_car_collision(player_a_ptr->get(), player_b_ptr->get(), body_a, body_b,

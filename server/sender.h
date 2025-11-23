@@ -9,6 +9,9 @@
 #include "server_protocol.h"
 
 
+constexpr std::string_view SENDER = "SENDER";
+
+
 class Sender final {
 
 

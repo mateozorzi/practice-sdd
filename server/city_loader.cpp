@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "car.h"  // Should remove later
+#include "../common/constants.h"
 #include "world_creation_exception.h"
 
 

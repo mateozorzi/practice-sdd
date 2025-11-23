@@ -18,6 +18,9 @@
 #include "server_config.h"
 
 
+constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
+
+
 class GameMonitor {
 
 

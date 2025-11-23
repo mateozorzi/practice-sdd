@@ -54,7 +54,7 @@ app:
                     braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.7
-                    turn_torque: 1.0
+                    turn_torque: 0.030
                     mass: 1.0
                     health: 100
                 sport:
@@ -70,7 +70,7 @@ app:
                     braking_factor: 0.5
                     max_speed: 50.0
                     drift_factor: 0.8
-                    turn_torque: 0.6
+                    turn_torque: 0.050
                     mass: 1.0
                     health: 90
                 convertible:
@@ -86,7 +86,7 @@ app:
                     braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.7
-                    turn_torque: 0.03
+                    turn_torque: 0.040
                     mass: 1.0
                     health: 95
                 sedan:
@@ -102,7 +102,7 @@ app:
                     braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.7
-                    turn_torque: 0.03
+                    turn_torque: 0.035
                     mass: 1.0
                     health: 95
                 jeep:
@@ -118,7 +118,7 @@ app:
                     braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.7
-                    turn_torque: 0.03
+                    turn_torque: 0.025
                     mass: 1.0
                     health: 95
                 rally:
@@ -134,7 +134,7 @@ app:
                     braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.7
-                    turn_torque: 0.03
+                    turn_torque: 0.030
                     mass: 1.0
                     health: 95
                 truck:
@@ -150,7 +150,7 @@ app:
                     braking_factor: 0.3
                     max_speed: 14.0
                     drift_factor: 0.2
-                    turn_torque: 0.5
+                    turn_torque: 0.020
                     mass: 2.0
                     health: 300
     client:

@@ -3,10 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "../common/checkpoint_dto.h"
-#include "../common/client_event_dto.h"
 #include "../common/constants.h"
-#include "../common/upgrade_dto.h"
 
 Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model, const CarPhysicsConfig& config):
         client_id(client_id),

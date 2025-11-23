@@ -10,6 +10,13 @@
 #include "server_config.h"
 
 
+constexpr std::string_view SERVER = "SERVER";
+constexpr char SERVER_CMD_EXIT = 'q';
+constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
+constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
+constexpr std::string_view SERVER_CONFIG_FILEPATH = "server/resources/server_config.yaml";
+
+
 class Server {
 
     ServerConfig config;

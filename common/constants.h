@@ -28,6 +28,22 @@ enum class GameLoopAction : uint8_t {
 };
 
 
+// COLLISIONS
+constexpr uint16_t CATEGORY_GROUND = 0x0001;
+constexpr uint16_t CATEGORY_BRIDGE = 0x0002;
+constexpr uint16_t CATEGORY_CAR_GROUND = 0x0004;
+constexpr uint16_t CATEGORY_CAR_BRIDGE = 0x0008;
+constexpr uint16_t CATEGORY_CAR_UNDER = 0x0010;
+constexpr uint16_t CATEGORY_SENSOR = CATEGORY_GROUND | CATEGORY_BRIDGE;
+
+constexpr uint16_t MASK_GROUND = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATEGORY_CAR_UNDER;
+constexpr uint16_t MASK_BRIDGE = CATEGORY_BRIDGE | CATEGORY_CAR_BRIDGE;
+constexpr uint16_t MASK_CAR_GROUND = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATEGORY_CAR_UNDER;
+constexpr uint16_t MASK_CAR_BRIDGE = CATEGORY_BRIDGE | CATEGORY_CAR_BRIDGE;
+constexpr uint16_t MASK_CAR_UNDER = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATEGORY_CAR_UNDER;
+constexpr uint16_t MASK_SENSOR = CATEGORY_CAR_GROUND | CATEGORY_CAR_BRIDGE | CATEGORY_CAR_UNDER;
+
+
 // CHECKPOINTS
 constexpr char HORIZONTAL = 'H';
 constexpr char VERTICAL = 'V';
@@ -35,21 +51,6 @@ constexpr char INTERSECTION = 'I';
 
 // SERVER
 constexpr int MAX_PATH_LENGTH = 4096;
-constexpr char SERVER_CMD_EXIT = 'q';
-constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
-constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
-constexpr std::string_view SERVER_CONFIG_FILEPATH = "server/resources/server_config.yaml";
-
-// SERVER CLASSES
-constexpr std::string_view SERVER = "SERVER";
-constexpr std::string_view LOBBY = "LOBBY";
-constexpr std::string_view GAME = "GAME";
-constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
-constexpr std::string_view GAME_LOOP = "GAME_LOOP";
-constexpr std::string_view ACCEPTOR = "ACCEPTOR";
-constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
-constexpr std::string_view RECEIVER = "RECEIVER";
-constexpr std::string_view SENDER = "SENDER";
 
 // EXCEPTIONS
 constexpr std::string_view EXCEPTION = "Exception";
@@ -58,18 +59,6 @@ constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 // WORLD
 // TODO: remove, now in yaml
 constexpr float PIXELS_PER_METER = 30.0f;
-// TODO: replace with command line parameter
-constexpr std::string_view POLYGONS_LIBERTY_CITY =
-        "server/resources/world/blocks_liberty_city.json";
 
-
-// cars
-constexpr std::string_view CAR_COMPACT = "Compact";
-constexpr std::string_view CAR_SPORT = "Sport";
-constexpr std::string_view CAR_CONVERTIBLE = "Convertible";
-constexpr std::string_view CAR_SEDAN = "Sedan";
-constexpr std::string_view CAR_JEEP = "Jeep";
-constexpr std::string_view CAR_RALLY = "Rally";
-constexpr std::string_view CAR_TRUCK = "Truck";
 
 #endif

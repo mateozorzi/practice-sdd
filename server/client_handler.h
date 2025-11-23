@@ -14,6 +14,9 @@
 #include "server_config.h"
 
 
+constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
+
+
 class ClientHandler final: public Thread {
 
 
