@@ -39,4 +39,5 @@ target_sources(nfs_common
     player_race_stats_dto.h
     leaderboard_dto.h
     game_update_dto.h
+    isocket.h
     )

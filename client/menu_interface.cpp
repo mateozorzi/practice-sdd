@@ -22,8 +22,6 @@
 #include "Lobby/selectcars.h"
 #include "Lobby/waitingroom.h"
 
-#include "lobbyreceiver.h"
-
 MenuInterface::MenuInterface(ClientProtocol& protocol): protocol(protocol) {}
 
 
@@ -116,8 +114,6 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
 
         protocol.send_create_lobby(lobby);
 
-        // closed = waiting_room(true, lobby);
-
         loop.quit();
     });
 
@@ -154,8 +150,6 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
         // LobbyDTO lobby_info = protocol.receive_lobby_info();
 
         std::cout << player.username << " joined lobby ID: " << lobby.lobby_id << std::endl;
-        // jl.hide();
-        // closed = waiting_room(false, lobby);
 
         if (closed) {
             jl.show();
@@ -201,81 +195,6 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
     });
 
     loop.exec();
-
-    return closed;
-}
-
-bool MenuInterface::waiting_room(const bool is_owner, const LobbyDTO& lobby) {
-    WaitingRoom w(is_owner, lobby);
-    w.show();
-
-    bool closed = false;
-
-    LobbyReceiver lobbyReceiver(protocol, &w);
-
-    QEventLoop loop;
-
-    // lobby started signal from lobbyReceiver
-    QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, [&]() {
-        std::cout << "received lobby started signal for lobby ID: " << lobby.lobby_id << std::endl;
-        w.close();
-        loop.quit();
-    });
-
-    // lobby deleted signal from lobbyReceiver
-    QObject::connect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, [&]() {
-        std::cout << "received lobby deleted signal for lobby ID: " << lobby.lobby_id << std::endl;
-        closed = true;
-        loop.quit();
-    });
-
-    lobbyReceiver.start();
-
-    // start lobby signal
-    QObject::connect(&w, &WaitingRoom::start_lobby, [&]() {
-        std::cout << "emitting start lobby for lobby ID: " << lobby.lobby_id << std::endl;
-        LobbyDTO start(LobbyAction::START_LOBBY, lobby.lobby_id);
-        protocol.send_action_lobby(start);
-    });
-
-    // exit signal
-    QObject::connect(&w, &WaitingRoom::close_menu, [&]() {
-        std::cout << "emiting leave lobby for lobby ID: " << lobby.lobby_id << std::endl;
-        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
-        QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
-
-        LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
-        protocol.send_action_lobby(leave);
-
-        closed = true;
-        w.close();
-        loop.quit();
-        /*if (is_owner){
-            std::cout << "Owner leaving, waits for server signal to delete lobby ID: " <<
-        lobby.lobby_id << std::endl; LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
-            protocol.send_action_lobby(leave);
-        }else{
-            std::cout<<"Non-owner leaving lobby ID: " << lobby.lobby_id << std::endl;
-            QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyStarted, nullptr, nullptr);
-            QObject::disconnect(&lobbyReceiver, &LobbyReceiver::lobbyDeleted, nullptr, nullptr);
-
-            LobbyDTO leave(LobbyAction::LEAVE_LOBBY, lobby.lobby_id);
-            protocol.send_action_lobby(leave);
-
-            closed = true;
-            loop.quit();
-        }*/
-    });
-
-
-    loop.exec();
-
-    if (lobbyReceiver.is_alive()) {
-        lobbyReceiver.stop();
-        lobbyReceiver.join();
-    }
-
-    std::cout << "Is thread LobbyReceiver alive? " << lobbyReceiver.is_alive() << std::endl;
 
     return closed;
 }

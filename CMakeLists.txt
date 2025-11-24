@@ -229,6 +229,7 @@ if(NFS_TESTS)
     # (borrowed from https://google.github.io/googletest/quickstart-cmake.html)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
+    
     include(GoogleTest)
 
     # target for testing
@@ -237,7 +238,7 @@ if(NFS_TESTS)
 
     # HEY!! TODO XXX: I'm assuming that the code under testing is in nfs_common
     # Change this if you have to.
-    add_dependencies(nfs_tests nfs_common)
+    add_dependencies(nfs_tests nfs_common SDL2pp::SDL2pp)
 
     # Say where to find the xoz headers
     # HEY!! TODO XXX: add more subfolders here
@@ -255,6 +256,7 @@ if(NFS_TESTS)
         PUBLIC
         ${gtest_SOURCE_DIR}/include
         ${gmock_SOURCE_DIR}/include
+        ${libSDL2pp_SOURCE_DIR}
         )
 
     # HEY!! TODO XXX: I'm assuming that the code under testing is in nfs_common
@@ -262,5 +264,8 @@ if(NFS_TESTS)
     target_link_libraries(nfs_tests
         nfs_common
         GTest::gtest_main
+        gtest
+        gmock
+        SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer
     )
 endif()
