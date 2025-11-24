@@ -9,6 +9,8 @@
 #include <nlohmann/json_fwd.hpp>
 #include <qforeach.h>
 
+#include "game_state.h"
+
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
         mix(MIX_INIT_OGG),
@@ -149,16 +151,32 @@ void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
 
 void SDLManager::render_bridges() { render_layer(bridges_rects); }
 
-void SDLManager::render(const PlayerDTO& player, const int health,
-                        const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars,
-                        const bool is_moving) {
+void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
+
+    std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars;
+
+    for (const auto& [pid, pinfo] : game_state.players) {
+        PlayerDTO p;
+        p.id = std::stoi(pid);
+        p.car.model = pinfo.model;
+
+        CarPositionDTO pos;
+        pos.x_position = pinfo.x;
+        pos.y_position = pinfo.y;
+        pos.angle = pinfo.angle;
+        pos.layer = pinfo.layer;
+        pos.next = pinfo.checkpoint;
+
+        cars.emplace_back(p, pos);
+    }
 
     CarPositionDTO my_car;
     bool found = false;
+    uint32_t my_id = std::stoi(game_state.id);
 
     for (const auto& [car_player, car_pos]: cars) {
-        if (car_player.id == player.id) {
+        if (car_player.id == my_id) {
             my_car = car_pos;
             found = true;
             break;
@@ -173,9 +191,10 @@ void SDLManager::render(const PlayerDTO& player, const int health,
     const uint32_t pos_x = my_car.x_position;
     const uint32_t pos_y = my_car.y_position;
 
-    if (!animations.is_explosion_active(iteration_counter)) {
-        animations.start_explosion(iteration_counter, SDL2pp::Point(pos_x, pos_y));
-    }
+    /* if (!animations.is_explosion_active(iteration_counter)) {
+        animations.start_explosion(iteration_counter,
+                                   SDL2pp::Point(pos_x, pos_y));
+    } */
 
     update_camera(pos_x, pos_y);
     clear_screen();
@@ -185,7 +204,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer != CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, is_moving);
+            render_player(car_pos, car_player.car.model, true);
         }
     }
 
@@ -193,7 +212,7 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer == CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, is_moving);
+            render_player(car_pos, car_player.car.model, true);
         }
     }
 
@@ -201,15 +220,12 @@ void SDLManager::render(const PlayerDTO& player, const int health,
 
     render_checkpoints(my_car.next);
 
-    render_hud_health(health);
+    render_hud_health(game_state.player.life);
     render_hud_minimap(pos_x, pos_y);
     render_stats(cars);
     render_hint(my_car);
 
-    animations.render_explosion(iteration_counter);
-
-    // shop.render(100, Car::DEFAULT);
-
+    // animations.render_explosion(iteration_counter);
 
     show_screen();
     SDL_Delay(10);
@@ -281,6 +297,14 @@ nlohmann::json SDLManager::load_json_file(const std::string& path) {
 
 std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
+}
+
+void SDLManager::render_shop(int time) {
+    shop.render(time, Car::DEFAULT);
+}
+
+void SDLManager::close_shop() {
+    shop.close_shop();
 }
 
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {

@@ -16,6 +16,7 @@
 
 #include "animations.h"
 #include "camera.h"
+#include "game_state.h"
 #include "resource_manager.h"
 #include "sounds.h"
 #include "upgrade_shop.h"
@@ -70,8 +71,8 @@ public:
 
     void set_minimap();
     void clear_screen();
-    void render(const PlayerDTO& player, int health,
-                const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars, bool is_moving);
+    void render(LocalInfo &game_state
+    );
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
@@ -79,6 +80,9 @@ public:
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
     void load_city(const std::string& city_name);
+    void render_shop(int time);
+
+    void close_shop();
 };
 
 #endif
