@@ -225,8 +225,6 @@ void GameLoop::start_race(const RaceDTO& race) {
 
     race_active = true;
 
-    shop_phase();
-
     send_race(race);
 
     map_configuration(race.city);
@@ -382,6 +380,8 @@ void GameLoop::create_leaderboard(uint8_t current_race_index) {
     // game_monitor.broadcast(update);
 }
 
+enum GamePhase { SHOP, START_RACE, RACE, RACE_LEADERBOARD, FINAL_LEADERBOARD, FINISH_GAME };
+
 void GameLoop::run() {
 
     try {
@@ -393,70 +393,99 @@ void GameLoop::run() {
         static constexpr auto RACE_TIMEOUT = std::chrono::minutes(10);
         std::chrono::steady_clock::time_point race_start_time;
 
+        GamePhase phase = START_RACE;
+
         while (should_keep_running()) {
 
-
+            
             process_commands();
-
+            
             if (all_player_in_game()) {
+                
+                switch (phase){
+                    case SHOP:
+                        shop_phase();
+                        phase = START_RACE;
+                        break;
 
-                // start races
-                if (!race_active && current_race_index < selected_races.size) {
-                    start_race(selected_races.races[current_race_index]);
-                    race_start_time = std::chrono::steady_clock::now();
-                    continue;
-                }
 
-                if (player_in_race()) {
-                    auto current_time = std::chrono::steady_clock::now();
+                    case START_RACE:
+                    // start races
+                        if (!race_active && current_race_index < selected_races.size) {
+                            start_race(selected_races.races[current_race_index]);
+                            race_start_time = std::chrono::steady_clock::now();
+                            phase = RACE;
+                        }
+                        break;
 
-                    auto elapsed = current_time - race_start_time;
-                    uint32_t seconds =
-                            std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+                    case RACE:
+                        if (player_in_race()) {
+                        auto current_time = std::chrono::steady_clock::now();
 
-                    if (elapsed >= RACE_TIMEOUT) {
-                        // race finish by timeout
-                        // finish players who are still racing
-                        finish_race(seconds);
+                        auto elapsed = current_time - race_start_time;
+                        uint32_t seconds =
+                                std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+                        if (elapsed >= RACE_TIMEOUT) {
+                            // race finish by timeout
+                            // finish players who are still racing
+                            finish_race(seconds);
+                            continue;
+                        }
+
+                        check_alive_players(static_cast<uint32_t>(RACE_TIMEOUT_SEG));
+                        update_positions(selected_races.races[current_race_index]);
+                        check_race_times(seconds);
+                        box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+                        std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
                         continue;
-                    }
+                        }else{
+                            // if no player racing
+                            phase = RACE_LEADERBOARD;
+                        }
+                        break;
+                    
+                    case RACE_LEADERBOARD:
+                        // if no player racing, race is finished -> show results and start next one.
+                        if (race_active) {
+                            race_active = false;
 
-                    check_alive_players(static_cast<uint32_t>(RACE_TIMEOUT_SEG));
-                    update_positions(selected_races.races[current_race_index]);
-                    check_race_times(seconds);
-                    box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
-                    continue;
-                }
+                            // show player time
+                            for (const auto& [client_id, player]: players) {
+                                std::cout << "Player with ID: " << client_id
+                                            << " recorded time: " << player.get_recorded_time() << " seconds."
+                                            << std::endl;
+                            }
 
-                // if no player racing, race is finished -> show results and start next one.
-                if (race_active) {
-                    race_active = false;
+                            // create leaderboard and reset race_time to players
+                            create_leaderboard(current_race_index);
+                            // send FINISH_RACE
 
-                    // show player time
-                    for (const auto& [client_id, player]: players) {
-                        std::cout << "Player with ID: " << client_id
-                                  << " recorded time: " << player.get_recorded_time() << " seconds."
-                                  << std::endl;
-                    }
+                            // server send leaderboard to players, actual_race
+                            // push_back actual race into leaderboards, update final_leaderboard and reset
+                            // actual_race sleep to show leaderboard for some seconds, 5 seconds?
+                            current_race_index++;
 
-                    // create leaderboard and reset race_time to players
-                    create_leaderboard(current_race_index);
-                    // send FINISH_RACE
+                            if (current_race_index >= selected_races.size) {
+                                // all races finished
+                                // create and send final leaderboard
+                                phase = FINAL_LEADERBOARD;
+                            }else{
+                                phase = SHOP;
+                            }
+                        }
+                        break;
 
-                    // server send leaderboard to players, actual_race
-                    // push_back actual race into leaderboards, update final_leaderboard and reset
-                    // actual_race sleep to show leaderboard for some seconds, 5 seconds?
-                    current_race_index++;
-                }
+                    case FINAL_LEADERBOARD:
+                        create_final_leaderboard();
+                        // sleep to show final leaderboard for some seconds, 10 seconds?
+                        phase = FINISH_GAME;
+                        break;
 
-                if (current_race_index >= selected_races.size) {
-                    // all races finished
-                    // create and send final leaderboard
-                    create_final_leaderboard();
-
-                    // sleep to show final leaderboard for some seconds, 10 seconds?
-                    break;
+                    case FINISH_GAME:
+                        // end game loop
+                        this->stop();
+                        break;
                 }
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(waiting_frame_ms));
