@@ -8,14 +8,17 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../common/game_update_dto.h"
+#include "../common/leaderboard_dto.h"
 #include "../common/queue.h"
+#include "../common/race_dto.h"
+#include "../common/world_snapshot_dto.h"
 
 #include "game_command.h"
 #include "server_config.h"
-#include "../common/world_snapshot_dto.h"
-#include "../common/race_dto.h"
-#include "../common/leaderboard_dto.h"
-#include "../common/game_update_dto.h"
+
+
+constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
 
 
 class GameMonitor {

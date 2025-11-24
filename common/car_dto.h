@@ -13,7 +13,7 @@ struct CarDTO {
     uint8_t acceleration;
 
     CarDTO(const std::string& name, uint16_t health, uint8_t handling, uint8_t speed,
-            uint8_t acceleration):
+           uint8_t acceleration):
             model(name),
             health(health),
             handling(handling),

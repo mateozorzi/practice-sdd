@@ -1,215 +1,176 @@
 #include "config_loader.h"
 
-#include <iostream>
 #include <stdexcept>
 
-#include <yaml-cpp/yaml.h>
-
-ServerConfig ConfigLoader::load_yaml(const std::string& filepath) {
+ServerConfig ConfigLoader::load_yaml(const std::string& base_path) {
     try {
-        YAML::Node config = YAML::LoadFile(filepath);
 
-        if (!config["app"]) {
-            throw std::runtime_error("Missing 'app' root node in configuration file");
-        }
+        ServerConfig server_config;
 
-        ServerConfig serverConfig;
-        YAML::Node app = config["app"];
+        std::string game_path = base_path + "/game_config.yaml";
+        YAML::Node game_config = YAML::LoadFile(game_path);
+        load_game_config(game_config, server_config);
 
-        // Load game config
-        if (app["game"]) {
-            YAML::Node game = app["game"];
-            serverConfig.app.game.game_fps = game["game_fps"].as<float>();
-            serverConfig.app.game.max_concurrent_matches = game["max_concurrent_matches"].as<int>();
-            serverConfig.app.game.min_races_per_match = game["min_races_per_match"].as<int>();
-            serverConfig.app.game.max_races_per_match = game["max_races_per_match"].as<int>();
-            serverConfig.app.game.min_cars_per_match = game["min_cars_per_match"].as<int>();
-            serverConfig.app.game.max_cars_per_match = game["max_cars_per_match"].as<int>();
-            serverConfig.app.game.wait_time_between_races_seconds =
-                    game["wait_time_between_races_seconds"].as<float>();
-        }
+        std::string physics_path = base_path + "/physics_config.yaml";
+        YAML::Node physics_config = YAML::LoadFile(physics_path);
+        load_physics_config(physics_config, server_config);
 
-        // Load server config
-        if (app["server"]) {
-            YAML::Node server = app["server"];
-            serverConfig.app.server.command_queue_capacity =
-                    server["command_queue_capacity"].as<int>();
-            serverConfig.app.server.snapshot_queue_capacity =
-                    server["snapshot_queue_capacity"].as<int>();
-            serverConfig.app.server.waiting_for_players_fps =
-                    server["waiting_for_players_fps"].as<float>();
+        std::string world_path = base_path + "/world_config.yaml";
+        YAML::Node world_config = YAML::LoadFile(world_path);
+        load_world_config(world_config, server_config);
 
-            // Load world config
-            if (server["world"]) {
-                YAML::Node world = server["world"];
-                serverConfig.app.server.world.pixels_per_meter =
-                        world["pixels_per_meter"].as<float>();
-
-                // Load collisions
-                if (world["collisions"]) {
-                    YAML::Node collisions = world["collisions"];
-
-                    if (collisions["liberty_city"]) {
-                        YAML::Node lc = collisions["liberty_city"];
-                        serverConfig.app.server.world.collisions.liberty_city.blocks_file =
-                                lc["blocks_file"].as<std::string>();
-                        serverConfig.app.server.world.collisions.liberty_city.bridges_file =
-                                lc["bridges_file"].as<std::string>();
-                        serverConfig.app.server.world.collisions.liberty_city.decorations_file =
-                                lc["decorations_file"].as<std::string>();
-                    }
-
-                    if (collisions["san_andreas"]) {
-                        YAML::Node sa = collisions["san_andreas"];
-                        serverConfig.app.server.world.collisions.san_andreas.blocks_file =
-                                sa["blocks_file"].as<std::string>();
-                        serverConfig.app.server.world.collisions.san_andreas.bridges_file =
-                                sa["bridges_file"].as<std::string>();
-                        serverConfig.app.server.world.collisions.san_andreas.decorations_file =
-                                sa["decorations_file"].as<std::string>();
-                    }
-
-                    if (collisions["vice_city"]) {
-                        YAML::Node vc = collisions["vice_city"];
-                        serverConfig.app.server.world.collisions.vice_city.blocks_file =
-                                vc["blocks_file"].as<std::string>();
-                        serverConfig.app.server.world.collisions.vice_city.bridges_file =
-                                vc["bridges_file"].as<std::string>();
-                        serverConfig.app.server.world.collisions.vice_city.decorations_file =
-                                vc["decorations_file"].as<std::string>();
-                    }
-                }
-
-                // Load sprites
-                if (world["sprites"] && world["sprites"]["car"]) {
-                    YAML::Node car = world["sprites"]["car"];
-                    serverConfig.app.server.world.sprites.car.width = car["width"].as<float>();
-                    serverConfig.app.server.world.sprites.car.height = car["height"].as<float>();
-                }
-
-                // Load positions
-                if (world["positions"] && world["positions"]["race_start"]) {
-                    YAML::Node race_start = world["positions"]["race_start"];
-                    serverConfig.app.server.world.positions.race_start.meters_x =
-                            race_start["meters_x"].as<float>();
-                    serverConfig.app.server.world.positions.race_start.meters_y =
-                            race_start["meters_y"].as<float>();
-                }
-
-                // Load physics
-                if (world["physics"]) {
-                    YAML::Node physics = world["physics"];
-
-                    if (physics["block"]) {
-                        YAML::Node block = physics["block"];
-                        serverConfig.app.server.world.physics.block.density =
-                                block["density"].as<float>();
-                        serverConfig.app.server.world.physics.block.friction =
-                                block["friction"].as<float>();
-                        serverConfig.app.server.world.physics.block.restitution =
-                                block["restitution"].as<float>();
-                    }
-
-                    if (physics["car"]) {
-                        YAML::Node car = physics["car"];
-                        serverConfig.app.server.world.physics.car.density =
-                                car["density"].as<float>();
-                        serverConfig.app.server.world.physics.car.friction =
-                                car["friction"].as<float>();
-                        serverConfig.app.server.world.physics.car.restitution =
-                                car["restitution"].as<float>();
-                        serverConfig.app.server.world.physics.car.linear_damping =
-                                car["linear_damping"].as<float>();
-                        serverConfig.app.server.world.physics.car.angular_damping =
-                                car["angular_damping"].as<float>();
-                        serverConfig.app.server.world.physics.car.min_turn_speed =
-                                car["min_turn_speed"].as<float>();
-                        serverConfig.app.server.world.physics.car.acceleration =
-                                car["acceleration"].as<float>();
-                        serverConfig.app.server.world.physics.car.breaking_factor =
-                                car["breaking_factor"].as<float>();
-                        serverConfig.app.server.world.physics.car.max_speed =
-                                car["max_speed"].as<float>();
-                        serverConfig.app.server.world.physics.car.drift_factor =
-                                car["drift_factor"].as<float>();
-                        serverConfig.app.server.world.physics.car.turn_torque =
-                                car["turn_torque"].as<float>();
-                        serverConfig.app.server.world.physics.car.mass = car["mass"].as<float>();
-                        serverConfig.app.server.world.physics.car.health = car["health"].as<int>();
-                    }
-                }
-            }
-        }
-
-        // Load client config
-        if (app["client"] && app["client"]["cars"]) {
-            YAML::Node cars = app["client"]["cars"];
-
-            if (cars["compact"]) {
-                YAML::Node compact = cars["compact"];
-                serverConfig.app.client.cars.compact.health = compact["health"].as<int>();
-                serverConfig.app.client.cars.compact.handling = compact["handling"].as<int>();
-                serverConfig.app.client.cars.compact.acceleration =
-                        compact["acceleration"].as<int>();
-                serverConfig.app.client.cars.compact.speed = compact["speed"].as<int>();
-            }
-
-            if (cars["sport"]) {
-                YAML::Node sport = cars["sport"];
-                serverConfig.app.client.cars.sport.health = sport["health"].as<int>();
-                serverConfig.app.client.cars.sport.handling = sport["handling"].as<int>();
-                serverConfig.app.client.cars.sport.acceleration = sport["acceleration"].as<int>();
-                serverConfig.app.client.cars.sport.speed = sport["speed"].as<int>();
-            }
-
-            if (cars["convertible"]) {
-                YAML::Node convertible = cars["convertible"];
-                serverConfig.app.client.cars.convertible.health = convertible["health"].as<int>();
-                serverConfig.app.client.cars.convertible.handling =
-                        convertible["handling"].as<int>();
-                serverConfig.app.client.cars.convertible.acceleration =
-                        convertible["acceleration"].as<int>();
-                serverConfig.app.client.cars.convertible.speed = convertible["speed"].as<int>();
-            }
-
-            if (cars["sedan"]) {
-                YAML::Node sedan = cars["sedan"];
-                serverConfig.app.client.cars.sedan.health = sedan["health"].as<int>();
-                serverConfig.app.client.cars.sedan.handling = sedan["handling"].as<int>();
-                serverConfig.app.client.cars.sedan.acceleration = sedan["acceleration"].as<int>();
-                serverConfig.app.client.cars.sedan.speed = sedan["speed"].as<int>();
-            }
-
-            if (cars["jeep"]) {
-                YAML::Node jeep = cars["jeep"];
-                serverConfig.app.client.cars.jeep.health = jeep["health"].as<int>();
-                serverConfig.app.client.cars.jeep.handling = jeep["handling"].as<int>();
-                serverConfig.app.client.cars.jeep.acceleration = jeep["acceleration"].as<int>();
-                serverConfig.app.client.cars.jeep.speed = jeep["speed"].as<int>();
-            }
-
-            if (cars["rally"]) {
-                YAML::Node rally = cars["rally"];
-                serverConfig.app.client.cars.rally.health = rally["health"].as<int>();
-                serverConfig.app.client.cars.rally.handling = rally["handling"].as<int>();
-                serverConfig.app.client.cars.rally.acceleration = rally["acceleration"].as<int>();
-                serverConfig.app.client.cars.rally.speed = rally["speed"].as<int>();
-            }
-
-            if (cars["truck"]) {
-                YAML::Node truck = cars["truck"];
-                serverConfig.app.client.cars.truck.health = truck["health"].as<int>();
-                serverConfig.app.client.cars.truck.handling = truck["handling"].as<int>();
-                serverConfig.app.client.cars.truck.acceleration = truck["acceleration"].as<int>();
-                serverConfig.app.client.cars.truck.speed = truck["speed"].as<int>();
-            }
-        }
-
-        return serverConfig;
+        return server_config;
 
     } catch (const YAML::Exception& e) {
+
         throw std::runtime_error(std::string("YAML parsing error: ") + e.what());
     } catch (const std::exception& e) {
+
         throw std::runtime_error(std::string("Configuration loading error: ") + e.what());
+    }
+}
+
+
+void ConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& server_config) {
+
+
+    if (!config["game"])
+        throw std::runtime_error("Missing 'game' root node in game configuration file");
+
+    YAML::Node game = config["game"];
+
+    server_config.game.game_fps = game["game_fps"].as<unsigned int>();
+    server_config.game.max_concurrent_games = game["max_concurrent_games"].as<unsigned int>();
+    server_config.game.min_races_per_game = game["min_races_per_game"].as<unsigned int>();
+    server_config.game.max_races_per_game = game["max_races_per_game"].as<unsigned int>();
+    server_config.game.min_players_per_game = game["min_players_per_game"].as<unsigned int>();
+    server_config.game.max_players_per_game = game["max_players_per_game"].as<unsigned int>();
+    server_config.game.wait_time_upgrade_menu = game["wait_time_upgrade_menu"].as<unsigned int>();
+    server_config.game.wait_time_final_leaderboard =
+            game["wait_time_final_leaderboard"].as<unsigned int>();
+
+    if (game["upgrades"]) {
+
+        YAML::Node upgrades = game["upgrades"];
+        server_config.game.upgrades.health_upgrade = upgrades["health_upgrade"].as<float>();
+        server_config.game.upgrades.speed_upgrade = upgrades["speed_upgrade"].as<float>();
+        server_config.game.upgrades.acceleration_upgrade =
+                upgrades["acceleration_upgrade"].as<float>();
+        server_config.game.upgrades.handling_upgrade = upgrades["handling_upgrade"].as<float>();
+    }
+
+    if (config["server"]) {
+
+        YAML::Node server = config["server"];
+        server_config.server.server_port = server["server_port"].as<unsigned short>();
+        server_config.server.command_queue_capacity =
+                server["command_queue_capacity"].as<unsigned int>();
+        server_config.server.snapshot_queue_capacity =
+                server["snapshot_queue_capacity"].as<unsigned int>();
+        server_config.server.waiting_for_players_fps =
+                server["waiting_for_players_fps"].as<unsigned int>();
+    }
+}
+
+
+void ConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& server_config) {
+
+    if (!config["physics"])
+        throw std::runtime_error("Missing 'physics' node in physics configuration file");
+
+    YAML::Node physics = config["physics"];
+
+    if (physics["collidable"]) {
+
+        YAML::Node collidable = physics["collidable"];
+        server_config.physics.block.density = collidable["density"].as<float>();
+        server_config.physics.block.friction = collidable["friction"].as<float>();
+        server_config.physics.block.restitution = collidable["restitution"].as<float>();
+    }
+
+    if (physics["race_start"]) {
+
+        YAML::Node race_start = physics["race_start"];
+        server_config.physics.positions.race_start.meters_x = race_start["meters_x"].as<float>();
+        server_config.physics.positions.race_start.meters_y = race_start["meters_y"].as<float>();
+    }
+
+    if (physics["cars"]) {
+
+        YAML::Node cars = physics["cars"];
+
+        if (cars["compact"])
+            load_car_physics(cars["compact"], server_config.physics.compact);
+        if (cars["sport"])
+            load_car_physics(cars["sport"], server_config.physics.sport);
+        if (cars["convertible"])
+            load_car_physics(cars["convertible"], server_config.physics.convertible);
+        if (cars["sedan"])
+            load_car_physics(cars["sedan"], server_config.physics.sedan);
+        if (cars["jeep"])
+            load_car_physics(cars["jeep"], server_config.physics.jeep);
+        if (cars["rally"])
+            load_car_physics(cars["rally"], server_config.physics.rally);
+        if (cars["truck"])
+            load_car_physics(cars["truck"], server_config.physics.truck);
+    }
+}
+
+void ConfigLoader::load_car_physics(const YAML::Node& car_node, CarConfig& car_config) {
+
+    car_config.model = car_node["model"].as<std::string>();
+    car_config.width = car_node["width"].as<float>();
+    car_config.height = car_node["height"].as<float>();
+    car_config.density = car_node["density"].as<float>();
+    car_config.friction = car_node["friction"].as<float>();
+    car_config.restitution = car_node["restitution"].as<float>();
+    car_config.linear_damping = car_node["linear_damping"].as<float>();
+    car_config.angular_damping = car_node["angular_damping"].as<float>();
+    car_config.min_turn_speed = car_node["min_turn_speed"].as<float>();
+    car_config.acceleration = car_node["acceleration"].as<float>();
+    car_config.braking_factor = car_node["braking_factor"].as<float>();
+    car_config.max_speed = car_node["max_speed"].as<float>();
+    car_config.drift_factor = car_node["drift_factor"].as<float>();
+    car_config.turn_torque = car_node["turn_torque"].as<float>();
+    car_config.mass = car_node["mass"].as<float>();
+    car_config.health = car_node["health"].as<unsigned int>();
+}
+
+void ConfigLoader::load_world_config(const YAML::Node& config, ServerConfig& server_config) {
+
+    if (!config["world"])
+        throw std::runtime_error("Missing 'world' node in world configuration file");
+
+    YAML::Node world = config["world"];
+
+    server_config.world.pixels_per_meter = world["pixels_per_meter"].as<unsigned int>();
+
+    load_city(world["liberty_city"], server_config.world.liberty_city);
+    load_city(world["san_andreas"], server_config.world.san_andreas);
+    load_city(world["vice_city"], server_config.world.vice_city);
+}
+
+
+void ConfigLoader::load_city(const YAML::Node& node, CityLoaderConfig& city) {
+
+    if (node["collidables"]) {
+
+        auto c = node["collidables"];
+        city.collidables.on_ground_collidable_file = c["on_ground"].as<std::string>();
+        city.collidables.on_bridge_collidable_file = c["on_bridge"].as<std::string>();
+    }
+
+    if (node["sensors"]) {
+
+        auto s = node["sensors"];
+        city.sensors.on_bridge_sensor_file = s["on_bridge"].as<std::string>();
+        city.sensors.under_bridge_sensor_file = s["under_bridge"].as<std::string>();
+    }
+
+    if (node["object_rendering"]) {
+
+        auto obj = node["object_rendering"];
+        city.objects.bridge_file = obj["bridge"].as<std::string>();
+        city.objects.decoration_file = obj["decoration"].as<std::string>();
     }
 }

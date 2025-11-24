@@ -30,29 +30,51 @@ struct LobbyDTO {
     RaceCatalogueDTO selected_races;
 
 
-    LobbyDTO(): action(LobbyAction::CREATE_LOBBY), lobby_id(-1), lobby_name(""), max_players(0), active_players(0) {}
+    LobbyDTO():
+            action(LobbyAction::CREATE_LOBBY),
+            lobby_id(-1),
+            lobby_name(""),
+            max_players(0),
+            active_players(0) {}
 
     // create lobby
-    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name, const uint8_t max_p):
+    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name,
+                      const uint8_t max_p):
             action(act), lobby_id(id), lobby_name(name), max_players(max_p), active_players(0) {}
 
-    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name, const uint8_t max_p, const uint8_t active_p):
-        action(act), lobby_id(id), lobby_name(name), max_players(max_p), active_players(active_p) {}
+    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name,
+                      const uint8_t max_p, const uint8_t active_p):
+            action(act),
+            lobby_id(id),
+            lobby_name(name),
+            max_players(max_p),
+            active_players(active_p) {}
 
-    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name, const uint8_t max_p, const uint8_t active_p, const RaceCatalogueDTO& races):
-        action(act), lobby_id(id), lobby_name(name), max_players(max_p), active_players(active_p), selected_races(races) {}
+    explicit LobbyDTO(LobbyAction act, const uint32_t id, const std::string& name,
+                      const uint8_t max_p, const uint8_t active_p, const RaceCatalogueDTO& races):
+            action(act),
+            lobby_id(id),
+            lobby_name(name),
+            max_players(max_p),
+            active_players(active_p),
+            selected_races(races) {}
 
     // join Lobby, start, leave
     explicit LobbyDTO(LobbyAction act, const uint32_t id):
             action(act), lobby_id(id), lobby_name(""), max_players(0), active_players(0) {}
 
-    explicit LobbyDTO(LobbyAction act): action(act), lobby_id(-1), lobby_name(""), max_players(0), active_players(0) {}
+    explicit LobbyDTO(LobbyAction act):
+            action(act), lobby_id(-1), lobby_name(""), max_players(0), active_players(0) {}
 
     LobbyDTO(LobbyAction act, const std::string& name):
             action(act), lobby_id(-1), lobby_name(name), max_players(0), active_players(0) {}
 
     explicit LobbyDTO(const uint32_t id):
-            action(LobbyAction::INFO_LOBBY), lobby_id(id), lobby_name(""), max_players(0), active_players(0) {}
+            action(LobbyAction::INFO_LOBBY),
+            lobby_id(id),
+            lobby_name(""),
+            max_players(0),
+            active_players(0) {}
 };
 
 #endif  // LOBBY_DTO_H

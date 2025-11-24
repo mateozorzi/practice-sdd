@@ -18,7 +18,7 @@ signals:
     void close_menu();
 
 public:
-    JoinLobby(LobbyCatalogueDTO lobbies, QWidget* parent = nullptr);
+    explicit JoinLobby(LobbyCatalogueDTO lobbies, QWidget* parent = nullptr);
     ~JoinLobby();
 
     void fill_table(const LobbyCatalogueDTO& lobbies);

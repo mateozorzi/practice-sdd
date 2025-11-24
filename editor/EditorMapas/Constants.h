@@ -13,4 +13,4 @@
 #define INTERSECTION 'I'
 
 
-#endif // CONSTANTS_H
+#endif  // CONSTANTS_H

@@ -3,8 +3,8 @@
 #include <chrono>
 #include <thread>
 
-#include "../common/liberror.h"
 #include "../common/game_update_dto.h"
+#include "../common/liberror.h"
 
 
 Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
@@ -25,23 +25,23 @@ void Sender::run() {
             try {
 
                 auto variant_snapshot = snapshot_queue.pop();
-                
-                if (variant_snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS){
-                    //WorldSnapshotDTO
-                    //std::cout<< "[SENDER] Sending WorldSnapshotDTO to client: " << client_id << std::endl;
+
+                if (variant_snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+                    // WorldSnapshotDTO
+                    // std::cout<< "[SENDER] Sending WorldSnapshotDTO to client: " << client_id <<
+                    // std::endl;
                     this->server_protocol.send_world_snapshot(variant_snapshot);
-                }else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_RACE){
-                    //RaceDTO
-                    std::cout<< "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
+                } else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
+                    // RaceDTO
+                    std::cout << "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
                     this->server_protocol.send_race_update(variant_snapshot);
-                }else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD){
+                } else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
                     this->server_protocol.send_leaderboard_update(variant_snapshot);
-                }else if (std::holds_alternative<std::monostate>(variant_snapshot.data)){
-                    //if data is type monostate, send gameloopaction
+                } else if (std::holds_alternative<std::monostate>(variant_snapshot.data)) {
+                    // if data is type monostate, send gameloopaction
                     this->server_protocol.send_game_action(variant_snapshot);
-                
                 }
-                //std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
+                // std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
 
             } catch (const ClosedQueue&) {
 

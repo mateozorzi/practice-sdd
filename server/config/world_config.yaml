@@ -1,0 +1,45 @@
+world:
+
+  pixels_per_meter: 30
+
+
+  liberty_city:
+    collidables:
+      on_ground: "server/world/collidables/on_ground_collidables_liberty_city.json"
+      on_bridge: "server/world/collidables/on_bridge_collidables_liberty_city.json"
+
+    sensors:
+      on_bridge: "server/world/sensors/on_bridge_sensors_liberty_city.json"
+      under_bridge: "server/world/sensors/under_bridge_sensors_liberty_city.json"
+
+    object_rendering:
+      bridge: "server/world/object_rendering/bridges_liberty_city.json"
+      decoration: "server/world/object_rendering/decorations_liberty_city.json"
+
+
+  san_andreas:
+    collidables:
+      on_ground: "server/world/collidables/on_ground_collidables_san_andreas.json"
+      on_bridge: "server/world/collidables/on_bridge_collidables_san_andreas.json"
+
+    sensors:
+      on_bridge: "server/world/sensors/on_bridge_sensors_san_andreas.json"
+      under_bridge: "server/world/sensors/under_bridge_sensors_san_andreas.json"
+
+    object_rendering:
+      bridge: "server/world/object_rendering/bridges_san_andreas.json"
+      decoration: "server/world/object_rendering/decorations_san_andreas.json"
+
+
+  vice_city:
+    collidables:
+      on_ground: "server/world/collidables/on_ground_collidables_vice_city.json"
+      on_bridge: "server/world/collidables/on_bridge_collidables_vice_city.json"
+
+    sensors:
+      on_bridge: "server/world/sensors/on_bridge_sensors_vice_city.json"
+      under_bridge: "server/world/sensors/under_bridge_sensors_vice_city.json"
+
+    object_rendering:
+      bridge: "server/world/object_rendering/bridges_vice_city.json"
+      decoration: "server/world/object_rendering/decorations_vice_city.json"

@@ -1,8 +1,9 @@
 #ifndef ANIMATIONS_H
 #define ANIMATIONS_H
+#include <optional>
+
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
-#include <optional>
 
 #include "camera.h"
 #include "resource_manager.h"

@@ -1,16 +1,15 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
-#include <QString>
 #include <QPoint>
+#include <QString>
 #include <QWidget>
 
-class Messages
-{
+class Messages {
 public:
     Messages();
     void checkpoint_message(QWidget* parent, QString title, QString body, QPoint point);
     void message_no_args(QWidget* parent, QString title, QString body);
 };
 
-#endif // MESSAGES_H
+#endif  // MESSAGES_H

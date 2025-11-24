@@ -10,8 +10,8 @@
 #include <SDL2pp/SDL2pp.hh>
 
 #include "../common/car_position_dto.h"
-#include "../common/player_dto.h"
 #include "../common/game_update_dto.h"
+#include "../common/player_dto.h"
 
 #include "menu_interface.h"
 
@@ -20,7 +20,7 @@ Client::Client(const std::string& hostname, const std::string& servname):
         sdl_manager(nullptr),
         protocol(client_socket),
         receiver(protocol),
-        input_manager( *sdl_manager, protocol),
+        input_manager(*sdl_manager, protocol),
         menu(protocol),
         client_id(0) {}
 
@@ -56,8 +56,7 @@ void Client::run() {
             return;
         }
         // Obtener posiciones
-        Queue<GameUpdateDTO>& car_queue =
-                receiver.get_car_positions_queue();
+        Queue<GameUpdateDTO>& car_queue = receiver.get_car_positions_queue();
 
         bool has_positions = false;
         std::vector<GameUpdateDTO> snapshots;
@@ -65,17 +64,17 @@ void Client::run() {
 
         while (car_queue.try_pop(snapshot)) {
             has_positions = true;
-            snapshots.push_back(snapshot); 
+            snapshots.push_back(snapshot);
         }
-        if (has_positions) { 
-            for(auto& snapshot : snapshots){
-                if (snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-                    last_world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
-                } else if (snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
-                    last_race_state = std::get<RaceDTO>(snapshot.data);
+        if (has_positions) {
+            for (auto& game_update: snapshots) {
+                if (game_update.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+                    last_world_snapshot = std::get<WorldSnapshotDTO>(game_update.data);
+                } else if (game_update.gameloop_action == GameLoopAction::SEND_RACE) {
+                    last_race_state = std::get<RaceDTO>(game_update.data);
                     sdl_manager->load_city(last_race_state.value().city);
-                }else /*(std::holds_alternative<std::monostate>(snapshot.data))*/ {
-                    //race finish by timeout
+                } else /*(std::holds_alternative<std::monostate>(snapshot.data))*/ {
+                    // race finish by timeout
                 }
             }
         }
@@ -85,7 +84,8 @@ void Client::run() {
         if (last_world_snapshot.has_value()) {
             car_positions = last_world_snapshot.value().get_car_positions();
         }
-        //std::cout << "[Client] next checkpoint id for player " << player.id << ": " << static_cast<int>(car_positions[0].second.next.id) << std::endl;
+        // std::cout << "[Client] next checkpoint id for player " << player.id << ": " <<
+        // static_cast<int>(car_positions[0].second.next.id) << std::endl;
 
         sdl_manager->render(player, health, car_positions, input_manager.is_moving());
     }

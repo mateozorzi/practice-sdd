@@ -5,19 +5,20 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "../common/game_command_dto.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/race_catalogue_dto.h"
 #include "../common/thread.h"
 
-#include "city.h"
+#include "city_loader.h"
 #include "collision_listener.h"
 #include "game_monitor.h"
 #include "player.h"
 #include "server_config.h"
-#include "../common/race_catalogue_dto.h"
-#include "../common/leaderboard_dto.h"
 
-
+constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr float GAME_STEP = 1.0f / 60.0f;
 constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
@@ -25,16 +26,16 @@ constexpr int POSITION_ITERATIONS = 6;
 
 class GameLoop final: public Thread {
 
+    std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
 
     const uint8_t max_players;
     const ServerConfig& config;
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
-    b2World world;
-    City city_world;
+    b2World box2d_world;
+    CityLoader city_loader;
     std::unordered_map<uint32_t, Player> players;
     CollisionListener collision_listener;
-    std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
     RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO final_leaderboard;
@@ -52,12 +53,12 @@ class GameLoop final: public Thread {
     void create_final_leaderboard();
     void create_leaderboard(uint8_t current_race_index);
     void send_race(const RaceDTO& race);
-    CarClientConfig get_car_config(const ServerConfig& config, CarDTO model);
+    CarConfig get_car_config(const ServerConfig& server_config, const CarDTO& car_dto);
 
     bool all_player_in_game() const;
     bool player_in_race() const;
 
-    void map_configuration(const std::string& city);
+    void map_configuration(const std::string& city_name);
     void shop_phase();
 
 

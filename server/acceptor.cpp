@@ -6,8 +6,8 @@
 #include "../common/liberror.h"
 
 
-Acceptor::Acceptor(const std::string& port, Lobby& lobby, const ServerConfig& config):
-        acceptor_socket(port.c_str()), lobby(lobby), config(config) {}
+Acceptor::Acceptor(const std::string& port, Lobby& lobby, const ServerConfig& server_config):
+        acceptor_socket(port.c_str()), lobby(lobby), server_config(server_config) {}
 
 
 void Acceptor::run() {
@@ -19,12 +19,13 @@ void Acceptor::run() {
             Socket peer_socket = acceptor_socket.accept();
             reap();
             client_id++;
-            std::unique_ptr<ClientHandler> client =
-                    std::make_unique<ClientHandler>(std::move(peer_socket), lobby, client_id, config);
+            std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(
+                    std::move(peer_socket), lobby, client_id, server_config);
             client->start();
             clients.push_back(std::move(client));
-            std::cout << "[" << ACCEPTOR << "] " << "New client has been accepted. Number of active clients: " << clients.size()
-                      << std::endl;
+            std::cout << "[" << ACCEPTOR << "] "
+                      << "New client has been accepted. Number of active clients: "
+                      << clients.size() << std::endl;
         } catch (const std::exception& e) {
 
             if (!should_keep_running())
@@ -41,7 +42,8 @@ void Acceptor::reap() {
         if (!client->is_alive()) {
 
             client->join();
-            std::cout << "[" << ACCEPTOR << "] " << "Reaping dead client." << std::endl;
+            std::cout << "[" << ACCEPTOR << "] "
+                      << "Reaping dead client." << std::endl;
             return true;
         }
 
@@ -53,8 +55,11 @@ void Acceptor::reap() {
 
 void Acceptor::clear() {
 
-    for (auto& client: clients)
+    for (auto& client: clients) {
+
+        client->stop();
         client->join();
+    }
 
     clients.clear();
 }

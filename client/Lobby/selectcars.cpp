@@ -1,27 +1,30 @@
 #include "selectcars.h"
 
-#include "ui_selectcars.h"
-#include "../../common/car_dto.h"
-#include "../../common/car_catalogue_dto.h"
 #include <QLabel>
-#include <QProgressBar>
-#include <iostream>
 #include <QListWidget>
+#include <QProgressBar>
+#include <algorithm>
+#include <iostream>
+
+#include "../../common/car_catalogue_dto.h"
+#include "../../common/car_dto.h"
+
+#include "ui_selectcars.h"
 
 #define MAX_IMG 64
 
 SelectCars::SelectCars(CarCatalogueDTO& catalogue, QWidget* parent):
-        QMainWindow(parent)
-        , ui(new Ui::SelectCars)
-        , catalogue(catalogue)
-        , actual_car(CarDTO())
-{
+        QMainWindow(parent), ui(new Ui::SelectCars), catalogue(catalogue), actual_car(CarDTO()) {
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
 
     value_format();
     QStringList colLabels;
-    colLabels <<"Name" << "Health" << "Handling" << "Acceleration" << "Speed";
+    colLabels << "Name"
+              << "Health"
+              << "Handling"
+              << "Acceleration"
+              << "Speed";
     ui->Carinfo->setRowCount(colLabels.size());
     ui->Carinfo->setColumnCount(1);
     ui->Carinfo->setVerticalHeaderLabels(colLabels);
@@ -38,7 +41,6 @@ SelectCars::SelectCars(CarCatalogueDTO& catalogue, QWidget* parent):
     set_market();
 
     onCarChosen(catalogue.cars[0]);
-
 }
 
 SelectCars::~SelectCars() {
@@ -46,13 +48,12 @@ SelectCars::~SelectCars() {
     delete scene;
 }
 
-void SelectCars::on_Exit_clicked()
-{
+void SelectCars::on_Exit_clicked() {
     emit back_to_lobby();
     this->close();
 }
 
-void SelectCars::value_format(){
+void SelectCars::value_format() {
     QString style = R"(
     QTableWidget#Carinfo {
         background-color: transparent;
@@ -97,7 +98,7 @@ CarDTO SelectCars::inspect_catalogue() {
     int maxAcceleration = 0;
     int maxSpeed = 0;
 
-    for (const CarDTO& car : catalogue.cars) {
+    for (const CarDTO& car: catalogue.cars) {
         maxHealth = std::max(maxHealth, (int)car.health);
         maxHandling = std::max(maxHandling, (int)car.handling);
         maxAcceleration = std::max(maxAcceleration, (int)car.acceleration);
@@ -118,19 +119,22 @@ CarDTO SelectCars::normalize_value_car(const CarDTO& car, const CarDTO& normaliz
     int accelaration_normalized = 0;
     int speed_normalized = 0;
 
-    if (static_cast<int>(normalized.health) > 0){
-        health_normalized = (static_cast<int>(car.health) * 100) / static_cast<int>(normalized.health);
+    if (static_cast<int>(normalized.health) > 0) {
+        health_normalized =
+                (static_cast<int>(car.health) * 100) / static_cast<int>(normalized.health);
     }
 
-    if (static_cast<int>(normalized.handling) > 0){
-        handling_normalized = (static_cast<int>(car.handling) * 100) / static_cast<int>(normalized.handling);
+    if (static_cast<int>(normalized.handling) > 0) {
+        handling_normalized =
+                (static_cast<int>(car.handling) * 100) / static_cast<int>(normalized.handling);
     }
 
-    if (static_cast<int>(normalized.acceleration) > 0){
-        accelaration_normalized = (static_cast<int>(car.acceleration) * 100) / static_cast<int>(normalized.acceleration);
+    if (static_cast<int>(normalized.acceleration) > 0) {
+        accelaration_normalized = (static_cast<int>(car.acceleration) * 100) /
+                                  static_cast<int>(normalized.acceleration);
     }
 
-    if (static_cast<int>(normalized.speed) > 0){
+    if (static_cast<int>(normalized.speed) > 0) {
         speed_normalized = (static_cast<int>(car.speed) * 100) / static_cast<int>(normalized.speed);
     }
 
@@ -142,7 +146,7 @@ CarDTO SelectCars::normalize_value_car(const CarDTO& car, const CarDTO& normaliz
     return CarDTO(car.model, health, handling, speed, acceleration);
 }
 
-void SelectCars::onCarChosen(const CarDTO& car){
+void SelectCars::onCarChosen(const CarDTO& car) {
     actual_car = car;
     ui->Carinfo->clearContents();
 
@@ -196,8 +200,7 @@ QString SelectCars::getProgressBarStyle(const int value) {
         color = "#2ecc71";
     }
 
-    return QString(
-                   "QProgressBar {"
+    return QString("QProgressBar {"
                    "   border: 2px solid #7f8c8d;"
                    "   border-radius: 8px;"
                    "   background: #ecf0f1;"
@@ -206,11 +209,11 @@ QString SelectCars::getProgressBarStyle(const int value) {
                    "QProgressBar::chunk {"
                    "   background-color: %1;"
                    "   border-radius: 6px;"
-                   "}"
-                   ).arg(color);
+                   "}")
+            .arg(color);
 }
 
-void SelectCars::set_market(){
+void SelectCars::set_market() {
     ui->img_cars->setViewMode(QListWidget::IconMode);
     ui->img_cars->setFlow(QListWidget::LeftToRight);
     ui->img_cars->setWrapping(true);
@@ -223,7 +226,7 @@ void SelectCars::set_market(){
     ui->img_cars->setIconSize(QSize(120, 120));
     ui->img_cars->clear();
 
-    for (const CarDTO& car : catalogue.cars) {
+    for (const CarDTO& car: catalogue.cars) {
         QListWidgetItem* item = new QListWidgetItem();
 
         QString path = ":/cars/images/" + QString::fromStdString(car.model) + ".png";
@@ -247,33 +250,30 @@ void SelectCars::set_market(){
         }
     });
 
-    ui->img_cars->setStyleSheet(
-            "QListWidget {"
-            "   background: transparent;"
-            "   border: none;"
-            "}"
-            "QListWidget::item {"
-            "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #34495e, stop:1 #2c3e50);"
-            "   color: white;"
-            "   font-weight: bold;"
-            "   border-radius: 10px;"
-            "   border: 2px solid #7f8c8d;"
-            "   padding: 5px;"
-            "}"
-            "QListWidget::item:hover {"
-            "   border: 2px solid #e74c3c;"
-            "   background: #2c3e50;"
-            "}"
-            "QListWidget::item:selected {"
-            "   border: 3px solid #e74c3c;"
-            "   background: #2c3e50;"
-            "}"
-            );
+    ui->img_cars->setStyleSheet("QListWidget {"
+                                "   background: transparent;"
+                                "   border: none;"
+                                "}"
+                                "QListWidget::item {"
+                                "   background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 "
+                                "#34495e, stop:1 #2c3e50);"
+                                "   color: white;"
+                                "   font-weight: bold;"
+                                "   border-radius: 10px;"
+                                "   border: 2px solid #7f8c8d;"
+                                "   padding: 5px;"
+                                "}"
+                                "QListWidget::item:hover {"
+                                "   border: 2px solid #e74c3c;"
+                                "   background: #2c3e50;"
+                                "}"
+                                "QListWidget::item:selected {"
+                                "   border: 3px solid #e74c3c;"
+                                "   background: #2c3e50;"
+                                "}");
 }
 
-void SelectCars::on_Select_clicked()
-{
-    //emit car selection
+void SelectCars::on_Select_clicked() {
+    // emit car selection
     emit confirm_car(actual_car);
 }
-

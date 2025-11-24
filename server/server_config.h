@@ -3,31 +3,23 @@
 
 #include <string>
 
-// Innermost structs first (no dependencies)
-struct CarClientConfig {
-    float health;
-    float handling;
-    float acceleration;
-    float speed;
-};
 
-struct CarDefaults {
-    struct CarClientConfig compact;
-    struct CarClientConfig sport;
-    struct CarClientConfig convertible;
-    struct CarClientConfig sedan;
-    struct CarClientConfig jeep;
-    struct CarClientConfig rally;
-    struct CarClientConfig truck;
-};
+// ============================================================================
+// PHYSICS CONFIGURATION STRUCTS
+// ============================================================================
 
-struct BlockPhysicsConfig {
+struct CollidableConfig {
+
     float density;
     float friction;
     float restitution;
 };
 
-struct CarPhysicsConfig {
+struct CarConfig {
+
+    std::string model;
+    float width;
+    float height;
     float density;
     float friction;
     float restitution;
@@ -35,96 +27,122 @@ struct CarPhysicsConfig {
     float angular_damping;  // The same that above, but when turning (lower = more turning)
     float min_turn_speed;
     float acceleration;
-    float breaking_factor;  // How strong the car brakes
+    float braking_factor;
     float max_speed;
     float drift_factor;  // The lower = more drifting
     float turn_torque;
     float mass;
-    int health;
+    unsigned int health;
 };
 
-struct PhysicsConfig {
-    struct BlockPhysicsConfig block;
-    struct CarPhysicsConfig car;
-};
+struct RaceStartPosition {
 
-struct CoordinatesConfig {
     float meters_x;
     float meters_y;
 };
 
 struct PositionsConfig {
-    struct CoordinatesConfig race_start;
+
+    struct RaceStartPosition race_start;
 };
 
-struct CarSpritesConfig {
-    float width;
-    float height;
+struct PhysicsConfig {
+
+    struct CollidableConfig block;
+    struct PositionsConfig positions;
+    struct CarConfig compact;
+    struct CarConfig sport;
+    struct CarConfig convertible;
+    struct CarConfig sedan;
+    struct CarConfig jeep;
+    struct CarConfig rally;
+    struct CarConfig truck;
 };
 
-struct SpritesConfig {
-    struct CarSpritesConfig car;
+
+// ============================================================================
+// WORLD CONFIGURATION STRUCTS
+// ============================================================================
+
+struct CollidableFiles {
+
+    std::string on_ground_collidable_file;
+    std::string on_bridge_collidable_file;
 };
 
-struct WorldCollisionsConfig {
-    std::string blocks_file;
-    std::string bridges_file;
-    std::string decorations_file;
+struct SensorFiles {
+
+    std::string on_bridge_sensor_file;
+    std::string under_bridge_sensor_file;
 };
 
-struct CollisionsConfig {
-    struct WorldCollisionsConfig liberty_city;
-    struct WorldCollisionsConfig san_andreas;
-    struct WorldCollisionsConfig vice_city;
+struct ObjectRenderingFiles {
+
+    std::string bridge_file;
+    std::string decoration_file;
+};
+
+struct CityLoaderConfig {
+
+    struct CollidableFiles collidables;
+    struct SensorFiles sensors;
+    struct ObjectRenderingFiles objects;
 };
 
 struct WorldConfig {
-    float pixels_per_meter;
-    struct CollisionsConfig collisions;
-    struct SpritesConfig sprites;
-    struct PositionsConfig positions;
-    struct PhysicsConfig physics;
+
+    unsigned int pixels_per_meter;
+    struct CityLoaderConfig liberty_city;
+    struct CityLoaderConfig san_andreas;
+    struct CityLoaderConfig vice_city;
 };
 
+
+// ============================================================================
+// GAME CONFIGURATION STRUCTS
+// ============================================================================
+
 struct UpgradeConfig {
+
     float health_upgrade;
     float speed_upgrade;
     float acceleration_upgrade;
     float handling_upgrade;
 };
 
-// game = both server and client
 struct GameConfig {
-    float game_fps;
-    unsigned int max_concurrent_matches;
-    unsigned int min_races_per_match;
-    unsigned int max_races_per_match;
-    unsigned int min_cars_per_match;
-    unsigned int max_cars_per_match;
-    float wait_time_between_races_seconds;
+
+    unsigned int game_fps;
+    unsigned int max_concurrent_games;
+    unsigned int min_races_per_game;
+    unsigned int max_races_per_game;
+    unsigned int min_players_per_game;
+    unsigned int max_players_per_game;
+    unsigned int wait_time_upgrade_menu;
+    unsigned int wait_time_final_leaderboard;
     struct UpgradeConfig upgrades;
 };
 
-struct ClientSpecificConfig {
-    struct CarDefaults cars;
-};
-
 struct ServerSpecificConfig {
-    // unsigned short      default_server_port;
-    float command_queue_capacity;
-    float snapshot_queue_capacity;
-    float waiting_for_players_fps;
-    struct WorldConfig world;
+
+    unsigned short server_port;
+    unsigned int command_queue_capacity;
+    unsigned int snapshot_queue_capacity;
+    unsigned int waiting_for_players_fps;
 };
 
-struct ServerConfigDef {
-    struct GameConfig game;
-    struct ServerSpecificConfig server;
-    struct ClientSpecificConfig client;
-};
+// ============================================================================
+// ROOT CONFIGURATION STRUCT
+// ============================================================================
 
 struct ServerConfig {
-    struct ServerConfigDef app;
+
+    struct PhysicsConfig physics;
+
+    struct WorldConfig world;
+
+    struct GameConfig game;
+    struct ServerSpecificConfig server;
 };
 
 #endif  // SERVER_CONFIG_H

@@ -2,8 +2,9 @@
 
 #include <optional>
 
-UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources, Sounds& sounds, int window_width, int window_height,
-                         const std::string& font_path) :
+UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
+                         ResourceManager& resources, Sounds& sounds, int window_width,
+                         int window_height, const std::string& font_path):
         renderer(renderer),
         mixer(mixer),
         resources(resources),
@@ -159,4 +160,3 @@ std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
 
     return std::nullopt;
 }
-

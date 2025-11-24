@@ -2,6 +2,8 @@
 #define RACESELECTOR_H
 
 #include <QMainWindow>
+#include <vector>
+
 #include "../../common/race_catalogue_dto.h"
 #include "../../common/race_dto.h"
 

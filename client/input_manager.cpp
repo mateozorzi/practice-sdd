@@ -1,6 +1,8 @@
 #include "input_manager.h"
 
-InputManager::InputManager(SDLManager& sdl, ClientProtocol& protocol): sdl(sdl), sender(protocol) { sender.start(); }
+InputManager::InputManager(SDLManager& sdl, ClientProtocol& protocol): sdl(sdl), sender(protocol) {
+    sender.start();
+}
 
 bool InputManager::try_move(bool& movement, const MovementDTO move) {
     if (!movement) {
@@ -56,7 +58,7 @@ bool InputManager::handle_keyup(const SDL_Event& event) {
     }
 }
 
-bool InputManager::handle_click(const SDL_Event &event, int time) {
+bool InputManager::handle_click(const SDL_Event& event, int time) {
     if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT && !click_buy) {
         click_buy = true;
 
@@ -92,7 +94,7 @@ bool InputManager::handle_click(const SDL_Event &event, int time) {
     return false;
 }
 
-bool InputManager::handle_shop_movement(const SDL_Event &event, int time) {
+bool InputManager::handle_shop_movement(const SDL_Event& event, int time) {
     if (event.type == SDL_MOUSEMOTION) {
         int mouse_x = event.motion.x;
         int mouse_y = event.motion.y;

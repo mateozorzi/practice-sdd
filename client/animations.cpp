@@ -1,7 +1,7 @@
 #include "animations.h"
 
-Animations::Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources) : renderer(renderer), camera(camera),
-    resources(resources) {}
+Animations::Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources):
+        renderer(renderer), camera(camera), resources(resources) {}
 
 void Animations::start_explosion(int current_it, SDL2pp::Point position) {
     if (!explosion.has_value()) {
@@ -51,24 +51,17 @@ void Animations::render_explosion(int current_it) {
     int screen_x = (animation.position.GetX() - view.x) * 1920 / view.w;
     int screen_y = (animation.position.GetY() - view.y) * 1920 / view.h;
 
-    SDL2pp::Rect dst(screen_x - animation.scale_size / 2, screen_y - animation.scale_size, animation.scale_size, animation.scale_size);
-    if (!camera.on_screen(dst)) return;
+    SDL2pp::Rect dst(screen_x - animation.scale_size / 2, screen_y - animation.scale_size,
+                     animation.scale_size, animation.scale_size);
+    if (!camera.on_screen(dst))
+        return;
 
-    SDL2pp::Rect explosion_world(
-    animation.position.GetX() - animation.frame_size/2,
-    animation.position.GetY() - animation.frame_size/2,
-    animation.frame_size,
-    animation.frame_size
-    );
+    SDL2pp::Rect explosion_world(animation.position.GetX() - animation.frame_size / 2,
+                                 animation.position.GetY() - animation.frame_size / 2,
+                                 animation.frame_size, animation.frame_size);
 
     if (!camera.on_screen(explosion_world))
         return;
 
     renderer.Copy(sheet, src, dst);
 }
-
-
-
-
-
-

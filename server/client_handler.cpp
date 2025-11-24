@@ -1,7 +1,9 @@
 #include "client_handler.h"
 
+#include <algorithm>
 #include <iostream>
 #include <utility>
+#include <vector>
 
 #include "../common/liberror.h"
 #include "../common/lobbies_catalogue_dto.h"
@@ -9,12 +11,13 @@
 
 
 ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client_id,
-                             const ServerConfig& config):
+                             const ServerConfig& server_config):
         peer_socket(std::move(peer_socket)),
         server_protocol(this->peer_socket),
         lobby(lobby),
-        config(config),
-        client_id(client_id), selected_races() {}
+        server_config(server_config),
+        client_id(client_id),
+        selected_races() {}
 
 
 void ClientHandler::launch_lobby() {
@@ -39,11 +42,9 @@ void ClientHandler::launch_lobby() {
                     join_existing_game(client_id, lobby_dto.lobby_id);
                     break;
                 case LobbyAction::LIST_RACES:
-                    std::cout<<"Client with ID: " << client_id << " requested races catalogue." << std::endl;
                     list_load_races();
                     break;
                 case LobbyAction::SEND_RACE_SELECTION:
-                    std::cout<<"Client with ID: " << client_id << " sent race selection." << std::endl;
                     select_races(lobby_dto);
                     break;
                 case LobbyAction::LEAVE_LOBBY:
@@ -65,9 +66,6 @@ void ClientHandler::update_player_username(const std::string& actual_username) {
 
     username = actual_username;
 
-    std::cerr << "[" << CLIENT_HANDLER << "] " << "Updated username for client with ID: " << client_id
-        << " to: " << username << std::endl;
-    
     server_protocol.send_client_id(client_id);
 }
 
@@ -76,15 +74,42 @@ void ClientHandler::list_active_games() {
 
     lobby.reap();
     server_protocol.send_lobby_catalogue(lobby.list_games());
-    std::cerr << "[" << CLIENT_HANDLER << "] " << "Sent lobby catalogue to client with ID: " << client_id
-        << std::endl;
 }
 
+
+void ClientHandler::send_car_catalogue() {
+
+    std::vector<CarConfig> car_types = {
+
+            {server_config.physics.compact},     {server_config.physics.sport},
+            {server_config.physics.convertible}, {server_config.physics.sedan},
+            {server_config.physics.jeep},        {server_config.physics.rally},
+            {server_config.physics.truck}};
+
+    std::vector<CarDTO> cars;
+    cars.reserve(car_types.size());
+
+    std::transform(car_types.begin(), car_types.end(), std::back_inserter(cars),
+                   [](const auto& car_config) {
+                       return CarDTO(
+                               car_config.model, static_cast<uint16_t>(car_config.health),
+                               static_cast<uint8_t>(
+                                       (car_config.turn_torque + car_config.drift_factor) * 100),
+                               static_cast<uint8_t>(car_config.max_speed),
+                               static_cast<uint8_t>(car_config.acceleration));
+                   });
+
+    CarCatalogueDTO catalogue(std::move(cars));
+    server_protocol.send_car_catalogue(catalogue);
+}
+
+
 void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
-                               Queue<GameUpdateDTO>& snapshot_queue) {
+                                        Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
-    Receiver receiver(server_protocol, lobby, client_id, command_queue, config);
+    send_car_catalogue();
+    Receiver receiver(server_protocol, lobby, client_id, command_queue);
     receiver.start();
     Sender sender(server_protocol, lobby, client_id, snapshot_queue);
     sender.run();
@@ -94,18 +119,17 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
     receiver.join();
 }
 
-void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players, const std::string& lobby_name) {
+void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
+                                    const std::string& lobby_name) {
 
-    std::cerr << "[" << CLIENT_HANDLER << "] " << "Creating new game with ID: " << client_id
-            << " | Max players: " << max_players << std::endl;
     game_id = client_id;
-    auto [command_queue, snapshot_queue] = lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+    auto [command_queue, snapshot_queue] =
+            lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
 void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
 
-    std::cerr << "[" << CLIENT_HANDLER << "] " << "Client with ID: " << client_id << " requested to join existing lobby." << std::endl;
     game_id = actual_game_id;
 
     auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
@@ -115,16 +139,12 @@ void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t 
 void ClientHandler::list_load_races() {
 
     RaceCatalogueDTO races = lobby.list_races();
-    std::cout<<"Loaded "<<static_cast<int>(races.size)<<" races from lobby."<<std::endl;
     server_protocol.send_races_catalogue(races);
-    std::cerr << "[" << CLIENT_HANDLER << "] " << "Sent races catalogue to client with ID: " << client_id
-        << std::endl;
 }
 
 void ClientHandler::select_races(const LobbyDTO& lobby_dto) {
 
     selected_races = lobby_dto.selected_races;
-    std::cout<<"Client with ID: " << client_id << " selected "<<static_cast<int>(selected_races.size)<<" races for the lobby."<<std::endl;
 }
 
 void ClientHandler::run() {

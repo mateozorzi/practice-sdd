@@ -1,26 +1,27 @@
 #include <QApplication>
 
-#include "lobby.h"
-#include "selectcars.h"
-#include "creategame.h"
-#include "waitingroom.h"
-#include "createlobby.h"
 #include "../../common/car_catalogue_dto.h"
 #include "../../common/car_dto.h"
+
+#include "creategame.h"
+#include "createlobby.h"
+#include "lobby.h"
+#include "selectcars.h"
+#include "waitingroom.h"
 
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
     Lobby w;
     w.show();
 
-    //creategame g;
-    //g.showMaximized();
+    // creategame g;
+    // g.showMaximized();
 
-    //WaitingRoom w(true);
-    //w.show();
+    // WaitingRoom w(true);
+    // w.show();
 
-    //CreateLobby c;
-    //c.show();
+    // CreateLobby c;
+    // c.show();
 
     return a.exec();
 }

@@ -1,11 +1,13 @@
 #ifndef LOBBYRECEIVER_H
 #define LOBBYRECEIVER_H
 
-#include "client_protocol.h"
-#include "../common/thread.h"
 #include <QObject>
 
-class LobbyReceiver : public QObject, public Thread{
+#include "../common/thread.h"
+
+#include "client_protocol.h"
+
+class LobbyReceiver: public QObject, public Thread {
 
     Q_OBJECT
 
@@ -23,4 +25,4 @@ private:
 };
 
 
-#endif // LOBBYRECEIVER_H
+#endif  // LOBBYRECEIVER_H

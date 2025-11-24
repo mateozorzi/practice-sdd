@@ -13,11 +13,11 @@ class Lobby: public QMainWindow {
     Q_OBJECT
 
 public:
-    Lobby(QWidget* parent = nullptr);
+    explicit Lobby(QWidget* parent = nullptr);
     ~Lobby();
 
 signals:
-    void input_username(const QString &username);
+    void input_username(const QString& username);
     void game_close();
 
 private slots:
