@@ -47,7 +47,6 @@ public:
     void send_world_snapshot(const GameUpdateDTO& snapshot);
     void send_race_update(const GameUpdateDTO& snapshot);
     void send_leaderboard_update(const GameUpdateDTO& snapshot);
-    void send_finish_race_timeout();
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);
     void send_json_file(const std::string& file_path);

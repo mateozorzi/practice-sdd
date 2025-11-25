@@ -194,11 +194,6 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
     send_buffer();
 }
 
-void ServerProtocol::send_finish_race_timeout() {
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE_FINISHED));
-    send_buffer();
-}
-
 void ServerProtocol::send_lobby(const LobbyDTO& lobby_dto) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
     add_uint32_to_buffer(lobby_dto.lobby_id);

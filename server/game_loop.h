@@ -26,7 +26,7 @@ constexpr int POSITION_ITERATIONS = 6;
 
 
 //enum class GamePhase { WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, GAME_FINISHED };
-
+enum GamePhase {WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, LEADERBOARD, GAME_FINISHED };
 
 class GameLoop final: public Thread {
 
@@ -34,12 +34,18 @@ class GameLoop final: public Thread {
 
     const ServerConfig& config;
     const uint8_t max_players;
-    //GamePhase current_phase = GamePhase::WAITING_CAR_SELECTION;
+    GamePhase current_phase = GamePhase::WAITING_CAR_SELECTION;
     const std::chrono::milliseconds game_iteration_duration;
 
-    //std::chrono::seconds countdown_seconds = std::chrono::seconds(5);
-    //std::chrono::seconds upgrade_shop_seconds = std::chrono::seconds(15);
-    //std::chrono::minutes race_timeout_minutes = std::chrono::minutes(10);
+    std::optional<std::chrono::steady_clock::time_point> phase_start = std::nullopt;
+    std::optional<std::chrono::steady_clock::time_point> race_start_time = std::nullopt;
+    std::chrono::seconds countdown_seconds = std::chrono::seconds(5);
+    std::chrono::seconds upgrade_shop_seconds = std::chrono::seconds(10);
+    std::chrono::seconds leaderboard_seconds = std::chrono::seconds(10);
+    std::chrono::seconds game_finish_seconds = std::chrono::seconds(15);
+    std::chrono::seconds race_timeout_seconds = std::chrono::seconds(600);
+    uint8_t current_race_index = 0;
+    
 
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
@@ -53,17 +59,19 @@ class GameLoop final: public Thread {
     bool race_active;
 
     void fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time);
-    //void handle_waiting_car_selection_phase();
-    //void handle_upgrade_shop_phase();
-    //void handle_countdown_phase(uint8_t current_race_index);
-    //void handle_in_race_phase(uint8_t current_race_index);
-    //void handle_game_finished_phase();
+    void handle_waiting_car_selection_phase();
+    void handle_upgrade_shop_phase();
+    void handle_countdown_phase();
+    void handle_in_race_phase();
+    void handle_leaderboard_phase();
+    void handle_game_finished_phase();
 
-    //void process_commands_in_waiting_car_selection_phase();
-    //void process_commands_in_upgrade_shop_phase();
-    //void process_commands_in_countdown_phase();
-    //void process_commands_in_race_phase();
-    //void process_commands_in_game_finished_phase();
+    void process_commands_in_waiting_car_selection_phase();
+    void process_commands_in_upgrade_shop_phase();
+    void process_commands_in_countdown_phase();
+    void process_commands_in_race_phase();
+    void process_commands_in_leaderboard_phase();
+    void process_commands_in_game_finished_phase();
 
     void process_commands();
     void handle_car_selection(const GameCommand& game_command);
@@ -72,10 +80,10 @@ class GameLoop final: public Thread {
     void handle_upgrade_car(const GameCommand& game_command);
     void handle_command(const GameCommand& game_command);
     void update_positions(const RaceDTO& race);
-    void start_race(const RaceDTO& race);
+    void set_race(const RaceDTO& race);
     void finish_race(uint32_t timeout_time);
-    void create_final_leaderboard();
-    void create_leaderboard(uint8_t current_race_index);
+    LeaderboardDTO create_final_leaderboard();
+    LeaderboardDTO create_leaderboard();
     void send_race(const RaceDTO& race);
     CarConfig get_car_config(const ServerConfig& server_config, const CarDTO& car_dto);
 
@@ -103,7 +111,7 @@ public:
     uint8_t get_active_players() const;
 
     void check_race_times(uint32_t seconds);
-    void check_alive_players(uint32_t race_timeout_ms);
+    void check_alive_players();
 
     void add_player(uint32_t client_id, const std::string& username);
 

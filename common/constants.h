@@ -20,10 +20,14 @@ enum class GameLoopAction : uint8_t {
 
     SEND_UPDATE_POSITIONS = 0x10,
     SEND_RACE = 0x11,
-    SEND_RACE_FINISHED = 0x12,
+    START_RACE = 0x12,
     SEND_LEADERBOARD = 0x13,
     START_SHOP = 0x14,
-    CLOSE_SHOP = 0x15,
+    START_COUNTDOWN = 0x15,
+    GAME_FINISHED = 0x16,
+    RETURN_TO_LOBBY = 0x17,
+
+    CLOSE_SHOP = 0x18 //provisional, delete later
 };
 
 
