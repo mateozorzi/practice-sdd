@@ -84,6 +84,7 @@ public:
     void render_shop(int time);
 
     void close_shop();
+    void play_upgrade_sound();
 };
 
 #endif

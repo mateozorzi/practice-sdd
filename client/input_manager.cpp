@@ -68,6 +68,7 @@ bool InputManager::handle_click(const SDL_Event& event, int time) {
         auto opt_button = sdl.interact_button(mouse_x, mouse_y, time);
         if (opt_button.has_value()) {
             ButtonType button = opt_button.value();
+            sdl.play_upgrade_sound();
             switch (button) {
                 case Acceleration:
                     sender.add_event(BuyUpgradeDTO{Acceleration});

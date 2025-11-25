@@ -330,6 +330,10 @@ void SDLManager::close_shop() {
     shop.close_shop();
 }
 
+void SDLManager::play_upgrade_sound() {
+    sounds.play_upgrade_sound();
+}
+
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
     SDL2pp::Rect view = get_view_rect_with_shake();
 
