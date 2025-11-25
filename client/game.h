@@ -17,6 +17,7 @@ private:
     LocalInfo game_state;
     std::unique_ptr<GamePhase> phase;
     bool keep_running;
+    std::string current_city;  // Ciudad del mapa actualmente cargado
 
     friend class GamePhase;
     friend class WaitingForGamePhase;

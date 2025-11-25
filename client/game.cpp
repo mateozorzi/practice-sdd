@@ -3,9 +3,10 @@
 
 #include "../common/queue.h"
 #include "../common/constants.h"
+#include "../common/race_dto.h"
 
 Game::Game(ClientProtocol& protocol, uint32_t id) : protocol(protocol), sdl(SDLManager()), input_handler(sdl, this->protocol),
-                           receiver(this->protocol), game_state{id, {}, {}, {}}, keep_running(true) {
+                           receiver(this->protocol), game_state{id, {}, {}, {}}, keep_running(true), current_city("") {
     phase = std::make_unique<RacePhase>(*this, 0);
 }
 
@@ -122,6 +123,15 @@ bool Game::update_upgrade() {
             }
             sdl.close_shop();
             return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_RACE) {
+            // Detectar cuando se recibe una nueva carrera - Deberia hacerse durante etapa especifica (waiting o endgame) - Usar variable de sdl manager
+            if (std::holds_alternative<RaceDTO>(dto.data)) {
+                RaceDTO race = std::get<RaceDTO>(dto.data);
+                if (current_city != race.city) {
+                    current_city = race.city;
+                    sdl.load_city(race.city);
+                }
+            }
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
                 WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
@@ -175,6 +185,14 @@ bool Game::update_race() {
                 update_game_state_from_snapshot(last);
             }
             return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_RACE) {
+            if (std::holds_alternative<RaceDTO>(dto.data)) {
+                RaceDTO race = std::get<RaceDTO>(dto.data);
+                if (current_city != race.city) {
+                    current_city = race.city;
+                    sdl.load_city(race.city);
+                }
+            }
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (game_state.phase == Phase::WAITING_PLAYERS) {
                 game_state.phase = Phase::RACE;
