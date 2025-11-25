@@ -11,6 +11,7 @@
 #include <QTextStream>
 #include <QVector>
 #include <QWidget>
+#include <algorithm>
 
 #include "Constants.h"
 
@@ -20,13 +21,9 @@ Coordinates::Coordinates(QVector<Checkpoint>& checkpoint): checkpoints(checkpoin
 
 bool Coordinates::point_too_close(const Checkpoint& checkpoint) {
     QPoint pos = checkpoint.click;
-    for (const Checkpoint& p: checkpoints) {
-        if (p.contains(pos)) {
-            return true;
-        }
-    }
 
-    return false;
+    return std::any_of(checkpoints.begin(), checkpoints.end(),
+                       [&pos](const Checkpoint& p) { return p.contains(pos); });
 }
 
 bool Coordinates::is_a_checkpoint(const Checkpoint& checkpoint) {
@@ -63,18 +60,17 @@ void Coordinates::update_id(int id_delete) {
 
 
 Checkpoint Coordinates::delete_checkpoint(const QPoint& point) {
+    auto it = std::find_if(
+            checkpoints.begin(), checkpoints.end(),
+            [&point](const Checkpoint& checkpoint) { return checkpoint.contains(point); });
 
-    Checkpoint del = Checkpoint();
-
-    for (auto it = checkpoints.begin(); it != checkpoints.end(); ++it) {
-        if (it->contains(point)) {
-            del = *it;
-            checkpoints.erase(it);
-            break;
-        }
+    if (it != checkpoints.end()) {
+        Checkpoint del = *it;
+        checkpoints.erase(it);
+        return del;
     }
 
-    return del;
+    return Checkpoint();  // Return default checkpoint if not found
 }
 
 bool Coordinates::enough_checkpoints() { return (checkpoints.size() >= MIN_CHECKPOINTS); }
@@ -147,7 +143,6 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
         int width = r.width();
         out << id_checkpoint << "," << orientation << "," << center.x() << "," << center.y() << ","
             << height << "," << width << "\n";
-        id_checkpoint++;
     }
 
     archivo.close();

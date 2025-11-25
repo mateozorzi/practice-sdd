@@ -1,10 +1,11 @@
 #ifndef MOCK_SOCKET_H
 #define MOCK_SOCKET_H
 
-#include "../common/isocket.h"
 #include <gmock/gmock.h>
 
-class MockSocket : public ISocket {
+#include "../common/isocket.h"
+
+class MockSocket: public ISocket {
 public:
     MOCK_METHOD(int, sendsome, (const void* data, unsigned int sz), (override));
     MOCK_METHOD(int, recvsome, (void* data, unsigned int sz), (override));
