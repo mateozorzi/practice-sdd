@@ -568,7 +568,7 @@ void GameLoop::run() {
                             update_positions(selected_races.races[current_race_index]);
                             check_race_times(seconds);
                             box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                            std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
+                            fixed_sleep(now);
                             continue;
                         } else {                          
                             // if no player racing
