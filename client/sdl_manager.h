@@ -52,6 +52,7 @@ private:
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
     void update_camera(int player_x, int player_y);
+    SDL2pp::Rect get_view_rect_with_shake();
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving);
     void render_hud_health(int health, int max_health);
     void render_hud_minimap(int player_x, int player_y);

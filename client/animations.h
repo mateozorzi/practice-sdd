@@ -32,7 +32,7 @@ private:
         int duration = 30;
     };
 
-    std::optional<ExplosionAnimation> camera_shake;
+    std::optional<CameraShakeAnimation> camera_shake;
 
 public:
     Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources);
