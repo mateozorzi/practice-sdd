@@ -8,12 +8,12 @@
 #include <arpa/inet.h>
 
 #include "socket.h"
-
+#include "isocket.h"
 
 class CommonProtocol {
 
 protected:
-    Socket& socket;
+    ISocket& socket;
     std::vector<uint8_t> protocol_buffer;
 
     void add_uint8_to_buffer(uint8_t value);
@@ -32,7 +32,7 @@ public:
     CommonProtocol(const CommonProtocol& other) = delete;
     CommonProtocol& operator=(const CommonProtocol& other) = delete;
 
-    explicit CommonProtocol(Socket& socket);
+    explicit CommonProtocol(ISocket& socket);
 
     void stop();
 };

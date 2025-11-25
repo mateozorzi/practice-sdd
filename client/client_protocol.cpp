@@ -83,9 +83,9 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
 
 void ClientProtocol::change_username(const LobbyDTO& lobby) {
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
-    add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
+    add_uint32_to_buffer(0);
     add_string_to_buffer(lobby.lobby_name);
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby.max_players));
+    add_uint8_to_buffer(0);
     add_uint8_to_buffer(0);
     add_uint8_to_buffer(0);  // race = 0
     send_buffer();
@@ -239,15 +239,10 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue() {
 
 LobbyDTO ClientProtocol::receive_lobby() {
     const uint8_t action_byte = recv_uint8();
-    std::cout << "Received lobby action byte: " << static_cast<int>(action_byte) << std::endl;
     const uint32_t lobby_id = recv_uint32();
-    std::cout << "Received lobby ID: " << static_cast<int>(lobby_id) << std::endl;
     const std::string lobby_name = recv_string();
-    std::cout << "Received lobby name: " << lobby_name << std::endl;
     const uint8_t max_players = recv_uint8();
-    std::cout << "Received lobby max players: " << static_cast<int>(max_players) << std::endl;
     const uint8_t active_players = recv_uint8();
-    std::cout << "Received lobby active players: " << static_cast<int>(active_players) << std::endl;
 
     LobbyAction action = static_cast<LobbyAction>(action_byte);
 
@@ -261,7 +256,6 @@ LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue() {
     for (uint8_t i = 0; i < size; ++i) {
         LobbyDTO lobby = receive_lobby();
         lobbies.push_back(lobby);
-        std::cout << "Received lobby: " << lobby.lobby_name << std::endl;
     }
     return LobbyCatalogueDTO(std::move(lobbies));
 }
@@ -298,25 +292,6 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
     std::cout << "Received race catalogue of size: " << static_cast<int>(size) << std::endl;
 
     return RaceCatalogueDTO(std::move(races));
-}
-
-LobbyDTO ClientProtocol::receive_lobby_info() {
-    const uint8_t action_byte = recv_uint8();
-    const uint32_t lobby_id = recv_uint32();
-    // const std::string lobby_name = recv_string();
-    // const uint8_t max_players = recv_uint8();
-
-    LobbyAction action = static_cast<LobbyAction>(action_byte);
-
-    return LobbyDTO(action, lobby_id);
-}
-
-LobbyDTO ClientProtocol::receive_lobby_action() {
-    const uint8_t action_byte = recv_uint8();
-
-    LobbyAction action = static_cast<LobbyAction>(action_byte);
-
-    return LobbyDTO(action);
 }
 
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
