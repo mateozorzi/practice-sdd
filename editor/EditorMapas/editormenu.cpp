@@ -34,15 +34,17 @@ void EditorMenu::on_pushButton_3_clicked() { QApplication::quit(); }
 QString EditorMenu::find_races_path() {
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cdUp();
-    qDebug() << "path: " << dir.path();
-    // dir.cdUp();
     while (true) {
         if (dir.exists("server")) {
-            dir.cd("server");
+            if (!dir.cd("server")) {
+                break;
+            }
             if (!dir.exists("races")) {
                 dir.mkdir("races");
             }
-            dir.cd("races");
+            if (!dir.cd("races")) {
+                break;
+            }
             qDebug() << "path: " << dir.path();
             return dir.path();
         }
@@ -52,7 +54,6 @@ QString EditorMenu::find_races_path() {
         }
 
         if (!dir.cdUp()) {
-            qDebug() << "path: " << dir.path();
             break;
         }
     }

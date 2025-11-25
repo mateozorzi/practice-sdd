@@ -7,8 +7,8 @@
 
 #include <arpa/inet.h>
 
-#include "socket.h"
 #include "isocket.h"
+#include "socket.h"
 
 class CommonProtocol {
 

@@ -38,7 +38,7 @@ void SelectCircuit::fill_table() {
 }
 
 void SelectCircuit::fill_races_info() {
-    for (Race& r: this->races) {
+    for (const Race& r: this->races) {
         int id = r.id;
         QString name = r.name;
         QString city = r.city;
@@ -80,14 +80,14 @@ void SelectCircuit::read_info_races(const QStringList& races_names) {
 
         QTextStream in(&file);
 
-        QString line = in.readLine();
-        QStringList images = line.split(",");
+        QString firstline = in.readLine();
+        QStringList images = firstline.split(",");
         QString map = images[0];
         QString mask = images[1];
 
-        QString info = in.readLine();  // skip header City,n_laps
+        in.readLine();  // skip header City,n_laps
 
-        info = in.readLine();
+        QString info = in.readLine();
 
         QStringList infoRace = info.split(',');
         QString cityName = infoRace[0];

@@ -6,7 +6,7 @@
 
 #include "ui_joinlobby.h"
 
-JoinLobby::JoinLobby(LobbyCatalogueDTO lobbies, QWidget* parent):
+JoinLobby::JoinLobby(const LobbyCatalogueDTO& lobbies, QWidget* parent):
         QMainWindow(parent), ui(new Ui::JoinLobby) {
     ui->setupUi(this);
 
