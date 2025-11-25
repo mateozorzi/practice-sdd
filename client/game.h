@@ -10,7 +10,7 @@
 
 class Game {
 private:
-    ClientProtocol&& protocol;
+    ClientProtocol& protocol;
     SDLManager sdl;
     InputManager input_handler;
     Receiver receiver;
@@ -38,11 +38,11 @@ private:
 
     void handle_upgrade_events();
     bool update_upgrade();
-    void show_upgrade(const int& it);
+    void show_upgrade();
 
     void handle_race_events();
     bool update_race();
-    void show_race(const int& it);
+    void show_race();
 
     /*
     void handle_stats_events();
@@ -55,9 +55,8 @@ private:
     void update_player(const PlayerDTO &player, const CarPositionDTO &car);
 
 public:
-    explicit Game(Lobby& lobby);
+    explicit Game(ClientProtocol& protocol, uint32_t id);
     void run();
-    ~Game();
 };
 
 #endif

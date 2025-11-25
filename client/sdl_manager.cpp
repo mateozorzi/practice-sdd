@@ -24,9 +24,7 @@ SDLManager::SDLManager():
         animations(renderer, camera, resources),
         shop(renderer, mixer, resources, sounds, 1920, 1080, "client/assets/fonts/UrbanHaze.ttf") {
     renderer.SetLogicalSize(1920, 1080);
-    // set_minimap();
-    // load_bridges_rects(load_json_file(bridges));
-    // load_decorations_rects(load_json_file(decoration));
+    load_city("Liberty City");
 }
 
 void SDLManager::set_minimap() {
@@ -158,7 +156,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     for (const auto& [pid, pinfo] : game_state.players) {
         PlayerDTO p;
-        p.id = std::stoi(pid);
+        p.id = pid;
         p.car.model = pinfo.model;
 
         CarPositionDTO pos;
@@ -173,7 +171,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     CarPositionDTO my_car;
     bool found = false;
-    uint32_t my_id = std::stoi(game_state.id);
+    uint32_t my_id = game_state.id;
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_player.id == my_id) {

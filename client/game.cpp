@@ -5,9 +5,9 @@
 
 class Lobby;
 
-Game::Game(Lobby& lobby) : protocol(std::move()), sdl(SDLManager()), input_handler(sdl, this->protocol),
-                           receiver(this->protocol), game_state(), keep_running(true) {
-    phase = std::make_unique<UpgradePhase>(*this, 0);
+Game::Game(ClientProtocol& protocol, uint32_t id) : protocol(protocol), sdl(SDLManager()), input_handler(sdl, this->protocol),
+                           receiver(this->protocol), game_state{id, {}, {}, {}}, keep_running(true) {
+    phase = std::make_unique<RacePhase>(*this, 0);
 }
 
 void Game::run() {
@@ -31,20 +31,67 @@ void Game::reset_events() {
     game_state.player.died = false;
 }
 
+void Game::detect_events(const WorldSnapshotDTO &snapshot) {
+    for (const auto& [playerDTO, carPos] : snapshot.get_car_positions()) {
+        const uint32_t& id = playerDTO.id;
+        auto it = game_state.players.find(id);
+
+        if (it == game_state.players.end()) {
+            continue;
+        }
+
+        PlayerInfo& prev = it->second;
+        bool moved = false;
+
+        if (prev.x != (int)carPos.x_position ||
+            prev.y != (int)carPos.y_position ||
+            prev.angle != (int)carPos.angle) {
+            moved = true;
+            }
+
+        prev.isMoving = moved;
+    }
+}
+
 void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
     if (player.id == game_state.player.id) {
-        game_state.player.x = car.x_position;
-        game_state.player.y = car.y_position;
-        game_state.player.angle = car.angle;
-        game_state.player.life = player.health;
-    } else {
-        auto it = game_state.players.find(player.username);
-        if (it != game_state.players.end()) {
-            it->second.x = car.x_position;
-            it->second.y = car.y_position;
-            it->second.angle = car.angle;
-            it->second.life = player.health;
-        }
+        PlayerInfo& info = game_state.player;
+        info.id = player.id;
+        info.x = car.x_position;
+        info.y = car.y_position;
+        info.angle = car.angle;
+        info.life = player.health;
+        info.died = player.dead;
+        info.layer = car.layer;
+        info.checkpoint = car.next;
+        info.model = player.car.model;
+        return;
+    }
+
+    PlayerInfo& info = game_state.players[player.id];
+
+    info.id = player.id;
+    info.model = player.car.model;
+    info.life = player.health;
+    info.died = player.dead;
+    info.x = car.x_position;
+    info.y = car.y_position;
+    info.angle = car.angle;
+    info.layer = car.layer;
+    info.checkpoint = car.next;
+}
+
+
+void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
+    game_state.players.clear();
+
+    for (const auto& [playerDTO, carPos] : snapshot.get_car_positions()) {
+        if (playerDTO.username == game_state.player.model ||
+            playerDTO.id == game_state.player.id) {
+            update_player(playerDTO, carPos);
+            continue;
+            }
+        update_player(playerDTO, carPos);
     }
 }
 
@@ -84,9 +131,9 @@ bool Game::update_upgrade() {
     return true;
 }
 
-void Game::show_upgrade(const int &it) {
+void Game::show_upgrade() {
     sdl.clear_screen();
-    sdl.render();
+    sdl.render(game_state);
     sdl.render_shop(game_state.player.time);
     sdl.show_screen();
 }
@@ -128,13 +175,12 @@ bool Game::update_race() {
 }
 
 
-void Game::show_race(const int &it) {
+void Game::show_race() {
     sdl.clear_screen();
-    sdl.render(game_state, it);
+    sdl.render(game_state);
     sdl.show_screen();
 }
 
 void Game::change_phase(std::unique_ptr<GamePhase> new_phase) {
     phase = std::move(new_phase);
 }
-

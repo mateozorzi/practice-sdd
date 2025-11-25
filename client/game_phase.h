@@ -15,7 +15,7 @@ public:
     void change_phase(int last_it);
     virtual void handle_game_events() = 0;
     virtual bool update_game_state() = 0;
-    virtual void show_game(const int& it) = 0;
+    virtual void show_game() = 0;
     virtual ~GamePhase() {}
 };
 
@@ -34,7 +34,7 @@ public:
     UpgradePhase(Game& game, int starting_it);
     void handle_game_events() override;
     bool update_game_state() override;
-    void show_game(const int& it) override;
+    void show_game() override;
 };
 
 class RacePhase : public GamePhase {
@@ -42,7 +42,7 @@ public:
     RacePhase(Game& game, int starting_it);
     void handle_game_events() override;
     bool update_game_state() override;
-    void show_game(const int& it) override;
+    void show_game() override;
 };
 
 /*

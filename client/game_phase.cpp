@@ -9,7 +9,7 @@ void GamePhase::run() {
     bool loop = true;
 
     while (loop) {
-        show_game(it);
+        show_game();
         handle_game_events();
         if (!game.keep_running)
             break;
@@ -23,15 +23,17 @@ void GamePhase::run() {
 }
 
 void GamePhase::change_phase(int last_it) {
+    /*
     if (game.game_state.phase == Phase::WAITING_PLAYERS) {
-        game.change_phase(std::make_unique<WaitingForGamePhase>{game, 0});
-    } else if (game.game_state.phase == Phase::UPGRADE) {
-        game.change_phase(std::make_unique<UpgradePhase>{game, 0});
+        game.change_phase(std::make_unique<WaitingForGamePhase>(game, 0));
+    */
+     if (game.game_state.phase == Phase::UPGRADE) {
+        game.change_phase(std::make_unique<UpgradePhase>(game, 0));
     } else if (game.game_state.phase == Phase::RACE) {
-        game.change_phase(std::make_unique<RacePhase>{game, last_it});
-    } else if (game.game_state.phase == Phase::STATS) {
-        game.change_phase(std::make_unique<StatsPhase>{game, last_it});
-    }
+        game.change_phase(std::make_unique<RacePhase>(game, last_it));
+    } /* else if (game.game_state.phase == Phase::STATS) {
+        game.change_phase(std::make_unique<StatsPhase>(game, last_it));
+    } */
 }
 
 /*
@@ -44,12 +46,12 @@ void WaitingForGamePhase::show_game(const int &it) { game.show_waiting(it); }
 UpgradePhase::UpgradePhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
 void UpgradePhase::handle_game_events() { game.handle_upgrade_events(); }
 bool UpgradePhase::update_game_state() { return game.update_upgrade(); }
-void UpgradePhase::show_game(const int &it) { game.show_upgrade(it); }
+void UpgradePhase::show_game() { game.show_upgrade(); }
 
 RacePhase::RacePhase(Game& game, int starting_it) : GamePhase(game, starting_it) {}
 void RacePhase::handle_game_events() { game.handle_race_events(); }
 bool RacePhase::update_game_state() { return game.update_race(); }
-void RacePhase::show_game(const int &it) { game.show_race(it); }
+void RacePhase::show_game() { game.show_race(); }
 
 /*
 StatsPhase::StatsPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
