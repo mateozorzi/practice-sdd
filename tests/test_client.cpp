@@ -12,14 +12,10 @@
 #include "../common/leaderboard_dto.h"
 #include "mock_socket.h"
 
-#define SIZE_BYTE_LOBBY_ACTION 1
-#define SIZE_BYTE_LOBBY_ID 4
-#define SIZE_BYTE_STRING 4
-#define SIZE_BYTE_MAX_PLAYERS 1
-#define SIZE_BYTE_ACTIVE_PLAYERS 1
-#define SIZE_BYTE_RACES 1
-#define SIZE_BYTE_CHECKPOINTS 1
-#define SIZE_BYTE_LAPS 1
+#define SIZE_UINT32_T 4
+#define SIZE_UINT16_T 2
+#define SIZE_UINT8_T 1
+
 
 
 using ::testing::_;
@@ -113,8 +109,10 @@ TEST_F(ClientProtocolTest, SendCreateLobby_WithMock){
     protocol->send_create_lobby(lobby);
     
     //expected size calculation
-    size_t expected_size = SIZE_BYTE_LOBBY_ACTION + SIZE_BYTE_LOBBY_ID + SIZE_BYTE_STRING + lobby.lobby_name.size() + 
-    SIZE_BYTE_MAX_PLAYERS + SIZE_BYTE_ACTIVE_PLAYERS + SIZE_BYTE_RACES;
+    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT32_T + lobby.lobby_name.size() + 
+    SIZE_UINT8_T
+ + SIZE_UINT8_T
+ + SIZE_UINT8_T;
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
     //test action
@@ -163,8 +161,10 @@ TEST_F(ClientProtocolTest, AskForLobbies_WithMock){
     protocol->ask_for_lobbies(lobby);
 
     //check action send
-    size_t expected_size = SIZE_BYTE_LOBBY_ACTION + SIZE_BYTE_LOBBY_ID + SIZE_BYTE_STRING + 
-    SIZE_BYTE_MAX_PLAYERS + SIZE_BYTE_ACTIVE_PLAYERS + SIZE_BYTE_RACES;
+    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT32_T + 
+    SIZE_UINT8_T
+ + SIZE_UINT8_T
+ + SIZE_UINT8_T;
     EXPECT_EQ(captured_bytes.size(), expected_size); //action + lobby_id + lobby_name size + max_players + active_players + race
 
     uint8_t action = captured_bytes[0];
@@ -190,7 +190,7 @@ TEST_F(ClientProtocolTest, SendCarSelection_WithMock){
     protocol->send_car_selection(car);
 
     //check size sent
-    size_t expected_size = SIZE_BYTE_LOBBY_ACTION + SIZE_BYTE_STRING + car.model.size(); //action + size of string + string bytes
+    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + car.model.size(); //action + size of string + string bytes
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
     //check action send
@@ -225,8 +225,10 @@ TEST_F(ClientProtocolTest, ChangeUsername_WithMock){
     protocol->change_username(lobby);
 
     //check size sent
-    size_t expected_size = SIZE_BYTE_LOBBY_ACTION + SIZE_BYTE_LOBBY_ID + SIZE_BYTE_STRING + 
-    lobby.lobby_name.size() + SIZE_BYTE_MAX_PLAYERS + SIZE_BYTE_ACTIVE_PLAYERS + SIZE_BYTE_RACES;
+    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT32_T + 
+    lobby.lobby_name.size() + SIZE_UINT8_T
+ + SIZE_UINT8_T
+ + SIZE_UINT8_T;
     EXPECT_EQ(expected_size, captured_bytes.size());
 
     
@@ -273,8 +275,10 @@ TEST_F(ClientProtocolTest, SendExit_WithMock){
     protocol->change_username(lobby);
 
     //check size sent
-    size_t expected_size = SIZE_BYTE_LOBBY_ACTION + SIZE_BYTE_LOBBY_ID + SIZE_BYTE_STRING + 
-    SIZE_BYTE_MAX_PLAYERS + SIZE_BYTE_ACTIVE_PLAYERS + SIZE_BYTE_RACES;
+    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT32_T + 
+    SIZE_UINT8_T
+ + SIZE_UINT8_T
+ + SIZE_UINT8_T;
     EXPECT_EQ(expected_size, captured_bytes.size());
 
     
@@ -304,10 +308,12 @@ TEST_F(ClientProtocolTest, SendRaceSelection_WithMock){
     protocol->send_races_selection(races);
 
     //check size sent
-    size_t expected_size = SIZE_BYTE_LOBBY_ACTION+ SIZE_BYTE_LOBBY_ID + SIZE_BYTE_STRING + 
-    SIZE_BYTE_MAX_PLAYERS + SIZE_BYTE_ACTIVE_PLAYERS + SIZE_BYTE_RACES+ 
-    (SIZE_BYTE_STRING+ race1.name.size() + SIZE_BYTE_STRING +race1.city.size() + SIZE_BYTE_CHECKPOINTS + SIZE_BYTE_LAPS) +
-    (SIZE_BYTE_STRING + race2.name.size() + SIZE_BYTE_STRING + race2.city.size() + SIZE_BYTE_CHECKPOINTS + SIZE_BYTE_LAPS); //action + size of string + string bytes
+    size_t expected_size = SIZE_UINT8_T+ SIZE_UINT32_T + SIZE_UINT32_T + 
+    SIZE_UINT8_T
+ + SIZE_UINT8_T
+ + SIZE_UINT8_T+ 
+    (SIZE_UINT32_T+ race1.name.size() + SIZE_UINT32_T +race1.city.size() + SIZE_UINT8_T + SIZE_UINT8_T) +
+    (SIZE_UINT32_T + race2.name.size() + SIZE_UINT32_T + race2.city.size() + SIZE_UINT8_T + SIZE_UINT8_T); //action + size of string + string bytes
     
     EXPECT_EQ(expected_size, captured_bytes.size());
 }
