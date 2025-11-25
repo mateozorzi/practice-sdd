@@ -25,16 +25,11 @@ class Client {
 public:
     explicit Client(const std::string& hostname, const std::string& servname);
     void run();
-    ~Client();
 
 private:
     Socket client_socket;
-    std::unique_ptr<SDLManager> sdl_manager;
     ClientProtocol protocol;
-    Receiver receiver;
-    InputManager input_manager;
     MenuInterface menu;
-    uint32_t client_id;
 };
 
 #endif  // CLIENT_H

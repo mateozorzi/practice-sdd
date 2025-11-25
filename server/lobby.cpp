@@ -184,9 +184,6 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
 
     Game& game = *it->second;
     game.remove_player(client_id);
-    std::cerr << "[" << LOBBY << "] "
-              << "Player with ID: " << client_id << " removed from game with ID: " << (int)game_id
-              << std::endl;
 }
 
 RaceCatalogueDTO Lobby::list_races() {

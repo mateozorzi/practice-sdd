@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <string>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -24,12 +25,22 @@ constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
 
 
+//enum class GamePhase { WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, GAME_FINISHED };
+
+
 class GameLoop final: public Thread {
 
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
 
-    const uint8_t max_players;
     const ServerConfig& config;
+    const uint8_t max_players;
+    //GamePhase current_phase = GamePhase::WAITING_CAR_SELECTION;
+    const std::chrono::milliseconds game_iteration_duration;
+
+    //std::chrono::seconds countdown_seconds = std::chrono::seconds(5);
+    //std::chrono::seconds upgrade_shop_seconds = std::chrono::seconds(15);
+    //std::chrono::minutes race_timeout_minutes = std::chrono::minutes(10);
+
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
     b2World box2d_world;
@@ -40,6 +51,19 @@ class GameLoop final: public Thread {
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO final_leaderboard;
     bool race_active;
+
+    void fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time);
+    //void handle_waiting_car_selection_phase();
+    //void handle_upgrade_shop_phase();
+    //void handle_countdown_phase(uint8_t current_race_index);
+    //void handle_in_race_phase(uint8_t current_race_index);
+    //void handle_game_finished_phase();
+
+    //void process_commands_in_waiting_car_selection_phase();
+    //void process_commands_in_upgrade_shop_phase();
+    //void process_commands_in_countdown_phase();
+    //void process_commands_in_race_phase();
+    //void process_commands_in_game_finished_phase();
 
     void process_commands();
     void handle_car_selection(const GameCommand& game_command);
