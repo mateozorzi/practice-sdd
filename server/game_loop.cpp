@@ -19,8 +19,10 @@
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                    const uint8_t max_players, const ServerConfig& config,
                    RaceCatalogueDTO& selected):
-        max_players(max_players),
         config(config),
+        max_players(max_players),
+        game_iteration_duration(1000 / config.game.game_fps),
+        waiting_iteration_duration(1000 / 10),
         game_monitor(game_monitor),
         command_queue(command_queue),
         box2d_world(b2Vec2(0.0f, 0.0f)),
@@ -42,21 +44,16 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
              [this](const GameCommand& game_command) { handle_upgrade_car(game_command); }}};
 }
 
-std::string obtain_polygons_path(const std::string& city) {
-    return ("server/resources/world/collidables/on_ground_collidables_" + city + ".json");
+
+void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time, const std::chrono::milliseconds& iteration_duration) {
+
+    const std::chrono::steady_clock::time_point iteration_end_time = std::chrono::steady_clock::now();
+    const std::chrono::milliseconds iteration_time = std::chrono::duration_cast<std::chrono::milliseconds>(iteration_end_time - iteration_start_time);
+
+    if (iteration_time < iteration_duration)
+        std::this_thread::sleep_for(iteration_duration - iteration_time);
 }
 
-std::string obtain_collidables_bridges_path(const std::string& city) {
-    return ("server/resources/world/collidables/on_bridge_collidables_" + city + ".json");
-}
-
-std::string obtain_collidables_sensors_bridge_path(const std::string& city) {
-    return ("server/resources/world/sensors/on_bridge_sensors_" + city + ".json");
-}
-
-std::string obtain_sensors_ground_path(const std::string& city) {
-    return ("server/resources/world/sensors/under_bridge_sensors_" + city + ".json");
-}
 
 
 void GameLoop::remove_player(const uint32_t client_id) {
@@ -386,8 +383,6 @@ void GameLoop::run() {
 
     try {
 
-        const int game_frame_ms = static_cast<int>(1000.0f / config.game.game_fps);
-        const int waiting_frame_ms = static_cast<int>(1000.0f / 10);
         uint8_t current_race_index = 0;
 
         static constexpr auto RACE_TIMEOUT = std::chrono::minutes(10);
@@ -396,6 +391,8 @@ void GameLoop::run() {
         GamePhase phase = START_RACE;
 
         while (should_keep_running()) {
+
+            const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 
             
             process_commands();
@@ -437,7 +434,7 @@ void GameLoop::run() {
                         update_positions(selected_races.races[current_race_index]);
                         check_race_times(seconds);
                         box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                        std::this_thread::sleep_for(std::chrono::milliseconds(game_frame_ms));
+                        fixed_sleep(now, game_iteration_duration);
                         continue;
                         }else{
                             // if no player racing
@@ -488,7 +485,7 @@ void GameLoop::run() {
                         break;
                 }
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(waiting_frame_ms));
+                fixed_sleep(now, waiting_iteration_duration);
             }
         }
     } catch (const ClosedQueue&) {}
