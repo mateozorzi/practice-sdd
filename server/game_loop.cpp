@@ -22,7 +22,6 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         config(config),
         max_players(max_players),
         game_iteration_duration(1000 / config.game.game_fps),
-        waiting_iteration_duration(1000 / 10),
         game_monitor(game_monitor),
         command_queue(command_queue),
         box2d_world(b2Vec2(0.0f, 0.0f)),
@@ -45,14 +44,127 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
 }
 
 
-void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time, const std::chrono::milliseconds& iteration_duration) {
+void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time) {
 
     const std::chrono::steady_clock::time_point iteration_end_time = std::chrono::steady_clock::now();
     const std::chrono::milliseconds iteration_time = std::chrono::duration_cast<std::chrono::milliseconds>(iteration_end_time - iteration_start_time);
 
-    if (iteration_time < iteration_duration)
-        std::this_thread::sleep_for(iteration_duration - iteration_time);
+    if (iteration_time < game_iteration_duration)
+        std::this_thread::sleep_for(game_iteration_duration - iteration_time);
 }
+
+/*
+
+
+void GameLoop::process_commands_in_waiting_car_selection_phase() {
+
+    GameCommand game_command;
+
+    while (command_queue.try_pop(game_command)) {
+
+        ClientAction action = game_command.get_client_action();
+
+        if (action == ClientAction::DISCONNECT) {
+
+            handle_disconnection(game_command);
+            continue;
+        } else if (action == ClientAction::SEND_CAR_SELECTION) {
+
+            handle_car_selection(game_command);
+            continue;
+        }
+    }
+}
+
+
+void GameLoop::handle_waiting_car_selection_phase() {
+
+    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+    process_commands_in_waiting_car_selection_phase();
+
+    if (all_player_in_game()) {
+
+        current_phase = GamePhase::UPGRADE_SHOP;
+    }
+
+    fixed_sleep(now);
+}
+
+
+
+void GameLoop::handle_upgrade_shop_phase() {
+
+    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+    const std::chrono::steady_clock::time_point elapsed = now - phase_start;
+
+    process_commands_in_upgrade_shop_phase();
+
+    if (elapsed_time >= upgrade_shop_seconds)
+        current_phase = GamePhase::COUNTDOWN;
+
+    fixed_sleep(now);
+}
+
+
+
+void GameLoop::handle_countdown_phase(const uint8_t current_race_index) {
+
+    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    auto elapsed_time = now - phase_start;
+
+    map_configuration(selected_races.races[current_race_index].city);
+
+    process_commands_in_waiting_car_selection_phase();
+
+    //update_positions(selected_races.races[current_race_index]);
+
+    if (elapsed_time >= countdown_seconds) {
+
+        start_race(selected_races.races[current_race_index]);
+        current_phase = GamePhase::IN_RACE;
+    }
+
+    fixed_sleep(now);
+}
+
+
+void GameLoop::handle_in_race_phase(const uint8_t current_race_index) {
+
+    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+    const std::chrono::steady_clock::time_point elapsed = now - phase_start;
+
+    process_commands_in_race_phase();
+
+    update_positions(selected_races.races[current_race_index]);
+
+    //check_race_times(seconds);
+
+    box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+
+    if (elapsed_time >= race_timeout_minutes)
+        current_phase = GamePhase::UPGRADE_SHOP;
+
+    fixed_sleep(now);
+}
+
+
+void GameLoop::handle_game_finished_phase() {
+
+    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    auto elapsed_time = now - phase_start;
+
+    process_commands_in_game_finished_phase();
+
+    if (elapsed_time >= final_leaderboard_seconds)
+        //return to lobby here!
+
+    fixed_sleep(now);
+}
+
+*/
 
 
 
@@ -391,9 +503,30 @@ void GameLoop::run() {
         GamePhase phase = START_RACE;
 
         while (should_keep_running()) {
+            
+            /*if (!phase_start.has_value())
+                phase_start = std::chrono::steady_clock::now();
+
+            switch (current_phase) {
+
+                case (GamePhase::WAITING_CAR_SELECTION):
+                    handle_waiting_car_selection_phase();
+                    break;
+                case (GamePhase::UPGRADE_SHOP):
+                    handle_upgrade_shop_phase();
+                    break;
+                case (GamePhase::COUNTDOWN):
+                    handle_countdown_phase(current_race_index);
+                    break;
+                case (GamePhase::IN_RACE):
+                    handle_in_race_phase(current_race_index);
+                    break;
+                case (GamePhase::GAME_FINISHED):
+                    handle_game_finished_phase();
+                    break;
+            }*/
 
             const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
             
             process_commands();
             
@@ -434,7 +567,7 @@ void GameLoop::run() {
                         update_positions(selected_races.races[current_race_index]);
                         check_race_times(seconds);
                         box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-                        fixed_sleep(now, game_iteration_duration);
+                        fixed_sleep(now);
                         continue;
                         }else{
                             // if no player racing
@@ -485,7 +618,7 @@ void GameLoop::run() {
                         break;
                 }
 
-                fixed_sleep(now, waiting_iteration_duration);
+                fixed_sleep(now);
             }
         }
     } catch (const ClosedQueue&) {}
