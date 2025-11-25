@@ -83,7 +83,7 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     sounds.play_engine_sound(is_moving);
 }
 
-void SDLManager::render_hud_health(const int health) {
+void SDLManager::render_hud_health(const int health, const int max_health) {
     constexpr int health_bar_width = 400;
     constexpr int health_bar_height = 20;
     constexpr int health_bar_x = 20;
@@ -94,8 +94,14 @@ void SDLManager::render_hud_health(const int health) {
     renderer.FillRect(
             SDL2pp::Rect(health_bar_x, health_bar_y, health_bar_width, health_bar_height));
 
-    // Dibujar barra de vida
-    const int current_health_width = (health * health_bar_width) / 100;
+    // Dibujar barra de vida segun vida maxima del auto
+    int current_health_width = 0;
+    if (max_health > 0) {
+        current_health_width = (health * health_bar_width) / max_health;
+        if (current_health_width > health_bar_width) {
+            current_health_width = health_bar_width;
+        }
+    }
     renderer.SetDrawColor(255, 0, 0, 255);
     renderer.FillRect(
             SDL2pp::Rect(health_bar_x, health_bar_y, current_health_width, health_bar_height));
@@ -218,7 +224,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     render_checkpoints(my_car.next);
 
-    render_hud_health(game_state.player.life);
+    render_hud_health(game_state.player.life, game_state.player.max_life);
     render_hud_minimap(pos_x, pos_y);
     render_stats(cars);
     render_hint(my_car);

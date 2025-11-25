@@ -12,6 +12,7 @@ struct PlayerInfo {
     int y = 0;
     int angle = 0;
     int life = 0;
+    int max_life = 100;
     int time = 0;
     std::string model;
     bool isMoving = false;

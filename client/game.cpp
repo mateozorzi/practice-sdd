@@ -63,6 +63,7 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
         info.y = car.y_position;
         info.angle = car.angle;
         info.life = player.health;
+        info.max_life = player.car.health;
         info.died = player.dead;
         info.layer = car.layer;
         info.checkpoint = car.next;
@@ -75,6 +76,7 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
     info.id = player.id;
     info.model = player.car.model;
     info.life = player.health;
+    info.max_life = player.car.health;
     info.died = player.dead;
     info.x = car.x_position;
     info.y = car.y_position;
