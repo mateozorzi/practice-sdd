@@ -2,8 +2,7 @@
 #include <memory>
 
 #include "../common/queue.h"
-
-class Lobby;
+#include "../common/constants.h"
 
 Game::Game(ClientProtocol& protocol, uint32_t id) : protocol(protocol), sdl(SDLManager()), input_handler(sdl, this->protocol),
                            receiver(this->protocol), game_state{id, {}, {}, {}}, keep_running(true) {
@@ -11,6 +10,7 @@ Game::Game(ClientProtocol& protocol, uint32_t id) : protocol(protocol), sdl(SDLM
 }
 
 void Game::run() {
+    this->receiver.start();
     try {
         while (keep_running) {
             phase->run();
@@ -18,6 +18,8 @@ void Game::run() {
     } catch (const std::exception& e) {
         this->keep_running = false;
     }
+    this->receiver.stop();
+    this->receiver.join();
 }
 
 void Game::reset_events() {
@@ -81,7 +83,6 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
     info.checkpoint = car.next;
 }
 
-
 void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
     game_state.players.clear();
 
@@ -103,7 +104,7 @@ bool Game::update_upgrade() {
     GameUpdateDTO dto;
     bool pop = true;
     WorldSnapshotDTO last;
-    bool got_snapshot;
+    bool got_snapshot = false;
     reset_events();
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (pop) {
@@ -112,9 +113,20 @@ bool Game::update_upgrade() {
             continue;
         }
 
-        WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
-        last = std::move(snapshot);
-        got_snapshot = true;
+        if (dto.gameloop_action == GameLoopAction::CLOSE_SHOP) {
+            game_state.phase = Phase::RACE;
+            if (got_snapshot) {
+                update_game_state_from_snapshot(last);
+            }
+            sdl.close_shop();
+            return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
+                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                last = std::move(snapshot);
+                got_snapshot = true;
+            }
+        }
 
         if (game_state.phase != Phase::UPGRADE) {
             if (got_snapshot) {
@@ -155,16 +167,31 @@ bool Game::update_race() {
             continue;
         }
 
-        WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
-        detect_events(snapshot);
-        last = std::move(snapshot);
-        got_snapshot = true;
+        if (dto.gameloop_action == GameLoopAction::START_SHOP) {
+            game_state.phase = Phase::UPGRADE;
+            if (got_snapshot) {
+                update_game_state_from_snapshot(last);
+            }
+            return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+            if (game_state.phase == Phase::WAITING_PLAYERS) {
+                game_state.phase = Phase::RACE;
+            }
+            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
+                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                detect_events(snapshot);
+                last = std::move(snapshot);
+                got_snapshot = true;
+            }
+        } else if (dto.gameloop_action == GameLoopAction::CLOSE_SHOP) {
+            game_state.phase = Phase::RACE;
+        }
 
         if (game_state.phase != Phase::RACE) {
             if (got_snapshot) {
                 update_game_state_from_snapshot(last);
-                return false;
             }
+            return false;
         }
     }
 
@@ -173,7 +200,6 @@ bool Game::update_race() {
     }
     return true;
 }
-
 
 void Game::show_race() {
     sdl.clear_screen();
