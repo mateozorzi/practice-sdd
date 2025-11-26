@@ -122,17 +122,57 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
 void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
                                     const std::string& lobby_name) {
 
-    game_id = client_id;
-    auto [command_queue, snapshot_queue] =
+    lobby.reap();
+
+    if (max_players < static_cast<uint8_t>(server_config.server.min_players_per_game)) {
+
+        LobbyDTO lobby_dto(LobbyAction::MIN_PLAYERS_ERROR, 0, "",
+                           server_config.server.min_players_per_game);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    } else if (max_players > static_cast<uint8_t>(server_config.server.max_players_per_game)) {
+
+        LobbyDTO lobby_dto(LobbyAction::MAX_PLAYERS_ERROR, 0, "",
+                           server_config.server.max_players_per_game);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto result =
             lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
+    game_id = client_id;
+
+    LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
 void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
 
+    lobby.reap();
+
+    auto result = lobby.join_existing_game(client_id, actual_game_id, username);
+
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
     game_id = actual_game_id;
 
-    auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
+    LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 

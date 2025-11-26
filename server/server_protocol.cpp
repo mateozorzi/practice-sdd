@@ -194,12 +194,15 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
     send_buffer();
 }
 
-void ServerProtocol::send_finish_race_timeout() {
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE_FINISHED));
+void ServerProtocol::send_lobby_response(const LobbyDTO& lobby_dto) {
+
+    add_lobby_to_buffer(lobby_dto);
+
     send_buffer();
 }
 
-void ServerProtocol::send_lobby(const LobbyDTO& lobby_dto) {
+void ServerProtocol::add_lobby_to_buffer(const LobbyDTO& lobby_dto) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
     add_uint32_to_buffer(lobby_dto.lobby_id);
     add_string_to_buffer(lobby_dto.lobby_name);
@@ -211,9 +214,7 @@ void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalog
 
     add_uint8_to_buffer(lobby_catalogue.size);
 
-    for (const auto& lobby: lobby_catalogue.lobbies) {
-        send_lobby(lobby);
-    }
+    for (const auto& lobby: lobby_catalogue.lobbies) add_lobby_to_buffer(lobby);
 
     send_buffer();
 }

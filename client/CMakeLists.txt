@@ -26,7 +26,6 @@ target_sources(nfs_client
     Lobby/createlobby.cpp
     Lobby/joinlobby.cpp
     Lobby/waitingroom.cpp
-    lobbyreceiver.cpp
     menu_interface.cpp
     Lobby/raceselector.cpp
     sounds.cpp
@@ -59,7 +58,6 @@ target_sources(nfs_client
     Lobby/joinlobby.h
     Lobby/waitingroom.h
     Lobby/raceselector.h
-    lobbyreceiver.h
 
 
     )

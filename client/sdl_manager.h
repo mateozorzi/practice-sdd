@@ -72,8 +72,7 @@ public:
 
     void set_minimap();
     void clear_screen();
-    void render(LocalInfo &game_state
-    );
+    void render(LocalInfo& game_state);
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);

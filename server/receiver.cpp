@@ -37,6 +37,9 @@ void Receiver::run() {
             }
 
             command_queue.push(GameCommand(client_id, std::move(game_command)));
+
+            if (game_command.client_action == ClientAction::DISCONNECT)
+                break;
         }
     } catch (const LibError& e) {
 

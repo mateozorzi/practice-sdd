@@ -20,6 +20,9 @@
 constexpr std::string_view LOBBY = "LOBBY";
 
 
+using GameQueues = std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&>;
+
+
 class Lobby {
 
 
@@ -37,11 +40,11 @@ public:
 
     explicit Lobby(const ServerConfig& config);
 
-    std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> create_new_game(
-            uint32_t client_id, const std::string& username, uint8_t max_players,
-            const std::string& name, RaceCatalogueDTO& selected);
-    std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> join_existing_game(
-            uint32_t client_id, uint32_t game_id, const std::string& username);
+    std::optional<GameQueues> create_new_game(uint32_t client_id, const std::string& username,
+                                              uint8_t max_players, const std::string& name,
+                                              RaceCatalogueDTO& selected);
+    std::optional<GameQueues> join_existing_game(uint32_t client_id, uint32_t game_id,
+                                                 const std::string& username);
     LobbyCatalogueDTO list_games();
     void reap();
     void remove_player(uint32_t client_id, uint32_t game_id);

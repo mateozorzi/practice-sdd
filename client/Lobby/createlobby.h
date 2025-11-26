@@ -16,6 +16,8 @@ public:
 
     QString get_lobby_name();
     int get_number_players();
+    void create_denied();
+    void create_denied_players(uint8_t players, std::string message);
 
 signals:
     void create_lobby();

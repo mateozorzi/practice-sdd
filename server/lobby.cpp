@@ -84,11 +84,23 @@ void Lobby::initialize_races() {
     }
 }
 
-std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Lobby::create_new_game(
-        const uint32_t client_id, const std::string& username, const uint8_t max_players,
-        const std::string& name, RaceCatalogueDTO& selected) {
+std::optional<GameQueues> Lobby::create_new_game(const uint32_t client_id,
+                                                 const std::string& username,
+                                                 const uint8_t max_players, const std::string& name,
+                                                 RaceCatalogueDTO& selected) {
 
     std::lock_guard lock(mtx);
+
+    if (games.size() >= config.server.max_concurrent_games) {
+
+        std::cerr << "[" << LOBBY
+                  << "] "
+                     "Max number of concurrent games ("
+                  << config.server.max_concurrent_games
+                  << ") has been reached. Cannot create the game." << std::endl;
+
+        return std::nullopt;
+    }
 
     uint32_t game_id = client_id;
 
@@ -106,8 +118,9 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Lobby::create_new_game(
     return queues;
 }
 
-std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Lobby::join_existing_game(
-        const uint32_t client_id, const uint32_t game_id, const std::string& username) {
+std::optional<GameQueues> Lobby::join_existing_game(const uint32_t client_id,
+                                                    const uint32_t game_id,
+                                                    const std::string& username) {
 
     std::lock_guard lock(mtx);
 
@@ -119,9 +132,8 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Lobby::join_existing_game(
                   << "] "
                      "Game "
                   << (int)game_id << " not found." << std::endl;
-        static Queue<GameCommand> dummy_command;
-        static Queue<GameUpdateDTO> dummy_snapshot;
-        return {dummy_command, dummy_snapshot};
+
+        return std::nullopt;
     }
 
     Game& game = *(it->second);
@@ -129,9 +141,8 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Lobby::join_existing_game(
 
         std::cerr << "[" << LOBBY << "] "
                   << "Game with ID: " << game_id << " is full." << std::endl;
-        static Queue<GameCommand> dummy_command;
-        static Queue<GameUpdateDTO> dummy_snapshot;
-        return {dummy_command, dummy_snapshot};
+
+        return std::nullopt;
     }
 
     auto queues = game.add_player(client_id, username);
@@ -184,9 +195,6 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
 
     Game& game = *it->second;
     game.remove_player(client_id);
-    std::cerr << "[" << LOBBY << "] "
-              << "Player with ID: " << client_id << " removed from game with ID: " << (int)game_id
-              << std::endl;
 }
 
 RaceCatalogueDTO Lobby::list_races() {

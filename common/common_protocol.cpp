@@ -4,7 +4,7 @@
 #include <vector>
 
 
-CommonProtocol::CommonProtocol(Socket& socket): socket(socket) {}
+CommonProtocol::CommonProtocol(ISocket& socket): socket(socket) {}
 
 
 void CommonProtocol::add_uint8_to_buffer(const uint8_t value) {
