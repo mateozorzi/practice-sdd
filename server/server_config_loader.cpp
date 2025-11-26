@@ -1,8 +1,8 @@
-#include "config_loader.h"
+#include "server_config_loader.h"
 
 #include <stdexcept>
 
-ServerConfig ConfigLoader::load_yaml(const std::string& base_path) {
+ServerConfig ServerConfigLoader::load_yaml(const std::string& base_path) {
     try {
 
         ServerConfig server_config;
@@ -31,7 +31,7 @@ ServerConfig ConfigLoader::load_yaml(const std::string& base_path) {
 }
 
 
-void ConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& server_config) {
+void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& server_config) {
 
 
     if (!config["game"])
@@ -73,7 +73,7 @@ void ConfigLoader::load_game_config(const YAML::Node& config, ServerConfig& serv
 }
 
 
-void ConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& server_config) {
+void ServerConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& server_config) {
 
     if (!config["physics"])
         throw std::runtime_error("Missing 'physics' node in physics configuration file");
@@ -116,7 +116,7 @@ void ConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& s
     }
 }
 
-void ConfigLoader::load_car_physics(const YAML::Node& car_node, CarConfig& car_config) {
+void ServerConfigLoader::load_car_physics(const YAML::Node& car_node, CarConfig& car_config) {
 
     car_config.model = car_node["model"].as<std::string>();
     car_config.width = car_node["width"].as<float>();
@@ -136,7 +136,7 @@ void ConfigLoader::load_car_physics(const YAML::Node& car_node, CarConfig& car_c
     car_config.health = car_node["health"].as<unsigned int>();
 }
 
-void ConfigLoader::load_world_config(const YAML::Node& config, ServerConfig& server_config) {
+void ServerConfigLoader::load_world_config(const YAML::Node& config, ServerConfig& server_config) {
 
     if (!config["world"])
         throw std::runtime_error("Missing 'world' node in world configuration file");
@@ -151,7 +151,7 @@ void ConfigLoader::load_world_config(const YAML::Node& config, ServerConfig& ser
 }
 
 
-void ConfigLoader::load_city(const YAML::Node& node, CityLoaderConfig& city) {
+void ServerConfigLoader::load_city(const YAML::Node& node, CityLoaderConfig& city) {
 
     if (node["collidables"]) {
 

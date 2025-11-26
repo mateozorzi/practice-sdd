@@ -1,5 +1,6 @@
-#ifndef CONFIG_LOADER_H
-#define CONFIG_LOADER_H
+#ifndef SERVER_CONFIG_LOADER_H
+#define SERVER_CONFIG_LOADER_H
+
 
 #include <string>
 
@@ -8,7 +9,8 @@
 #include "server_config.h"
 
 
-class ConfigLoader {
+class ServerConfigLoader {
+
 
     void load_game_config(const YAML::Node& config, ServerConfig& server_config);
 
@@ -20,8 +22,9 @@ class ConfigLoader {
 
 
 public:
-    ConfigLoader() = default;
-    ~ConfigLoader() = default;
+
+
+    ServerConfigLoader() = default;
 
     ServerConfig load_yaml(const std::string& base_path);
 };
