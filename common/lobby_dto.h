@@ -17,8 +17,11 @@ enum class LobbyAction : uint8_t {
     CHANGE_USERNAME = 0x07,
     LIST_RACES = 0x08,
     SEND_RACE_SELECTION = 0x09,
-    SUCCESS = 0x10,
-    ERROR = 0x11
+
+    CREATE_OR_JOIN_SUCCESS = 0x10,
+    CREATE_OR_JOIN_ERROR = 0x11,
+    MIN_PLAYERS_ERROR = 0x12,
+    MAX_PLAYERS_ERROR = 0x13
 
 };
 

@@ -108,10 +108,10 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
         protocol.send_create_lobby(lobby);
         //client wait for server response
         LobbyDTO lobby_response = protocol.receive_lobby();
-        if (lobby_response.action == LobbyAction::SUCCESS){
+        if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_SUCCESS){
             cl.close();
             loop.quit();
-        } else if (lobby_response.action == LobbyAction::ERROR){
+        } else if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_ERROR){
             cl.show();
             cl.create_denied();
         }
@@ -148,12 +148,12 @@ bool MenuInterface::join_lobby() {
         protocol.send_action_lobby(lobby_req);
         LobbyDTO lobby_info = protocol.receive_lobby();
 
-        if (lobby_info.action == LobbyAction::SUCCESS) {
+        if (lobby_info.action == LobbyAction::CREATE_OR_JOIN_SUCCESS) {
             //lobby accepted
             jl.close();
             loop.quit();
 
-        }else if(lobby_info.action == LobbyAction::ERROR){
+        }else if(lobby_info.action == LobbyAction::CREATE_OR_JOIN_ERROR){
             //lobby denied
             jl.fill_table(lobbies); 
             jl.join_denied();
