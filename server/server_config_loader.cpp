@@ -40,11 +40,6 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
     YAML::Node game = config["game"];
 
     server_config.game.game_fps = game["game_fps"].as<unsigned int>();
-    server_config.game.max_concurrent_games = game["max_concurrent_games"].as<unsigned int>();
-    server_config.game.min_races_per_game = game["min_races_per_game"].as<unsigned int>();
-    server_config.game.max_races_per_game = game["max_races_per_game"].as<unsigned int>();
-    server_config.game.min_players_per_game = game["min_players_per_game"].as<unsigned int>();
-    server_config.game.max_players_per_game = game["max_players_per_game"].as<unsigned int>();
     server_config.game.wait_seconds_upgrade_shop = game["wait_seconds_upgrade_shop"].as<unsigned int>();
     server_config.game.wait_seconds_countdown = game["wait_seconds_countdown"].as<unsigned int>();
     server_config.game.timeout_seconds_race = game["timeout_seconds_race"].as<unsigned int>();
@@ -65,6 +60,11 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
 
         YAML::Node server = config["server"];
         server_config.server.server_port = server["server_port"].as<unsigned short>();
+        server_config.server.max_concurrent_games = server["max_concurrent_games"].as<unsigned int>();
+        server_config.server.min_races_per_game = server["min_races_per_game"].as<unsigned int>();
+        server_config.server.max_races_per_game = server["max_races_per_game"].as<unsigned int>();
+        server_config.server.min_players_per_game = server["min_players_per_game"].as<unsigned int>();
+        server_config.server.max_players_per_game = server["max_players_per_game"].as<unsigned int>();
         server_config.server.command_queue_capacity =
                 server["command_queue_capacity"].as<unsigned int>();
         server_config.server.snapshot_queue_capacity =

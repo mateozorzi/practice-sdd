@@ -195,6 +195,7 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
 }
 
 void ServerProtocol::send_lobby(const LobbyDTO& lobby_dto) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
     add_uint32_to_buffer(lobby_dto.lobby_id);
     add_string_to_buffer(lobby_dto.lobby_name);
@@ -206,9 +207,8 @@ void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalog
 
     add_uint8_to_buffer(lobby_catalogue.size);
 
-    for (const auto& lobby: lobby_catalogue.lobbies) {
+    for (const auto& lobby: lobby_catalogue.lobbies)
         send_lobby(lobby);
-    }
 
     send_buffer();
 }
