@@ -66,7 +66,7 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies) {
 }
 
 void JoinLobby::join_denied() {
-    QMessageBox::warning(this, "Access Denied", "Denied join to lobby");
+    QMessageBox::warning(this, "Access Denied", "Denied join to lobby, refresh and try again.");
 }
 
 JoinLobby::~JoinLobby() { delete ui; }

@@ -46,6 +46,7 @@ public:
     void send_world_snapshot(const GameUpdateDTO& snapshot);
     void send_race_update(const GameUpdateDTO& snapshot);
     void send_leaderboard_update(const GameUpdateDTO& snapshot);
+    void add_lobby_to_buffer(const LobbyDTO& lobby_dto);
     void send_lobby(const LobbyDTO& lobby_dto);
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);
