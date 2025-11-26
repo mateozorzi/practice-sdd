@@ -17,7 +17,7 @@ public:
     bool lobby_create(PlayerDTO& player);
     bool select_races();
     bool create_lobby(const PlayerDTO& player);
-    bool join_lobby(PlayerDTO& player);
+    bool join_lobby();
 };
 
 

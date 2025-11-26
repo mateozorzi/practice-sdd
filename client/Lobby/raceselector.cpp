@@ -24,6 +24,7 @@ void RaceSelector::fill_available_races() {
     ui->availableRaces->clear();
 
     ui->availableRaces->setRowCount(static_cast<int>(available_races.size()));
+    ui->availableRaces->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     config_available_races();
 
@@ -49,6 +50,7 @@ void RaceSelector::config_select_races() {
     QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Actions"};
     ui->select->setColumnCount(col.size());
     ui->select->setHorizontalHeaderLabels(col);
+    ui->select->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ui->select->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->select->setShowGrid(false);
@@ -59,6 +61,7 @@ void RaceSelector::config_available_races() {
     QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Actions"};
     ui->availableRaces->setColumnCount(col.size());
     ui->availableRaces->setHorizontalHeaderLabels(col);
+    ui->availableRaces->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ui->availableRaces->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->availableRaces->setShowGrid(false);

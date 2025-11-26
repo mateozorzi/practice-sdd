@@ -31,6 +31,7 @@ void SelectCircuit::fill_table() {
     ui->tableRaces->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableRaces->setShowGrid(false);
     ui->tableRaces->verticalHeader()->setVisible(false);
+    ui->tableRaces->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     read_info_races(races_names);
 

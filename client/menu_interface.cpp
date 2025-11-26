@@ -128,7 +128,7 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
     return closed;
 }
 
-bool MenuInterface::join_lobby(PlayerDTO& player) {
+bool MenuInterface::join_lobby() {
 
     LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
     protocol.ask_for_lobbies(lobby_request);
@@ -214,7 +214,7 @@ bool MenuInterface::lobby_create(PlayerDTO& player) {
         cg.hide();
         bool close_menu = false;
 
-        close_menu = join_lobby(player);
+        close_menu = join_lobby();
 
         if (close_menu) {
             cg.show();
