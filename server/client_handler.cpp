@@ -124,19 +124,19 @@ void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_
 
     lobby.reap();
 
-    auto result = lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+    if (max_players < static_cast<uint8_t>(server_config.server.min_players_per_game)) {
 
-    if (max_players < server_config.game.server.min_players_per_game) {
-
-        LobbyDTO lobby_dto(LobbyAction::MIN_PLAYERS_ERROR, 0, "", 0);
+        LobbyDTO lobby_dto(LobbyAction::MIN_PLAYERS_ERROR, 0, "", server_config.server.min_players_per_game);
         server_protocol.send_lobby_response(lobby_dto);
         return;
-    } else if (max_players > server_config.game.server.max_players_per_game) {
+    } else if (max_players > static_cast<uint8_t>(server_config.server.max_players_per_game)) {
 
-        LobbyDTO lobby_dto(LobbyAction::MAX_PLAYERS_ERROR, 0, "", 0);
+        LobbyDTO lobby_dto(LobbyAction::MAX_PLAYERS_ERROR, 0, "", server_config.server.max_players_per_game);
         server_protocol.send_lobby_response(lobby_dto);
         return;
     }
+
+    auto result = lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
     if (!result.has_value()) {
 
         LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
