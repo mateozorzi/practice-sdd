@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <QMessageBox>
 
 #include <stdio.h>
 
@@ -102,7 +103,7 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
         std::cout << player.username << " creating lobby: " << lobby_name
                   << " with max players: " << max_players << std::endl;
         LobbyDTO lobby(LobbyAction::CREATE_LOBBY, player.id, lobby_name, max_players);
-        cl.close();
+        cl.hide();
 
         closed = select_races();
 
@@ -113,8 +114,19 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
         }
 
         protocol.send_create_lobby(lobby);
+        //client wait for server response
+        LobbyDTO lobby_response = protocol.receive_lobby();
+        std::cout << "Received lobby creation response from server: " << static_cast<int>(lobby_response.action) << std::endl;
+        if (lobby_response.action == LobbyAction::SUCCESS){
+            std::cout << "Lobby created successfully with ID: " << lobby_response.lobby_id
+                      << std::endl;
+            cl.close();
+            loop.quit();
+        } else if (lobby_response.action == LobbyAction::ERROR){
+            cl.show();
+            cl.create_denied();
+        }
 
-        loop.quit();
     });
 
     QObject::connect(&cl, &CreateLobby::close_menu, [&]() {
@@ -147,35 +159,21 @@ bool MenuInterface::join_lobby(PlayerDTO& player) {
 
         LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, lobby.lobby_id);
         protocol.send_action_lobby(lobby_req);
-        // LobbyDTO lobby_info = protocol.receive_lobby_info();
+        LobbyDTO lobby_info = protocol.receive_lobby();
 
-        std::cout << player.username << " joined lobby ID: " << lobby.lobby_id << std::endl;
-
-        if (closed) {
-            jl.show();
-        } else {
-            jl.close();
-            loop.quit();
-        }
-
-        /*if (lobby_info.action == LobbyAction::JOIN_LOBBY) {
+        if (lobby_info.action == LobbyAction::SUCCESS) {
             //lobby accepted
             std::cout << player.username <<" joined lobby ID: " << lobby.lobby_id << std::endl;
-            jl.hide();
-            closed = waiting_room(false, lobby);
+            jl.close();
+            loop.quit();
 
-            if (closed) {
-                jl.show();
-            }else{
-                jl.close();
-                loop.quit();
-            }
-
-        }else {
+        }else if(lobby_info.action == LobbyAction::ERROR){
             //lobby denied
             std::cout << player.username <<" join lobby ID: " << lobby.lobby_id << " denied." <<
-        std::endl; jl.fill_table(lobbies); jl.join_denied();
-        }*/
+            std::endl; 
+            jl.fill_table(lobbies); 
+            jl.join_denied();
+        }
     });
 
     QObject::connect(&jl, &JoinLobby::refresh, [&]() {

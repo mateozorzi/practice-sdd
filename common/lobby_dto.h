@@ -16,7 +16,9 @@ enum class LobbyAction : uint8_t {
     INFO_LOBBY = 0x06,
     CHANGE_USERNAME = 0x07,
     LIST_RACES = 0x08,
-    SEND_RACE_SELECTION = 0x09
+    SEND_RACE_SELECTION = 0x09,
+    SUCCESS = 0x10,
+    ERROR = 0x11
 
 };
 

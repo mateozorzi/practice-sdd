@@ -127,7 +127,7 @@ physics:
       restitution: 0.02
       linear_damping: 1.5
       angular_damping: 3.5
-      min_turn_speed: 0.2
+      min_turn_speed: 0.25
       acceleration: 3.0
       braking_factor: 0.25
       max_speed: 12.0

@@ -16,6 +16,7 @@ public:
 
     QString get_lobby_name();
     int get_number_players();
+    void create_denied();
 
 signals:
     void create_lobby();
