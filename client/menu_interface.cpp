@@ -114,6 +114,14 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
         } else if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_ERROR) {
             cl.show();
             cl.create_denied();
+        }else if (lobby_response.action == LobbyAction::MAX_PLAYERS_ERROR) {
+            // lobby full
+            cl.show();
+            cl.create_denied_players(lobby_response.max_players, "Max players reached");
+        } else if (lobby_response.action == LobbyAction::MIN_PLAYERS_ERROR) {
+            // not enough players
+            cl.show();
+            cl.create_denied_players(lobby_response.max_players, "Min players required");
         }
     });
 
