@@ -240,6 +240,7 @@ PlayerDTO MenuInterface::lobby() {
 
     Lobby l;
     l.showMaximized();
+    std::cout<<"Showing lobby window"<<std::endl;
 
     PlayerDTO player("", -1, CarDTO(), -1, false);
 
@@ -250,10 +251,12 @@ PlayerDTO MenuInterface::lobby() {
 
     // Conectás la señal del lobby con el cliente
     QObject::connect(&l, &Lobby::input_username, [&](const QString& name) {
+        std::cout<<"Received username signal"<<std::endl;
         username = name.toStdString();
 
         protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));
         client_id = protocol.receive_id();  // wait for server response
+        std::cout<<"Received client ID from server: "<<client_id<<std::endl;
         player.username = username;
         player.id = client_id;
         std::cout << "Username entered: " << player.username << std::endl;

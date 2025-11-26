@@ -334,16 +334,22 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
 
 double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
                                                  const CheckpointDTO& checkpoint) {
-    const double dx = checkpoint.x - player.x_position;
-    const double dy = checkpoint.y - player.y_position;
+    
+    const int dx = checkpoint.x - player.x_position;
+    const int dy = checkpoint.y - player.y_position;
 
     const double angle_rad = std::atan2(dy, dx);
     double angle_deg = angle_rad * (180.0 / M_PI);
-
-    const double rotation = angle_deg - 90.0;
-    if (rotation < 0)
-        angle_deg += 360;
-
+    
+    
+    // Convertir para que 0° = arriba
+    angle_deg += 90.0;
+    
+    // Normalizar
+    if (angle_deg < 0) angle_deg += 360.0;
+    if (angle_deg >= 360.0) angle_deg -= 360.0;
+    
+    
     return angle_deg;
 }
 

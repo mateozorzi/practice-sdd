@@ -113,6 +113,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 255);
 border:2px solid;
 border-color: rgb(255, 255, 255);</string>
         </property>
@@ -189,6 +190,7 @@ border-color: rgb(255, 255, 255);</string>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 255);
 border:2px solid;
 border-color: rgb(255, 255, 255);</string>
           </property>
@@ -263,6 +265,7 @@ border-color: rgb(255, 255, 255);</string>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 255);
 border:2px solid;
 border-color: rgb(255, 255, 255);</string>
           </property>
@@ -337,6 +340,7 @@ border-color: rgb(255, 255, 255);</string>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 0, 0);
+color: rgb(255, 255, 255);
 border:2px solid;
 border-color: rgb(255, 255, 255);</string>
           </property>
@@ -363,10 +367,6 @@ border-color: rgb(255, 255, 255);</string>
      </layout>
     </item>
    </layout>
-   <zorder>layoutWidget</zorder>
-   <zorder>Tituloventana</zorder>
-   <zorder>Exit</zorder>
-   <zorder>layoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
