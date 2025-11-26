@@ -8,8 +8,11 @@ game:
   min_players_per_game: 2
   max_players_per_game: 8
 
-  wait_time_upgrade_menu: 10
-  wait_time_final_leaderboard: 20
+  wait_seconds_upgrade_shop: 1
+  wait_seconds_countdown: 1
+  timeout_seconds_race: 600
+  wait_seconds_leaderboard: 10
+  wait_seconds_game_finished: 15
 
   upgrades:
     health_upgrade: 50.0
@@ -22,4 +25,3 @@ server:
   server_port: 8080
   command_queue_capacity: 500
   snapshot_queue_capacity: 100
-  waiting_for_players_fps: 15

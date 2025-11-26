@@ -45,9 +45,11 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
     server_config.game.max_races_per_game = game["max_races_per_game"].as<unsigned int>();
     server_config.game.min_players_per_game = game["min_players_per_game"].as<unsigned int>();
     server_config.game.max_players_per_game = game["max_players_per_game"].as<unsigned int>();
-    server_config.game.wait_time_upgrade_menu = game["wait_time_upgrade_menu"].as<unsigned int>();
-    server_config.game.wait_time_final_leaderboard =
-            game["wait_time_final_leaderboard"].as<unsigned int>();
+    server_config.game.wait_seconds_upgrade_shop = game["wait_seconds_upgrade_shop"].as<unsigned int>();
+    server_config.game.wait_seconds_countdown = game["wait_seconds_countdown"].as<unsigned int>();
+    server_config.game.timeout_seconds_race = game["timeout_seconds_race"].as<unsigned int>();
+    server_config.game.wait_seconds_leaderboard = game["wait_seconds_leaderboard"].as<unsigned int>();
+    server_config.game.wait_seconds_game_finished = game["wait_seconds_game_finished"].as<unsigned int>();
 
     if (game["upgrades"]) {
 
@@ -67,8 +69,6 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
                 server["command_queue_capacity"].as<unsigned int>();
         server_config.server.snapshot_queue_capacity =
                 server["snapshot_queue_capacity"].as<unsigned int>();
-        server_config.server.waiting_for_players_fps =
-                server["waiting_for_players_fps"].as<unsigned int>();
     }
 }
 
