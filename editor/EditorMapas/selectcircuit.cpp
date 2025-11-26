@@ -21,7 +21,7 @@ void SelectCircuit::fill_table() {
     QStringList races_names = dir.entryList(QStringList() << "*.csv", QDir::Files);
     qDebug() << "size: " << races_names.size();
 
-    ui->tableRaces->clear();
+    ui->tableRaces->clearContents();
     ui->tableRaces->setRowCount(races_names.length());
 
     QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Open", "Delete"};
@@ -32,6 +32,8 @@ void SelectCircuit::fill_table() {
     ui->tableRaces->setShowGrid(false);
     ui->tableRaces->verticalHeader()->setVisible(false);
     ui->tableRaces->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableRaces->setFocusPolicy(Qt::NoFocus);
+    ui->tableRaces->setSelectionMode(QAbstractItemView::NoSelection);
 
     read_info_races(races_names);
 
