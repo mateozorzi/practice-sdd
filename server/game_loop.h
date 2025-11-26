@@ -3,17 +3,15 @@
 
 
 #include <functional>
-#include <string>
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <vector>
-
 
 #include "../common/game_command_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/race_catalogue_dto.h"
 #include "../common/thread.h"
-
 
 #include "city_loader.h"
 #include "collision_listener.h"
@@ -28,7 +26,14 @@ constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
 
 
-enum class GamePhase { WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, LEADERBOARD, GAME_FINISHED };
+enum class GamePhase {
+    WAITING_CAR_SELECTION,
+    UPGRADE_SHOP,
+    COUNTDOWN,
+    IN_RACE,
+    LEADERBOARD,
+    GAME_FINISHED
+};
 
 
 class GameLoop final: public Thread {

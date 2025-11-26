@@ -13,8 +13,6 @@
 
 #include "world_creation_exception.h"
 
-#define RACE_TIMEOUT_SEG 600  // 10 minutes
-
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                    const uint8_t max_players, const ServerConfig& config,
@@ -51,13 +49,15 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
 
 void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time) {
 
-    const std::chrono::steady_clock::time_point iteration_end_time = std::chrono::steady_clock::now();
-    const std::chrono::milliseconds iteration_time = std::chrono::duration_cast<std::chrono::milliseconds>(iteration_end_time - iteration_start_time);
+    const std::chrono::steady_clock::time_point iteration_end_time =
+            std::chrono::steady_clock::now();
+    const std::chrono::milliseconds iteration_time =
+            std::chrono::duration_cast<std::chrono::milliseconds>(iteration_end_time -
+                                                                  iteration_start_time);
 
     if (iteration_time < game_iteration_duration)
         std::this_thread::sleep_for(game_iteration_duration - iteration_time);
 }
-
 
 
 void GameLoop::process_commands_in_waiting_car_selection_phase() {
@@ -180,23 +180,23 @@ void GameLoop::handle_waiting_car_selection_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to upgrade shop phase." << std::endl;
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
-        
+
         set_race(selected_races.races[current_race_index]);
 
-        //GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-        //game_monitor.broadcast(game_update);
+        // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+        // game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
 }
-    
+
 
 void GameLoop::handle_upgrade_shop_phase() {
-    
+
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    
+
     const auto elapsed = now - *phase_start;
-    
+
     process_commands_in_upgrade_shop_phase();
 
     if (elapsed >= upgrade_shop_seconds) {
@@ -209,14 +209,13 @@ void GameLoop::handle_upgrade_shop_phase() {
         shop_phase();
 
         // Commented for now, should implement client-side.
-        //GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
-        //game_monitor.broadcast(game_update);
+        // GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
+        // game_monitor.broadcast(game_update);
     }
-    
+
     fixed_sleep(now);
 }
-        
-        
+
 
 void GameLoop::handle_countdown_phase() {
 
@@ -232,8 +231,8 @@ void GameLoop::handle_countdown_phase() {
         phase_start = std::nullopt;
 
         // Commented for now, should implement client-side.
-        //GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
-        //game_monitor.broadcast(game_update);
+        // GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
+        // game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -262,11 +261,11 @@ void GameLoop::handle_in_race_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
         current_phase = GamePhase::LEADERBOARD;
         phase_start = std::nullopt;
-        LeaderboardDTO leaderboard = create_leaderboard();
+        // LeaderboardDTO leaderboard = create_leaderboard();
 
         // Commented for now, should implement client-side.
-        //GameUpdateDTO game_update(GameLoopAction::SEND_LEADERBOARD, leaderboard);
-        //game_monitor.broadcast(game_update);
+        // GameUpdateDTO game_update(GameLoopAction::SEND_LEADERBOARD, leaderboard);
+        // game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -287,25 +286,24 @@ void GameLoop::handle_leaderboard_phase() {
 
             current_phase = GamePhase::UPGRADE_SHOP;
             set_race(selected_races.races[current_race_index]);
-            //update_positions(selected_races.races[current_race_index]);
+            // update_positions(selected_races.races[current_race_index]);
             current_race_index += 1;
 
             shop_phase();
-            //GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-            //game_monitor.broadcast(game_update);
+            // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+            // game_monitor.broadcast(game_update);
         } else {
 
             current_phase = GamePhase::GAME_FINISHED;
-            LeaderboardDTO final_leaderboard = create_final_leaderboard();
+            // LeaderboardDTO final_leaderboard = create_final_leaderboard();
 
             // Commented for now, should implement client-side.
-            //GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, final_leaderboard);
-            //game_monitor.broadcast(game_update);
+            // GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, final_leaderboard);
+            // game_monitor.broadcast(game_update);
         }
     }
     fixed_sleep(now);
 }
-    
 
 
 void GameLoop::handle_game_finished_phase() {
@@ -318,15 +316,14 @@ void GameLoop::handle_game_finished_phase() {
     fixed_sleep(now);
 
     if (elapsed_time >= game_finish_seconds) {
-        
+
         // Commented for now, should implement client-side.
-        //GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
-        //game_monitor.broadcast(game_update);
+        // GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
+        // game_monitor.broadcast(game_update);
 
         this->stop();
     }
 }
-
 
 
 void GameLoop::remove_player(const uint32_t client_id) {
@@ -519,7 +516,6 @@ void GameLoop::finish_race(uint32_t timeout_time) {
 
 void GameLoop::check_alive_players() {
 
-    std::chrono::seconds race_timeout_seconds = std::chrono::seconds(600);
     uint32_t timeout = static_cast<uint32_t>(race_timeout_seconds.count());
 
     for (auto& [client_id, player]: players) {
@@ -617,7 +613,7 @@ LeaderboardDTO GameLoop::create_leaderboard() {
     for (size_t i = 0; i < race_stats.size(); ++i) {
         race_stats[i].position = position;
         position++;
-        if (race_stats[i].total_time >= RACE_TIMEOUT_SEG) {
+        if (std::chrono::seconds(race_stats[i].total_time) >= race_timeout_seconds) {
             race_stats[i].points = 0;
             continue;  // skip players who did not finish the race
         }
@@ -648,11 +644,8 @@ void GameLoop::run() {
 
     try {
 
-        static constexpr auto RACE_TIMEOUT = std::chrono::minutes(10);
-        std::chrono::steady_clock::time_point race_start_time;
-
         while (should_keep_running()) {
-            
+
             if (!phase_start.has_value())
                 phase_start = std::chrono::steady_clock::now();
 

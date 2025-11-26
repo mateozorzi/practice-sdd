@@ -40,11 +40,14 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
     YAML::Node game = config["game"];
 
     server_config.game.game_fps = game["game_fps"].as<unsigned int>();
-    server_config.game.wait_seconds_upgrade_shop = game["wait_seconds_upgrade_shop"].as<unsigned int>();
+    server_config.game.wait_seconds_upgrade_shop =
+            game["wait_seconds_upgrade_shop"].as<unsigned int>();
     server_config.game.wait_seconds_countdown = game["wait_seconds_countdown"].as<unsigned int>();
     server_config.game.timeout_seconds_race = game["timeout_seconds_race"].as<unsigned int>();
-    server_config.game.wait_seconds_leaderboard = game["wait_seconds_leaderboard"].as<unsigned int>();
-    server_config.game.wait_seconds_game_finished = game["wait_seconds_game_finished"].as<unsigned int>();
+    server_config.game.wait_seconds_leaderboard =
+            game["wait_seconds_leaderboard"].as<unsigned int>();
+    server_config.game.wait_seconds_game_finished =
+            game["wait_seconds_game_finished"].as<unsigned int>();
 
     if (game["upgrades"]) {
 
@@ -60,11 +63,14 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
 
         YAML::Node server = config["server"];
         server_config.server.server_port = server["server_port"].as<unsigned short>();
-        server_config.server.max_concurrent_games = server["max_concurrent_games"].as<unsigned int>();
+        server_config.server.max_concurrent_games =
+                server["max_concurrent_games"].as<unsigned int>();
         server_config.server.min_races_per_game = server["min_races_per_game"].as<unsigned int>();
         server_config.server.max_races_per_game = server["max_races_per_game"].as<unsigned int>();
-        server_config.server.min_players_per_game = server["min_players_per_game"].as<unsigned int>();
-        server_config.server.max_players_per_game = server["max_players_per_game"].as<unsigned int>();
+        server_config.server.min_players_per_game =
+                server["min_players_per_game"].as<unsigned int>();
+        server_config.server.max_players_per_game =
+                server["max_players_per_game"].as<unsigned int>();
         server_config.server.command_queue_capacity =
                 server["command_queue_capacity"].as<unsigned int>();
         server_config.server.snapshot_queue_capacity =
@@ -73,7 +79,8 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
 }
 
 
-void ServerConfigLoader::load_physics_config(const YAML::Node& config, ServerConfig& server_config) {
+void ServerConfigLoader::load_physics_config(const YAML::Node& config,
+                                             ServerConfig& server_config) {
 
     if (!config["physics"])
         throw std::runtime_error("Missing 'physics' node in physics configuration file");

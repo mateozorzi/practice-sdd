@@ -84,19 +84,21 @@ void Lobby::initialize_races() {
     }
 }
 
-std::optional<GameQueues> Lobby::create_new_game(
-        const uint32_t client_id, const std::string& username, const uint8_t max_players,
-        const std::string& name, RaceCatalogueDTO& selected) {
+std::optional<GameQueues> Lobby::create_new_game(const uint32_t client_id,
+                                                 const std::string& username,
+                                                 const uint8_t max_players, const std::string& name,
+                                                 RaceCatalogueDTO& selected) {
 
     std::lock_guard lock(mtx);
 
     if (games.size() >= config.server.max_concurrent_games) {
 
         std::cerr << "[" << LOBBY
-            << "] "
-                "Max number of concurrent games ("
-            << config.server.max_concurrent_games << ") has been reached. Cannot create the game." << std::endl;
-        
+                  << "] "
+                     "Max number of concurrent games ("
+                  << config.server.max_concurrent_games
+                  << ") has been reached. Cannot create the game." << std::endl;
+
         return std::nullopt;
     }
 
@@ -116,8 +118,9 @@ std::optional<GameQueues> Lobby::create_new_game(
     return queues;
 }
 
-std::optional<GameQueues> Lobby::join_existing_game(
-        const uint32_t client_id, const uint32_t game_id, const std::string& username) {
+std::optional<GameQueues> Lobby::join_existing_game(const uint32_t client_id,
+                                                    const uint32_t game_id,
+                                                    const std::string& username) {
 
     std::lock_guard lock(mtx);
 
@@ -129,7 +132,7 @@ std::optional<GameQueues> Lobby::join_existing_game(
                   << "] "
                      "Game "
                   << (int)game_id << " not found." << std::endl;
-        
+
         return std::nullopt;
     }
 
@@ -138,7 +141,7 @@ std::optional<GameQueues> Lobby::join_existing_game(
 
         std::cerr << "[" << LOBBY << "] "
                   << "Game with ID: " << game_id << " is full." << std::endl;
-        
+
         return std::nullopt;
     }
 

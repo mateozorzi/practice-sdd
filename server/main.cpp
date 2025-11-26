@@ -19,7 +19,8 @@ constexpr std::string_view UNKNOWN_EXCEPTION = "Unknown exception";
 int main() {
 
     try {
-        ServerConfig server_config = ServerConfigLoader().load_yaml(std::string(SERVER_CONFIG_FILEPATH));
+        ServerConfig server_config =
+                ServerConfigLoader().load_yaml(std::string(SERVER_CONFIG_FILEPATH));
 
         const std::string port = std::to_string(server_config.server.server_port);
         Server server(port, server_config);

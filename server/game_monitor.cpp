@@ -61,10 +61,10 @@ void GameMonitor::remove_client(const uint32_t client_id) {
 
     if (it == snapshot_queues.end())
         return;
-    
+
     snapshot_queues.erase(it);
     std::cerr << "[" << GAME_MONITOR << "] "
-            << "Removing player with ID: " << client_id << std::endl;
+              << "Removing player with ID: " << client_id << std::endl;
 }
 
 

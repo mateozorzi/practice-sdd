@@ -214,8 +214,7 @@ void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalog
 
     add_uint8_to_buffer(lobby_catalogue.size);
 
-    for (const auto& lobby: lobby_catalogue.lobbies)
-        add_lobby_to_buffer(lobby);
+    for (const auto& lobby: lobby_catalogue.lobbies) add_lobby_to_buffer(lobby);
 
     send_buffer();
 }
