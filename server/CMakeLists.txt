@@ -7,7 +7,6 @@ target_sources(nfs_server
     city_utils.cpp
     client_handler.cpp
     collision_listener.cpp
-    config_loader.cpp
     game.cpp
     game_command.cpp
     game_loop.cpp
@@ -18,6 +17,7 @@ target_sources(nfs_server
     receiver.cpp
     sender.cpp
     server.cpp
+    server_config_loader.cpp
     server_protocol.cpp
     PUBLIC
     # .h files
@@ -27,7 +27,6 @@ target_sources(nfs_server
     city_utils.h
     client_handler.h
     collision_listener.h
-    config_loader.h
     game.h
     game_command.h
     game_loop.h
@@ -38,6 +37,7 @@ target_sources(nfs_server
     sender.h
     server.h
     server_config.h
+    server_config_loader.h
     server_protocol.h
     world_creation_exception.h
     )

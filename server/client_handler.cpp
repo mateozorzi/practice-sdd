@@ -122,17 +122,39 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
 void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
                                     const std::string& lobby_name) {
 
+    auto result = lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::ERROR, 0, "", 0);
+        server_protocol.send_lobby(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
     game_id = client_id;
-    auto [command_queue, snapshot_queue] =
-            lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+
+    LobbyDTO lobby_dto(LobbyAction::SUCCESS, 0, "", 0);
+    server_protocol.send_lobby(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
 void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
 
+    auto result = lobby.join_existing_game(client_id, actual_game_id, username);
+
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::ERROR, 0, "", 0);
+        server_protocol.send_lobby(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
     game_id = actual_game_id;
 
-    auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
+    LobbyDTO lobby_dto(LobbyAction::SUCCESS, 0, "", 0);
+    server_protocol.send_lobby(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 

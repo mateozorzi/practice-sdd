@@ -8,10 +8,12 @@
 #include <unordered_map>
 #include <vector>
 
+
 #include "../common/game_command_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/race_catalogue_dto.h"
 #include "../common/thread.h"
+
 
 #include "city_loader.h"
 #include "collision_listener.h"
@@ -19,14 +21,15 @@
 #include "player.h"
 #include "server_config.h"
 
+
 constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr float GAME_STEP = 1.0f / 60.0f;
 constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
 
 
-//enum class GamePhase { WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, GAME_FINISHED };
-enum GamePhase {WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, LEADERBOARD, GAME_FINISHED };
+enum class GamePhase { WAITING_CAR_SELECTION, UPGRADE_SHOP, COUNTDOWN, IN_RACE, LEADERBOARD, GAME_FINISHED };
+
 
 class GameLoop final: public Thread {
 
@@ -39,13 +42,12 @@ class GameLoop final: public Thread {
 
     std::optional<std::chrono::steady_clock::time_point> phase_start = std::nullopt;
     std::optional<std::chrono::steady_clock::time_point> race_start_time = std::nullopt;
-    std::chrono::seconds countdown_seconds = std::chrono::seconds(5);
-    std::chrono::seconds upgrade_shop_seconds = std::chrono::seconds(10);
-    std::chrono::seconds leaderboard_seconds = std::chrono::seconds(10);
-    std::chrono::seconds game_finish_seconds = std::chrono::seconds(15);
-    std::chrono::seconds race_timeout_seconds = std::chrono::seconds(600);
+    std::chrono::seconds upgrade_shop_seconds;
+    std::chrono::seconds countdown_seconds;
+    std::chrono::seconds race_timeout_seconds;
+    std::chrono::seconds leaderboard_seconds;
+    std::chrono::seconds game_finish_seconds;
     uint8_t current_race_index = 0;
-    
 
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
