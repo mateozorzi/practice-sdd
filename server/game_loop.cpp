@@ -262,7 +262,7 @@ void GameLoop::handle_in_race_phase() {
         current_phase = GamePhase::LEADERBOARD;
         phase_start = std::nullopt;
         LeaderboardDTO leaderboard = create_leaderboard();
-        (void) leaderboard;
+        (void)leaderboard;
 
         // Commented for now, should implement client-side.
         // GameUpdateDTO game_update(GameLoopAction::SEND_LEADERBOARD, leaderboard);
@@ -296,9 +296,8 @@ void GameLoop::handle_leaderboard_phase() {
         } else {
 
             current_phase = GamePhase::GAME_FINISHED;
-            LeaderboardDTO final_leaderboard = create_final_leaderboard();
-
-            (void) final_leaderboard;
+            final_leaderboard = create_final_leaderboard();
+            (void)final_leaderboard;
 
             // Commented for now, should implement client-side.
             // GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, final_leaderboard);
@@ -591,9 +590,7 @@ LeaderboardDTO GameLoop::create_final_leaderboard() {
                   << " | Total Points: " << static_cast<int>(stats.points) << std::endl;
     }
 
-    final_leaderboard = LeaderboardDTO("Final Leaderboard", final_stats);
-
-    return final_leaderboard;
+    return LeaderboardDTO("Final Leaderboard", final_stats);
 }
 
 LeaderboardDTO GameLoop::create_leaderboard() {

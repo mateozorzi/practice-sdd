@@ -27,7 +27,7 @@ enum class GameLoopAction : uint8_t {
     GAME_FINISHED = 0x16,
     RETURN_TO_LOBBY = 0x17,
 
-    CLOSE_SHOP = 0x18 //provisional, delete later
+    CLOSE_SHOP = 0x18  // provisional, delete later
 };
 
 
