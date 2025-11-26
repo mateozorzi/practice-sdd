@@ -137,11 +137,7 @@ bool UpgradeShop::is_shop_open() const { return isOpen; }
 
 void UpgradeShop::toggle_shop() { isOpen = !isOpen; }
 
-void UpgradeShop::close_shop() {
-    if (isOpen) {
-        isOpen = false;
-    }
-}
+void UpgradeShop::close_shop() { isOpen = false; }
 
 std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
     SDL2pp::Point point{x, y};

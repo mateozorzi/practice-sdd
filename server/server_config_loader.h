@@ -22,8 +22,6 @@ class ServerConfigLoader {
 
 
 public:
-
-
     ServerConfigLoader() = default;
 
     ServerConfig load_yaml(const std::string& base_path);

@@ -1,12 +1,16 @@
 #ifndef GAME_H
 #define GAME_H
+
+
+#include <memory>
+#include <string>
+
 #include "client_protocol.h"
 #include "game_phase.h"
 #include "game_state.h"
 #include "input_manager.h"
 #include "receiver.h"
 #include "sdl_manager.h"
-#include "../server/receiver.h"
 
 class Game {
 private:
@@ -53,7 +57,7 @@ private:
 
     void change_phase(std::unique_ptr<GamePhase> new_phase);
 
-    void update_player(const PlayerDTO &player, const CarPositionDTO &car);
+    void update_player(const PlayerDTO& player, const CarPositionDTO& car);
 
 public:
     explicit Game(ClientProtocol& protocol, uint32_t id);

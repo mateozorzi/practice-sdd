@@ -160,7 +160,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars;
 
-    for (const auto& [pid, pinfo] : game_state.players) {
+    for (const auto& [pid, pinfo]: game_state.players) {
         PlayerDTO p;
         p.id = pid;
         p.car.model = pinfo.model;
@@ -303,13 +303,9 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time) {
-    shop.render(time, Car::DEFAULT);
-}
+void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT); }
 
-void SDLManager::close_shop() {
-    shop.close_shop();
-}
+void SDLManager::close_shop() { shop.close_shop(); }
 
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
     SDL2pp::Rect view = camera.get_view_rect();

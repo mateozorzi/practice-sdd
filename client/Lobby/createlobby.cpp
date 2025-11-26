@@ -35,7 +35,7 @@ void CreateLobby::on_create_clicked() {
     emit create_lobby();
 }
 
-void CreateLobby::create_denied(){
+void CreateLobby::create_denied() {
     QMessageBox::warning(this, "Create Denied", "Denied create lobby.");
 }
 

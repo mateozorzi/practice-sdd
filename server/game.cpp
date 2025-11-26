@@ -33,10 +33,7 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Game::add_player(
     return {command_queue, snapshot_queue};
 }
 
-void Game::remove_player(const uint32_t client_id) {
-
-    game_monitor.remove_client(client_id);
-}
+void Game::remove_player(const uint32_t client_id) { game_monitor.remove_client(client_id); }
 
 const std::string Game::get_name() const { return name; }
 
@@ -63,7 +60,7 @@ Game::~Game() {
 
         Game::stop();
         std::cerr << "[" << GAME << "] "
-            << "Game with ID: " << game_id << " stopped." << std::endl;
+                  << "Game with ID: " << game_id << " stopped." << std::endl;
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();

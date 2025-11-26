@@ -1,12 +1,19 @@
 #include "game.h"
-#include <memory>
 
-#include "../common/queue.h"
+#include <utility>
+
 #include "../common/constants.h"
+#include "../common/queue.h"
 #include "../common/race_dto.h"
 
-Game::Game(ClientProtocol& protocol, uint32_t id) : protocol(protocol), sdl(SDLManager()), input_handler(sdl, this->protocol),
-                           receiver(this->protocol), game_state{id, {}, {}, {}}, keep_running(true), current_city("") {
+Game::Game(ClientProtocol& protocol, uint32_t id):
+        protocol(protocol),
+        sdl(SDLManager()),
+        input_handler(sdl, this->protocol),
+        receiver(this->protocol),
+        game_state{id, {}, {}, {}},
+        keep_running(true),
+        current_city("") {
     phase = std::make_unique<RacePhase>(*this, 0);
 }
 
@@ -24,7 +31,7 @@ void Game::run() {
 }
 
 void Game::reset_events() {
-    for (auto& [username, p] : game_state.players) {
+    for (auto& [username, p]: game_state.players) {
         p.crashed = false;
         p.died = false;
         p.isMoving = false;
@@ -34,8 +41,8 @@ void Game::reset_events() {
     game_state.player.died = false;
 }
 
-void Game::detect_events(const WorldSnapshotDTO &snapshot) {
-    for (const auto& [playerDTO, carPos] : snapshot.get_car_positions()) {
+void Game::detect_events(const WorldSnapshotDTO& snapshot) {
+    for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
         const uint32_t& id = playerDTO.id;
         auto it = game_state.players.find(id);
 
@@ -46,11 +53,10 @@ void Game::detect_events(const WorldSnapshotDTO &snapshot) {
         PlayerInfo& prev = it->second;
         bool moved = false;
 
-        if (prev.x != (int)carPos.x_position ||
-            prev.y != (int)carPos.y_position ||
+        if (prev.x != (int)carPos.x_position || prev.y != (int)carPos.y_position ||
             prev.angle != (int)carPos.angle) {
             moved = true;
-            }
+        }
 
         prev.isMoving = moved;
     }
@@ -89,12 +95,11 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
 void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
     game_state.players.clear();
 
-    for (const auto& [playerDTO, carPos] : snapshot.get_car_positions()) {
-        if (playerDTO.username == game_state.player.model ||
-            playerDTO.id == game_state.player.id) {
+    for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
+        if (playerDTO.username == game_state.player.model || playerDTO.id == game_state.player.id) {
             update_player(playerDTO, carPos);
             continue;
-            }
+        }
         update_player(playerDTO, carPos);
     }
 }
@@ -124,7 +129,8 @@ bool Game::update_upgrade() {
             sdl.close_shop();
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_RACE) {
-            // Detectar cuando se recibe una nueva carrera - Deberia hacerse durante etapa especifica (waiting o endgame) - Usar variable de sdl manager
+            // Detectar cuando se recibe una nueva carrera - Deberia hacerse durante etapa
+            // especifica (waiting o endgame) - Usar variable de sdl manager
             if (std::holds_alternative<RaceDTO>(dto.data)) {
                 RaceDTO race = std::get<RaceDTO>(dto.data);
                 if (current_city != race.city) {
@@ -162,9 +168,7 @@ void Game::show_upgrade() {
     sdl.show_screen();
 }
 
-void Game::handle_race_events() {
-    this->keep_running = input_handler.handle_movement();
-}
+void Game::handle_race_events() { this->keep_running = input_handler.handle_movement(); }
 
 bool Game::update_race() {
     GameUpdateDTO dto;
@@ -227,6 +231,4 @@ void Game::show_race() {
     sdl.show_screen();
 }
 
-void Game::change_phase(std::unique_ptr<GamePhase> new_phase) {
-    phase = std::move(new_phase);
-}
+void Game::change_phase(std::unique_ptr<GamePhase> new_phase) { phase = std::move(new_phase); }
