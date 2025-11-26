@@ -122,12 +122,14 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
 void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
                                     const std::string& lobby_name) {
 
+    lobby.reap();
+
     auto result = lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
 
     if (!result.has_value()) {
 
         LobbyDTO lobby_dto(LobbyAction::ERROR, 0, "", 0);
-        server_protocol.send_lobby(lobby_dto);
+        server_protocol.send_lobby_response(lobby_dto);
         return;
     }
 
@@ -135,18 +137,20 @@ void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_
     game_id = client_id;
 
     LobbyDTO lobby_dto(LobbyAction::SUCCESS, 0, "", 0);
-    server_protocol.send_lobby(lobby_dto);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
 void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
+
+    lobby.reap();
 
     auto result = lobby.join_existing_game(client_id, actual_game_id, username);
 
     if (!result.has_value()) {
 
         LobbyDTO lobby_dto(LobbyAction::ERROR, 0, "", 0);
-        server_protocol.send_lobby(lobby_dto);
+        server_protocol.send_lobby_response(lobby_dto);
         return;
     }
 
@@ -154,7 +158,7 @@ void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t 
     game_id = actual_game_id;
 
     LobbyDTO lobby_dto(LobbyAction::SUCCESS, 0, "", 0);
-    server_protocol.send_lobby(lobby_dto);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 

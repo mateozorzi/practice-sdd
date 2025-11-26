@@ -194,13 +194,9 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
     send_buffer();
 }
 
-void ServerProtocol::send_lobby(const LobbyDTO& lobby_dto) {
+void ServerProtocol::send_lobby_response(const LobbyDTO& lobby_dto) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
-    add_uint32_to_buffer(lobby_dto.lobby_id);
-    add_string_to_buffer(lobby_dto.lobby_name);
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.max_players));
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.active_players));
+    add_lobby_to_buffer(lobby_dto);
 
     send_buffer();
 }
