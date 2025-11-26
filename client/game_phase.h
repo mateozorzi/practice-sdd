@@ -29,7 +29,7 @@ public:
 };
 */
 
-class UpgradePhase : public GamePhase {
+class UpgradePhase: public GamePhase {
 public:
     UpgradePhase(Game& game, int starting_it);
     void handle_game_events() override;
@@ -37,7 +37,7 @@ public:
     void show_game() override;
 };
 
-class RacePhase : public GamePhase {
+class RacePhase: public GamePhase {
 public:
     RacePhase(Game& game, int starting_it);
     void handle_game_events() override;

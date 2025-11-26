@@ -2,11 +2,11 @@
 
 #include <QApplication>
 #include <QEventLoop>
+#include <QMessageBox>
 #include <QString>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <QMessageBox>
 
 #include <stdio.h>
 
@@ -106,16 +106,15 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
         }
 
         protocol.send_create_lobby(lobby);
-        //client wait for server response
+        // client wait for server response
         LobbyDTO lobby_response = protocol.receive_lobby();
-        if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_SUCCESS){
+        if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_SUCCESS) {
             cl.close();
             loop.quit();
-        } else if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_ERROR){
+        } else if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_ERROR) {
             cl.show();
             cl.create_denied();
         }
-
     });
 
     QObject::connect(&cl, &CreateLobby::close_menu, [&]() {
@@ -143,25 +142,23 @@ bool MenuInterface::join_lobby() {
     QEventLoop loop;
 
     QObject::connect(&jl, &JoinLobby::join_lobby, [&](const LobbyDTO& lobby) {
-
         LobbyDTO lobby_req(LobbyAction::JOIN_LOBBY, lobby.lobby_id);
         protocol.send_action_lobby(lobby_req);
         LobbyDTO lobby_info = protocol.receive_lobby();
 
         if (lobby_info.action == LobbyAction::CREATE_OR_JOIN_SUCCESS) {
-            //lobby accepted
+            // lobby accepted
             jl.close();
             loop.quit();
 
-        }else if(lobby_info.action == LobbyAction::CREATE_OR_JOIN_ERROR){
-            //lobby denied
-            jl.fill_table(lobbies); 
+        } else if (lobby_info.action == LobbyAction::CREATE_OR_JOIN_ERROR) {
+            // lobby denied
+            jl.fill_table(lobbies);
             jl.join_denied();
         }
     });
 
     QObject::connect(&jl, &JoinLobby::refresh, [&]() {
-
         LobbyDTO lobby_request(LobbyAction::SEND_LOBBY_LIST);
         protocol.ask_for_lobbies(lobby_request);
         LobbyCatalogueDTO lobbies = protocol.receive_lobby_catalogue();
@@ -180,7 +177,7 @@ bool MenuInterface::join_lobby() {
     return closed;
 }
 
-bool MenuInterface::lobby_create(PlayerDTO& player) {
+bool MenuInterface::lobby_create(const PlayerDTO& player) {
     creategame cg;
     cg.showMaximized();
 

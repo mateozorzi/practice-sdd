@@ -261,7 +261,8 @@ void GameLoop::handle_in_race_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
         current_phase = GamePhase::LEADERBOARD;
         phase_start = std::nullopt;
-        // LeaderboardDTO leaderboard = create_leaderboard();
+        LeaderboardDTO leaderboard = create_leaderboard();
+        (void) leaderboard;
 
         // Commented for now, should implement client-side.
         // GameUpdateDTO game_update(GameLoopAction::SEND_LEADERBOARD, leaderboard);
@@ -295,7 +296,9 @@ void GameLoop::handle_leaderboard_phase() {
         } else {
 
             current_phase = GamePhase::GAME_FINISHED;
-            // LeaderboardDTO final_leaderboard = create_final_leaderboard();
+            LeaderboardDTO final_leaderboard = create_final_leaderboard();
+
+            (void) final_leaderboard;
 
             // Commented for now, should implement client-side.
             // GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, final_leaderboard);
