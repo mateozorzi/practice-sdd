@@ -241,7 +241,7 @@ bool MenuInterface::lobby_create(const PlayerDTO& player) {
     return closed;
 }
 
-PlayerDTO MenuInterface::lobby() {
+void MenuInterface::lobby(PlayerDTO& player) {
     int fake_argc = 0;
     char* fake_argv[] = {nullptr};
     QApplication app(fake_argc, fake_argv);
@@ -250,10 +250,11 @@ PlayerDTO MenuInterface::lobby() {
     l.showMaximized();
     std::cout<<"Showing lobby window"<<std::endl;
 
-    PlayerDTO player("", -1, CarDTO(), -1, false);
+    //PlayerDTO player("", -1, CarDTO(), -1, false);
 
     std::string username;
     uint32_t client_id = -1;
+    player.id = client_id;
 
     bool menu_closed = false;
 
@@ -304,6 +305,4 @@ PlayerDTO MenuInterface::lobby() {
     });
 
     app.exec();
-
-    return player;
 }

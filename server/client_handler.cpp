@@ -25,7 +25,8 @@ void ClientHandler::launch_lobby() {
     while (is_in_lobby) {
 
         try {
-
+            std::cout<<"[CLIENT_HANDLER] "
+                     <<"Waiting for lobby action from client ID: " << client_id << std::endl;
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
 
@@ -117,6 +118,8 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
     sender.stop();
     receiver.stop();
     receiver.join();
+
+    is_in_lobby = true;
 }
 
 void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
@@ -189,11 +192,14 @@ void ClientHandler::select_races(const LobbyDTO& lobby_dto) {
 
 void ClientHandler::run() {
 
-    while (should_keep_running() && is_in_lobby) {
+    while (should_keep_running()) {
 
         try {
-
-            launch_lobby();
+            if (is_in_lobby){
+                std::cout << "[CLIENT_HANDLER] "
+                          << "Launching lobby for client ID: " << client_id << std::endl;
+                launch_lobby();
+            }
         } catch (const LibError&) {
 
         } catch (const std::exception& e) {
