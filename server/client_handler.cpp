@@ -58,7 +58,6 @@ void ClientHandler::launch_lobby() {
     }
 
     ClientHandler::stop();
-
 }
 
 
@@ -195,7 +194,7 @@ void ClientHandler::run() {
     while (should_keep_running()) {
 
         try {
-            if (is_in_lobby){
+            if (is_in_lobby) {
                 std::cout << "[CLIENT_HANDLER] "
                           << "Launching lobby for client ID: " << client_id << std::endl;
                 launch_lobby();

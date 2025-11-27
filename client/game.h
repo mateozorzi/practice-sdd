@@ -36,7 +36,7 @@ private:
 
     void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
 
-    
+
     void handle_waiting_events();
     bool update_waiting();
     void show_waiting();
@@ -48,7 +48,7 @@ private:
     void handle_countdown_events();
     bool update_countdown();
     void show_countdown();
-    
+
     void handle_race_events();
     bool update_race();
     void show_race();

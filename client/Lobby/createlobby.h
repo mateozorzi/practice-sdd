@@ -1,7 +1,9 @@
 #ifndef CREATELOBBY_H
 #define CREATELOBBY_H
 
+
 #include <QMainWindow>
+#include <string>
 
 namespace Ui {
 class CreateLobby;
@@ -17,7 +19,7 @@ public:
     QString get_lobby_name();
     int get_number_players();
     void create_denied();
-    void create_denied_players(uint8_t players, std::string message);
+    void create_denied_players(uint8_t players, const std::string& message);
 
 signals:
     void create_lobby();

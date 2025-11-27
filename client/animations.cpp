@@ -95,5 +95,3 @@ SDL2pp::Point Animations::get_camera_shake() {
 
     return SDL2pp::Point(dx, dy);
 }
-
-

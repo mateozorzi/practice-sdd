@@ -135,7 +135,7 @@ bool InputManager::handle_countdown() {
         if (event.type == SDL_QUIT) {
             return false;
         }
-        //cheats
+        // cheats
     }
     return true;
 }

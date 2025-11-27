@@ -183,13 +183,12 @@ void GameLoop::handle_waiting_car_selection_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to upgrade shop phase." << std::endl;
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
-        
+
         GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
         game_monitor.broadcast(game_update);
 
-        //send here to set the race in upgrade phase once
+        // send here to set the race in upgrade phase once
         set_race(selected_races.races[current_race_index]);
-
     }
 
     fixed_sleep(now);
@@ -214,7 +213,7 @@ void GameLoop::handle_upgrade_shop_phase() {
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
         game_monitor.broadcast(game_update);
 
-        //send update_positions to show the map in the countdown phase
+        // send update_positions to show the map in the countdown phase
         update_positions(selected_races.races[current_race_index]);
     }
 
@@ -273,7 +272,7 @@ void GameLoop::handle_in_race_phase() {
         GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
         game_monitor.broadcast(game_update);
 
-        GameUpdateDTO l (GameLoopAction::SEND_LEADERBOARD, leaderboard);
+        GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
         game_monitor.broadcast(l);
     }
 
@@ -464,7 +463,7 @@ void GameLoop::update_positions(const RaceDTO& race) {
     }
 
     // Update NPC positions
-    for (auto& npc : npcs) {
+    for (auto& npc: npcs) {
         npc.update();
         world_snapshot.add_npc_position(npc.get_position());
     }
@@ -493,42 +492,43 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name) { 
+void GameLoop::map_configuration(const std::string& city_name) {
     city_loader.load_city(city_name);
     load_npcs(city_name);
 }
 
 void GameLoop::load_npcs(const std::string& city_name) {
     npcs.clear();
-    
+
     std::string normalized_city = city_name;
-    std::transform(normalized_city.begin(), normalized_city.end(), normalized_city.begin(), ::tolower);
+    std::transform(normalized_city.begin(), normalized_city.end(), normalized_city.begin(),
+                   ::tolower);
     std::replace(normalized_city.begin(), normalized_city.end(), ' ', '_');
-    
+
     std::string npc_file = "server/world/npcs/npcs_" + normalized_city + ".json";
-    
+
     try {
         std::ifstream file(npc_file);
         if (!file) {
             std::cout << "[GAME_LOOP] NPC file not found: " << npc_file << std::endl;
             return;
         }
-        
+
         nlohmann::json json_data;
         file >> json_data;
-        
+
         if (!json_data.is_array()) {
             std::cout << "[GAME_LOOP] Invalid NPC file format" << std::endl;
             return;
         }
-        
+
         uint32_t npc_id = 0;
         constexpr float NPC_SPEED = 1.5f;  // Slow speed in pixels per update
-        
-        for (const auto& polygon : json_data) {
+
+        for (const auto& polygon: json_data) {
             if (polygon.is_array() && polygon.size() >= 3) {
                 std::vector<std::vector<int>> route;
-                for (const auto& point : polygon) {
+                for (const auto& point: polygon) {
                     if (point.is_array() && point.size() >= 2) {
                         route.push_back({point[0].get<int>(), point[1].get<int>()});
                     }
@@ -536,9 +536,9 @@ void GameLoop::load_npcs(const std::string& city_name) {
                 npcs.emplace_back(npc_id++, route, NPC_SPEED);
             }
         }
-        
+
         std::cout << "[GAME_LOOP] Loaded " << npcs.size() << " NPCs from " << npc_file << std::endl;
-        
+
     } catch (const std::exception& e) {
         std::cout << "[GAME_LOOP] Error loading NPCs: " << e.what() << std::endl;
     }

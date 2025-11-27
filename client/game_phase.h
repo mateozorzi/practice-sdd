@@ -19,7 +19,7 @@ public:
 };
 
 
-class WaitingForGamePhase : public GamePhase {
+class WaitingForGamePhase: public GamePhase {
 public:
     WaitingForGamePhase(Game& game, int starting_it);
     void handle_game_events() override;
@@ -53,7 +53,7 @@ public:
 };
 
 
-class LeaderboardPhase : public GamePhase {
+class LeaderboardPhase: public GamePhase {
 public:
     LeaderboardPhase(Game& game, int starting_it);
     void handle_game_events() override;

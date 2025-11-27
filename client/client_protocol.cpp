@@ -187,7 +187,7 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
         CarPositionDTO car_position = receive_car_position();
         world_snapshot.add_car_position(player, car_position);
     }
-    
+
     // Receive NPC data
     const uint8_t npc_size = recv_uint8();
     for (uint8_t i = 0; i < npc_size; ++i) {
@@ -197,7 +197,7 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
         uint32_t angle = recv_uint32();
         world_snapshot.add_npc_position(NpcDTO(npc_id, x_position, y_position, angle));
     }
-    
+
     return world_snapshot;
 }
 

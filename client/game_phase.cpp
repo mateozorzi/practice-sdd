@@ -26,8 +26,8 @@ bool GamePhase::run() {
     return request_phase_change;
 }
 
-WaitingForGamePhase::WaitingForGamePhase(Game &game, int starting_it) : GamePhase(game, starting_it)
-{} 
+WaitingForGamePhase::WaitingForGamePhase(Game& game, int starting_it):
+        GamePhase(game, starting_it) {}
 void WaitingForGamePhase::handle_game_events() { game.handle_waiting_events(); }
 bool WaitingForGamePhase::update_game_state() { return game.update_waiting(); }
 void WaitingForGamePhase::show_game() { game.show_waiting(); }
@@ -50,8 +50,7 @@ bool RacePhase::update_game_state() { return game.update_race(); }
 void RacePhase::show_game() { game.show_race(); }
 
 
-LeaderboardPhase::LeaderboardPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
+LeaderboardPhase::LeaderboardPhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
 void LeaderboardPhase::handle_game_events() { game.handle_leaderboard_events(); }
 bool LeaderboardPhase::update_game_state() { return game.update_leaderboard(); }
 void LeaderboardPhase::show_game() { game.show_leaderboard(); }
-

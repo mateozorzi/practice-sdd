@@ -25,9 +25,7 @@ const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& WorldSnapshotDTO::get_c
     return car_positions;
 }
 
-const std::vector<NpcDTO>& WorldSnapshotDTO::get_npc_positions() const {
-    return npc_positions;
-}
+const std::vector<NpcDTO>& WorldSnapshotDTO::get_npc_positions() const { return npc_positions; }
 
 void WorldSnapshotDTO::reserve(const size_t count) { car_positions.reserve(count); }
 

@@ -98,7 +98,7 @@ void SDLManager::render_npc(const NpcDTO& npc) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
     const int car_screen_x = (npc.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (npc.y_position - view_rect.y) * 1080 / view_rect.h;
-    
+
     // Use a default NPC car sprite (Compact car)
     SDL2pp::Rect sprite_rect = SDL2pp::Rect(0, 0, 50, 50);
 
@@ -158,7 +158,7 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
 
 void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
     SDL2pp::Rect view = get_view_rect_with_shake();
-    
+
     constexpr int screen_w = 1920;
     constexpr int screen_h = 1080;
 
@@ -229,7 +229,7 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.died = true;
         animations.start_camera_shake(iteration_counter);
     }
-    
+
     update_camera(pos_x, pos_y);
     clear_screen();
 
@@ -239,7 +239,7 @@ void SDLManager::render(LocalInfo& game_state) {
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, 1920, 1080));
 
     // Render NPCs on ground layer
-    for (const auto& npc : game_state.npcs) {
+    for (const auto& npc: game_state.npcs) {
         render_npc(npc);
     }
 
@@ -274,15 +274,13 @@ void SDLManager::render(LocalInfo& game_state) {
 
 void SDLManager::render_waiting() {
     clear_screen();
-    draw_row("Waiting for players...", 700, 500,
-             SDL2pp::Color(255, 255, 255, 255), 48);
+    draw_row("Waiting for players...", 700, 500, SDL2pp::Color(255, 255, 255, 255), 48);
     show_screen();
 }
 
 void SDLManager::render_countdown() {
     clear_screen();
-    draw_row("The race will start soon...", 600, 500,
-             SDL2pp::Color(255, 255, 255, 255), 48);
+    draw_row("The race will start soon...", 600, 500, SDL2pp::Color(255, 255, 255, 255), 48);
     show_screen();
 }
 
@@ -368,9 +366,7 @@ bool SDLManager::is_shop_open() { return shop.is_shop_open(); }
 
 void SDLManager::toggle_shop() { shop.toggle_shop(); }
 
-void SDLManager::play_upgrade_sound() {
-    sounds.play_upgrade_sound();
-}
+void SDLManager::play_upgrade_sound() { sounds.play_upgrade_sound(); }
 
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
     SDL2pp::Rect view = get_view_rect_with_shake();
@@ -399,22 +395,24 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
 
 double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
                                                  const CheckpointDTO& checkpoint) {
-    
+
     const int dx = checkpoint.x - player.x_position;
     const int dy = checkpoint.y - player.y_position;
 
     const double angle_rad = std::atan2(dy, dx);
     double angle_deg = angle_rad * (180.0 / M_PI);
-    
-    
+
+
     // Convertir para que 0° = arriba
     angle_deg += 90.0;
-    
+
     // Normalizar
-    if (angle_deg < 0) angle_deg += 360.0;
-    if (angle_deg >= 360.0) angle_deg -= 360.0;
-    
-    
+    if (angle_deg < 0)
+        angle_deg += 360.0;
+    if (angle_deg >= 360.0)
+        angle_deg -= 360.0;
+
+
     return angle_deg;
 }
 

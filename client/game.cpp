@@ -18,15 +18,16 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
 }
 
 void Game::run() {
-    bool phase_changed = false;
+
     this->receiver.start();
     try {
         while (keep_running) {
+
+            bool phase_changed = false;
             phase_changed = phase->run();
-            if (phase_changed){
+            if (phase_changed) {
                 change_phase();
             }
-            
         }
     } catch (const std::exception& e) {
         this->keep_running = false;
@@ -108,16 +109,14 @@ void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
         }
         update_player(playerDTO, carPos);
     }
-    
+
     // Update NPCs
     game_state.npcs = snapshot.get_npc_positions();
 }
 
-void Game::handle_waiting_events() {
-    this->keep_running = input_handler.handle_waiting();
-}
+void Game::handle_waiting_events() { this->keep_running = input_handler.handle_waiting(); }
 
-bool Game::update_waiting(){
+bool Game::update_waiting() {
     GameUpdateDTO dto;
     bool pop = true;
     WorldSnapshotDTO last;
@@ -129,7 +128,7 @@ bool Game::update_waiting(){
             pop = false;
             continue;
         }
-        
+
         if (dto.gameloop_action == GameLoopAction::START_SHOP) {
             game_state.phase = Phase::UPGRADE;
             if (got_snapshot) {
@@ -283,9 +282,7 @@ void Game::show_race() {
     sdl.show_screen();
 }
 
-void Game::handle_leaderboard_events() {
-    this->keep_running = input_handler.handle_leaderboard();
-}
+void Game::handle_leaderboard_events() { this->keep_running = input_handler.handle_leaderboard(); }
 
 bool Game::update_leaderboard() {
     GameUpdateDTO dto;
@@ -303,6 +300,7 @@ bool Game::update_leaderboard() {
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
             if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
                 LeaderboardDTO leaderboard = std::get<LeaderboardDTO>(dto.data);
+                (void)leaderboard;  // Avoiding cppcheck error.
                 // show leaderboard
             }
         } else if (dto.gameloop_action == GameLoopAction::START_SHOP) {
@@ -319,7 +317,7 @@ void Game::show_leaderboard() {
     sdl.show_screen();
 }
 
-void Game::change_phase() { 
+void Game::change_phase() {
     switch (this->game_state.phase) {
         case Phase::WAITING_FOR_CAR_SELECTION:
             phase = std::make_unique<WaitingForGamePhase>(*this, 0);
@@ -328,15 +326,15 @@ void Game::change_phase() {
             phase = std::make_unique<UpgradePhase>(*this, 0);
             break;
         case Phase::COUNTDOWN:
-            phase =  std::make_unique<CountdownPhase>(*this, 0);
+            phase = std::make_unique<CountdownPhase>(*this, 0);
             break;
         case Phase::IN_RACE:
             phase = std::make_unique<RacePhase>(*this, 0);
             break;
         case Phase::LEADERBOARD:
-            phase = std::make_unique<LeaderboardPhase>(*this, 0);    
+            phase = std::make_unique<LeaderboardPhase>(*this, 0);
             break;
         case Phase::GAME_FINISHED:
             break;
-    } 
+    }
 }
