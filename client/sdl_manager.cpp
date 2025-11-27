@@ -263,22 +263,34 @@ void SDLManager::render(LocalInfo& game_state) {
 
 void SDLManager::render_waiting() {
     clear_screen();
-    draw_row("Waiting for players...", TEXT_WAITING_X, TEXT_WAITING_Y,
-             SDL2pp::Color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A), TEXT_WAITING_SIZE);
+    const std::string text = "Waiting for players...";
+    SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_WAITING_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_WAITING_SIZE);
     show_screen();
 }
 
 void SDLManager::render_countdown() {
     clear_screen();
-    draw_row("The race will start soon...", TEXT_COUNTDOWN_X, TEXT_COUNTDOWN_Y,
-             SDL2pp::Color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A), TEXT_COUNTDOWN_SIZE);
+    const std::string text = "The race will start soon...";
+    SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_COUNTDOWN_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_COUNTDOWN_SIZE);
     show_screen();
 }
 
 void SDLManager::render_leaderboard() {
     clear_screen();
-    draw_row("Leaderboard", TEXT_LEADERBOARD_X, TEXT_LEADERBOARD_Y,
-             SDL2pp::Color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A), TEXT_LEADERBOARD_SIZE);
+    const std::string text = "Leaderboard";
+    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
     show_screen();
 }
 
