@@ -6,57 +6,52 @@
 
 GamePhase::GamePhase(Game& game, int starting_it): game(game), it(starting_it), FPS_CLIENT(60) {}
 
-void GamePhase::run() {
+bool GamePhase::run() {
     bool loop = true;
-
+    bool request_phase_change = false;
     while (loop) {
         show_game();
         handle_game_events();
         if (!game.keep_running)
             break;
         if (!update_game_state()) {
+            request_phase_change = true;
             loop = false;
         }
 
         if (!game.keep_running)
             break;
     }
+
+    return request_phase_change;
 }
 
-void GamePhase::change_phase(int last_it) {
-
-    // if (game.game_state.phase == Phase::WAITING_PLAYERS) {
-    //     game.change_phase(std::make_unique<WaitingForGamePhase>(game, 0));
-
-    if (game.game_state.phase == Phase::UPGRADE) {
-        game.change_phase(std::make_unique<UpgradePhase>(game, 0));
-    } else if (game.game_state.phase == Phase::RACE) {
-        game.change_phase(std::make_unique<RacePhase>(game, last_it));
-        //}  else if (game.game_state.phase == Phase::STATS) {
-        //    game.change_phase(std::make_unique<StatsPhase>(game, last_it));
-    }
-}
-
-/*
 WaitingForGamePhase::WaitingForGamePhase(Game &game, int starting_it) : GamePhase(game, starting_it)
-{} void WaitingForGamePhase::handle_game_events() { game.handle_waiting_events(); } bool
-WaitingForGamePhase::update_game_state() { return game.update_waiting(); } void
-WaitingForGamePhase::show_game(const int &it) { game.show_waiting(it); }
-*/
+{} 
+void WaitingForGamePhase::handle_game_events() { game.handle_waiting_events(); }
+bool WaitingForGamePhase::update_game_state() { return game.update_waiting(); }
+void WaitingForGamePhase::show_game() { game.show_waiting(); }
+
 
 UpgradePhase::UpgradePhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
 void UpgradePhase::handle_game_events() { game.handle_upgrade_events(); }
 bool UpgradePhase::update_game_state() { return game.update_upgrade(); }
 void UpgradePhase::show_game() { game.show_upgrade(); }
 
+
+CountdownPhase::CountdownPhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
+void CountdownPhase::handle_game_events() { game.handle_countdown_events(); }
+bool CountdownPhase::update_game_state() { return game.update_countdown(); }
+void CountdownPhase::show_game() { game.show_countdown(); }
+
 RacePhase::RacePhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
 void RacePhase::handle_game_events() { game.handle_race_events(); }
 bool RacePhase::update_game_state() { return game.update_race(); }
 void RacePhase::show_game() { game.show_race(); }
 
-/*
-StatsPhase::StatsPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
-void StatsPhase::handle_game_events() { game.handle_stats_events(); }
-bool StatsPhase::update_game_state() { return game.update_stats(); }
-void StatsPhase::show_game(const int &it) { game.show_stats(); }
-*/
+
+LeaderboardPhase::LeaderboardPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
+void LeaderboardPhase::handle_game_events() { game.handle_leaderboard_events(); }
+bool LeaderboardPhase::update_game_state() { return game.update_leaderboard(); }
+void LeaderboardPhase::show_game() { game.show_leaderboard(); }
+

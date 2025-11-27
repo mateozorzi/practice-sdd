@@ -63,9 +63,20 @@ void SDLManager::update_camera(const int player_x, const int player_y) {
     camera.update(player_x, player_y);
 }
 
+SDL2pp::Rect SDLManager::get_view_rect_with_shake() {
+    SDL2pp::Rect view_rect = camera.get_view_rect();
+    // Aplicar camera shake si está activo
+    if (animations.is_camera_shake_active(iteration_counter)) {
+        SDL2pp::Point shake_offset = animations.get_camera_shake();
+        view_rect.x += shake_offset.GetX();
+        view_rect.y += shake_offset.GetY();
+    }
+    return view_rect;
+}
+
 void SDLManager::render_player(const CarPositionDTO& player, const std::string& model,
                                bool is_moving) {
-    SDL2pp::Rect view_rect = camera.get_view_rect();
+    SDL2pp::Rect view_rect = get_view_rect_with_shake();
     const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
     const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
     SDL2pp::Rect sprite_rect = SDL2pp::Rect(128, 32, 32, 32);  // default
@@ -146,7 +157,8 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
 }
 
 void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
-    const SDL2pp::Rect view = camera.get_view_rect();
+    SDL2pp::Rect view = get_view_rect_with_shake();
+    
     constexpr int screen_w = 1920;
     constexpr int screen_h = 1080;
 
@@ -213,11 +225,18 @@ void SDLManager::render(LocalInfo& game_state) {
                                    SDL2pp::Point(pos_x, pos_y));
     } */
 
+    if (game_state.player.life <= 0 && !game_state.player.died) {
+        game_state.player.died = true;
+        animations.start_camera_shake(iteration_counter);
+    }
+    
     update_camera(pos_x, pos_y);
     clear_screen();
 
+    SDL2pp::Rect view_rect = get_view_rect_with_shake();
+
     SDL2pp::Texture& map = resources.get_texture(map_name);
-    renderer.Copy(map, camera.get_view_rect(), SDL2pp::Rect(0, 0, 1920, 1080));
+    renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, 1920, 1080));
 
     // Render NPCs on ground layer
     for (const auto& npc : game_state.npcs) {
@@ -251,6 +270,26 @@ void SDLManager::render(LocalInfo& game_state) {
 
     show_screen();
     SDL_Delay(10);
+}
+
+void SDLManager::render_waiting() {
+    clear_screen();
+    draw_row("Waiting for players...", 700, 500,
+             SDL2pp::Color(255, 255, 255, 255), 48);
+    show_screen();
+}
+
+void SDLManager::render_countdown() {
+    clear_screen();
+    draw_row("The race will start soon...", 600, 500,
+             SDL2pp::Color(255, 255, 255, 255), 48);
+    show_screen();
+}
+
+void SDLManager::render_leaderboard() {
+    clear_screen();
+    draw_row("Leaderboard", 850, 100, SDL2pp::Color(255, 215, 0, 255), 64);
+    show_screen();
 }
 
 void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,
@@ -325,8 +364,16 @@ void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
 
+bool SDLManager::is_shop_open() { return shop.is_shop_open(); }
+
+void SDLManager::toggle_shop() { shop.toggle_shop(); }
+
+void SDLManager::play_upgrade_sound() {
+    sounds.play_upgrade_sound();
+}
+
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
-    SDL2pp::Rect view = camera.get_view_rect();
+    SDL2pp::Rect view = get_view_rect_with_shake();
 
     SDL2pp::Rect checkpoint_rect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
     if (!camera.on_screen(checkpoint_rect)) {
@@ -374,7 +421,7 @@ double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
 void SDLManager::render_hint(const CarPositionDTO& player) {
     double angle = calculate_angle_to_checkpoint(player, player.next);
 
-    SDL2pp::Rect view = camera.get_view_rect();
+    SDL2pp::Rect view = get_view_rect_with_shake();
 
     const int car_screen_x = (player.x_position - view.x) * 1920 / view.w;
     const int car_screen_y = (player.y_position - view.y) * 1080 / view.h;

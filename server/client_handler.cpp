@@ -25,8 +25,6 @@ void ClientHandler::launch_lobby() {
     while (is_in_lobby) {
 
         try {
-            std::cout<<"[CLIENT_HANDLER] "
-                     <<"Waiting for lobby action from client ID: " << client_id << std::endl;
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
 

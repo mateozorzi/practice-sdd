@@ -26,8 +26,9 @@ private:
     friend class GamePhase;
     friend class WaitingForGamePhase;
     friend class UpgradePhase;
+    friend class CountdownPhase;
     friend class RacePhase;
-    friend class StatsPhase;
+    friend class LeaderboardPhase;
 
     void reset_events();
 
@@ -35,27 +36,29 @@ private:
 
     void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
 
-    /*
+    
     void handle_waiting_events();
     bool update_waiting();
-    void show_waiting(const int& it);
-    */
+    void show_waiting();
 
     void handle_upgrade_events();
     bool update_upgrade();
     void show_upgrade();
 
+    void handle_countdown_events();
+    bool update_countdown();
+    void show_countdown();
+    
     void handle_race_events();
     bool update_race();
     void show_race();
 
-    /*
-    void handle_stats_events();
-    bool update_stats();
-    void show_stats(const int& it);
-    */
 
-    void change_phase(std::unique_ptr<GamePhase> new_phase);
+    void handle_leaderboard_events();
+    bool update_leaderboard();
+    void show_leaderboard();
+
+    void change_phase();
 
     void update_player(const PlayerDTO& player, const CarPositionDTO& car);
 

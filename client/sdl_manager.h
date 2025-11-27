@@ -53,6 +53,7 @@ private:
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
     void update_camera(int player_x, int player_y);
+    SDL2pp::Rect get_view_rect_with_shake();
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving);
     void render_npc(const NpcDTO& npc);
     void render_hud_health(int health, int max_health);
@@ -74,6 +75,9 @@ public:
     void set_minimap();
     void clear_screen();
     void render(LocalInfo& game_state);
+    void render_waiting();
+    void render_countdown();
+    void render_leaderboard();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
@@ -84,6 +88,9 @@ public:
     void render_shop(int time);
 
     void close_shop();
+    bool is_shop_open();
+    void toggle_shop();
+    void play_upgrade_sound();
 };
 
 #endif

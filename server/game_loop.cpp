@@ -183,11 +183,13 @@ void GameLoop::handle_waiting_car_selection_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to upgrade shop phase." << std::endl;
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
+        
+        GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+        game_monitor.broadcast(game_update);
 
+        //send here to set the race in upgrade phase once
         set_race(selected_races.races[current_race_index]);
 
-        // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-        // game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -208,12 +210,12 @@ void GameLoop::handle_upgrade_shop_phase() {
         current_phase = GamePhase::COUNTDOWN;
         phase_start = std::nullopt;
 
-        // Should delete later
-        shop_phase();
-
         // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
+        game_monitor.broadcast(game_update);
+
+        //send update_positions to show the map in the countdown phase
+        update_positions(selected_races.races[current_race_index]);
     }
 
     fixed_sleep(now);
@@ -234,8 +236,8 @@ void GameLoop::handle_countdown_phase() {
         phase_start = std::nullopt;
 
         // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
+        game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -268,8 +270,11 @@ void GameLoop::handle_in_race_phase() {
         (void)leaderboard;
 
         // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::SEND_LEADERBOARD, leaderboard);
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
+        game_monitor.broadcast(game_update);
+
+        GameUpdateDTO l (GameLoopAction::SEND_LEADERBOARD, leaderboard);
+        game_monitor.broadcast(l);
     }
 
     fixed_sleep(now);
@@ -289,13 +294,13 @@ void GameLoop::handle_leaderboard_phase() {
         if (current_race_index + 1 < selected_races.size) {
 
             current_phase = GamePhase::UPGRADE_SHOP;
-            set_race(selected_races.races[current_race_index]);
             // update_positions(selected_races.races[current_race_index]);
             current_race_index += 1;
 
-            shop_phase();
-            // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-            // game_monitor.broadcast(game_update);
+            GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+            game_monitor.broadcast(game_update);
+
+            set_race(selected_races.races[current_race_index]);
         } else {
 
             current_phase = GamePhase::GAME_FINISHED;
@@ -543,8 +548,6 @@ void GameLoop::shop_phase() {
 
     GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
     game_monitor.broadcast(shop_update);
-    GameUpdateDTO shop_close(GameLoopAction::CLOSE_SHOP, std::monostate{});
-    game_monitor.broadcast(shop_close);
 }
 
 void GameLoop::set_race(const RaceDTO& race) {
