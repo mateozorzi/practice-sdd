@@ -34,7 +34,9 @@ enum class GamePhase {
     COUNTDOWN,
     IN_RACE,
     LEADERBOARD,
-    GAME_FINISHED
+    GAME_FINISHED,
+    WINNER_PHASE,
+    RETURN_TO_LOBBY
 };
 
 
@@ -76,6 +78,7 @@ class GameLoop final: public Thread {
     void process_commands_in_race_phase();
     void process_commands_in_leaderboard_phase();
     void process_commands_in_game_finished_phase();
+    void process_commands_in_winner_phase();
     
     void handle_waiting_car_selection_phase();
     void handle_upgrade_shop_phase();
@@ -83,6 +86,8 @@ class GameLoop final: public Thread {
     void handle_in_race_phase();
     void handle_leaderboard_phase();
     void handle_game_finished_phase();
+    void handle_winner_phase();
+    void handle_return_to_lobby();
 
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);

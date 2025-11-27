@@ -33,6 +33,8 @@ public:
     bool handle_buy_events(int time);
     bool handle_countdown();
     bool handle_leaderboard();
+    bool handle_game_finished();
+    bool handle_winner();
     bool is_moving() const;
     ~InputManager();
 };

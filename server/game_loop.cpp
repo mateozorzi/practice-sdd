@@ -159,6 +159,21 @@ void GameLoop::process_commands_in_game_finished_phase() {
     }
 }
 
+void GameLoop::process_commands_in_winner_phase() {
+    GameCommand game_command;
+
+    while (command_queue.try_pop(game_command)) {
+
+        ClientAction action = game_command.get_client_action();
+
+        if (action == ClientAction::DISCONNECT) {
+
+            handle_disconnection(game_command);
+            continue;
+        }
+    }
+}
+
 
 void GameLoop::handle_waiting_car_selection_phase() {
 
@@ -283,14 +298,17 @@ void GameLoop::handle_leaderboard_phase() {
 
             set_race(selected_races.races[current_race_index]);
         } else {
-
+            std::cout<< "[" << GAME_LOOP << "] Switching to game finished phase." << std::endl;
             current_phase = GamePhase::GAME_FINISHED;
             final_leaderboard = create_final_leaderboard();
             (void)final_leaderboard;
 
             // Commented for now, should implement client-side.
-            // GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, final_leaderboard);
-            // game_monitor.broadcast(game_update);
+            GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, std::monostate{});
+            game_monitor.broadcast(game_update);
+
+            GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, final_leaderboard);
+            game_monitor.broadcast(l);
         }
     }
     fixed_sleep(now);
@@ -304,15 +322,40 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands_in_game_finished_phase();
 
-    fixed_sleep(now);
-
+    
     if (elapsed_time >= game_finish_seconds) {
-
+        std::cout<< "[" << GAME_LOOP << "] Switching to winner phase." << std::endl;
+        current_phase = GamePhase::WINNER_PHASE;
         // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::WINNER_PHASE, std::monostate{});
+        game_monitor.broadcast(game_update);
+    }
+    fixed_sleep(now);
+}
 
-        this->stop();
+void GameLoop::handle_winner_phase(){
+    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    auto elapsed_time = now - *phase_start;
+
+    process_commands_in_winner_phase();
+
+    
+    if (elapsed_time >= game_finish_seconds) {
+        std::cout<< "[" << GAME_LOOP << "] Returning to lobby." << std::endl;
+        current_phase = GamePhase::RETURN_TO_LOBBY;
+        
+        // Commented for now, should implement client-side.
+        GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
+        game_monitor.broadcast(game_update);
+        
+    }
+    fixed_sleep(now);
+}
+
+void GameLoop::handle_return_to_lobby(){
+    //disconnect all players
+    for (const auto& [client_id, player] : players) {
+        remove_player(client_id);
     }
 }
 
@@ -690,6 +733,13 @@ void GameLoop::run() {
                     break;
                 case (GamePhase::GAME_FINISHED):
                     handle_game_finished_phase();
+                    break;
+                case (GamePhase::WINNER_PHASE):
+                    handle_winner_phase();
+                    break;
+                case (GamePhase::RETURN_TO_LOBBY):
+                    // Should not reach here, as the loop stops in handle_winner_phase
+                    handle_return_to_lobby();
                     break;
             }
         }

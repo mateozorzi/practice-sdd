@@ -289,6 +289,7 @@ bool Game::update_leaderboard() {
     bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (pop) {
+        //std::cout << "Checking for leaderboard updates..." << std::endl;
         if (!updates.try_pop(dto)) {
             pop = false;
             continue;
@@ -317,6 +318,65 @@ void Game::show_leaderboard() {
     sdl.show_screen();
 }
 
+void Game::handle_game_finished_events() {this->keep_running = input_handler.handle_game_finished();}
+
+bool Game::update_game_finished() {
+    GameUpdateDTO dto;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::WINNER_PHASE) {
+            game_state.phase = Phase::WINNER_PHASE;
+            return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
+            if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
+                LeaderboardDTO leaderboard = std::get<LeaderboardDTO>(dto.data);
+                (void)leaderboard;  // Avoiding cppcheck error.
+                // show leaderboard
+            }
+        }
+    }
+    return true;
+}
+
+void Game::show_game_finished() {
+    sdl.clear_screen();
+    sdl.render_game_finished();
+    sdl.show_screen();
+}
+
+void Game::handle_winner_events() { this->keep_running = input_handler.handle_winner(); }
+
+bool Game::update_winner(){
+    GameUpdateDTO dto;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+            this->keep_running = false;
+            return true;
+        } //receive winner info
+    }
+    return true;
+}
+
+void Game::show_winner() {
+    sdl.clear_screen();
+    sdl.render_winner();
+    sdl.show_screen();
+}
+
+
 void Game::change_phase() {
     switch (this->game_state.phase) {
         case Phase::WAITING_FOR_CAR_SELECTION:
@@ -335,6 +395,12 @@ void Game::change_phase() {
             phase = std::make_unique<LeaderboardPhase>(*this, 0);
             break;
         case Phase::GAME_FINISHED:
+            std::cout<< "Changing to Game Finished Phase" << std::endl;
+            phase = std::make_unique<GameFinishedPhase>(*this, 0);
+            break;
+        case Phase::WINNER_PHASE:
+            std::cout<< "Changing to Winner Phase" << std::endl;
+            phase = std::make_unique<WinnerPhase>(*this, 0);
             break;
     }
 }
