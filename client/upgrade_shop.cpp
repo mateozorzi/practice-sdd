@@ -41,6 +41,7 @@ UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
         SDL2pp::Rect button_rect(button_x, button_y, button_width, button_height);
         buttons.push_back({button_rect, buttons_text[i], buttons_type[i]});
     }
+    
 }
 
 void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
@@ -64,7 +65,7 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
     }
 }
 
-void UpgradeShop::render(int player_time, Car player_car) {
+void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name) {
     (void)player_time;  // Aumenta segun compre mejoras
     (void)player_car;   // Para poner el auto al lado de botones de mejoras
 
@@ -144,6 +145,11 @@ void UpgradeShop::render(int player_time, Car player_car) {
                                        text_texture.GetHeight()));
         }
     }
+
+    // In the background the city map is rendered
+    //SDL2pp::Texture& map_texture = resources.get_texture(map_name);
+    //renderer.Copy(map_texture, SDL2pp::NullOpt, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
+    (void)map_name;
 }
 
 bool UpgradeShop::is_shop_open() const { return isOpen; }

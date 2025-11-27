@@ -14,6 +14,7 @@
 #include "common/car_position_dto.h"
 #include "common/npc_dto.h"
 #include "common/player_dto.h"
+#include "../common/leaderboard_dto.h"
 
 #include "animations.h"
 #include "camera.h"
@@ -81,8 +82,7 @@ public:
     void render(LocalInfo& game_state);
     void render_waiting();
     void render_countdown();
-    void render_leaderboard();
-    void render_game_finished();
+    void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string title);
     void render_winner();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);

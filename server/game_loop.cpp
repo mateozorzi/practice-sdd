@@ -159,21 +159,6 @@ void GameLoop::process_commands_in_game_finished_phase() {
     }
 }
 
-void GameLoop::process_commands_in_winner_phase() {
-    GameCommand game_command;
-
-    while (command_queue.try_pop(game_command)) {
-
-        ClientAction action = game_command.get_client_action();
-
-        if (action == ClientAction::DISCONNECT) {
-
-            handle_disconnection(game_command);
-            continue;
-        }
-    }
-}
-
 void GameLoop::process_commands_in_return_to_lobby_phase(){
     GameCommand game_command;
     while (command_queue.try_pop(game_command)) {
@@ -338,31 +323,11 @@ void GameLoop::handle_game_finished_phase() {
     
     if (elapsed_time >= game_finish_seconds) {
         phase_start = std::nullopt;
-        std::cout<< "[" << GAME_LOOP << "] Switching to winner phase." << std::endl;
-        current_phase = GamePhase::WINNER_PHASE;
-        // Commented for now, should implement client-side.
-        GameUpdateDTO game_update(GameLoopAction::WINNER_PHASE, std::monostate{});
-        game_monitor.broadcast(game_update);
-    }
-    fixed_sleep(now);
-}
-
-void GameLoop::handle_winner_phase(){
-    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    auto elapsed_time = now - *phase_start;
-
-    process_commands_in_winner_phase();
-
-    
-    if (elapsed_time >= game_finish_seconds) {
-        phase_start = std::nullopt;
-        std::cout<< "[" << GAME_LOOP << "] Returning to lobby." << std::endl;
+        std::cout<< "[" << GAME_LOOP << "] Switching to return to lobby phase." << std::endl;
         current_phase = GamePhase::RETURN_TO_LOBBY;
-        
         // Commented for now, should implement client-side.
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
         game_monitor.broadcast(game_update);
-        
     }
     fixed_sleep(now);
 }
@@ -751,9 +716,6 @@ void GameLoop::run() {
                     break;
                 case (GamePhase::GAME_FINISHED):
                     handle_game_finished_phase();
-                    break;
-                case (GamePhase::WINNER_PHASE):
-                    handle_winner_phase();
                     break;
                 case (GamePhase::RETURN_TO_LOBBY):
                     handle_return_to_lobby();

@@ -11,6 +11,23 @@
 
 #include "client_constants.h"
 #include "game_state.h"
+#include "../common/leaderboard_dto.h"
+#include "../common/player_race_stats_dto.h"
+
+// Constantes para el leaderboard
+constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
+constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
+constexpr int LEADERBOARD_ENTRY_FONT_SIZE = 32;
+constexpr int LEADERBOARD_TITLE_SPACING = 40;
+constexpr int LEADERBOARD_ENTRY_SPACING = 25;
+constexpr int LEADERBOARD_HEADER_ENTRY_SPACING = 50;
+constexpr int LEADERBOARD_SEPARATOR_SPACING = 30;
+
+// Anchos de columnas
+constexpr int COLUMN_POS_WIDTH = 100;
+constexpr int COLUMN_NAME_WIDTH = 200;
+constexpr int COLUMN_TIME_WIDTH = 100;
+constexpr int COLUMN_POINTS_WIDTH = 100;
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
@@ -280,29 +297,86 @@ void SDLManager::render_countdown() {
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
     draw_row(text, text_x, text_y, text_color, TEXT_COUNTDOWN_SIZE);
+    //in the background the city map is rendered
+    //SDL2pp::Texture& map_texture = resources.get_texture(map_name);
+    //renderer.Copy(map_texture, SDL2pp::NullOpt, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
     show_screen();
 }
 
-void SDLManager::render_leaderboard() {
+void SDLManager::render_leaderboard(const LeaderboardDTO& leaderboard, const std::string title) {
     clear_screen();
-    const std::string text = "Leaderboard";
-    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
-    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
-    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
-    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
-    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
-    show_screen();
-}
+    
+    const int TABLE_WIDTH = COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH + COLUMN_TIME_WIDTH + COLUMN_POINTS_WIDTH;
+    const int TABLE_START_X = (SCREEN_WIDTH - TABLE_WIDTH) / 2;
 
-void SDLManager::render_game_finished() {
-    clear_screen();
-    const std::string text = "Final Leaderboard";
-    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
-    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
-    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
-    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
-    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
+    SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
+    SDL2pp::Color header_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Color entry_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+
+    // Título
+    SDL2pp::Texture& title_texture = resources.get_text(title, FONT_PATH, LEADERBOARD_TITLE_FONT_SIZE, title_color);
+    int title_x = (SCREEN_WIDTH - title_texture.GetWidth()) / 2;
+    int title_y = 50;
+    renderer.Copy(title_texture, SDL2pp::NullOpt, 
+                  SDL2pp::Rect(title_x, title_y, title_texture.GetWidth(), title_texture.GetHeight()));
+
+    // Encabezados
+    int header_y = title_y + title_texture.GetHeight() + LEADERBOARD_TITLE_SPACING;
+    
+    std::vector<std::string> headers = {"POS", "NAME", "TIME", "PTS"};
+    int current_x = TABLE_START_X;
+    
+    for (size_t i = 0; i < headers.size(); ++i) {
+        SDL2pp::Texture& header_texture = resources.get_text(headers[i], FONT_PATH, LEADERBOARD_HEADER_FONT_SIZE, header_color);
+        renderer.Copy(header_texture, SDL2pp::NullOpt, 
+                      SDL2pp::Rect(current_x + 10, header_y, header_texture.GetWidth(), header_texture.GetHeight()));
+        current_x += (i == 0) ? COLUMN_POS_WIDTH : 
+                    (i == 1) ? COLUMN_NAME_WIDTH : 
+                    (i == 2) ? COLUMN_TIME_WIDTH : COLUMN_POINTS_WIDTH;
+    }
+
+    // Entradas
+    int entry_y = header_y + 60;
+    
+    for (const auto& entry : leaderboard.players) {
+        current_x = TABLE_START_X;
+        
+        // Posición
+        std::string pos_text = std::to_string(entry.position);
+        SDL2pp::Texture& pos_texture = resources.get_text(pos_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        renderer.Copy(pos_texture, SDL2pp::NullOpt, 
+                      SDL2pp::Rect(current_x + 10, entry_y, pos_texture.GetWidth(), pos_texture.GetHeight()));
+        current_x += COLUMN_POS_WIDTH;
+
+        // Nombre
+        SDL2pp::Texture& name_texture = resources.get_text(entry.username, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        renderer.Copy(name_texture, SDL2pp::NullOpt, 
+                      SDL2pp::Rect(current_x + 10, entry_y, name_texture.GetWidth(), name_texture.GetHeight()));
+        current_x += COLUMN_NAME_WIDTH;
+
+        // Tiempo
+        std::string time_text;
+        if (entry.points == 0){
+            time_text = "DSQ";
+        }else{
+            time_text = std::to_string(entry.total_time) + " seg";
+        }
+        SDL2pp::Texture& time_texture = resources.get_text(time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        renderer.Copy(time_texture, SDL2pp::NullOpt, 
+                      SDL2pp::Rect(current_x + 10, entry_y, time_texture.GetWidth(), time_texture.GetHeight()));
+        current_x += COLUMN_TIME_WIDTH;
+
+        // Puntos
+        std::string points_text = std::to_string(entry.points);
+        SDL2pp::Texture& points_texture = resources.get_text(points_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        renderer.Copy(points_texture, SDL2pp::NullOpt, 
+                      SDL2pp::Rect(current_x + 10, entry_y, points_texture.GetWidth(), points_texture.GetHeight()));
+
+        entry_y += 30;
+    }
+
     show_screen();
+
 }
 
 void SDLManager::render_winner() {
@@ -383,7 +457,7 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT); }
+void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT, map_name); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
 

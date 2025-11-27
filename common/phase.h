@@ -8,7 +8,6 @@ enum class Phase {
     IN_RACE = 3,
     LEADERBOARD = 4,
     GAME_FINISHED = 5,
-    WINNER_PHASE = 6
 };
 
 #endif

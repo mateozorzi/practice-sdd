@@ -53,7 +53,7 @@ public:
                         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
 
     void set_shop_info(const ShopInfoDTO& info);
-    void render(int player_time, Car player_car);
+    void render(int player_time, Car player_car, const std::string& map_name);
     bool is_shop_open() const;
     void toggle_shop();
     std::optional<ButtonType> interact_button(int x, int y, int time);
