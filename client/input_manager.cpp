@@ -129,6 +129,27 @@ bool InputManager::handle_buy_events(int time) {
     return true;
 }
 
+bool InputManager::handle_countdown() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+        //cheats
+    }
+    return true;
+}
+
+bool InputManager::handle_leaderboard() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 bool InputManager::handle_movement() {
     SDL_Event event;

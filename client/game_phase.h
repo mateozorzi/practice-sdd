@@ -36,6 +36,14 @@ public:
     void show_game() override;
 };
 
+class CountdownPhase: public GamePhase {
+public:
+    CountdownPhase(Game& game, int starting_it);
+    void handle_game_events() override;
+    bool update_game_state() override;
+    void show_game() override;
+};
+
 class RacePhase: public GamePhase {
 public:
     RacePhase(Game& game, int starting_it);
@@ -44,14 +52,14 @@ public:
     void show_game() override;
 };
 
-/*
-class StatsPhase : public GamePhase {
+
+class LeaderboardPhase : public GamePhase {
 public:
-    StatsPhase(Game& game, int starting_it);
+    LeaderboardPhase(Game& game, int starting_it);
     void handle_game_events() override;
     bool update_game_state() override;
-    void show_game(const int& it) override;
+    void show_game() override;
 };
-*/
+
 
 #endif

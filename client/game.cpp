@@ -149,10 +149,12 @@ void Game::handle_upgrade_events() {
 }
 
 bool Game::update_upgrade() {
+    if (!sdl.is_shop_open()) {
+        sdl.toggle_shop();
+    }
     GameUpdateDTO dto;
     bool pop = true;
     WorldSnapshotDTO last;
-    bool got_snapshot = false;
     reset_events();
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (pop) {
@@ -161,11 +163,8 @@ bool Game::update_upgrade() {
             continue;
         }
 
-        if (dto.gameloop_action == GameLoopAction::START_RACE) {
-            game_state.phase = Phase::IN_RACE;
-            if (got_snapshot) {
-                update_game_state_from_snapshot(last);
-            }
+        if (dto.gameloop_action == GameLoopAction::START_COUNTDOWN) {
+            game_state.phase = Phase::COUNTDOWN;
             sdl.close_shop();
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_RACE) {
@@ -181,16 +180,53 @@ bool Game::update_upgrade() {
         }
     }
 
+    return true;
+}
+
+void Game::show_upgrade() {
+    sdl.clear_screen();
+    sdl.render_shop(game_state.player.time);
+    sdl.show_screen();
+}
+
+void Game::handle_countdown_events() { this->keep_running = input_handler.handle_countdown(); }
+
+bool Game::update_countdown() {
+    GameUpdateDTO dto;
+    WorldSnapshotDTO last;
+    bool got_snapshot = false;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::START_RACE) {
+            game_state.phase = Phase::IN_RACE;
+            return false;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
+                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                detect_events(snapshot);
+                last = std::move(snapshot);
+                got_snapshot = true;
+            }
+        }
+    }
     if (got_snapshot) {
         update_game_state_from_snapshot(last);
     }
     return true;
 }
 
-void Game::show_upgrade() {
+void Game::show_countdown() {
     sdl.clear_screen();
-    sdl.render(game_state);
-    sdl.render_shop(game_state.player.time);
+    sdl.render_countdown();
     sdl.show_screen();
 }
 
@@ -209,13 +245,13 @@ bool Game::update_race() {
             continue;
         }
 
-        if (dto.gameloop_action == GameLoopAction::START_SHOP) {
-            game_state.phase = Phase::UPGRADE;
+        if (dto.gameloop_action == GameLoopAction::LEADERBOARD) {
+            game_state.phase = Phase::LEADERBOARD;
             if (got_snapshot) {
                 update_game_state_from_snapshot(last);
             }
             return false;
-        }else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
                 WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
                 detect_events(snapshot);
@@ -244,6 +280,42 @@ void Game::show_race() {
     sdl.show_screen();
 }
 
+void Game::handle_leaderboard_events() {
+    this->keep_running = input_handler.handle_leaderboard();
+}
+
+bool Game::update_leaderboard() {
+    GameUpdateDTO dto;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
+            game_state.phase = Phase::GAME_FINISHED;
+            return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
+            if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
+                LeaderboardDTO leaderboard = std::get<LeaderboardDTO>(dto.data);
+                // show leaderboard
+            }
+        } else if (dto.gameloop_action == GameLoopAction::START_SHOP) {
+            game_state.phase = Phase::UPGRADE;
+            return false;
+        }
+    }
+    return true;
+}
+
+void Game::show_leaderboard() {
+    sdl.clear_screen();
+    sdl.render_leaderboard();
+    sdl.show_screen();
+}
+
 void Game::change_phase() { 
     switch (this->game_state.phase) {
         case Phase::WAITING_FOR_CAR_SELECTION:
@@ -253,11 +325,13 @@ void Game::change_phase() {
             phase = std::make_unique<UpgradePhase>(*this, 0);
             break;
         case Phase::COUNTDOWN:
+            phase =  std::make_unique<CountdownPhase>(*this, 0);
             break;
         case Phase::IN_RACE:
             phase = std::make_unique<RacePhase>(*this, 0);
             break;
         case Phase::LEADERBOARD:
+            phase = std::make_unique<LeaderboardPhase>(*this, 0);    
             break;
         case Phase::GAME_FINISHED:
             break;

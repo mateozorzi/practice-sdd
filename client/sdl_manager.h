@@ -74,6 +74,8 @@ public:
     void clear_screen();
     void render(LocalInfo& game_state);
     void render_waiting();
+    void render_countdown();
+    void render_leaderboard();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
@@ -84,6 +86,8 @@ public:
     void render_shop(int time);
 
     void close_shop();
+    bool is_shop_open();
+    void toggle_shop();
     void play_upgrade_sound();
 };
 

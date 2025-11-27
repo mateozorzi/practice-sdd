@@ -256,8 +256,21 @@ void SDLManager::render(LocalInfo& game_state) {
 
 void SDLManager::render_waiting() {
     clear_screen();
-    draw_row("Esperando jugadores...", 700, 500,
+    draw_row("Waiting for players...", 700, 500,
              SDL2pp::Color(255, 255, 255, 255), 48);
+    show_screen();
+}
+
+void SDLManager::render_countdown() {
+    clear_screen();
+    draw_row("The race will start soon...", 600, 500,
+             SDL2pp::Color(255, 255, 255, 255), 48);
+    show_screen();
+}
+
+void SDLManager::render_leaderboard() {
+    clear_screen();
+    draw_row("Leaderboard", 850, 100, SDL2pp::Color(255, 215, 0, 255), 64);
     show_screen();
 }
 
@@ -332,6 +345,10 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
 void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
+
+bool SDLManager::is_shop_open() { return shop.is_shop_open(); }
+
+void SDLManager::toggle_shop() { shop.toggle_shop(); }
 
 void SDLManager::play_upgrade_sound() {
     sounds.play_upgrade_sound();

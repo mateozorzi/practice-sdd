@@ -38,14 +38,20 @@ void UpgradePhase::handle_game_events() { game.handle_upgrade_events(); }
 bool UpgradePhase::update_game_state() { return game.update_upgrade(); }
 void UpgradePhase::show_game() { game.show_upgrade(); }
 
+
+CountdownPhase::CountdownPhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
+void CountdownPhase::handle_game_events() { game.handle_countdown_events(); }
+bool CountdownPhase::update_game_state() { return game.update_countdown(); }
+void CountdownPhase::show_game() { game.show_countdown(); }
+
 RacePhase::RacePhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
 void RacePhase::handle_game_events() { game.handle_race_events(); }
 bool RacePhase::update_game_state() { return game.update_race(); }
 void RacePhase::show_game() { game.show_race(); }
 
-/*
-StatsPhase::StatsPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
-void StatsPhase::handle_game_events() { game.handle_stats_events(); }
-bool StatsPhase::update_game_state() { return game.update_stats(); }
-void StatsPhase::show_game(const int &it) { game.show_stats(); }
-*/
+
+LeaderboardPhase::LeaderboardPhase(Game &game, int starting_it) : GamePhase(game, starting_it) {}
+void LeaderboardPhase::handle_game_events() { game.handle_leaderboard_events(); }
+bool LeaderboardPhase::update_game_state() { return game.update_leaderboard(); }
+void LeaderboardPhase::show_game() { game.show_leaderboard(); }
+

@@ -26,8 +26,9 @@ private:
     friend class GamePhase;
     friend class WaitingForGamePhase;
     friend class UpgradePhase;
+    friend class CountdownPhase;
     friend class RacePhase;
-    friend class StatsPhase;
+    friend class LeaderboardPhase;
 
     void reset_events();
 
@@ -44,15 +45,18 @@ private:
     bool update_upgrade();
     void show_upgrade();
 
+    void handle_countdown_events();
+    bool update_countdown();
+    void show_countdown();
+    
     void handle_race_events();
     bool update_race();
     void show_race();
 
-    /*
-    void handle_stats_events();
-    bool update_stats();
-    void show_stats(const int& it);
-    */
+
+    void handle_leaderboard_events();
+    bool update_leaderboard();
+    void show_leaderboard();
 
     void change_phase();
 
