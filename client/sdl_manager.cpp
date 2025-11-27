@@ -9,34 +9,33 @@
 #include <nlohmann/json_fwd.hpp>
 #include <qforeach.h>
 
+#include "client_constants.h"
 #include "game_state.h"
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
         mix(MIX_INIT_OGG),
         mixer(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024),
-        window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080,
+        window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
                SDL_WINDOW_RESIZABLE),
         renderer(window, -1, SDL_RENDERER_ACCELERATED),
         resources(renderer),
-        camera(512, 288, 4640, 4672),
+        camera(CAMERA_VIEW_WIDTH, CAMERA_VIEW_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT),
         sounds(mixer, resources),
         animations(renderer, camera, resources),
-        shop(renderer, mixer, resources, sounds, 1920, 1080, "client/assets/fonts/UrbanHaze.ttf") {
-    renderer.SetLogicalSize(1920, 1080);
-    load_city("Liberty City");
+        shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
+    renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    load_city(DEFAULT_CITY);
 }
 
 void SDLManager::set_minimap() {
-    constexpr int minimap_width = 384;   // 1920 : 5
-    constexpr int minimap_height = 216;  // 1080 : 5
     minimap = SDL2pp::Texture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-                              minimap_width, minimap_height);
+                              MINIMAP_WIDTH, MINIMAP_HEIGHT);
     renderer.SetTarget(minimap.value());
     std::cout << "Cargando minimap de " << map_name << std::endl;
     SDL2pp::Texture& map = resources.get_texture(map_name);
-    renderer.Copy(map, SDL2pp::Rect(0, 0, 4640, 4672),
-                  SDL2pp::Rect(0, 0, minimap_width, minimap_height));
+    renderer.Copy(map, SDL2pp::Rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT),
+                  SDL2pp::Rect(0, 0, MINIMAP_WIDTH, MINIMAP_HEIGHT));
     renderer.SetTarget();
 }
 
@@ -77,9 +76,9 @@ SDL2pp::Rect SDLManager::get_view_rect_with_shake() {
 void SDLManager::render_player(const CarPositionDTO& player, const std::string& model,
                                bool is_moving) {
     SDL2pp::Rect view_rect = get_view_rect_with_shake();
-    const int car_screen_x = (player.x_position - view_rect.x) * 1920 / view_rect.w;
-    const int car_screen_y = (player.y_position - view_rect.y) * 1080 / view_rect.h;
-    SDL2pp::Rect sprite_rect = SDL2pp::Rect(128, 32, 32, 32);  // default
+    const int car_screen_x = (player.x_position - view_rect.x) * SCREEN_WIDTH / view_rect.w;
+    const int car_screen_y = (player.y_position - view_rect.y) * SCREEN_HEIGHT / view_rect.h;
+    SDL2pp::Rect sprite_rect = SDL2pp::Rect(DEFAULT_SPRITE_X, DEFAULT_SPRITE_Y, DEFAULT_SPRITE_W, DEFAULT_SPRITE_H);
 
     auto it = CAR_SPRITES.find(model);
     if (it != CAR_SPRITES.end()) {
@@ -87,8 +86,8 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     }
 
     // Usar solo sprite vertical y rotarlo con SDL
-    SDL2pp::Texture& cars = resources.get_texture("client/assets/sprites/cars-no-background.png");
-    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
+    SDL2pp::Texture& cars = resources.get_texture(CARS_SPRITE_PATH);
+    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     sounds.play_engine_sound(is_moving);
@@ -96,81 +95,71 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
 
 void SDLManager::render_npc(const NpcDTO& npc) {
     SDL2pp::Rect view_rect = camera.get_view_rect();
-    const int car_screen_x = (npc.x_position - view_rect.x) * 1920 / view_rect.w;
-    const int car_screen_y = (npc.y_position - view_rect.y) * 1080 / view_rect.h;
+    const int car_screen_x = (npc.x_position - view_rect.x) * SCREEN_WIDTH / view_rect.w;
+    const int car_screen_y = (npc.y_position - view_rect.y) * SCREEN_HEIGHT / view_rect.h;
 
     // Use a default NPC car sprite (Compact car)
-    SDL2pp::Rect sprite_rect = SDL2pp::Rect(0, 0, 50, 50);
+    SDL2pp::Rect sprite_rect = SDL2pp::Rect(NPC_SPRITE_X, NPC_SPRITE_Y, NPC_SPRITE_SIZE, NPC_SPRITE_SIZE);
 
-    SDL2pp::Texture& cars = resources.get_texture("client/assets/sprites/cars-no-background.png");
-    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
-                  static_cast<double>(npc.angle + 90), SDL2pp::NullOpt, SDL_FLIP_NONE);
+    SDL2pp::Texture& cars = resources.get_texture(CARS_SPRITE_PATH);
+    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
+                  static_cast<double>(npc.angle + NPC_ANGLE_OFFSET), SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
 void SDLManager::render_hud_health(const int health, const int max_health) {
-    constexpr int health_bar_width = 400;
-    constexpr int health_bar_height = 20;
-    constexpr int health_bar_x = 20;
-    constexpr int health_bar_y = 1080 - health_bar_height - 20;
-
     // Fondo de la barra
-    renderer.SetDrawColor(0, 0, 0, 255);
+    renderer.SetDrawColor(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, COLOR_BLACK_A);
     renderer.FillRect(
-            SDL2pp::Rect(health_bar_x, health_bar_y, health_bar_width, health_bar_height));
+            SDL2pp::Rect(HEALTH_BAR_X, HEALTH_BAR_Y, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT));
 
     // Dibujar barra de vida segun vida maxima del auto
     int current_health_width = 0;
     if (max_health > 0) {
-        current_health_width = (health * health_bar_width) / max_health;
-        if (current_health_width > health_bar_width) {
-            current_health_width = health_bar_width;
+        current_health_width = (health * HEALTH_BAR_WIDTH) / max_health;
+        if (current_health_width > HEALTH_BAR_WIDTH) {
+            current_health_width = HEALTH_BAR_WIDTH;
         }
     }
-    renderer.SetDrawColor(255, 0, 0, 255);
+    renderer.SetDrawColor(COLOR_RED_R, COLOR_RED_G, COLOR_RED_B, COLOR_RED_A);
     renderer.FillRect(
-            SDL2pp::Rect(health_bar_x, health_bar_y, current_health_width, health_bar_height));
+            SDL2pp::Rect(HEALTH_BAR_X, HEALTH_BAR_Y, current_health_width, HEALTH_BAR_HEIGHT));
 }
 
 void SDLManager::render_hud_minimap(int player_x, int player_y) {
-    constexpr int minimap_width = 384;   // 1920 : 5
-    constexpr int minimap_height = 216;  // 1080 : 5
-
-    const int minimap_x = 1920 - minimap_width - 20;
-    const int minimap_y = 1080 - minimap_height - 20;
+    const int minimap_x = SCREEN_WIDTH - MINIMAP_WIDTH - MINIMAP_MARGIN;
+    const int minimap_y = SCREEN_HEIGHT - MINIMAP_HEIGHT - MINIMAP_MARGIN;
 
     // Borde del minimapa
-    renderer.SetDrawColor(0, 0, 0, 255);
+    renderer.SetDrawColor(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, COLOR_BLACK_A);
     renderer.FillRect(
-            SDL2pp::Rect(minimap_x - 2, minimap_y - 2, minimap_width + 4, minimap_height + 4));
+            SDL2pp::Rect(minimap_x - MINIMAP_BORDER_THICKNESS, minimap_y - MINIMAP_BORDER_THICKNESS,
+                         MINIMAP_WIDTH + 2 * MINIMAP_BORDER_THICKNESS, MINIMAP_HEIGHT + 2 * MINIMAP_BORDER_THICKNESS));
 
     // Dibujar minimapa
     renderer.Copy(minimap.value(), SDL2pp::NullOpt,
-                  SDL2pp::Rect(minimap_x, minimap_y, minimap_width, minimap_height));
+                  SDL2pp::Rect(minimap_x, minimap_y, MINIMAP_WIDTH, MINIMAP_HEIGHT));
 
     // Jugador en el minimapa
-    const int player_minimap_x = minimap_x + (player_x * minimap_width / 4640);
-    const int player_minimap_y = minimap_y + (player_y * minimap_height / 4672);
+    const int player_minimap_x = minimap_x + (player_x * MINIMAP_WIDTH / WORLD_WIDTH);
+    const int player_minimap_y = minimap_y + (player_y * MINIMAP_HEIGHT / WORLD_HEIGHT);
 
     // Dibujar jugador en minimapa
-    renderer.SetDrawColor(255, 255, 0, 255);
-    renderer.FillRect(SDL2pp::Rect(player_minimap_x - 2, player_minimap_y - 2, 10, 10));
+    renderer.SetDrawColor(COLOR_YELLOW_R, COLOR_YELLOW_G, COLOR_YELLOW_B, COLOR_YELLOW_A);
+    renderer.FillRect(SDL2pp::Rect(player_minimap_x - MINIMAP_PLAYER_OFFSET, player_minimap_y - MINIMAP_PLAYER_OFFSET, MINIMAP_PLAYER_SIZE, MINIMAP_PLAYER_SIZE));
 }
 
 void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
     SDL2pp::Rect view = get_view_rect_with_shake();
-
-    constexpr int screen_w = 1920;
-    constexpr int screen_h = 1080;
 
     for (const auto& src_rect: rects) {
         if (!camera.on_screen(src_rect))
             continue;
 
         // Vista en pantalla
-        const int dx = (src_rect.x - view.x) * screen_w / view.w;
-        const int dy = (src_rect.y - view.y) * screen_h / view.h;
-        const int dw = src_rect.w * screen_w / view.w;
-        const int dh = src_rect.h * screen_h / view.h;
+        const int dx = (src_rect.x - view.x) * SCREEN_WIDTH / view.w;
+        const int dy = (src_rect.y - view.y) * SCREEN_HEIGHT / view.h;
+        const int dw = src_rect.w * SCREEN_WIDTH / view.w;
+        const int dh = src_rect.h * SCREEN_HEIGHT / view.h;
         const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
         SDL2pp::Texture& map = resources.get_texture(map_name);
@@ -213,7 +202,7 @@ void SDLManager::render(LocalInfo& game_state) {
     }
 
     if (!found) {
-        SDL_Delay(10);
+        SDL_Delay(RENDER_DELAY_MS);
         return;
     }
 
@@ -236,7 +225,7 @@ void SDLManager::render(LocalInfo& game_state) {
     SDL2pp::Rect view_rect = get_view_rect_with_shake();
 
     SDL2pp::Texture& map = resources.get_texture(map_name);
-    renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, 1920, 1080));
+    renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 
     // Render NPCs on ground layer
     for (const auto& npc: game_state.npcs) {
@@ -269,24 +258,39 @@ void SDLManager::render(LocalInfo& game_state) {
     // animations.render_explosion(iteration_counter);
 
     show_screen();
-    SDL_Delay(10);
+    SDL_Delay(RENDER_DELAY_MS);
 }
 
 void SDLManager::render_waiting() {
     clear_screen();
-    draw_row("Waiting for players...", 700, 500, SDL2pp::Color(255, 255, 255, 255), 48);
+    const std::string text = "Waiting for players...";
+    SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_WAITING_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_WAITING_SIZE);
     show_screen();
 }
 
 void SDLManager::render_countdown() {
     clear_screen();
-    draw_row("The race will start soon...", 600, 500, SDL2pp::Color(255, 255, 255, 255), 48);
+    const std::string text = "The race will start soon...";
+    SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_COUNTDOWN_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_COUNTDOWN_SIZE);
     show_screen();
 }
 
 void SDLManager::render_leaderboard() {
     clear_screen();
-    draw_row("Leaderboard", 850, 100, SDL2pp::Color(255, 215, 0, 255), 64);
+    const std::string text = "Leaderboard";
+    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
     show_screen();
 }
 
@@ -294,31 +298,30 @@ void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Col
                           int font_size) {
 
     SDL2pp::Texture& text_texture =
-            resources.get_text(sentence, "client/assets/fonts/UrbanHaze.ttf", font_size, color);
+            resources.get_text(sentence, FONT_PATH, font_size, color);
 
     renderer.Copy(text_texture, SDL2pp::NullOpt,
                   SDL2pp::Rect(x, y, text_texture.GetWidth(), text_texture.GetHeight()));
 }
 
 void SDLManager::render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars) {
-    int box_w = 1920 * 4 / 5;
-    int box_h = 1080 * 4 / 5;
-    int box_x = (1920 - box_w) / 2;
-    int box_y = (1080 - box_h) / 2;
+    int box_w = SCREEN_WIDTH * STATS_BOX_WIDTH_RATIO / STATS_BOX_DIVISOR;
+    int box_h = SCREEN_HEIGHT * STATS_BOX_HEIGHT_RATIO / STATS_BOX_DIVISOR;
+    int box_x = (SCREEN_WIDTH - box_w) / 2;
+    int box_y = (SCREEN_HEIGHT - box_h) / 2;
 
     SDL2pp::Rect stats{box_x, box_y, box_w, box_h};
 
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
-    renderer.SetDrawColor(0, 0, 0, 100);
+    renderer.SetDrawColor(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, COLOR_BLACK_ALPHA);
     renderer.DrawRect(stats);
 
-    SDL2pp::Color text_color = SDL2pp::Color(255, 255, 255, 255);
+    SDL2pp::Color text_color = SDL2pp::Color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
 
-    int margin = 20;
-    int text_x = box_x + margin;
-    int text_y = box_y + margin;
-    int font_size = box_h / 20;
-    int spacing = font_size + 10;
+    int text_x = box_x + STATS_MARGIN;
+    int text_y = box_y + STATS_MARGIN;
+    int font_size = box_h / STATS_FONT_SIZE_DIVISOR;
+    int spacing = font_size + STATS_SPACING_OFFSET;
 
     std::string separation = "     ";
     std::string header = "Jugador" + separation + "Tiempo";
@@ -376,17 +379,17 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
         return;
     }
 
-    int screen_x = ((checkpoint.x - checkpoint.width / 2) - view.x) * 1920 / view.w;
-    int screen_y = ((checkpoint.y - checkpoint.height / 2) - view.y) * 1080 / view.h;
-    int screen_w = checkpoint.width * 1920 / view.w;
-    int screen_h = checkpoint.height * 1080 / view.h;
+    int screen_x = ((checkpoint.x - checkpoint.width / 2) - view.x) * SCREEN_WIDTH / view.w;
+    int screen_y = ((checkpoint.y - checkpoint.height / 2) - view.y) * SCREEN_HEIGHT / view.h;
+    int screen_w = checkpoint.width * SCREEN_WIDTH / view.w;
+    int screen_h = checkpoint.height * SCREEN_HEIGHT / view.h;
 
     SDL2pp::Rect dst(screen_x, screen_y, screen_w, screen_h);
 
     if (checkpoint.is_finish_line) {
-        renderer.SetDrawColor(255, 255, 0, 200);
+        renderer.SetDrawColor(COLOR_YELLOW_R, COLOR_YELLOW_G, COLOR_YELLOW_B, COLOR_YELLOW_ALPHA);
     } else {
-        renderer.SetDrawColor(255, 0, 0, 200);
+        renderer.SetDrawColor(COLOR_RED_R, COLOR_RED_G, COLOR_RED_B, COLOR_RED_ALPHA);
     }
 
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
@@ -404,13 +407,13 @@ double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
 
 
     // Convertir para que 0° = arriba
-    angle_deg += 90.0;
+    angle_deg += ANGLE_OFFSET_DEGREES;
 
     // Normalizar
     if (angle_deg < 0)
-        angle_deg += 360.0;
-    if (angle_deg >= 360.0)
-        angle_deg -= 360.0;
+        angle_deg += FULL_CIRCLE_DEGREES;
+    if (angle_deg >= FULL_CIRCLE_DEGREES)
+        angle_deg -= FULL_CIRCLE_DEGREES;
 
 
     return angle_deg;
@@ -421,31 +424,27 @@ void SDLManager::render_hint(const CarPositionDTO& player) {
 
     SDL2pp::Rect view = get_view_rect_with_shake();
 
-    const int car_screen_x = (player.x_position - view.x) * 1920 / view.w;
-    const int car_screen_y = (player.y_position - view.y) * 1080 / view.h;
+    const int car_screen_x = (player.x_position - view.x) * SCREEN_WIDTH / view.w;
+    const int car_screen_y = (player.y_position - view.y) * SCREEN_HEIGHT / view.h;
 
-    const int arrow_w = 60;
-    const int arrow_h = 60;
+    SDL2pp::Rect dst(car_screen_x - ARROW_WIDTH / 2, car_screen_y - ARROW_VERTICAL_OFFSET, ARROW_WIDTH, ARROW_HEIGHT);
 
-    SDL2pp::Rect dst(car_screen_x - arrow_w / 2, car_screen_y - 140, arrow_w, arrow_h);
-
-    SDL2pp::Texture& arrow = resources.get_texture("client/assets/sprites/arrow.png");
+    SDL2pp::Texture& arrow = resources.get_texture(ARROW_SPRITE_PATH);
     renderer.Copy(arrow, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
 void SDLManager::load_city(const std::string& city_name) {
     // todo en minusculas
 
-    map_name = "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - " +
-               city_name + ".png";
+    map_name = std::string(MAP_BACKGROUND_PREFIX) + city_name + MAP_BACKGROUND_SUFFIX;
 
     std::string city_name_lower = city_name;
     std::transform(city_name_lower.begin(), city_name_lower.end(), city_name_lower.begin(),
                    ::tolower);
     // separate city_name lower with _
     std::replace(city_name_lower.begin(), city_name_lower.end(), ' ', '_');
-    decoration = "server/world/decorations_" + city_name_lower + ".json";
-    bridges = "server/world/bridges_" + city_name_lower + ".json";
+    decoration = std::string(DECORATIONS_PREFIX) + city_name_lower + JSON_SUFFIX;
+    bridges = std::string(BRIDGES_PREFIX) + city_name_lower + JSON_SUFFIX;
 
     set_minimap();
     load_bridges_rects(load_json_file(bridges));

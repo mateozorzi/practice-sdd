@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <SDL2/SDL.h>
+
 #include "game.h"
 
 GamePhase::GamePhase(Game& game, int starting_it): game(game), it(starting_it), FPS_CLIENT(60) {}
@@ -9,7 +11,10 @@ GamePhase::GamePhase(Game& game, int starting_it): game(game), it(starting_it), 
 bool GamePhase::run() {
     bool loop = true;
     bool request_phase_change = false;
+    const uint32_t frame_delay = 1000 / FPS_CLIENT;  // Delay en milisegundos para 60 FPS
     while (loop) {
+        uint32_t frame_start = SDL_GetTicks();
+        
         show_game();
         handle_game_events();
         if (!game.keep_running)
@@ -21,6 +26,12 @@ bool GamePhase::run() {
 
         if (!game.keep_running)
             break;
+        
+        // Control de frame rate para evitar consumo excesivo de CPU
+        uint32_t frame_time = SDL_GetTicks() - frame_start;
+        if (frame_time < frame_delay) {
+            SDL_Delay(frame_delay - frame_time);
+        }
     }
 
     return request_phase_change;
