@@ -34,8 +34,7 @@ private:
     SDL2pp::Mixer& mixer;
     ResourceManager& resources;
     Sounds& sounds;
-    SDL2pp::SDLTTF ttf;
-    SDL2pp::Font font;
+    std::string font_path;
 
     std::vector<ShopButton> buttons;
     SDL2pp::Rect shop_rect;

@@ -1,6 +1,9 @@
 #include "upgrade_shop.h"
 
 #include <optional>
+#include <optional>
+
+#include "client_constants.h"
 
 UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                          ResourceManager& resources, Sounds& sounds, int window_width,
@@ -9,27 +12,28 @@ UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
         mixer(mixer),
         resources(resources),
         sounds(sounds),
-        font(font_path, 18),
-        shop_rect((window_width - window_width * 3 / 4) / 2,
-                  (window_height - window_height * 3 / 4) / 2, window_width * 3 / 4,
-                  window_height * 3 / 4),
+        font_path(font_path),
+        shop_rect((window_width - window_width * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN) / 2,
+                  (window_height - window_height * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN) / 2,
+                  window_width * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN,
+                  window_height * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN),
         isOpen(true),
         window_width(window_width),
         window_height(window_height) {
 
     // Tamaño: 3/4 de la ventana
-    int shop_width = window_width * 3 / 4;
-    int shop_height = window_height * 3 / 4;
+    int shop_width = window_width * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN;
+    int shop_height = window_height * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN;
 
     // Botones
-    int button_width = shop_width * 3 / 5;
-    int button_height = shop_height / 8;
-    int button_spacing = shop_height / 20;
+    int button_width = shop_width * SHOP_BUTTON_WIDTH_RATIO_NUM / SHOP_BUTTON_WIDTH_RATIO_DEN;
+    int button_height = shop_height / SHOP_BUTTON_HEIGHT_DIVISOR;
+    int button_spacing = shop_height / SHOP_BUTTON_SPACING_DIVISOR;
 
     std::string buttons_text[4] = {"Health", "Speed", "Acceleration", "Handling"};
     ButtonType buttons_type[4] = {Health, Speed, Acceleration, Handling};
 
-    int start_y = shop_rect.y + shop_height / 4;  // Empieza 1/4 de altura de la ventana de tienda
+    int start_y = shop_rect.y + shop_height / SHOP_BUTTON_START_Y_DIVISOR;
     int button_x = shop_rect.x + (shop_width - button_width) / 2;  // Centrar horizontalmente
 
     for (int i = 0; i < 4; i++) {
@@ -69,10 +73,14 @@ void UpgradeShop::render(int player_time, Car player_car) {
         return;
     }
 
-    SDL2pp::Color shop_color(40, 40, 40, 230);
-    SDL2pp::Color border_color(0, 0, 0);
-    SDL2pp::Color button_color(80, 80, 80, 255);
-    int border_thickness = 5;
+    SDL2pp::Color shop_color(COLOR_SHOP_BG_R, COLOR_SHOP_BG_G, COLOR_SHOP_BG_B,
+                             COLOR_SHOP_BG_A);
+    SDL2pp::Color border_color(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, COLOR_BLACK_A);
+    SDL2pp::Color button_color(COLOR_SHOP_BUTTON_R, COLOR_SHOP_BUTTON_G, COLOR_SHOP_BUTTON_B,
+                               COLOR_SHOP_BUTTON_A);
+    SDL2pp::Color button_hover_color(COLOR_SHOP_BUTTON_HOVER_R, COLOR_SHOP_BUTTON_HOVER_G,
+                                      COLOR_SHOP_BUTTON_HOVER_B, COLOR_SHOP_BUTTON_HOVER_A);
+    int border_thickness = SHOP_BORDER_THICKNESS;
 
     // Fondo de tienda
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
@@ -90,11 +98,11 @@ void UpgradeShop::render(int player_time, Car player_car) {
                                    border_thickness, shop_rect.h));
 
     // Titulo de la tienda
-    SDL2pp::Surface title_surface =
-            font.RenderText_Blended("UPGRADE SHOP", SDL_Color{255, 215, 0, 255});
-    SDL2pp::Texture title_texture(renderer, title_surface);
+    SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
+    SDL2pp::Texture& title_texture =
+            resources.get_text(SHOP_TITLE_TEXT, font_path, SHOP_FONT_SIZE, title_color);
     int title_x = shop_rect.x + (shop_rect.w - title_texture.GetWidth()) / 2;
-    int title_y = shop_rect.y + 15;
+    int title_y = shop_rect.y + SHOP_TITLE_Y_OFFSET;
     renderer.Copy(
             title_texture, SDL2pp::NullOpt,
             SDL2pp::Rect(title_x, title_y, title_texture.GetWidth(), title_texture.GetHeight()));
@@ -103,12 +111,17 @@ void UpgradeShop::render(int player_time, Car player_car) {
     for (const ShopButton& btn: buttons) {
         // Fondo del boton
         renderer.SetDrawBlendMode(SDL_BLENDMODE_NONE);
-        renderer.SetDrawColor(button_color);
+        // Hover si el mouse esta por encima
+        if (touched_button_type == btn.type) {
+            renderer.SetDrawColor(button_hover_color);
+        } else {
+            renderer.SetDrawColor(button_color);
+        }
         renderer.FillRect(btn.rect);
 
         // Borde del boton
         renderer.SetDrawColor(border_color);
-        int btn_border = 2;
+        int btn_border = SHOP_BUTTON_BORDER_THICKNESS;
         renderer.FillRect(SDL2pp::Rect(btn.rect.x, btn.rect.y, btn.rect.w, btn_border));
         renderer.FillRect(SDL2pp::Rect(btn.rect.x, btn.rect.y + btn.rect.h - btn_border, btn.rect.w,
                                        btn_border));
@@ -118,10 +131,10 @@ void UpgradeShop::render(int player_time, Car player_car) {
 
         // Texto del boton
         if (!btn.text.empty()) {
-            std::string button_text = btn.text + ": " + std::to_string(btn.cost) + " seconds";
-            SDL2pp::Surface text_surface =
-                    font.RenderText_Blended(button_text, SDL_Color{255, 255, 255, 255});
-            SDL2pp::Texture text_texture(renderer, text_surface);
+            std::string button_text = btn.text + ": " + std::to_string(btn.cost) + SHOP_SECONDS_TEXT;
+            SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+            SDL2pp::Texture& text_texture =
+                    resources.get_text(button_text, font_path, SHOP_FONT_SIZE, text_color);
 
             int text_x = btn.rect.x + (btn.rect.w - text_texture.GetWidth()) / 2;
             int text_y = btn.rect.y + (btn.rect.h - text_texture.GetHeight()) / 2;
@@ -141,7 +154,7 @@ void UpgradeShop::close_shop() { isOpen = false; }
 
 std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
     SDL2pp::Point point{x, y};
-    touched_button_type = ButtonType::None;
+    touched_button_type = None;
 
     for (const ShopButton& btn: buttons) {
         if (btn.rect.Contains(point)) {
@@ -156,8 +169,8 @@ std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
             return btn.type;
         }
     }
-    if (touched_button_type == ButtonType::None) {
-        last_touched_button_type = ButtonType::None;
+    if (touched_button_type == None) {
+        last_touched_button_type = None;
     }
 
     return std::nullopt;
