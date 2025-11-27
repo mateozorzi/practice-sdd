@@ -160,17 +160,6 @@ bool InputManager::handle_game_finished() {
     return true;
 }
 
-bool InputManager::handle_winner() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-            return false;
-        }
-    }
-    return true;
-}
-
-
 bool InputManager::handle_movement() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
