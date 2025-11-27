@@ -16,6 +16,7 @@
 #include "city_loader.h"
 #include "collision_listener.h"
 #include "game_monitor.h"
+#include "npc.h"
 #include "player.h"
 #include "server_config.h"
 
@@ -27,6 +28,7 @@ constexpr int POSITION_ITERATIONS = 6;
 
 
 enum class GamePhase {
+
     WAITING_CAR_SELECTION,
     UPGRADE_SHOP,
     COUNTDOWN,
@@ -56,22 +58,17 @@ class GameLoop final: public Thread {
 
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
-    b2World box2d_world;
+    b2World box2d_world = b2Vec2(0.0f, 0.0f);
     CityLoader city_loader;
     std::unordered_map<uint32_t, Player> players;
+    std::vector<Npc> npcs;
     CollisionListener collision_listener;
     RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO final_leaderboard;
-    bool race_active;
+    bool race_active = false;
 
     void fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time);
-    void handle_waiting_car_selection_phase();
-    void handle_upgrade_shop_phase();
-    void handle_countdown_phase();
-    void handle_in_race_phase();
-    void handle_leaderboard_phase();
-    void handle_game_finished_phase();
 
     void process_commands_in_waiting_car_selection_phase();
     void process_commands_in_upgrade_shop_phase();
@@ -79,13 +76,19 @@ class GameLoop final: public Thread {
     void process_commands_in_race_phase();
     void process_commands_in_leaderboard_phase();
     void process_commands_in_game_finished_phase();
+    
+    void handle_waiting_car_selection_phase();
+    void handle_upgrade_shop_phase();
+    void handle_countdown_phase();
+    void handle_in_race_phase();
+    void handle_leaderboard_phase();
+    void handle_game_finished_phase();
 
-    void process_commands();
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
     void handle_upgrade_car(const GameCommand& game_command);
-    void handle_command(const GameCommand& game_command);
+
     void update_positions(const RaceDTO& race);
     void set_race(const RaceDTO& race);
     void finish_race(uint32_t timeout_time);
@@ -98,7 +101,7 @@ class GameLoop final: public Thread {
     bool player_in_race() const;
 
     void map_configuration(const std::string& city_name);
-    void shop_phase();
+    void load_npcs(const std::string& city_name);
 
 
 public:

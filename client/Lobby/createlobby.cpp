@@ -39,7 +39,7 @@ void CreateLobby::create_denied() {
     QMessageBox::warning(this, "Create Denied", "Denied create lobby.");
 }
 
-void CreateLobby::create_denied_players(uint8_t players, std::string message){
+void CreateLobby::create_denied_players(uint8_t players, const std::string& message) {
     QString msg = QString::fromStdString(message);
     QMessageBox::warning(this, "Access Denied", msg + ": " + QString::number(players));
 }

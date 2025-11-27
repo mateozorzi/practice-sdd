@@ -24,6 +24,7 @@ public:
     void initialize_channels();
 
     void play_engine_sound(bool is_moving);
+    void play_upgrade_sound();
 };
 
 

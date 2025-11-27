@@ -2,8 +2,11 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <string>
 #include <vector>
+
+#include <nlohmann/json.hpp>
 
 #include "../common/checkpoint_dto.h"
 #include "../common/client_event_dto.h"
@@ -27,23 +30,11 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         game_finish_seconds(config.game.wait_seconds_game_finished),
         game_monitor(game_monitor),
         command_queue(command_queue),
-        box2d_world(b2Vec2(0.0f, 0.0f)),
         city_loader(box2d_world),
         collision_listener(players),
-        selected_races(selected),
-        race_active(false) {
+        selected_races(selected) {
 
     box2d_world.SetContactListener(&collision_listener);
-
-    command_handlers = {
-            {ClientAction::SEND_CAR_SELECTION,
-             [this](const GameCommand& game_command) { handle_car_selection(game_command); }},
-            {ClientAction::SEND_CAR_MOVEMENT,
-             [this](const GameCommand& game_command) { handle_car_movement(game_command); }},
-            {ClientAction::DISCONNECT,
-             [this](const GameCommand& game_command) { handle_disconnection(game_command); }},
-            {ClientAction::SEND_UPGRADE,
-             [this](const GameCommand& game_command) { handle_upgrade_car(game_command); }}};
 }
 
 
@@ -181,10 +172,10 @@ void GameLoop::handle_waiting_car_selection_phase() {
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
 
-        set_race(selected_races.races[current_race_index]);
+        GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+        game_monitor.broadcast(game_update);
 
-        // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        set_race(selected_races.races[current_race_index]);
     }
 
     fixed_sleep(now);
@@ -205,12 +196,10 @@ void GameLoop::handle_upgrade_shop_phase() {
         current_phase = GamePhase::COUNTDOWN;
         phase_start = std::nullopt;
 
-        // Should delete later
-        shop_phase();
+        GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
+        game_monitor.broadcast(game_update);
 
-        // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        update_positions(selected_races.races[current_race_index]);
     }
 
     fixed_sleep(now);
@@ -230,9 +219,8 @@ void GameLoop::handle_countdown_phase() {
         current_phase = GamePhase::IN_RACE;
         phase_start = std::nullopt;
 
-        // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
+        game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -264,9 +252,11 @@ void GameLoop::handle_in_race_phase() {
         LeaderboardDTO leaderboard = create_leaderboard();
         (void)leaderboard;
 
-        // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::SEND_LEADERBOARD, leaderboard);
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
+        game_monitor.broadcast(game_update);
+
+        GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
+        game_monitor.broadcast(l);
     }
 
     fixed_sleep(now);
@@ -286,13 +276,12 @@ void GameLoop::handle_leaderboard_phase() {
         if (current_race_index + 1 < selected_races.size) {
 
             current_phase = GamePhase::UPGRADE_SHOP;
-            set_race(selected_races.races[current_race_index]);
-            // update_positions(selected_races.races[current_race_index]);
             current_race_index += 1;
 
-            shop_phase();
-            // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-            // game_monitor.broadcast(game_update);
+            GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+            game_monitor.broadcast(game_update);
+
+            set_race(selected_races.races[current_race_index]);
         } else {
 
             current_phase = GamePhase::GAME_FINISHED;
@@ -357,13 +346,6 @@ void GameLoop::add_player(const uint32_t client_id, const std::string& username)
               << "Player with ID: " << client_id << " has joined the game. | Username: " << username
               << std::endl
               << std::endl;
-}
-
-void GameLoop::process_commands() {
-
-    GameCommand game_command;
-
-    while (command_queue.try_pop(game_command)) handle_command(game_command);
 }
 
 CarConfig GameLoop::get_car_config(const ServerConfig& server_config, const CarDTO& car_dto) {
@@ -436,14 +418,6 @@ void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
     }
 }
 
-void GameLoop::handle_command(const GameCommand& game_command) {
-
-    const auto it = command_handlers.find(game_command.get_client_action());
-
-    if (it != command_handlers.end())
-        it->second(game_command);
-}
-
 void GameLoop::update_positions(const RaceDTO& race) {
 
     WorldSnapshotDTO world_snapshot;
@@ -453,6 +427,12 @@ void GameLoop::update_positions(const RaceDTO& race) {
         player.update_car_position(race);
         PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position());
+    }
+
+    // Update NPC positions
+    for (auto& npc: npcs) {
+        npc.update();
+        world_snapshot.add_npc_position(npc.get_position());
     }
 
     GameUpdateDTO update(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
@@ -479,14 +459,56 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name) { city_loader.load_city(city_name); }
+void GameLoop::map_configuration(const std::string& city_name) {
+    city_loader.load_city(city_name);
+    load_npcs(city_name);
+}
 
-void GameLoop::shop_phase() {
+void GameLoop::load_npcs(const std::string& city_name) {
+    npcs.clear();
 
-    GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
-    game_monitor.broadcast(shop_update);
-    GameUpdateDTO shop_close(GameLoopAction::CLOSE_SHOP, std::monostate{});
-    game_monitor.broadcast(shop_close);
+    std::string normalized_city = city_name;
+    std::transform(normalized_city.begin(), normalized_city.end(), normalized_city.begin(),
+                   ::tolower);
+    std::replace(normalized_city.begin(), normalized_city.end(), ' ', '_');
+
+    std::string npc_file = "server/world/npcs/npcs_" + normalized_city + ".json";
+
+    try {
+        std::ifstream file(npc_file);
+        if (!file) {
+            std::cout << "[GAME_LOOP] NPC file not found: " << npc_file << std::endl;
+            return;
+        }
+
+        nlohmann::json json_data;
+        file >> json_data;
+
+        if (!json_data.is_array()) {
+            std::cout << "[GAME_LOOP] Invalid NPC file format" << std::endl;
+            return;
+        }
+
+        uint32_t npc_id = 0;
+        constexpr float NPC_SPEED = 1.5f;  // Slow speed in pixels per update
+
+        for (const auto& polygon: json_data) {
+            if (polygon.is_array() && polygon.size() >= 3) {
+                std::vector<std::vector<int>> route;
+                for (const auto& point: polygon) {
+                    if (point.is_array() && point.size() >= 2) {
+                        route.push_back({point[0].get<int>(), point[1].get<int>()});
+                    }
+                }
+                npcs.emplace_back(npc_id++, route, NPC_SPEED);
+            }
+        }
+
+        std::cout << "[GAME_LOOP] Loaded " << npcs.size() << " NPCs from " << npc_file << std::endl;
+
+    } catch (const std::exception& e) {
+        std::cout << "[GAME_LOOP] Error loading NPCs: " << e.what() << std::endl;
+    }
 }
 
 void GameLoop::set_race(const RaceDTO& race) {

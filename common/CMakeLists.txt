@@ -35,6 +35,7 @@ target_sources(nfs_common
     race_dto.h
     checkpoint_dto.h
     race_catalogue_dto.h
+    npc_dto.h
 
     player_race_stats_dto.h
     leaderboard_dto.h

@@ -115,7 +115,7 @@ bool MenuInterface::create_lobby(const PlayerDTO& player) {
         } else if (lobby_response.action == LobbyAction::CREATE_OR_JOIN_ERROR) {
             cl.show();
             cl.create_denied();
-        }else if (lobby_response.action == LobbyAction::MAX_PLAYERS_ERROR) {
+        } else if (lobby_response.action == LobbyAction::MAX_PLAYERS_ERROR) {
             // lobby full
             cl.show();
             cl.create_denied_players(lobby_response.max_players, "Max players reached");
@@ -249,9 +249,9 @@ void MenuInterface::lobby(PlayerDTO& player) {
 
     Lobby l;
     l.showMaximized();
-    std::cout<<"Showing lobby window"<<std::endl;
+    std::cout << "Showing lobby window" << std::endl;
 
-    //PlayerDTO player("", -1, CarDTO(), -1, false);
+    // PlayerDTO player("", -1, CarDTO(), -1, false);
 
     std::string username;
     uint32_t client_id = -1;
@@ -261,12 +261,12 @@ void MenuInterface::lobby(PlayerDTO& player) {
 
     // Conectás la señal del lobby con el cliente
     QObject::connect(&l, &Lobby::input_username, [&](const QString& name) {
-        std::cout<<"Received username signal"<<std::endl;
+        std::cout << "Received username signal" << std::endl;
         username = name.toStdString();
 
         protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));
         client_id = protocol.receive_id();  // wait for server response
-        std::cout<<"Received client ID from server: "<<client_id<<std::endl;
+        std::cout << "Received client ID from server: " << client_id << std::endl;
         player.username = username;
         player.id = client_id;
         std::cout << "Username entered: " << player.username << std::endl;

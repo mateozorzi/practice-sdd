@@ -68,6 +68,7 @@ bool InputManager::handle_click(const SDL_Event& event, int time) {
         auto opt_button = sdl.interact_button(mouse_x, mouse_y, time);
         if (opt_button.has_value()) {
             ButtonType button = opt_button.value();
+            sdl.play_upgrade_sound();
             switch (button) {
                 case Acceleration:
                     sender.add_event(BuyUpgradeDTO{Acceleration});
@@ -94,6 +95,16 @@ bool InputManager::handle_click(const SDL_Event& event, int time) {
     return false;
 }
 
+bool InputManager::handle_waiting() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool InputManager::handle_shop_movement(const SDL_Event& event, int time) {
     if (event.type == SDL_MOUSEMOTION) {
         int mouse_x = event.motion.x;
@@ -114,6 +125,27 @@ bool InputManager::handle_buy_events(int time) {
             continue;
         if (handle_shop_movement(event, time))
             continue;
+    }
+    return true;
+}
+
+bool InputManager::handle_countdown() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+        // cheats
+    }
+    return true;
+}
+
+bool InputManager::handle_leaderboard() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
     }
     return true;
 }

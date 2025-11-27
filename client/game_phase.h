@@ -11,27 +11,34 @@ protected:
 
 public:
     GamePhase(Game& game, int starting_it);
-    void run();
-    void change_phase(int last_it);
+    bool run();
     virtual void handle_game_events() = 0;
     virtual bool update_game_state() = 0;
     virtual void show_game() = 0;
     virtual ~GamePhase() {}
 };
 
-/*
-class WaitingForGamePhase : public GamePhase {
+
+class WaitingForGamePhase: public GamePhase {
 public:
     WaitingForGamePhase(Game& game, int starting_it);
     void handle_game_events() override;
     bool update_game_state() override;
-    void show_game(const int& it) override;
+    void show_game() override;
 };
-*/
+
 
 class UpgradePhase: public GamePhase {
 public:
     UpgradePhase(Game& game, int starting_it);
+    void handle_game_events() override;
+    bool update_game_state() override;
+    void show_game() override;
+};
+
+class CountdownPhase: public GamePhase {
+public:
+    CountdownPhase(Game& game, int starting_it);
     void handle_game_events() override;
     bool update_game_state() override;
     void show_game() override;
@@ -45,14 +52,14 @@ public:
     void show_game() override;
 };
 
-/*
-class StatsPhase : public GamePhase {
+
+class LeaderboardPhase: public GamePhase {
 public:
-    StatsPhase(Game& game, int starting_it);
+    LeaderboardPhase(Game& game, int starting_it);
     void handle_game_events() override;
     bool update_game_state() override;
-    void show_game(const int& it) override;
+    void show_game() override;
 };
-*/
+
 
 #endif

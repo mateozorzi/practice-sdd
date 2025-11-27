@@ -25,8 +25,6 @@ void ClientHandler::launch_lobby() {
     while (is_in_lobby) {
 
         try {
-            std::cout<<"[CLIENT_HANDLER] "
-                     <<"Waiting for lobby action from client ID: " << client_id << std::endl;
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
 
@@ -50,16 +48,16 @@ void ClientHandler::launch_lobby() {
                     break;
                 case LobbyAction::LEAVE_LOBBY:
                 default:
-                    is_in_lobby = false;
+                    ClientHandler::stop();
                     break;
             }
         } catch (const std::exception& e) {
 
-            is_in_lobby = false;
+            ClientHandler::stop();
         }
     }
 
-    is_in_lobby = false;
+    ClientHandler::stop();
 }
 
 
@@ -109,6 +107,7 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                         Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
+
     send_car_catalogue();
     Receiver receiver(server_protocol, lobby, client_id, command_queue);
     receiver.start();
@@ -195,7 +194,7 @@ void ClientHandler::run() {
     while (should_keep_running()) {
 
         try {
-            if (is_in_lobby){
+            if (is_in_lobby) {
                 std::cout << "[CLIENT_HANDLER] "
                           << "Launching lobby for client ID: " << client_id << std::endl;
                 launch_lobby();
@@ -211,6 +210,11 @@ void ClientHandler::run() {
 
 
 void ClientHandler::stop() {
+
+    is_in_lobby = false;
+
+    if (_keep_running)
+        _keep_running = false;
 
     try {
 
