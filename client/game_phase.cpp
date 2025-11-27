@@ -6,43 +6,32 @@
 
 GamePhase::GamePhase(Game& game, int starting_it): game(game), it(starting_it), FPS_CLIENT(60) {}
 
-void GamePhase::run() {
+bool GamePhase::run() {
     bool loop = true;
-
+    bool request_phase_change = false;
     while (loop) {
         show_game();
         handle_game_events();
         if (!game.keep_running)
             break;
         if (!update_game_state()) {
+            request_phase_change = true;
             loop = false;
         }
 
         if (!game.keep_running)
             break;
     }
+
+    return request_phase_change;
 }
 
-void GamePhase::change_phase(int last_it) {
-
-    // if (game.game_state.phase == Phase::WAITING_PLAYERS) {
-    //     game.change_phase(std::make_unique<WaitingForGamePhase>(game, 0));
-
-    if (game.game_state.phase == Phase::UPGRADE) {
-        game.change_phase(std::make_unique<UpgradePhase>(game, 0));
-    } else if (game.game_state.phase == Phase::RACE) {
-        game.change_phase(std::make_unique<RacePhase>(game, last_it));
-        //}  else if (game.game_state.phase == Phase::STATS) {
-        //    game.change_phase(std::make_unique<StatsPhase>(game, last_it));
-    }
-}
-
-/*
 WaitingForGamePhase::WaitingForGamePhase(Game &game, int starting_it) : GamePhase(game, starting_it)
-{} void WaitingForGamePhase::handle_game_events() { game.handle_waiting_events(); } bool
-WaitingForGamePhase::update_game_state() { return game.update_waiting(); } void
-WaitingForGamePhase::show_game(const int &it) { game.show_waiting(it); }
-*/
+{} 
+void WaitingForGamePhase::handle_game_events() { game.handle_waiting_events(); }
+bool WaitingForGamePhase::update_game_state() { return game.update_waiting(); }
+void WaitingForGamePhase::show_game() { game.show_waiting(); }
+
 
 UpgradePhase::UpgradePhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
 void UpgradePhase::handle_game_events() { game.handle_upgrade_events(); }

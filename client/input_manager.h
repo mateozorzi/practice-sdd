@@ -28,6 +28,7 @@ private:
 
 public:
     explicit InputManager(SDLManager& sdl, ClientProtocol& protocol);
+    bool handle_waiting();
     bool handle_movement();
     bool handle_buy_events(int time);
     bool is_moving() const;

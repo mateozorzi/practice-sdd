@@ -95,6 +95,16 @@ bool InputManager::handle_click(const SDL_Event& event, int time) {
     return false;
 }
 
+bool InputManager::handle_waiting() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool InputManager::handle_shop_movement(const SDL_Event& event, int time) {
     if (event.type == SDL_MOUSEMOTION) {
         int mouse_x = event.motion.x;

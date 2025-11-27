@@ -254,6 +254,13 @@ void SDLManager::render(LocalInfo& game_state) {
     SDL_Delay(10);
 }
 
+void SDLManager::render_waiting() {
+    clear_screen();
+    draw_row("Esperando jugadores...", 700, 500,
+             SDL2pp::Color(255, 255, 255, 255), 48);
+    show_screen();
+}
+
 void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,
                           int font_size) {
 

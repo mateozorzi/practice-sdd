@@ -180,11 +180,13 @@ void GameLoop::handle_waiting_car_selection_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to upgrade shop phase." << std::endl;
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
+        
+        GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+        game_monitor.broadcast(game_update);
 
+        //send here to set the race in upgrade phase once
         set_race(selected_races.races[current_race_index]);
 
-        // GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
-        // game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -202,15 +204,15 @@ void GameLoop::handle_upgrade_shop_phase() {
     if (elapsed >= upgrade_shop_seconds) {
 
         std::cerr << "[" << GAME_LOOP << "] Switching to countdown phase." << std::endl;
-        current_phase = GamePhase::COUNTDOWN;
+        current_phase = GamePhase::IN_RACE;
         phase_start = std::nullopt;
 
         // Should delete later
-        shop_phase();
+        //shop_phase();
 
         // Commented for now, should implement client-side.
-        // GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
-        // game_monitor.broadcast(game_update);
+        GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
+        game_monitor.broadcast(game_update);
     }
 
     fixed_sleep(now);
@@ -485,8 +487,6 @@ void GameLoop::shop_phase() {
 
     GameUpdateDTO shop_update(GameLoopAction::START_SHOP, std::monostate{});
     game_monitor.broadcast(shop_update);
-    GameUpdateDTO shop_close(GameLoopAction::CLOSE_SHOP, std::monostate{});
-    game_monitor.broadcast(shop_close);
 }
 
 void GameLoop::set_race(const RaceDTO& race) {

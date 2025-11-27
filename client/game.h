@@ -35,11 +35,10 @@ private:
 
     void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
 
-    /*
+    
     void handle_waiting_events();
     bool update_waiting();
-    void show_waiting(const int& it);
-    */
+    void show_waiting();
 
     void handle_upgrade_events();
     bool update_upgrade();
@@ -55,7 +54,7 @@ private:
     void show_stats(const int& it);
     */
 
-    void change_phase(std::unique_ptr<GamePhase> new_phase);
+    void change_phase();
 
     void update_player(const PlayerDTO& player, const CarPositionDTO& car);
 

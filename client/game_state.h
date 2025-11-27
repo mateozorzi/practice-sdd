@@ -26,7 +26,7 @@ struct LocalInfo {
     uint32_t id;
     std::unordered_map<uint32_t, PlayerInfo> players;
     PlayerInfo player;
-    Phase phase = Phase::WAITING_PLAYERS;
+    Phase phase = Phase::WAITING_FOR_CAR_SELECTION;
 };
 
 #endif

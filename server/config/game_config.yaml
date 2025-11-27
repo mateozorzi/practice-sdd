@@ -1,8 +1,8 @@
 game:
 
   game_fps: 60
-  wait_seconds_upgrade_shop: 1
-  wait_seconds_countdown: 1
+  wait_seconds_upgrade_shop: 5
+  wait_seconds_countdown: 5
   timeout_seconds_race: 600
   wait_seconds_leaderboard: 10
   wait_seconds_game_finished: 15
