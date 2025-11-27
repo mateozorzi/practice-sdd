@@ -77,7 +77,8 @@ PlayerDTO Player::get_info() const {
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
-
+    std::cout<<"[" << PLAYER << "] Getting  race stats for player with ID: " << client_id << std::endl;
+    std::cout <<"Race time: "<< race_time << std::endl;
     return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
 }
 
@@ -115,8 +116,12 @@ bool Player::have_time_recorded() const {
 
 void Player::record_time(uint32_t seconds) {
     race_time = seconds;
+    std::cout << "[" << PLAYER << "] Player " << client_id << " recorded time: " << race_time
+              << " seconds." << std::endl;
     if (penalty) {
-        race_time += 10;
+        race_time += static_cast<uint32_t>(10);
+        std::cout << "[" << PLAYER << "] Penalty applied to player " << client_id
+                  << ". New recorded time: " << race_time << " seconds." << std::endl;
         penalty = false;
     }
 }
@@ -235,8 +240,17 @@ void Player::set_in_game() { in_game = true; }
 
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
-    if (car)
+    if (car){
+        penalty = true;
+        if (upgrade.upgrade == ButtonType::Health) {
+            std::cout << "Actual health: " << health << std::endl;
+            health += static_cast<uint16_t>(game_config.health_upgrade);
+            std::cout << "Upgraded health: " << health << std::endl;
+            return;
+        }
         car->set_upgrade(upgrade, game_config);
+
+    }
 }
 
 
