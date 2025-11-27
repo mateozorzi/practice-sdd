@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
+#include "../common/npc_dto.h"
 #include "../common/phase.h"
 
 struct PlayerInfo {
@@ -26,6 +28,7 @@ struct LocalInfo {
     uint32_t id;
     std::unordered_map<uint32_t, PlayerInfo> players;
     PlayerInfo player;
+    std::vector<NpcDTO> npcs;
     Phase phase = Phase::WAITING_PLAYERS;
 };
 

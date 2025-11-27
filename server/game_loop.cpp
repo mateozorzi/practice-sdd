@@ -2,8 +2,11 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <string>
 #include <vector>
+
+#include <nlohmann/json.hpp>
 
 #include "../common/checkpoint_dto.h"
 #include "../common/client_event_dto.h"
@@ -455,6 +458,12 @@ void GameLoop::update_positions(const RaceDTO& race) {
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }
 
+    // Update NPC positions
+    for (auto& npc : npcs) {
+        npc.update();
+        world_snapshot.add_npc_position(npc.get_position());
+    }
+
     GameUpdateDTO update(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
 
     game_monitor.broadcast(update);
@@ -479,7 +488,56 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name) { city_loader.load_city(city_name); }
+void GameLoop::map_configuration(const std::string& city_name) { 
+    city_loader.load_city(city_name);
+    load_npcs(city_name);
+}
+
+void GameLoop::load_npcs(const std::string& city_name) {
+    npcs.clear();
+    
+    std::string normalized_city = city_name;
+    std::transform(normalized_city.begin(), normalized_city.end(), normalized_city.begin(), ::tolower);
+    std::replace(normalized_city.begin(), normalized_city.end(), ' ', '_');
+    
+    std::string npc_file = "server/world/npcs/npcs_" + normalized_city + ".json";
+    
+    try {
+        std::ifstream file(npc_file);
+        if (!file) {
+            std::cout << "[GAME_LOOP] NPC file not found: " << npc_file << std::endl;
+            return;
+        }
+        
+        nlohmann::json json_data;
+        file >> json_data;
+        
+        if (!json_data.is_array()) {
+            std::cout << "[GAME_LOOP] Invalid NPC file format" << std::endl;
+            return;
+        }
+        
+        uint32_t npc_id = 0;
+        constexpr float NPC_SPEED = 1.5f;  // Slow speed in pixels per update
+        
+        for (const auto& polygon : json_data) {
+            if (polygon.is_array() && polygon.size() >= 3) {
+                std::vector<std::vector<int>> route;
+                for (const auto& point : polygon) {
+                    if (point.is_array() && point.size() >= 2) {
+                        route.push_back({point[0].get<int>(), point[1].get<int>()});
+                    }
+                }
+                npcs.emplace_back(npc_id++, route, NPC_SPEED);
+            }
+        }
+        
+        std::cout << "[GAME_LOOP] Loaded " << npcs.size() << " NPCs from " << npc_file << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cout << "[GAME_LOOP] Error loading NPCs: " << e.what() << std::endl;
+    }
+}
 
 void GameLoop::shop_phase() {
 

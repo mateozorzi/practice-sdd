@@ -103,6 +103,9 @@ void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
         }
         update_player(playerDTO, carPos);
     }
+    
+    // Update NPCs
+    game_state.npcs = snapshot.get_npc_positions();
 }
 
 void Game::handle_upgrade_events() {
