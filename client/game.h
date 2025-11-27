@@ -29,6 +29,8 @@ private:
     friend class CountdownPhase;
     friend class RacePhase;
     friend class LeaderboardPhase;
+    friend class GameFinishedPhase;
+    friend class WinnerPhase;
 
     void reset_events();
 
@@ -57,6 +59,14 @@ private:
     void handle_leaderboard_events();
     bool update_leaderboard();
     void show_leaderboard();
+
+    void handle_game_finished_events();
+    bool update_game_finished();
+    void show_game_finished();
+
+    void handle_winner_events();
+    bool update_winner();
+    void show_winner();
 
     void change_phase();
 

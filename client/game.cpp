@@ -5,6 +5,8 @@
 #include "../common/constants.h"
 #include "../common/queue.h"
 #include "../common/race_dto.h"
+#include "../common/client_event_dto.h"
+#include "sender.h"
 
 Game::Game(ClientProtocol& protocol, uint32_t id):
         protocol(protocol),
@@ -17,24 +19,32 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
     phase = std::make_unique<WaitingForGamePhase>(*this, 0);
 }
 
+
 void Game::run() {
 
     this->receiver.start();
     try {
         while (keep_running) {
-
             bool phase_changed = false;
             phase_changed = phase->run();
             if (phase_changed) {
                 change_phase();
             }
+            if(!keep_running){
+                std::cout << "Exiting main game loop." << std::endl;
+                break;
+            }
         }
     } catch (const std::exception& e) {
         this->keep_running = false;
     }
-    this->receiver.stop();
-    this->receiver.join();
-    protocol.send_client_action(ClientAction::DISCONNECT);
+    std::cout<<"Client disconnected from the server."<<std::endl;
+    input_handler.handle_disconnect();
+
+    if(receiver.is_alive()){
+        this->receiver.stop();
+        this->receiver.join();
+    }
 }
 
 void Game::reset_events() {
@@ -289,6 +299,7 @@ bool Game::update_leaderboard() {
     bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (pop) {
+        //std::cout << "Checking for leaderboard updates..." << std::endl;
         if (!updates.try_pop(dto)) {
             pop = false;
             continue;
@@ -317,6 +328,66 @@ void Game::show_leaderboard() {
     sdl.show_screen();
 }
 
+void Game::handle_game_finished_events() {this->keep_running = input_handler.handle_game_finished();}
+
+bool Game::update_game_finished() {
+    GameUpdateDTO dto;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::WINNER_PHASE) {
+            game_state.phase = Phase::WINNER_PHASE;
+            return false;
+        } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
+            if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
+                LeaderboardDTO leaderboard = std::get<LeaderboardDTO>(dto.data);
+                (void)leaderboard;  // Avoiding cppcheck error.
+                // show leaderboard
+            }
+        }
+    }
+    return true;
+}
+
+void Game::show_game_finished() {
+    sdl.clear_screen();
+    sdl.render_game_finished();
+    sdl.show_screen();
+}
+
+void Game::handle_winner_events() { this->keep_running = input_handler.handle_winner(); }
+
+bool Game::update_winner(){
+    GameUpdateDTO dto;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+            sdl.clear_screen();
+            this->keep_running = false;
+            return true;
+        } //receive winner info
+    }
+    return true;
+}
+
+void Game::show_winner() {
+    sdl.clear_screen();
+    sdl.render_winner();
+    sdl.show_screen();
+}
+
+
 void Game::change_phase() {
     switch (this->game_state.phase) {
         case Phase::WAITING_FOR_CAR_SELECTION:
@@ -335,6 +406,12 @@ void Game::change_phase() {
             phase = std::make_unique<LeaderboardPhase>(*this, 0);
             break;
         case Phase::GAME_FINISHED:
+            std::cout<< "Changing to Game Finished Phase" << std::endl;
+            phase = std::make_unique<GameFinishedPhase>(*this, 0);
+            break;
+        case Phase::WINNER_PHASE:
+            std::cout<< "Changing to Winner Phase" << std::endl;
+            phase = std::make_unique<WinnerPhase>(*this, 0);
             break;
     }
 }

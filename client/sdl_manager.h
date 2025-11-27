@@ -82,6 +82,8 @@ public:
     void render_waiting();
     void render_countdown();
     void render_leaderboard();
+    void render_game_finished();
+    void render_winner();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);

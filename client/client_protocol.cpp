@@ -38,6 +38,8 @@ void ClientProtocol::send_event(const ClientEventDTO& event) {
                     handle_move(d);
                 } else if constexpr (std::is_same_v<T, BuyUpgradeDTO>) {
                     handle_buy(d);
+                } else if constexpr (std::is_same_v<T, ClientActionDTO>) {
+                    send_client_action(d.action);
                 }
             },
             event);
@@ -227,7 +229,7 @@ GameUpdateDTO ClientProtocol::receive_update() {
         data = receive_race();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_LEADERBOARD)) {
         data = receive_leaderboard();
-    } else {  // update_type == SEND_FINISH_RACE
+    } else {
         data = std::monostate{};
     }
 

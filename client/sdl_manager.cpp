@@ -294,6 +294,28 @@ void SDLManager::render_leaderboard() {
     show_screen();
 }
 
+void SDLManager::render_game_finished() {
+    clear_screen();
+    const std::string text = "Final Leaderboard";
+    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
+    show_screen();
+}
+
+void SDLManager::render_winner() {
+    clear_screen();
+    const std::string text = "Winner!";
+    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
+    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
+    show_screen();
+}
+
 void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,
                           int font_size) {
 

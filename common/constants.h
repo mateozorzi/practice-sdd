@@ -27,6 +27,8 @@ enum class GameLoopAction : uint8_t {
     GAME_FINISHED = 0x16,
     RETURN_TO_LOBBY = 0x17,
     LEADERBOARD = 0x18,
+    WINNER_PHASE = 0x19,
+    DISCONNECT = 0x20,
 };
 
 

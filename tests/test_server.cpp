@@ -174,7 +174,8 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
                            SIZE_UINT32_T + player1.username.size() + SIZE_UINT32_T + SIZE_UINT32_T +
                            player1.car.model.size() + SIZE_UINT16_T + SIZE_UINT8_T +  // player1
                            4 * SIZE_UINT32_T + SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT8_T +
-                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T;  // car position1
+                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T + // car position1
+                           SIZE_UINT8_T;  //NPC size (0)
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
     // verify_data

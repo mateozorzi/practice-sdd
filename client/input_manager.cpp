@@ -150,6 +150,26 @@ bool InputManager::handle_leaderboard() {
     return true;
 }
 
+bool InputManager::handle_game_finished() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool InputManager::handle_winner() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 bool InputManager::handle_movement() {
     SDL_Event event;
@@ -170,6 +190,10 @@ bool InputManager::handle_movement() {
 }
 
 bool InputManager::is_moving() const { return w || a || s || d; }
+
+void InputManager::handle_disconnect() {
+    sender.add_event(ClientActionDTO(ClientAction::DISCONNECT));
+}
 
 InputManager::~InputManager() {
     if (sender.is_alive()) {

@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
@@ -82,6 +83,7 @@ GameCommandDTO ServerProtocol::receive_game_command() {
         case ClientAction::SEND_UPGRADE:
             return GameCommandDTO(client_action, receive_upgrade());
         case ClientAction::DISCONNECT:
+            std::cout << "[ServerProtocol] Received DISCONNECT action." << std::endl;
             return GameCommandDTO(client_action);
         case ClientAction::GET_JSON_FILE:
             return GameCommandDTO(client_action, recv_string());
