@@ -93,7 +93,7 @@ void SDLManager::render_npc(const NpcDTO& npc) {
 
     SDL2pp::Texture& cars = resources.get_texture("client/assets/sprites/cars-no-background.png");
     renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
-                  static_cast<double>(npc.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
+                  static_cast<double>(npc.angle + 90), SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
 void SDLManager::render_hud_health(const int health, const int max_health) {
