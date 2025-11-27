@@ -46,6 +46,7 @@ bool MenuInterface::car_selection(PlayerDTO& player) {
 
     QObject::connect(&sc, &SelectCars::back_to_lobby, [&]() {
         car_selection = false;
+        protocol.send_client_action(ClientAction::DISCONNECT);
         loop.quit();
     });
 

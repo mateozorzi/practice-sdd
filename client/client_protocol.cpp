@@ -311,3 +311,8 @@ nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
     // Parse and return JSON
     return nlohmann::json::parse(json_content);
 }
+
+void ClientProtocol::send_client_action(ClientAction action) {
+    add_uint8_to_buffer(static_cast<uint8_t>(action));
+    send_buffer();
+}

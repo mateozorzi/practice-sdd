@@ -71,6 +71,7 @@ public:
     LeaderboardDTO receive_leaderboard();
     nlohmann::json get_json(const std::string& file_path);
     GameUpdateDTO receive_update();
+    void send_client_action(ClientAction action);
 };
 
 #endif

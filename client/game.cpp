@@ -28,6 +28,7 @@ void Game::run() {
     }
     this->receiver.stop();
     this->receiver.join();
+    protocol.send_client_action(ClientAction::DISCONNECT);
 }
 
 void Game::reset_events() {
