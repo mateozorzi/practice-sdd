@@ -5,6 +5,8 @@
 #include "../common/constants.h"
 #include "../common/queue.h"
 #include "../common/race_dto.h"
+#include "../common/client_event_dto.h"
+#include "sender.h"
 
 Game::Game(ClientProtocol& protocol, uint32_t id):
         protocol(protocol),
@@ -17,24 +19,32 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
     phase = std::make_unique<WaitingForGamePhase>(*this, 0);
 }
 
+
 void Game::run() {
 
     this->receiver.start();
     try {
         while (keep_running) {
-
             bool phase_changed = false;
             phase_changed = phase->run();
             if (phase_changed) {
                 change_phase();
             }
+            if(!keep_running){
+                std::cout << "Exiting main game loop." << std::endl;
+                break;
+            }
         }
     } catch (const std::exception& e) {
         this->keep_running = false;
     }
-    this->receiver.stop();
-    this->receiver.join();
-    protocol.send_client_action(ClientAction::DISCONNECT);
+    std::cout<<"Client disconnected from the server."<<std::endl;
+    input_handler.handle_disconnect();
+
+    if(receiver.is_alive()){
+        this->receiver.stop();
+        this->receiver.join();
+    }
 }
 
 void Game::reset_events() {
@@ -363,6 +373,7 @@ bool Game::update_winner(){
         }
 
         if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+            sdl.clear_screen();
             this->keep_running = false;
             return true;
         } //receive winner info

@@ -16,9 +16,11 @@ void Receiver::run() {
     while (should_keep_running()) {
         try {
             GameUpdateDTO car_position = protocol.receive_update();
+            std::cout << "[RECEIVER] Received update from server." << std::endl;
             car_positions_queue.push(car_position);
         } catch (const std::exception& e) {
             break;
         }
     }
+    std::cout << "[RECEIVER] Exiting receiver thread." << std::endl;
 }

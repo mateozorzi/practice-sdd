@@ -18,7 +18,15 @@ void Sender::add_event(const ClientEventDTO& event) { events_queue.try_push(even
 
 void Sender::send_event() {
     const ClientEventDTO event = events_queue.pop();
+    //print if its clientactiondto
+    if (std::holds_alternative<ClientActionDTO>(event)) {
+        const ClientActionDTO& action = std::get<ClientActionDTO>(event);
+        if (action.action == ClientAction::DISCONNECT) {
+            std::cout << "[SENDER] Sending DISCONNECT action to server..." << std::endl;
+        }
+    }
     protocol.send_event(event);
+    std::cout << "[SENDER] Event sent to server." << std::endl;
 }
 
 void Sender::close_queue() {

@@ -191,6 +191,10 @@ bool InputManager::handle_movement() {
 
 bool InputManager::is_moving() const { return w || a || s || d; }
 
+void InputManager::handle_disconnect() {
+    sender.add_event(ClientActionDTO(ClientAction::DISCONNECT));
+}
+
 InputManager::~InputManager() {
     if (sender.is_alive()) {
         sender.stop();

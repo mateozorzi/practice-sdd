@@ -24,8 +24,9 @@ bool GamePhase::run() {
             loop = false;
         }
 
-        if (!game.keep_running)
+        if (!game.keep_running){
             break;
+        }
         
         // Control de frame rate para evitar consumo excesivo de CPU
         uint32_t frame_time = SDL_GetTicks() - frame_start;
