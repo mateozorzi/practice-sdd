@@ -16,6 +16,7 @@
 #include "city_loader.h"
 #include "collision_listener.h"
 #include "game_monitor.h"
+#include "npc.h"
 #include "player.h"
 #include "server_config.h"
 
@@ -59,6 +60,7 @@ class GameLoop final: public Thread {
     b2World box2d_world;
     CityLoader city_loader;
     std::unordered_map<uint32_t, Player> players;
+    std::vector<Npc> npcs;
     CollisionListener collision_listener;
     RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
@@ -98,6 +100,7 @@ class GameLoop final: public Thread {
     bool player_in_race() const;
 
     void map_configuration(const std::string& city_name);
+    void load_npcs(const std::string& city_name);
     void shop_phase();
 
 

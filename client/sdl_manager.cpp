@@ -94,6 +94,19 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     sounds.play_engine_sound(is_moving);
 }
 
+void SDLManager::render_npc(const NpcDTO& npc) {
+    SDL2pp::Rect view_rect = camera.get_view_rect();
+    const int car_screen_x = (npc.x_position - view_rect.x) * 1920 / view_rect.w;
+    const int car_screen_y = (npc.y_position - view_rect.y) * 1080 / view_rect.h;
+    
+    // Use a default NPC car sprite (Compact car)
+    SDL2pp::Rect sprite_rect = SDL2pp::Rect(0, 0, 50, 50);
+
+    SDL2pp::Texture& cars = resources.get_texture("client/assets/sprites/cars-no-background.png");
+    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - 50, car_screen_y - 50, 100, 100),
+                  static_cast<double>(npc.angle + 90), SDL2pp::NullOpt, SDL_FLIP_NONE);
+}
+
 void SDLManager::render_hud_health(const int health, const int max_health) {
     constexpr int health_bar_width = 400;
     constexpr int health_bar_height = 20;
@@ -224,6 +237,11 @@ void SDLManager::render(LocalInfo& game_state) {
 
     SDL2pp::Texture& map = resources.get_texture(map_name);
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, 1920, 1080));
+
+    // Render NPCs on ground layer
+    for (const auto& npc : game_state.npcs) {
+        render_npc(npc);
+    }
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer != CarLayer::ON_BRIDGE) {

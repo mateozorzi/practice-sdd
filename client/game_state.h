@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
+#include "../common/npc_dto.h"
 #include "../common/phase.h"
 
 struct PlayerInfo {

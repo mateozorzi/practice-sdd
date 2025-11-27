@@ -12,6 +12,7 @@
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
+#include "common/npc_dto.h"
 #include "common/player_dto.h"
 
 #include "animations.h"
@@ -54,6 +55,7 @@ private:
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving);
+    void render_npc(const NpcDTO& npc);
     void render_hud_health(int health, int max_health);
     void render_hud_minimap(int player_x, int player_y);
     void render_layer(const std::vector<SDL2pp::Rect>& rects);

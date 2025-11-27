@@ -13,6 +13,7 @@ target_sources(nfs_server
     game_monitor.cpp
     lobby.cpp
     main.cpp
+    npc.cpp
     player.cpp
     receiver.cpp
     sender.cpp
@@ -32,6 +33,7 @@ target_sources(nfs_server
     game_loop.h
     game_monitor.h
     lobby.h
+    npc.h
     player.h
     receiver.h
     sender.h
