@@ -23,18 +23,26 @@ void CreateLobby::on_create_clicked() {
     }
 
     // number of players <= 0
-    int players = ui->numberplayers->value();
+    /*int players = ui->numberplayers->value();
     if (players <= 0) {
         QMessageBox::warning(this, "Error", "The minimum of players is 1.");
         return;
     } else if (players > 15) {
         QMessageBox::warning(this, "Error", "The maximum of players is 15.");
         return;
-    }
+    }*/
 
     emit create_lobby();
 }
 
+void CreateLobby::create_denied() {
+    QMessageBox::warning(this, "Create Denied", "Denied create lobby.");
+}
+
+void CreateLobby::create_denied_players(uint8_t players, const std::string& message) {
+    QString msg = QString::fromStdString(message);
+    QMessageBox::warning(this, "Access Denied", msg + ": " + QString::number(players));
+}
 
 void CreateLobby::on_exit_clicked() {
     this->close();

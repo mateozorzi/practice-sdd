@@ -30,7 +30,7 @@ class ServerProtocol final: public CommonProtocol {
     BuyUpgradeDTO receive_upgrade();
     void add_race_to_buffer(const RaceDTO& race);
     void add_checkpoint_to_buffer(const CheckpointDTO& checkpoint);
-    void send_lobby(const LobbyDTO& lobby_dto);
+    void add_lobby_to_buffer(const LobbyDTO& lobby_dto);
 
 
 public:
@@ -47,7 +47,7 @@ public:
     void send_world_snapshot(const GameUpdateDTO& snapshot);
     void send_race_update(const GameUpdateDTO& snapshot);
     void send_leaderboard_update(const GameUpdateDTO& snapshot);
-    void send_finish_race_timeout();
+    void send_lobby_response(const LobbyDTO& lobby_dto);
     void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);
     void send_json_file(const std::string& file_path);

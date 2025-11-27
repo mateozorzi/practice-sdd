@@ -25,7 +25,6 @@ void ClientHandler::launch_lobby() {
     while (is_in_lobby) {
 
         try {
-
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
 
@@ -49,16 +48,16 @@ void ClientHandler::launch_lobby() {
                     break;
                 case LobbyAction::LEAVE_LOBBY:
                 default:
-                    is_in_lobby = false;
+                    ClientHandler::stop();
                     break;
             }
         } catch (const std::exception& e) {
 
-            is_in_lobby = false;
+            ClientHandler::stop();
         }
     }
 
-    is_in_lobby = false;
+    ClientHandler::stop();
 }
 
 
@@ -108,6 +107,7 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                         Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
+
     send_car_catalogue();
     Receiver receiver(server_protocol, lobby, client_id, command_queue);
     receiver.start();
@@ -117,22 +117,64 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
     sender.stop();
     receiver.stop();
     receiver.join();
+
+    is_in_lobby = true;
 }
 
 void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
                                     const std::string& lobby_name) {
 
-    game_id = client_id;
-    auto [command_queue, snapshot_queue] =
+    lobby.reap();
+
+    if (max_players < static_cast<uint8_t>(server_config.server.min_players_per_game)) {
+
+        LobbyDTO lobby_dto(LobbyAction::MIN_PLAYERS_ERROR, 0, "",
+                           server_config.server.min_players_per_game);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    } else if (max_players > static_cast<uint8_t>(server_config.server.max_players_per_game)) {
+
+        LobbyDTO lobby_dto(LobbyAction::MAX_PLAYERS_ERROR, 0, "",
+                           server_config.server.max_players_per_game);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto result =
             lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
+    game_id = client_id;
+
+    LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
 void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
 
+    lobby.reap();
+
+    auto result = lobby.join_existing_game(client_id, actual_game_id, username);
+
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
     game_id = actual_game_id;
 
-    auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
+    LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
@@ -149,11 +191,14 @@ void ClientHandler::select_races(const LobbyDTO& lobby_dto) {
 
 void ClientHandler::run() {
 
-    while (should_keep_running() && is_in_lobby) {
+    while (should_keep_running()) {
 
         try {
-
-            launch_lobby();
+            if (is_in_lobby) {
+                std::cout << "[CLIENT_HANDLER] "
+                          << "Launching lobby for client ID: " << client_id << std::endl;
+                launch_lobby();
+            }
         } catch (const LibError&) {
 
         } catch (const std::exception& e) {
@@ -165,6 +210,11 @@ void ClientHandler::run() {
 
 
 void ClientHandler::stop() {
+
+    is_in_lobby = false;
+
+    if (_keep_running)
+        _keep_running = false;
 
     try {
 

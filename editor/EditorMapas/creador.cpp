@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <QPen>
 #include <QPoint>
+#include <algorithm>
 #include <cmath>
 
 #include <stdio.h>
@@ -91,24 +92,25 @@ void Creador::set_background(const QString& path) {
 }
 
 void Creador::update_counter() {
-    int count = 0;
-    for (QGraphicsItem* item: scene->items()) {
-        if (dynamic_cast<QGraphicsRectItem*>(item)) {
-            count++;
-        }
-    }
+    QList<QGraphicsItem*> items = scene->items();
+    int count = std::count_if(items.begin(), items.end(), [](QGraphicsItem* item) {
+        return item && item->type() == QGraphicsRectItem::Type;
+    });
+
     ui->n_checkpoints->display(count);
 }
 
 Checkpoint Creador::calculate_checkpoint(const QPoint& pos) {
     int id = static_cast<int>(ui->n_checkpoints->value() + 1);
-    int left = pos.x(), right = pos.x();
+    int left = pos.x();   // cppcheck-suppress duplicateAssignExpression
+    int right = pos.x();  // cppcheck-suppress duplicateAssignExpression
     while (left > 0 && is_street(QPoint(left - 1, pos.y()))) left--;
     while (right < mask_circuit.width() - 1 && is_street(QPoint(right + 1, pos.y()))) right++;
     int horizontalLength = right - left;
 
 
-    int up = pos.y(), down = pos.y();
+    int up = pos.y();    // cppcheck-suppress duplicateAssignExpression
+    int down = pos.y();  // cppcheck-suppress duplicateAssignExpression
     while (up > 0 && is_street(QPoint(pos.x(), up - 1))) up--;
     while (down < mask_circuit.height() - 1 && is_street(QPoint(pos.x(), down + 1))) down++;
     int verticalLength = down - up;

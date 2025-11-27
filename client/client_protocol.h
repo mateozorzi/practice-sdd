@@ -62,8 +62,6 @@ public:
     CheckpointDTO receive_checkpoint();
     CarCatalogueDTO receive_car_catalogue();
     LobbyCatalogueDTO receive_lobby_catalogue();
-    LobbyDTO receive_lobby_info();
-    LobbyDTO receive_lobby_action();
     LobbyDTO receive_lobby();
     RaceDTO receive_race();
     RaceCatalogueDTO receive_race_catalogue();
@@ -73,6 +71,7 @@ public:
     LeaderboardDTO receive_leaderboard();
     nlohmann::json get_json(const std::string& file_path);
     GameUpdateDTO receive_update();
+    void send_client_action(ClientAction action);
 };
 
 #endif

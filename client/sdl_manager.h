@@ -12,10 +12,12 @@
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
+#include "common/npc_dto.h"
 #include "common/player_dto.h"
 
 #include "animations.h"
 #include "camera.h"
+#include "game_state.h"
 #include "resource_manager.h"
 #include "sounds.h"
 #include "upgrade_shop.h"
@@ -51,8 +53,10 @@ private:
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
     void update_camera(int player_x, int player_y);
+    SDL2pp::Rect get_view_rect_with_shake();
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving);
-    void render_hud_health(int health);
+    void render_npc(const NpcDTO& npc);
+    void render_hud_health(int health, int max_health);
     void render_hud_minimap(int player_x, int player_y);
     void render_layer(const std::vector<SDL2pp::Rect>& rects);
     void render_bridges();
@@ -70,8 +74,10 @@ public:
 
     void set_minimap();
     void clear_screen();
-    void render(const PlayerDTO& player, int health,
-                const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars, bool is_moving);
+    void render(LocalInfo& game_state);
+    void render_waiting();
+    void render_countdown();
+    void render_leaderboard();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
@@ -79,6 +85,12 @@ public:
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
     void load_city(const std::string& city_name);
+    void render_shop(int time);
+
+    void close_shop();
+    bool is_shop_open();
+    void toggle_shop();
+    void play_upgrade_sound();
 };
 
 #endif

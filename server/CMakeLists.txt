@@ -7,17 +7,18 @@ target_sources(nfs_server
     city_utils.cpp
     client_handler.cpp
     collision_listener.cpp
-    config_loader.cpp
     game.cpp
     game_command.cpp
     game_loop.cpp
     game_monitor.cpp
     lobby.cpp
     main.cpp
+    npc.cpp
     player.cpp
     receiver.cpp
     sender.cpp
     server.cpp
+    server_config_loader.cpp
     server_protocol.cpp
     PUBLIC
     # .h files
@@ -27,17 +28,18 @@ target_sources(nfs_server
     city_utils.h
     client_handler.h
     collision_listener.h
-    config_loader.h
     game.h
     game_command.h
     game_loop.h
     game_monitor.h
     lobby.h
+    npc.h
     player.h
     receiver.h
     sender.h
     server.h
     server_config.h
+    server_config_loader.h
     server_protocol.h
     world_creation_exception.h
     )

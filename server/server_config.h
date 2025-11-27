@@ -113,22 +113,25 @@ struct UpgradeConfig {
 struct GameConfig {
 
     unsigned int game_fps;
-    unsigned int max_concurrent_games;
-    unsigned int min_races_per_game;
-    unsigned int max_races_per_game;
-    unsigned int min_players_per_game;
-    unsigned int max_players_per_game;
-    unsigned int wait_time_upgrade_menu;
-    unsigned int wait_time_final_leaderboard;
+    unsigned int wait_seconds_upgrade_shop;
+    unsigned int wait_seconds_countdown;
+    unsigned int timeout_seconds_race;
+    unsigned int wait_seconds_leaderboard;
+    unsigned int wait_seconds_game_finished;
+
     struct UpgradeConfig upgrades;
 };
 
 struct ServerSpecificConfig {
 
     unsigned short server_port;
+    unsigned int max_concurrent_games;
+    unsigned int min_races_per_game;
+    unsigned int max_races_per_game;
+    unsigned int min_players_per_game;
+    unsigned int max_players_per_game;
     unsigned int command_queue_capacity;
     unsigned int snapshot_queue_capacity;
-    unsigned int waiting_for_players_fps;
 };
 
 // ============================================================================

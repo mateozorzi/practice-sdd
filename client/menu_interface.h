@@ -11,13 +11,12 @@ private:
 
 public:
     explicit MenuInterface(ClientProtocol& protocol);
-    PlayerDTO lobby();
+    void lobby(PlayerDTO& player);
     bool car_selection(PlayerDTO& player);
-    bool waiting_room(const bool is_owner, const LobbyDTO& lobby);
-    bool lobby_create(PlayerDTO& player);
+    bool lobby_create(const PlayerDTO& player);
     bool select_races();
     bool create_lobby(const PlayerDTO& player);
-    bool join_lobby(PlayerDTO& player);
+    bool join_lobby();
 };
 
 

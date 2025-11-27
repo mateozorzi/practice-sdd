@@ -36,3 +36,9 @@ void Sounds::play_engine_sound(const bool is_moving) {
 
     state.last_engine_time = now;
 }
+
+void Sounds::play_upgrade_sound() {
+    const int upgrade_channel = 2;
+    SDL2pp::Chunk& upgrade_sound = resources.get_sound("client/assets/sounds/sfx_upgrade.wav");
+    mixer.PlayChannel(upgrade_channel, upgrade_sound);
+}

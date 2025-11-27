@@ -25,11 +25,9 @@ option(NFS_MAKE_WARNINGS_AS_ERRORS "Enable / disable warnings as errors." ON)
 message(CMAKE_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}")
 
 # Define target: lib common between client, server and editor programs
-# HEY TODO XXX: change the name to something that you like
 add_library(nfs_common STATIC)
 
 # add the source files that make the lib
-# HEY!! TODO XXX: add more subfolders here
 add_subdirectory(common/)
 
 
@@ -42,21 +40,12 @@ set_project_warnings(nfs_common ${NFS_MAKE_WARNINGS_AS_ERRORS} FALSE)
 # location (so our dependants will not have to explicitly request this)
 target_include_directories(nfs_common PUBLIC .)
 
-# HEY!! TODO XXX: you need to install some runtime and dev libraries *before*
-# compiling the client/editor code.
-#
-# In xubuntu 24.04 these are:
-#
-# sudo apt-get install libopus-dev libopusfile-dev libxmp-dev libfluidsynth-dev fluidsynth libwavpack1 libwavpack-dev libfreetype-dev wavpack
-#
-
 # Enable SDL2pp with Image, TTF and Mixer support
 set(SDL2PP_WITH_IMAGE YES)
 set(SDL2PP_WITH_TTF YES)
 set(SDL2PP_WITH_MIXER YES)
 
 # Install libSDL2 and libSDL2pp (for client or editor)
-# HEY!! TODO XXX: add more dependendies (either for client, server or editor)
 if(NFS_CLIENT OR NFS_EDITOR)
     include(FetchContent)
     FetchContent_Declare(
@@ -101,15 +90,12 @@ if(NFS_CLIENT OR NFS_EDITOR)
         URL https://github.com/libSDL2pp/libSDL2pp/archive/cc198c9a5657048bee67ece82de620b2d5661084.zip
     )
 
-    FetchContent_Declare(
-        box2d
-        GIT_REPOSITORY https://github.com/erincatto/box2d.git
-        GIT_TAG v2.4.1
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        # override box2d max polygon vertices
-        PATCH_COMMAND sed -i "s/#define b2_maxPolygonVertices\t8/#define b2_maxPolygonVertices\t16/g" include/box2d/b2_settings.h || true
-    )
+    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp)
+endif()
+
+# Install yaml-cpp for server configuration
+if(NFS_SERVER)
+    include(FetchContent)
 
     FetchContent_Declare(
         nlohmann_json
@@ -119,13 +105,6 @@ if(NFS_CLIENT OR NFS_EDITOR)
         GIT_PROGRESS TRUE
     )
 
-    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable Box2D unit tests")
-    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp box2d nlohmann_json)
-endif()
-
-# Install yaml-cpp for server configuration
-if(NFS_SERVER)
-    include(FetchContent)
     FetchContent_Declare(
         yaml-cpp
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
@@ -136,7 +115,18 @@ if(NFS_SERVER)
     set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "Disable yaml-cpp tests")
     set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable yaml-cpp tools")
     set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "Disable yaml-cpp contrib")
-    FetchContent_MakeAvailable(yaml-cpp)
+    FetchContent_MakeAvailable()
+
+    FetchContent_Declare(
+        box2d
+        GIT_REPOSITORY https://github.com/erincatto/box2d.git
+        GIT_TAG v2.4.1
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+    )
+    set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable Box2D unit tests")
+
+    FetchContent_MakeAvailable(nlohmann_json yaml-cpp box2d)
 endif()
 
 # Program section
@@ -147,14 +137,13 @@ if(NFS_CLIENT)
     set(CMAKE_AUTORCC ON)
     find_package(Qt6 COMPONENTS Core REQUIRED)
     find_package(Qt6 COMPONENTS Widgets REQUIRED)
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
+
     add_executable(nfs_client)
 
     # Make them depend on nfs_common lib
     add_dependencies(nfs_client nfs_common SDL2pp::SDL2pp)
 
     # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(client Lobby)
 
     set_project_warnings(nfs_client ${NFS_MAKE_WARNINGS_AS_ERRORS} FALSE)
@@ -170,20 +159,18 @@ if(NFS_CLIENT)
 endif()
 
 if(NFS_SERVER)
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(nfs_server)
 
     # Make them depend on nfs_common lib
     add_dependencies(nfs_server nfs_common)
 
     # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(server)
 
     set_project_warnings(nfs_server ${NFS_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # Link the nfs_common lib target
-    target_link_libraries(nfs_server nfs_common box2d nlohmann_json::nlohmann_json yaml-cpp::yaml-cpp)
+    target_link_libraries(nfs_server nfs_common nlohmann_json::nlohmann_json yaml-cpp::yaml-cpp box2d)
 endif()
 
 if(NFS_EDITOR)
@@ -192,15 +179,13 @@ if(NFS_EDITOR)
     set(CMAKE_AUTORCC ON)
     find_package(Qt6 COMPONENTS Core REQUIRED)
     find_package(Qt6 COMPONENTS Widgets REQUIRED)
-    
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
+
     add_executable(nfs_editor)
 
     # Make them depend on nfs_common lib
     add_dependencies(nfs_editor nfs_common SDL2pp::SDL2pp)
 	    
     # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(editor EditorMapas)
 
     set_project_warnings(nfs_editor ${NFS_MAKE_WARNINGS_AS_ERRORS} FALSE)
@@ -229,22 +214,19 @@ if(NFS_TESTS)
     # (borrowed from https://google.github.io/googletest/quickstart-cmake.html)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
+    
     include(GoogleTest)
 
     # target for testing
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(nfs_tests)
 
-    # HEY!! TODO XXX: I'm assuming that the code under testing is in nfs_common
     # Change this if you have to.
-    add_dependencies(nfs_tests nfs_common)
+    add_dependencies(nfs_tests nfs_common SDL2pp::SDL2pp)
 
     # Say where to find the xoz headers
-    # HEY!! TODO XXX: add more subfolders here
     target_include_directories(nfs_tests PUBLIC .)
 
     # Add the source files to the nfs_tests target
-    # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(tests/)
 
     # Set the compiler warnings to the tests target (but be a little lesser strict)
@@ -255,12 +237,16 @@ if(NFS_TESTS)
         PUBLIC
         ${gtest_SOURCE_DIR}/include
         ${gmock_SOURCE_DIR}/include
+        ${libSDL2pp_SOURCE_DIR}
         )
 
-    # HEY!! TODO XXX: I'm assuming that the code under testing is in nfs_common
     # Change this if you have to.
     target_link_libraries(nfs_tests
         nfs_common
         GTest::gtest_main
+        gtest
+        gmock
+        SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer
+        nlohmann_json::nlohmann_json
     )
 endif()

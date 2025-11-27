@@ -6,7 +6,7 @@
 
 #include "ui_joinlobby.h"
 
-JoinLobby::JoinLobby(LobbyCatalogueDTO lobbies, QWidget* parent):
+JoinLobby::JoinLobby(const LobbyCatalogueDTO& lobbies, QWidget* parent):
         QMainWindow(parent), ui(new Ui::JoinLobby) {
     ui->setupUi(this);
 
@@ -66,7 +66,7 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies) {
 }
 
 void JoinLobby::join_denied() {
-    QMessageBox::warning(this, "Access Denied", "Denied join to lobby");
+    QMessageBox::warning(this, "Access Denied", "Denied join to lobby, refresh and try again.");
 }
 
 JoinLobby::~JoinLobby() { delete ui; }
