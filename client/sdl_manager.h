@@ -17,16 +17,20 @@
 
 #include "animations.h"
 #include "camera.h"
+#include "client_constants.h"
 #include "game_state.h"
 #include "resource_manager.h"
 #include "sounds.h"
 #include "upgrade_shop.h"
 
 static const std::unordered_map<std::string, SDL2pp::Rect> CAR_SPRITES = {
-        {"Compact", SDL2pp::Rect(0, 0, 50, 50)},       {"Sport", SDL2pp::Rect(50, 0, 50, 50)},
-        {"Convertible", SDL2pp::Rect(100, 0, 50, 50)}, {"Sedan", SDL2pp::Rect(150, 0, 50, 50)},
-        {"Jeep", SDL2pp::Rect(200, 0, 50, 50)},        {"Rally", SDL2pp::Rect(250, 0, 50, 50)},
-        {"Truck", SDL2pp::Rect(300, 0, 50, 50)}};
+        {"Compact", SDL2pp::Rect(0, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)},
+        {"Sport", SDL2pp::Rect(CAR_SPRITE_SIZE, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)},
+        {"Convertible", SDL2pp::Rect(2 * CAR_SPRITE_SIZE, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)},
+        {"Sedan", SDL2pp::Rect(3 * CAR_SPRITE_SIZE, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)},
+        {"Jeep", SDL2pp::Rect(4 * CAR_SPRITE_SIZE, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)},
+        {"Rally", SDL2pp::Rect(5 * CAR_SPRITE_SIZE, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)},
+        {"Truck", SDL2pp::Rect(6 * CAR_SPRITE_SIZE, 0, CAR_SPRITE_SIZE, CAR_SPRITE_SIZE)}};
 
 class SDLManager {
 private:
