@@ -8,7 +8,9 @@
 #include "../common/npc_dto.h"
 #include "../common/phase.h"
 
+
 struct PlayerInfo {
+
     uint32_t id;
     int x = 0;
     int y = 0;
@@ -25,10 +27,13 @@ struct PlayerInfo {
 };
 
 struct LocalInfo {
+
     uint32_t id;
     std::unordered_map<uint32_t, PlayerInfo> players;
     PlayerInfo player;
+    std::vector<NpcDTO> npcs;
     Phase phase = Phase::WAITING_FOR_CAR_SELECTION;
 };
+
 
 #endif
