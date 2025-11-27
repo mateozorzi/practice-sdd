@@ -92,7 +92,7 @@ class GameLoop final: public Thread {
     void handle_disconnection(const GameCommand& game_command);
     void handle_upgrade_car(const GameCommand& game_command);
 
-    void update_positions(const RaceDTO& race);
+    void update_positions(const RaceDTO& race, uint32_t elapsed_seconds);
     void set_race(const RaceDTO& race);
     void finish_race(uint32_t timeout_time);
     LeaderboardDTO create_final_leaderboard();

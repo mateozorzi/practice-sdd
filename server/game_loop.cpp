@@ -246,32 +246,32 @@ void GameLoop::handle_in_race_phase() {
 
     const auto elapsed = now - *phase_start;
 
+    double elapsed_seconds = std::chrono::duration<double>(elapsed).count();
+    //check_race_times(elapsed_seconds);
     
-    update_positions(selected_races.races[current_race_index]);
+    update_positions(selected_races.races[current_race_index], elapsed_seconds);
     
     check_alive_players();
     
-    double elapsed_seconds = std::chrono::duration<double>(elapsed).count();
-    check_race_times(elapsed_seconds);
     
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-    process_commands_in_race_phase();
-
+    
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
-
+        
         std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
         current_phase = GamePhase::LEADERBOARD;
         phase_start = std::nullopt;
         LeaderboardDTO leaderboard = create_leaderboard();
         (void)leaderboard;
-
+        
         GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
         game_monitor.broadcast(game_update);
 
         GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
         game_monitor.broadcast(l);
     }
-
+    process_commands_in_race_phase();
+    
     fixed_sleep(now);
 }
 
@@ -444,13 +444,13 @@ void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
     }
 }
 
-void GameLoop::update_positions(const RaceDTO& race) {
+void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
 
     WorldSnapshotDTO world_snapshot;
 
     for (auto& [client_id, player]: players) {
 
-        player.update_car_position(race);
+        player.update_car_position(race, elapsed_seconds);
         PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position());
     }

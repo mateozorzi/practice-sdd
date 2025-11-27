@@ -131,8 +131,11 @@ bool Player::is_dead() const { return health == 0; }
 
 void Player::handle_car_movement(const MovementDTO& movement_dto) {
 
-    if (car)
-        car->handle_movement(movement_dto);
+    if (car){
+        if (is_in_race()){
+            car->handle_movement(movement_dto);
+        }
+    }
 }
 
 bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint) {
@@ -157,34 +160,26 @@ bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& che
     return reached;
 }
 
-void Player::update_next_checkpoint(const RaceDTO& race) {
+bool Player::update_next_checkpoint(const RaceDTO& race) {
+    bool finished = false;
     if (static_cast<int>(id_next_checkpoint) >= static_cast<int>(race.size_checkpoints)) {
-        // Último checkpoint de la vuelta
-        // std::cout<<"Player id "<<client_id<<" reached finish line checkpoint "<<
-        // static_cast<int>(id_next_checkpoint)<<std::endl;
         if (n_lap + 1 > race.laps) {
             finish_race();
-            return;
+            finished = true;
+            return finished;
         } else {
-            // std::cout<<"Player id "<<client_id<<" completed lap "<<
-            // static_cast<int>(n_lap)<<std::endl;
             n_lap += 1;
-            id_next_checkpoint = 1;  // Reset a primer checkpoint
+            id_next_checkpoint = 1; 
         }
     } else if (static_cast<int>(id_next_checkpoint) < static_cast<int>(race.size_checkpoints)) {
-        // Checkpoint normal
-        // std::cout<<"Player id "<<client_id<<" reached checkpoint "<<
-        // static_cast<int>(id_next_checkpoint)<<std::endl;
         id_next_checkpoint += 1;
     }
 
     this->next = race.checkpoints[id_next_checkpoint - 1];
-    // std::cout<<"Player id "<<client_id<<" - Lap: "<< static_cast<int>(n_lap)<<
-    //", Next checkpoint: "<<static_cast<int>(this->next.id)<<" x:
-    //"<<static_cast<int>(this->next.x)<<" y: "<<static_cast<int>(this->next.y)<<std::endl;
+    return finished;
 }
 
-void Player::update_car_position(const RaceDTO& race) {
+void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds) {
 
     if (car) {
         car->update_position();
@@ -202,13 +197,10 @@ void Player::update_car_position(const RaceDTO& race) {
 
 
         if (reached_checkpoint(x, y, this->next)) {
-            update_next_checkpoint(race);
-            // std::cout<<"Player id "<<client_id<<" reached checkpoint "<<
-            // static_cast<int>(id_next_checkpoint)<< " next checkpoint id
-            // "<<static_cast<int>(this->next.id)<<std::endl;
-
-            // std::cout<<"Position x: "<<static_cast<float>(x)<<" y:
-            // "<<static_cast<float>(y)<<std::endl;
+            bool finished = update_next_checkpoint(race);
+            if (finished) {
+                record_time(elapsed_seconds);
+            }
         } else {
             return;
         }
