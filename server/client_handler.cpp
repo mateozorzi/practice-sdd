@@ -48,16 +48,17 @@ void ClientHandler::launch_lobby() {
                     break;
                 case LobbyAction::LEAVE_LOBBY:
                 default:
-                    is_in_lobby = false;
+                    ClientHandler::stop();
                     break;
             }
         } catch (const std::exception& e) {
 
-            is_in_lobby = false;
+            ClientHandler::stop();
         }
     }
 
-    is_in_lobby = false;
+    ClientHandler::stop();
+
 }
 
 
@@ -107,6 +108,7 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                         Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
+
     send_car_catalogue();
     Receiver receiver(server_protocol, lobby, client_id, command_queue);
     receiver.start();
@@ -209,6 +211,11 @@ void ClientHandler::run() {
 
 
 void ClientHandler::stop() {
+
+    is_in_lobby = false;
+
+    if (_keep_running)
+        _keep_running = false;
 
     try {
 

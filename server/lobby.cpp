@@ -24,7 +24,6 @@ void Lobby::initialize_races() {
     // folder exists, load races
     for (const auto& entry: std::filesystem::directory_iterator(path_folder)) {
         if (entry.path().extension() == ".csv") {
-            std::cout << "Loading race file: " << entry.path().filename() << std::endl;
 
             std::ifstream file(entry.path());
             std::string line;
@@ -74,10 +73,6 @@ void Lobby::initialize_races() {
             std::string race_name = entry.path().stem().string();
 
             RaceDTO race(race_name, city, checkpoints, n_laps);
-
-            std::cout << "Loaded race: " << race.name << " in " << race.city << " with "
-                      << race.checkpoints.size() << " checkpoints and " << (int)race.laps
-                      << " laps." << std::endl;
 
             races.push_back(race);
         }
