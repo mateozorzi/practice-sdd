@@ -121,5 +121,39 @@ constexpr const char* JSON_SUFFIX = ".json";
 // Default city
 constexpr const char* DEFAULT_CITY = "Liberty City";
 
+// Upgrade Shop
+constexpr int SHOP_FONT_SIZE = 18;
+constexpr int SHOP_SIZE_RATIO_NUM = 3;
+constexpr int SHOP_SIZE_RATIO_DEN = 4;  // Shop is 3/4 of window
+constexpr int SHOP_BORDER_THICKNESS = 5;
+constexpr int SHOP_TITLE_Y_OFFSET = 15;
+
+constexpr int SHOP_BUTTON_WIDTH_RATIO_NUM = 3;
+constexpr int SHOP_BUTTON_WIDTH_RATIO_DEN = 5;  // 3/5 of shop width
+constexpr int SHOP_BUTTON_HEIGHT_DIVISOR = 8;   // 1/8 of shop height
+constexpr int SHOP_BUTTON_SPACING_DIVISOR = 20;  // 1/20 of shop height
+constexpr int SHOP_BUTTON_START_Y_DIVISOR = 4;   // 1/4 of shop height
+constexpr int SHOP_BUTTON_BORDER_THICKNESS = 2;
+
+// Upgrade Shop Colors (RGBA)
+constexpr uint8_t COLOR_SHOP_BG_R = 40;
+constexpr uint8_t COLOR_SHOP_BG_G = 40;
+constexpr uint8_t COLOR_SHOP_BG_B = 40;
+constexpr uint8_t COLOR_SHOP_BG_A = 230;
+
+constexpr uint8_t COLOR_SHOP_BUTTON_R = 80;
+constexpr uint8_t COLOR_SHOP_BUTTON_G = 80;
+constexpr uint8_t COLOR_SHOP_BUTTON_B = 80;
+constexpr uint8_t COLOR_SHOP_BUTTON_A = 255;
+
+constexpr uint8_t COLOR_SHOP_BUTTON_HOVER_R = 120;
+constexpr uint8_t COLOR_SHOP_BUTTON_HOVER_G = 120;
+constexpr uint8_t COLOR_SHOP_BUTTON_HOVER_B = 120;
+constexpr uint8_t COLOR_SHOP_BUTTON_HOVER_A = 255;
+
+// Upgrade Shop Text
+constexpr const char* SHOP_TITLE_TEXT = "UPGRADE SHOP";
+constexpr const char* SHOP_SECONDS_TEXT = " seconds";
+
 #endif
 
