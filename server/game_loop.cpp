@@ -353,8 +353,6 @@ void GameLoop::remove_player(const uint32_t client_id) {
     if (it != players.end())
         players.erase(it);
 
-    game_monitor.unregister_client(client_id);
-
     std::cerr << "[" << GAME_LOOP << "] "
               << "Player with ID: " << client_id << " has been removed from the Game World."
               << std::endl;
@@ -365,6 +363,14 @@ bool GameLoop::is_full() const { return players.size() >= max_players; }
 bool GameLoop::is_empty() const { return players.empty(); }
 
 uint8_t GameLoop::get_active_players() const { return static_cast<uint8_t>(players.size()); }
+
+uint32_t GameLoop::get_next_client_id() const {
+
+    if (players.size() < 1)
+        return 0;
+
+    return players.begin()->first;
+}
 
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
@@ -433,9 +439,7 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
               << "Player with ID: " << game_command.get_client_id() << " has disconnected."
               << std::endl;
 
-    remove_player(game_command.get_client_id());
-    
-
+    game_monitor.unregister_client(game_command.get_client_id());
 }
 
 void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
