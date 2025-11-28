@@ -323,7 +323,14 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
     return RaceCatalogueDTO(std::move(races));
 }
 
-uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
+uint32_t ClientProtocol::receive_id() { 
+    uint8_t action = recv_uint8();
+    while(static_cast<LobbyAction>(action) != LobbyAction::SEND_ID) {
+        std::cout << "[ClientProtocol] Waiting for SEND_ID action, received: " << static_cast<int>(action) << std::endl;
+        action = recv_uint8();
+    }
+    return recv_uint32(); 
+}
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
 

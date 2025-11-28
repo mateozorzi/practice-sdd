@@ -41,9 +41,32 @@ void Game::run() {
         this->keep_running = false;
     }
 
+    
     if(receiver.is_alive()){
         this->receiver.stop();
         this->receiver.join();
+    }
+    //check_for_last_updates();
+}
+
+void Game::check_for_last_updates() {
+    GameUpdateDTO dto;
+    bool pop = true;
+    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
+    while (pop) {
+        if (!updates.try_pop(dto)) {
+            pop = false;
+            continue;
+        }
+        if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
+                std::cout<<"Era un snapshot, saliendo de check_for_last_updates"<<std::endl;
+            }
+        }else if (dto.gameloop_action == GameLoopAction::DISCONNECT) {
+            if (std::holds_alternative<std::monostate>(dto.data)) {
+                std::cout<<"Era un client action, saliendo de check_for_last_updates"<<std::endl;
+            }
+        }
     }
 }
 
@@ -253,6 +276,10 @@ bool Game::update_race() {
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
     while (pop) {
+        if (this->keep_running == false) {
+            std::cout<< "Exiting race update loop early." <<std::endl;
+            return true;
+        }
         if (!updates.try_pop(dto)) {
             pop = false;
             continue;

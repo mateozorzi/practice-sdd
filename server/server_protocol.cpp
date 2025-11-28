@@ -191,7 +191,7 @@ RaceCatalogueDTO ServerProtocol::receive_races() {
 }
 
 void ServerProtocol::send_player_id(const uint32_t player_id) {
-
+    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::SEND_ID));
     add_uint32_to_buffer(player_id);
 
     send_buffer();

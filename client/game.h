@@ -68,7 +68,7 @@ private:
     void change_phase();
 
     void update_player(const PlayerDTO& player, const CarPositionDTO& car);
-
+    void check_for_last_updates();
 public:
     explicit Game(ClientProtocol& protocol, uint32_t id);
     void run();
