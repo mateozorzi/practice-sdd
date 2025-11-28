@@ -58,17 +58,21 @@ private:
 
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
-    void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving);
-    void render_npc(const NpcDTO& npc);
+    void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving,
+                       const SDL2pp::Rect& view_rect, double scale_x, double scale_y);
+    void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x, double scale_y);
     void render_hud_health(int health, int max_health);
     void render_hud_minimap(int player_x, int player_y);
-    void render_layer(const std::vector<SDL2pp::Rect>& rects);
-    void render_bridges();
-    void render_decorations();
-    void render_checkpoints(const CheckpointDTO& checkpoint);
+    void render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view_rect,
+                     double scale_x, double scale_y);
+    void render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y);
+    void render_decorations(const SDL2pp::Rect& view_rect, double scale_x, double scale_y);
+    void render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view_rect,
+                            double scale_x, double scale_y);
     double calculate_angle_to_checkpoint(const CarPositionDTO& player,
                                          const CheckpointDTO& checkpoint);
-    void render_hint(const CarPositionDTO& player);
+    void render_hint(const CarPositionDTO& player, const SDL2pp::Rect& view_rect, double scale_x,
+                     double scale_y);
 
 public:
     SDLManager();

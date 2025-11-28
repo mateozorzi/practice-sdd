@@ -74,10 +74,10 @@ SDL2pp::Rect SDLManager::get_view_rect_with_shake() {
 }
 
 void SDLManager::render_player(const CarPositionDTO& player, const std::string& model,
-                               bool is_moving) {
-    SDL2pp::Rect view_rect = get_view_rect_with_shake();
-    const int car_screen_x = (player.x_position - view_rect.x) * SCREEN_WIDTH / view_rect.w;
-    const int car_screen_y = (player.y_position - view_rect.y) * SCREEN_HEIGHT / view_rect.h;
+                               bool is_moving, const SDL2pp::Rect& view_rect, double scale_x,
+                               double scale_y) {
+    const int car_screen_x = static_cast<int>((player.x_position - view_rect.x) * scale_x);
+    const int car_screen_y = static_cast<int>((player.y_position - view_rect.y) * scale_y);
     SDL2pp::Rect sprite_rect = SDL2pp::Rect(DEFAULT_SPRITE_X, DEFAULT_SPRITE_Y, DEFAULT_SPRITE_W, DEFAULT_SPRITE_H);
 
     auto it = CAR_SPRITES.find(model);
@@ -93,10 +93,10 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     sounds.play_engine_sound(is_moving);
 }
 
-void SDLManager::render_npc(const NpcDTO& npc) {
-    SDL2pp::Rect view_rect = camera.get_view_rect();
-    const int car_screen_x = (npc.x_position - view_rect.x) * SCREEN_WIDTH / view_rect.w;
-    const int car_screen_y = (npc.y_position - view_rect.y) * SCREEN_HEIGHT / view_rect.h;
+void SDLManager::render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
+                             double scale_y) {
+    const int car_screen_x = static_cast<int>((npc.x_position - view_rect.x) * scale_x);
+    const int car_screen_y = static_cast<int>((npc.y_position - view_rect.y) * scale_y);
 
     // Use a default NPC car sprite (Compact car)
     SDL2pp::Rect sprite_rect = SDL2pp::Rect(NPC_SPRITE_X, NPC_SPRITE_Y, NPC_SPRITE_SIZE, NPC_SPRITE_SIZE);
@@ -148,26 +148,32 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
     renderer.FillRect(SDL2pp::Rect(player_minimap_x - MINIMAP_PLAYER_OFFSET, player_minimap_y - MINIMAP_PLAYER_OFFSET, MINIMAP_PLAYER_SIZE, MINIMAP_PLAYER_SIZE));
 }
 
-void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects) {
-    SDL2pp::Rect view = get_view_rect_with_shake();
+void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view,
+                              double scale_x, double scale_y) {
+    SDL2pp::Texture& map = resources.get_texture(map_name);
 
     for (const auto& src_rect: rects) {
         if (!camera.on_screen(src_rect))
             continue;
 
         // Vista en pantalla
-        const int dx = (src_rect.x - view.x) * SCREEN_WIDTH / view.w;
-        const int dy = (src_rect.y - view.y) * SCREEN_HEIGHT / view.h;
-        const int dw = src_rect.w * SCREEN_WIDTH / view.w;
-        const int dh = src_rect.h * SCREEN_HEIGHT / view.h;
+        const int dx = static_cast<int>((src_rect.x - view.x) * scale_x);
+        const int dy = static_cast<int>((src_rect.y - view.y) * scale_y);
+        const int dw = static_cast<int>(src_rect.w * scale_x);
+        const int dh = static_cast<int>(src_rect.h * scale_y);
         const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
-        SDL2pp::Texture& map = resources.get_texture(map_name);
         renderer.Copy(map, src_rect, dst_rect);
     }
 }
 
-void SDLManager::render_bridges() { render_layer(bridges_rects); }
+void SDLManager::render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y) {
+    render_layer(bridges_rects, view_rect, scale_x, scale_y);
+}
+
+void SDLManager::render_decorations(const SDL2pp::Rect& view_rect, double scale_x, double scale_y) {
+    render_layer(decorations_rects, view_rect, scale_x, scale_y);
+}
 
 void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
@@ -222,38 +228,41 @@ void SDLManager::render(LocalInfo& game_state) {
     update_camera(pos_x, pos_y);
     clear_screen();
 
+    // Calcular view_rect y escala una sola vez
     SDL2pp::Rect view_rect = get_view_rect_with_shake();
+    const double scale_x = static_cast<double>(SCREEN_WIDTH) / view_rect.w;
+    const double scale_y = static_cast<double>(SCREEN_HEIGHT) / view_rect.h;
 
     SDL2pp::Texture& map = resources.get_texture(map_name);
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 
     // Render NPCs on ground layer
     for (const auto& npc: game_state.npcs) {
-        render_npc(npc);
+        render_npc(npc, view_rect, scale_x, scale_y);
     }
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer != CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, true);
+            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y);
         }
     }
 
-    render_bridges();
+    render_bridges(view_rect, scale_x, scale_y);
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer == CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, true);
+            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y);
         }
     }
 
-    render_decorations();
+    render_decorations(view_rect, scale_x, scale_y);
 
-    render_checkpoints(my_car.next);
+    render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
 
     render_hud_health(game_state.player.life, game_state.player.max_life);
     render_hud_minimap(pos_x, pos_y);
     render_stats(cars);
-    render_hint(my_car);
+    render_hint(my_car, view_rect, scale_x, scale_y);
 
     // animations.render_explosion(iteration_counter);
 
@@ -336,8 +345,6 @@ void SDLManager::render_stats(const std::vector<std::pair<PlayerDTO, CarPosition
     }
 }
 
-void SDLManager::render_decorations() { render_layer(decorations_rects); }
-
 void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {
     bridges_rects = loadRects(bridges_rects_data);
 }
@@ -371,18 +378,17 @@ void SDLManager::toggle_shop() { shop.toggle_shop(); }
 
 void SDLManager::play_upgrade_sound() { sounds.play_upgrade_sound(); }
 
-void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint) {
-    SDL2pp::Rect view = get_view_rect_with_shake();
-
+void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view,
+                                    double scale_x, double scale_y) {
     SDL2pp::Rect checkpoint_rect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
     if (!camera.on_screen(checkpoint_rect)) {
         return;
     }
 
-    int screen_x = ((checkpoint.x - checkpoint.width / 2) - view.x) * SCREEN_WIDTH / view.w;
-    int screen_y = ((checkpoint.y - checkpoint.height / 2) - view.y) * SCREEN_HEIGHT / view.h;
-    int screen_w = checkpoint.width * SCREEN_WIDTH / view.w;
-    int screen_h = checkpoint.height * SCREEN_HEIGHT / view.h;
+    int screen_x = static_cast<int>(((checkpoint.x - checkpoint.width / 2) - view.x) * scale_x);
+    int screen_y = static_cast<int>(((checkpoint.y - checkpoint.height / 2) - view.y) * scale_y);
+    int screen_w = static_cast<int>(checkpoint.width * scale_x);
+    int screen_h = static_cast<int>(checkpoint.height * scale_y);
 
     SDL2pp::Rect dst(screen_x, screen_y, screen_w, screen_h);
 
@@ -419,13 +425,12 @@ double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
     return angle_deg;
 }
 
-void SDLManager::render_hint(const CarPositionDTO& player) {
+void SDLManager::render_hint(const CarPositionDTO& player, const SDL2pp::Rect& view, double scale_x,
+                             double scale_y) {
     double angle = calculate_angle_to_checkpoint(player, player.next);
 
-    SDL2pp::Rect view = get_view_rect_with_shake();
-
-    const int car_screen_x = (player.x_position - view.x) * SCREEN_WIDTH / view.w;
-    const int car_screen_y = (player.y_position - view.y) * SCREEN_HEIGHT / view.h;
+    const int car_screen_x = static_cast<int>((player.x_position - view.x) * scale_x);
+    const int car_screen_y = static_cast<int>((player.y_position - view.y) * scale_y);
 
     SDL2pp::Rect dst(car_screen_x - ARROW_WIDTH / 2, car_screen_y - ARROW_VERTICAL_OFFSET, ARROW_WIDTH, ARROW_HEIGHT);
 
