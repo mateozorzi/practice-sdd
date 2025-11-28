@@ -49,6 +49,8 @@ public:
     void reap();
     void remove_player(uint32_t client_id, uint32_t game_id);
 
+    uint32_t get_updated_game_id(uint32_t client_id);
+
     RaceCatalogueDTO list_races();
 
 

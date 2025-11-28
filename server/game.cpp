@@ -49,6 +49,11 @@ uint32_t Game::get_next_client_id() const { return game_loop.get_next_client_id(
 
 bool Game::has_started() const { return game_loop.has_started(); }
 
+bool Game::has_player(const uint32_t client_id) const {
+
+    return game_loop.has_player(client_id);
+}
+
 
 void Game::stop() {
 
