@@ -22,6 +22,7 @@ private:
     std::unique_ptr<GamePhase> phase;
     bool keep_running;
     std::string current_city;  // Ciudad del mapa actualmente cargado
+    LeaderboardDTO leaderboard;
 
     friend class GamePhase;
     friend class WaitingForGamePhase;
@@ -63,10 +64,6 @@ private:
     void handle_game_finished_events();
     bool update_game_finished();
     void show_game_finished();
-
-    void handle_winner_events();
-    bool update_winner();
-    void show_winner();
 
     void change_phase();
 

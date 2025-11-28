@@ -6,6 +6,7 @@
 #include "../common/queue.h"
 #include "../common/race_dto.h"
 #include "../common/client_event_dto.h"
+#include "../common/leaderboard_dto.h"
 #include "sender.h"
 
 Game::Game(ClientProtocol& protocol, uint32_t id):
@@ -15,7 +16,8 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
         receiver(this->protocol),
         game_state{id, {}, {}, {}},
         keep_running(true),
-        current_city("") {
+        current_city(""), 
+        leaderboard(LeaderboardDTO()) {
     phase = std::make_unique<WaitingForGamePhase>(*this, 0);
 }
 
@@ -206,7 +208,7 @@ void Game::handle_countdown_events() { this->keep_running = input_handler.handle
 bool Game::update_countdown() {
     GameUpdateDTO dto;
     WorldSnapshotDTO last;
-    bool got_snapshot = false;
+    //bool got_snapshot = false;
     bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
@@ -223,16 +225,17 @@ bool Game::update_countdown() {
 
         if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                std::cout<< "Received snapshot during countdown phase." <<std::endl;
+                /*WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
                 detect_events(snapshot);
                 last = std::move(snapshot);
-                got_snapshot = true;
+                got_snapshot = true;*/
             }
         }
     }
-    if (got_snapshot) {
+    /*if (got_snapshot) {
         update_game_state_from_snapshot(last);
-    }
+    }*/
     return true;
 }
 
@@ -310,8 +313,8 @@ bool Game::update_leaderboard() {
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
             if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
-                LeaderboardDTO leaderboard = std::get<LeaderboardDTO>(dto.data);
-                (void)leaderboard;  // Avoiding cppcheck error.
+                LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
+                leaderboard = std::move(leaderboard_recv);  // Avoiding cppcheck error.
                 // show leaderboard
             }
         } else if (dto.gameloop_action == GameLoopAction::START_SHOP) {
@@ -324,7 +327,7 @@ bool Game::update_leaderboard() {
 
 void Game::show_leaderboard() {
     sdl.clear_screen();
-    sdl.render_leaderboard();
+    sdl.render_leaderboard(leaderboard, "Leaderboard");
     sdl.show_screen();
 }
 
@@ -340,13 +343,13 @@ bool Game::update_game_finished() {
             continue;
         }
 
-        if (dto.gameloop_action == GameLoopAction::WINNER_PHASE) {
-            game_state.phase = Phase::WINNER_PHASE;
-            return false;
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+            this->keep_running = false;
+            return true;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
             if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
-                LeaderboardDTO leaderboard = std::get<LeaderboardDTO>(dto.data);
-                (void)leaderboard;  // Avoiding cppcheck error.
+                LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
+                leaderboard = std::move(leaderboard_recv);  // Avoiding cppcheck error.
                 // show leaderboard
             }
         }
@@ -356,34 +359,7 @@ bool Game::update_game_finished() {
 
 void Game::show_game_finished() {
     sdl.clear_screen();
-    sdl.render_game_finished();
-    sdl.show_screen();
-}
-
-void Game::handle_winner_events() { this->keep_running = input_handler.handle_winner(); }
-
-bool Game::update_winner(){
-    GameUpdateDTO dto;
-    bool pop = true;
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (pop) {
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
-            sdl.clear_screen();
-            this->keep_running = false;
-            return true;
-        } //receive winner info
-    }
-    return true;
-}
-
-void Game::show_winner() {
-    sdl.clear_screen();
-    sdl.render_winner();
+    sdl.render_leaderboard(leaderboard, "Final Leaderboard");
     sdl.show_screen();
 }
 
@@ -408,10 +384,6 @@ void Game::change_phase() {
         case Phase::GAME_FINISHED:
             std::cout<< "Changing to Game Finished Phase" << std::endl;
             phase = std::make_unique<GameFinishedPhase>(*this, 0);
-            break;
-        case Phase::WINNER_PHASE:
-            std::cout<< "Changing to Winner Phase" << std::endl;
-            phase = std::make_unique<WinnerPhase>(*this, 0);
             break;
     }
 }

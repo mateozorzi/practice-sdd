@@ -2,10 +2,10 @@ game:
 
   game_fps: 60
   wait_seconds_upgrade_shop: 5
-  wait_seconds_countdown: 5
+  wait_seconds_countdown: 3
   timeout_seconds_race: 600
-  wait_seconds_leaderboard: 10
-  wait_seconds_game_finished: 15
+  wait_seconds_leaderboard: 5
+  wait_seconds_game_finished: 5
 
   upgrades:
     health_upgrade: 50.0
@@ -16,7 +16,7 @@ game:
 
 server:
   server_port: 8080
-  max_concurrent_games: 1
+  max_concurrent_games: 3
   min_races_per_game: 1
   max_races_per_game: 8
   min_players_per_game: 1
