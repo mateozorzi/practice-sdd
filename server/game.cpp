@@ -33,13 +33,22 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Game::add_player(
     return {command_queue, snapshot_queue};
 }
 
-void Game::remove_player(const uint32_t client_id) { game_monitor.remove_client(client_id); }
+void Game::remove_player(const uint32_t client_id) {
+
+    game_loop.remove_player(client_id);
+    game_monitor.remove_client(client_id);
+}
 
 const std::string Game::get_name() const { return name; }
 
 uint8_t Game::get_max_players() const { return max_players; }
 
 uint8_t Game::get_active_players() const { return game_loop.get_active_players(); }
+
+uint32_t Game::get_next_client_id() const {
+
+    return game_loop.get_next_client_id();
+}
 
 
 bool Game::has_started() const { return game_loop.is_alive(); }

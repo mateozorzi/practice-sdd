@@ -118,6 +118,9 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
     receiver.stop();
     receiver.join();
 
+    lobby.remove_player(client_id, game_id);
+    game_id = 0;
+
     is_in_lobby = true;
 }
 

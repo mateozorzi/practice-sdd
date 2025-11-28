@@ -122,6 +122,7 @@ public:
     bool is_full() const;
     bool is_empty() const;
     uint8_t get_active_players() const;
+    uint32_t get_next_client_id() const;
 
     void check_race_times(uint32_t seconds);
     void check_alive_players();
