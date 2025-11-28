@@ -54,13 +54,14 @@ void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteratio
 void GameLoop::process_commands_in_waiting_car_selection_phase() {
 
     GameCommand game_command;
-
+    std::cout<<"Processing commands in WAITING_CAR_SELECTION phase."<<std::endl;
     while (command_queue.try_pop(game_command)) {
 
         ClientAction action = game_command.get_client_action();
 
         if (action == ClientAction::DISCONNECT) {
 
+            game_monitor.broadcast(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
             handle_disconnection(game_command);
             continue;
         } else if (action == ClientAction::SEND_CAR_SELECTION) {
@@ -80,7 +81,7 @@ void GameLoop::process_commands_in_upgrade_shop_phase() {
         ClientAction action = game_command.get_client_action();
 
         if (action == ClientAction::DISCONNECT) {
-
+            game_monitor.broadcast(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
             handle_disconnection(game_command);
             continue;
         } else if (action == ClientAction::SEND_UPGRADE) {
@@ -101,6 +102,7 @@ void GameLoop::process_commands_in_countdown_phase() {
 
         if (action == ClientAction::DISCONNECT) {
 
+            game_monitor.broadcast(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
             handle_disconnection(game_command);
             continue;
         }
@@ -117,6 +119,7 @@ void GameLoop::process_commands_in_race_phase() {
 
         if (action == ClientAction::DISCONNECT) {
 
+            game_monitor.broadcast(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
             handle_disconnection(game_command);
             continue;
         } else if (action == ClientAction::SEND_CAR_MOVEMENT) {
@@ -137,6 +140,7 @@ void GameLoop::process_commands_in_leaderboard_phase() {
 
         if (action == ClientAction::DISCONNECT) {
 
+            game_monitor.broadcast(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
             handle_disconnection(game_command);
             continue;
         }
@@ -153,6 +157,7 @@ void GameLoop::process_commands_in_game_finished_phase() {
 
         if (action == ClientAction::DISCONNECT) {
 
+            game_monitor.broadcast(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
             handle_disconnection(game_command);
             continue;
         }
@@ -224,7 +229,7 @@ void GameLoop::handle_countdown_phase() {
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     auto elapsed_time = now - *phase_start;
 
-    process_commands_in_waiting_car_selection_phase();
+    process_commands_in_countdown_phase();
 
     if (elapsed_time >= countdown_seconds) {
 
@@ -256,6 +261,7 @@ void GameLoop::handle_in_race_phase() {
     
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     
+    process_commands_in_race_phase();
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
         
         std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
@@ -270,7 +276,6 @@ void GameLoop::handle_in_race_phase() {
         GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
         game_monitor.broadcast(l);
     }
-    process_commands_in_race_phase();
     
     fixed_sleep(now);
 }
