@@ -74,7 +74,7 @@ class GameLoop final: public Thread {
     void process_commands_in_waiting_car_selection_phase();
     void process_commands_in_upgrade_shop_phase();
     void process_commands_in_countdown_phase();
-    void process_commands_in_race_phase();
+    void process_commands_in_race_phase(uint32_t elapsed_seconds);
     void process_commands_in_leaderboard_phase();
     void process_commands_in_game_finished_phase();
     void process_commands_in_return_to_lobby_phase();
@@ -91,6 +91,7 @@ class GameLoop final: public Thread {
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
     void handle_upgrade_car(const GameCommand& game_command);
+    void handle_cheat_win_race(const GameCommand& game_command, uint32_t elapsed_seconds);
 
     void update_positions(const RaceDTO& race, uint32_t elapsed_seconds);
     void set_race(const RaceDTO& race);

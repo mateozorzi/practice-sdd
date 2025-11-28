@@ -109,7 +109,24 @@ void GameLoop::process_commands_in_countdown_phase() {
     }
 }
 
-void GameLoop::process_commands_in_race_phase() {
+void GameLoop::handle_cheat_win_race(const GameCommand& game_command, const uint32_t elapsed_seconds) {
+    //finish race to the player to send the leaderboard
+    //to the rest finish race with timeout time
+    uint32_t client_id = game_command.get_client_id();
+    for (auto& [id, player] : players) {
+        if (id != client_id) {
+            player.finish_race();
+            //convert race_timeout to uint32_t seconds
+            uint32_t race_timeout = static_cast<uint32_t>(race_timeout_seconds.count());
+            player.record_time(race_timeout);
+        } else {
+            player.finish_race();
+            player.record_time(elapsed_seconds);
+        }
+    }
+}
+
+void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
 
     GameCommand game_command;
 
@@ -126,6 +143,14 @@ void GameLoop::process_commands_in_race_phase() {
 
             handle_car_movement(game_command);
             continue;
+        } else if (action == ClientAction::CHEAT_WIN_RACE) {
+            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_client_id() << " used cheat: WIN_RACE" << std::endl;
+            handle_cheat_win_race(game_command, elapsed_seconds);
+            continue;
+        } else if (action == ClientAction::CHEAT_WIN_GAME) {
+
+        } else if (action == ClientAction::CHEAT_INFINITE_HEALTH) {
+        
         }
     }
 }
@@ -260,7 +285,7 @@ void GameLoop::handle_in_race_phase() {
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-    process_commands_in_race_phase();
+    process_commands_in_race_phase(elapsed_seconds);
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
 
         std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;

@@ -12,6 +12,9 @@ enum class ClientAction : uint8_t {
     SEND_UPGRADE = 0x02,
     SEND_CAR_MOVEMENT = 0x03,
     GET_JSON_FILE = 0x04,
+    CHEAT_WIN_RACE = 0x05,
+    CHEAT_WIN_GAME = 0x06,
+    CHEAT_INFINITE_HEALTH = 0x07,
 
 };
 
