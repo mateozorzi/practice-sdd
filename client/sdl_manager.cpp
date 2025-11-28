@@ -305,7 +305,6 @@ void SDLManager::render(LocalInfo& game_state) {
     // animations.render_explosion(iteration_counter);
 
     show_screen();
-    SDL_Delay(RENDER_DELAY_MS);
 }
 
 void SDLManager::render_waiting() {
