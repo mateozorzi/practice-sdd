@@ -135,6 +135,14 @@ void GameLoop::handle_cheat_win_game(const GameCommand& game_command, const uint
     cheat_game_winner_activated = true;
 }
 
+void GameLoop::handle_cheat_infinite_health(const GameCommand& game_command) {
+    uint32_t client_id = game_command.get_client_id();
+    auto it = players.find(client_id);
+    if (it != players.end()) {
+        it->second.activate_infinite_health();
+    }
+}
+
 void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
 
     GameCommand game_command;
@@ -161,7 +169,9 @@ void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
             handle_cheat_win_game(game_command, elapsed_seconds);
             continue;
         } else if (action == ClientAction::CHEAT_INFINITE_HEALTH) {
-        
+            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_client_id() << " used cheat: INFINITE_HEALTH" << std::endl;
+            handle_cheat_infinite_health(game_command);
+            continue;
         }
     }
 }

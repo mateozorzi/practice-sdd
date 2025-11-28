@@ -94,7 +94,7 @@ class GameLoop final: public Thread {
     void handle_upgrade_car(const GameCommand& game_command);
     void handle_cheat_win_race(const GameCommand& game_command, uint32_t elapsed_seconds);
     void handle_cheat_win_game(const GameCommand& game_command, uint32_t elapsed_seconds);
-
+    void handle_cheat_infinite_health(const GameCommand& game_command);
 
     void update_positions(const RaceDTO& race, uint32_t elapsed_seconds);
     void set_race(const RaceDTO& race);
