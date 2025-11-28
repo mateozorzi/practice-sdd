@@ -208,7 +208,7 @@ void Game::handle_countdown_events() { this->keep_running = input_handler.handle
 bool Game::update_countdown() {
     GameUpdateDTO dto;
     WorldSnapshotDTO last;
-    bool got_snapshot = false;
+    //bool got_snapshot = false;
     bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
@@ -225,16 +225,17 @@ bool Game::update_countdown() {
 
         if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                std::cout<< "Received snapshot during countdown phase." <<std::endl;
+                /*WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
                 detect_events(snapshot);
                 last = std::move(snapshot);
-                got_snapshot = true;
+                got_snapshot = true;*/
             }
         }
     }
-    if (got_snapshot) {
+    /*if (got_snapshot) {
         update_game_state_from_snapshot(last);
-    }
+    }*/
     return true;
 }
 

@@ -16,7 +16,7 @@ game:
 
 server:
   server_port: 8080
-  max_concurrent_games: 1
+  max_concurrent_games: 3
   min_races_per_game: 1
   max_races_per_game: 8
   min_players_per_game: 1
