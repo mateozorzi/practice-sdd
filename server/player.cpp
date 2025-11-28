@@ -102,7 +102,7 @@ void Player::finish_race() {
     has_finish_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
-    // car->reset_car_velocity();
+    car->reset_car_velocity();
 }
 
 bool Player::has_finished_race() const { return has_finish_race; }
@@ -181,7 +181,7 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
 
 void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds) {
 
-    if (car) {
+    if (car && is_in_race()) {
         car->update_position();
         // update race conditions
 

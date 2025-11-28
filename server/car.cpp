@@ -208,20 +208,6 @@ b2Body* Car::get_body() const { return box2d_body; }
 CarLayer Car::get_layer() const { return car_layer; }
 
 
-/*
-void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
-
-    config.max_speed += upgrade.speed_increase;
-    config.acceleration += upgrade.acceleration_increase;
-
-    // Recalculate turn torque and drift factor based on new handling
-    handling += upgrade.handling_increase;
-    config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
-    config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
-}
-*/
-
-
 void Car::set_collision(bool colliding) { is_colliding = colliding; }
 
 
@@ -284,9 +270,7 @@ void Car::set_layer(CarLayer layer) {
 }
 
 void Car::reset_car_velocity() {
-    // Resetear velocidad lineal a cero
     box2d_body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-
-    // Resetear velocidad angular a cero
     box2d_body->SetAngularVelocity(0.0f);
+    box2d_body->SetAwake(false);
 }
