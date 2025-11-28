@@ -4,10 +4,9 @@
 #include "../common/race_catalogue_dto.h"
 
 
-Game::Game(const uint32_t game_id, const uint8_t max_players, const ServerConfig& config,
-           std::string name, RaceCatalogueDTO& selected):
+Game::Game(const uint8_t max_players, const ServerConfig& config, std::string name,
+           RaceCatalogueDTO& selected):
         max_players(max_players),
-        game_id(game_id),
         config(config),
         name(std::move(name)),
         command_queue(static_cast<size_t>(config.server.command_queue_capacity)),
@@ -27,7 +26,7 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Game::add_player(
 
     game_loop.add_player(client_id, username);
 
-    if (game_loop.is_full())
+    if (!game_loop.is_alive())
         game_loop.start();
 
     return {command_queue, snapshot_queue};
@@ -45,13 +44,10 @@ uint8_t Game::get_max_players() const { return max_players; }
 
 uint8_t Game::get_active_players() const { return game_loop.get_active_players(); }
 
-uint32_t Game::get_next_client_id() const {
-
-    return game_loop.get_next_client_id();
-}
+uint32_t Game::get_next_client_id() const { return game_loop.get_next_client_id(); }
 
 
-bool Game::has_started() const { return game_loop.is_alive(); }
+bool Game::has_started() const { return game_loop.has_started(); }
 
 
 void Game::stop() {
@@ -68,8 +64,7 @@ Game::~Game() {
     try {
 
         Game::stop();
-        std::cerr << "[" << GAME << "] "
-                  << "Game with ID: " << game_id << " stopped." << std::endl;
+        std::cerr << "[" << GAME << "] Game stopped." << std::endl;
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();

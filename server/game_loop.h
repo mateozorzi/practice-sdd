@@ -78,7 +78,7 @@ class GameLoop final: public Thread {
     void process_commands_in_leaderboard_phase();
     void process_commands_in_game_finished_phase();
     void process_commands_in_return_to_lobby_phase();
-    
+
     void handle_waiting_car_selection_phase();
     void handle_upgrade_shop_phase();
     void handle_countdown_phase();
@@ -123,6 +123,7 @@ public:
     bool is_empty() const;
     uint8_t get_active_players() const;
     uint32_t get_next_client_id() const;
+    bool has_started() const;
 
     void check_race_times(uint32_t seconds);
     void check_alive_players();

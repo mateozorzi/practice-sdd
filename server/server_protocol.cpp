@@ -179,8 +179,7 @@ RaceCatalogueDTO ServerProtocol::receive_races() {
     uint8_t size = recv_uint8();
     std::vector<RaceDTO> races;
 
-    for (uint8_t i = 0; i < size; ++i)
-        races.push_back(receive_race());
+    for (uint8_t i = 0; i < size; ++i) races.push_back(receive_race());
 
     return RaceCatalogueDTO(std::move(races));
 }

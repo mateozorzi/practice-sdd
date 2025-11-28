@@ -99,7 +99,7 @@ std::optional<GameQueues> Lobby::create_new_game(const uint32_t client_id,
 
     uint32_t game_id = client_id;
 
-    auto game = std::make_unique<Game>(game_id, max_players, config, name, selected);
+    auto game = std::make_unique<Game>(max_players, config, name, selected);
 
     std::cerr << "[" << LOBBY
               << "] "
@@ -198,9 +198,8 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
         node.key() = game.get_next_client_id();
         games.insert(std::move(node));
 
-        std::cerr << "[" << LOBBY << "] Game ID changed: " 
-                  << game_id << " -> " << game.get_next_client_id() << std::endl;
-
+        std::cerr << "[" << LOBBY << "] Game ID changed: " << game_id << " -> "
+                  << game.get_next_client_id() << std::endl;
     }
 }
 
