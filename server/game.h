@@ -48,6 +48,7 @@ public:
     uint32_t get_next_client_id() const;
 
     bool has_started() const;
+    bool has_player(uint32_t client_id) const;
 
     void stop();
 

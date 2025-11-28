@@ -372,6 +372,17 @@ uint32_t GameLoop::get_next_client_id() const {
 
 bool GameLoop::has_started() const { return current_phase != GamePhase::WAITING_CAR_SELECTION; }
 
+bool GameLoop::has_player(const uint32_t client_id) const {
+
+    const auto it = players.find(client_id);
+
+    if (it != players.end())
+        return true;
+    
+    return false;;   
+}
+
+
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {
 

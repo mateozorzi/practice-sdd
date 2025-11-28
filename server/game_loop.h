@@ -124,6 +124,7 @@ public:
     uint8_t get_active_players() const;
     uint32_t get_next_client_id() const;
     bool has_started() const;
+    bool has_player(uint32_t client_id) const;
 
     void check_race_times(uint32_t seconds);
     void check_alive_players();

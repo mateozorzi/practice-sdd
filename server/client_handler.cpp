@@ -32,13 +32,13 @@ void ClientHandler::launch_lobby() {
                     update_player_username(lobby_dto.lobby_name);
                     break;
                 case LobbyAction::CREATE_LOBBY:
-                    create_new_game(client_id, lobby_dto.max_players, lobby_dto.lobby_name);
+                    create_new_game(lobby_dto.max_players, lobby_dto.lobby_name);
                     break;
                 case LobbyAction::SEND_LOBBY_LIST:
                     list_active_games();
                     break;
                 case LobbyAction::JOIN_LOBBY:
-                    join_existing_game(client_id, lobby_dto.lobby_id);
+                    join_existing_game(lobby_dto.lobby_id);
                     break;
                 case LobbyAction::LIST_RACES:
                     list_load_races();
@@ -118,13 +118,14 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
     receiver.stop();
     receiver.join();
 
+    const uint32_t game_id = lobby.get_updated_game_id(client_id);
+
     lobby.remove_player(client_id, game_id);
-    game_id = 0;
 
     is_in_lobby = true;
 }
 
-void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
+void ClientHandler::create_new_game(const uint8_t max_players,
                                     const std::string& lobby_name) {
 
     lobby.reap();
@@ -153,18 +154,17 @@ void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_
     }
 
     auto [command_queue, snapshot_queue] = result.value();
-    game_id = client_id;
 
     LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
     server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
-void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
+void ClientHandler::join_existing_game(const uint32_t game_id) {
 
     lobby.reap();
 
-    auto result = lobby.join_existing_game(client_id, actual_game_id, username);
+    auto result = lobby.join_existing_game(client_id, game_id, username);
 
     if (!result.has_value()) {
 
@@ -174,7 +174,6 @@ void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t 
     }
 
     auto [command_queue, snapshot_queue] = result.value();
-    game_id = actual_game_id;
 
     LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
     server_protocol.send_lobby_response(lobby_dto);
@@ -223,6 +222,8 @@ void ClientHandler::stop() {
 
         server_protocol.stop();
     } catch (const LibError&) {}
+
+    const uint32_t game_id = lobby.get_updated_game_id(client_id);
 
     lobby.remove_player(client_id, game_id);
 }

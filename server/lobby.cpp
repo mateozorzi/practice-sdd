@@ -203,6 +203,20 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
     }
 }
 
+
+uint32_t Lobby::get_updated_game_id(const uint32_t client_id) {
+
+    std::lock_guard lock(mtx);
+    
+    for (const auto& [game_id, game_ptr] : games) {
+        if (game_ptr->has_player(client_id))
+            return game_id;
+    }
+    
+    return 0;
+}
+
+
 RaceCatalogueDTO Lobby::list_races() {
     std::lock_guard lock(mtx);
 
