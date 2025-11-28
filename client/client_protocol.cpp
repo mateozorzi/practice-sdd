@@ -20,6 +20,7 @@
 #include "upgrade_shop.h"
 
 void ClientProtocol::ask_for_race_catalogue() {
+
     std::cout << "Requesting race catalogue from server..." << std::endl;
     add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::LIST_RACES));
     add_uint32_to_buffer(0);
@@ -53,18 +54,14 @@ void ClientProtocol::handle_move(const MovementDTO& dto) {
 }
 
 void ClientProtocol::handle_buy(const BuyUpgradeDTO& dto) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_UPGRADE));
     add_uint8_to_buffer(static_cast<uint8_t>(dto.upgrade));
     send_buffer();
 }
 
-void ClientProtocol::send_username(const std::string& username) {
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_USERNAME));
-    add_string_to_buffer(username);
-    send_buffer();
-}
-
 void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer(lobby.lobby_name);
@@ -75,6 +72,7 @@ void ClientProtocol::send_create_lobby(const LobbyDTO& lobby) {
 }
 
 void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
@@ -85,6 +83,7 @@ void ClientProtocol::ask_for_lobbies(const LobbyDTO& lobby) {
 }
 
 void ClientProtocol::change_username(const LobbyDTO& lobby) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(0);
     add_string_to_buffer(lobby.lobby_name);
@@ -95,6 +94,7 @@ void ClientProtocol::change_username(const LobbyDTO& lobby) {
 }
 
 void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(static_cast<uint32_t>(lobby.lobby_id));
     add_string_to_buffer("");
@@ -105,6 +105,7 @@ void ClientProtocol::send_action_lobby(const LobbyDTO& lobby) {
 }
 
 void ClientProtocol::send_exit(const LobbyDTO& lobby) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(lobby.action));
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
@@ -115,12 +116,14 @@ void ClientProtocol::send_exit(const LobbyDTO& lobby) {
 }
 
 void ClientProtocol::send_car_selection(const CarDTO& car) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::SEND_CAR_SELECTION));
     add_string_to_buffer(car.model);
     send_buffer();
 }
 
 void ClientProtocol::send_race(const RaceDTO& race) {
+
     add_string_to_buffer(race.name);
     add_string_to_buffer(race.city);
     add_uint8_to_buffer(race.size_checkpoints);
@@ -136,6 +139,7 @@ void ClientProtocol::send_race(const RaceDTO& race) {
 }
 
 void ClientProtocol::send_races_selection(const std::vector<RaceDTO>& races) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::SEND_RACE_SELECTION));
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
@@ -163,6 +167,7 @@ CarPositionDTO ClientProtocol::receive_car_position() {
 }
 
 std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
+
     const uint8_t size = recv_uint8();
     std::vector<CarPositionDTO> positions;
     for (uint8_t i = 0; i < size; ++i) {
@@ -172,6 +177,7 @@ std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
 }
 
 PlayerDTO ClientProtocol::receive_player() {
+
     const std::string& username = recv_string();
     const uint32_t id = recv_uint32();
     const std::string car_model = recv_string();
@@ -182,6 +188,7 @@ PlayerDTO ClientProtocol::receive_player() {
 }
 
 WorldSnapshotDTO ClientProtocol::receive_update_positions() {
+
     const uint8_t size = recv_uint8();
     WorldSnapshotDTO world_snapshot;
     for (uint8_t i = 0; i < size; ++i) {
@@ -204,6 +211,7 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
 }
 
 LeaderboardDTO ClientProtocol::receive_leaderboard() {
+
     std::string race_name = recv_string();
     uint8_t n_players = recv_uint8();
     std::vector<PlayerRaceStatsDTO> players;
@@ -219,6 +227,7 @@ LeaderboardDTO ClientProtocol::receive_leaderboard() {
 }
 
 GameUpdateDTO ClientProtocol::receive_update() {
+
     std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO> data;
     const uint8_t update_type = recv_uint8();
     // std::cout << "[ClientProtocol] Receiving game update of type: " <<
@@ -238,6 +247,7 @@ GameUpdateDTO ClientProtocol::receive_update() {
 }
 
 CarCatalogueDTO ClientProtocol::receive_car_catalogue() {
+
     uint8_t size = recv_uint8();
     std::vector<CarDTO> cars;
     for (uint8_t i = 0; i < size; ++i) {
@@ -252,6 +262,7 @@ CarCatalogueDTO ClientProtocol::receive_car_catalogue() {
 }
 
 LobbyDTO ClientProtocol::receive_lobby() {
+
     const uint8_t action_byte = recv_uint8();
     const uint32_t lobby_id = recv_uint32();
     const std::string lobby_name = recv_string();
@@ -264,6 +275,7 @@ LobbyDTO ClientProtocol::receive_lobby() {
 }
 
 LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue() {
+
     uint8_t size = recv_uint8();
     std::cout << "Received lobby catalogue of size: " << static_cast<int>(size) << std::endl;
     std::vector<LobbyDTO> lobbies;
@@ -275,6 +287,7 @@ LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue() {
 }
 
 CheckpointDTO ClientProtocol::receive_checkpoint() {
+
     const uint8_t id = recv_uint8();
     const char orientation = static_cast<char>(recv_string()[0]);
     const uint16_t x = recv_uint16();
@@ -285,6 +298,7 @@ CheckpointDTO ClientProtocol::receive_checkpoint() {
 }
 
 RaceDTO ClientProtocol::receive_race() {
+
     const std::string name = recv_string();
     const std::string city = recv_string();
     const uint8_t size_checkpoints = recv_uint8();
@@ -298,6 +312,7 @@ RaceDTO ClientProtocol::receive_race() {
 }
 
 RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
+
     uint8_t size = recv_uint8();
     std::vector<RaceDTO> races;
     for (uint8_t i = 0; i < size; ++i) {
@@ -311,6 +326,7 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
 uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
+
     // Send request for JSON file
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_JSON_FILE));
     add_string_to_buffer(file_path);
@@ -327,6 +343,7 @@ nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
 }
 
 void ClientProtocol::send_client_action(ClientAction action) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(action));
     send_buffer();
 }
