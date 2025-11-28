@@ -650,9 +650,11 @@ TEST_F(ServerProtocolTest, ReceiveLobbyInfo) {
 TEST_F(ServerProtocolTest, ReceiveUsername) {
     // push mock data
     std::vector<uint8_t> mock_data{
-            0x01,                                  // event type SetUsername
+            0x07,                                  // action
+            0x00, 0x00, 0x00, 0x00,                // client id 1
             0x00, 0x00, 0x00, 0x07,                // username size 7
-            'P',  'l',  'a',  'y',  'e', 'r', '1'  // username "Player1"
+            'P',  'l',  'a',  'y',  'e', 'r', '1',  // username "Player1"
+            0x00, 0x00, 0x00
     };
 
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);
@@ -669,11 +671,10 @@ TEST_F(ServerProtocolTest, ReceiveUsername) {
                 return static_cast<int>(bytes_to_read);
             });
 
-    GameCommandDTO game_command = protocol->receive_game_command();
+    LobbyDTO lobby_action = protocol->receive_lobby_info();
     // command_data has to be PlayerDTO
-    PlayerDTO* event = std::get_if<PlayerDTO>(&game_command.command_data);
-    ASSERT_NE(event, nullptr);
-    EXPECT_EQ(event->username, "Player1");
+    EXPECT_EQ(lobby_action.action, LobbyAction::CHANGE_USERNAME);
+    EXPECT_EQ(lobby_action.lobby_name, "Player1");
 }
 
 TEST_F(ServerProtocolTest, ReceiveMovment) {
@@ -709,7 +710,7 @@ TEST_F(ServerProtocolTest, ReceiveMovment) {
 TEST_F(ServerProtocolTest, ReceiveCarSelection) {
     // push mock data
     std::vector<uint8_t> mock_data{
-            0x05,                             // event type CarSelection
+            0x01,                             // event type CarSelection
             0x00, 0x00, 0x00, 0x06,           // car model size 6
             'M',  'o',  'd',  'e',  'l', 'X'  // car model "ModelX"
     };
@@ -738,7 +739,7 @@ TEST_F(ServerProtocolTest, ReceiveCarSelection) {
 TEST_F(ServerProtocolTest, ReceiveUpgrade) {
     // push mock data
     std::vector<uint8_t> mock_data{
-            0x07,  // event type Upgrade
+            0x02,  // event type Upgrade
             0x01,  // upgrade type Speed
     };
 
