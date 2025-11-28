@@ -46,6 +46,7 @@ public:
     const std::string get_name() const;
     uint8_t get_max_players() const;
     uint8_t get_active_players() const;
+    uint32_t get_next_client_id() const;
 
     bool has_started() const;
 

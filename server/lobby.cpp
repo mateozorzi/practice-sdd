@@ -189,7 +189,19 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
         return;
 
     Game& game = *it->second;
+
     game.remove_player(client_id);
+
+    if (client_id == game_id && game.get_active_players() > 0) {
+
+        auto node = games.extract(it);
+        node.key() = game.get_next_client_id();
+        games.insert(std::move(node));
+
+        std::cerr << "[" << LOBBY << "] Game ID changed: " 
+                  << game_id << " -> " << game.get_next_client_id() << std::endl;
+
+    }
 }
 
 RaceCatalogueDTO Lobby::list_races() {
