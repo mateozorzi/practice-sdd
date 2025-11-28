@@ -271,6 +271,12 @@ bool Game::update_race() {
                 last = std::move(snapshot);
                 got_snapshot = true;
             }
+        } else if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
+            game_state.phase = Phase::GAME_FINISHED;
+            if (got_snapshot) {
+                update_game_state_from_snapshot(last);
+            }
+            return false;
         }
 
         if (game_state.phase != Phase::IN_RACE) {

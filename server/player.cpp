@@ -14,7 +14,7 @@
 
 
 Player::Player(uint32_t client_id, const std::string& username):
-        client_id(client_id), username(username), car(nullptr) {}
+        client_id(client_id), username(username), car(nullptr), infinite_health(false) {}
 
 
 void Player::create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world) {
@@ -245,11 +245,17 @@ void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game
     }
 }
 
+void Player::activate_infinite_health() {
+    infinite_health = true;
+}
+
 
 bool Player::is_in_game() const { return in_game; }
 
 void Player::apply_collision_damage(uint16_t damage) {
-
+    if (infinite_health) {
+        return;
+    }
     if (health > damage)
         health -= damage;
     else

@@ -200,6 +200,8 @@ bool InputManager::handle_movement() {
             if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
                 handle_disconnect();
                 return false;
+            } else if (handle_cheats(event)) {
+                return true;
             }
             handle_keydown(event);
         } else if (event.type == SDL_KEYUP) {
@@ -214,6 +216,36 @@ bool InputManager::is_moving() const { return w || a || s || d; }
 void InputManager::handle_disconnect() {
     sender.add_event(ClientActionDTO(ClientAction::DISCONNECT));
 }
+
+void InputManager::handle_cheat_race_winner() {
+    sender.add_event(ClientActionDTO(ClientAction::CHEAT_WIN_RACE));
+}
+
+void InputManager::handle_cheat_game_winner() {
+    sender.add_event(ClientActionDTO(ClientAction::CHEAT_WIN_GAME));
+}
+
+void InputManager::handle_infinite_health() {
+    sender.add_event(ClientActionDTO(ClientAction::CHEAT_INFINITE_HEALTH));
+}
+
+bool InputManager::handle_cheats(const SDL_Event& event) {
+    if (event.key.keysym.sym == SDLK_1) {
+        //win the race cheat
+        handle_cheat_race_winner();
+        return true;
+    } else if (event.key.keysym.sym == SDLK_2) {
+        // game winner cheat
+        handle_cheat_game_winner();
+        return true;
+    } else if (event.key.keysym.sym == SDLK_3) {
+        // infinite health cheat
+        handle_infinite_health();
+        return true;
+    }
+    return false;
+}
+
 
 InputManager::~InputManager() {
     if (sender.is_alive()) {

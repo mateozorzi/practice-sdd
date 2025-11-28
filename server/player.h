@@ -39,6 +39,7 @@ class Player {
     bool dead = false;
     uint16_t base_health = 0;
     bool penalty = false;
+    bool infinite_health = false;
 
     bool update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
@@ -70,6 +71,7 @@ public:
     void set_car_layer(CarLayer layer);
     void set_in_game();
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
+    void activate_infinite_health();
 
     bool is_in_game() const;
     void start_race();

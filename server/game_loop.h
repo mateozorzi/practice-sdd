@@ -68,13 +68,14 @@ class GameLoop final: public Thread {
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO final_leaderboard;
     bool race_active = false;
+    bool cheat_game_winner_activated = false;
 
     void fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time);
 
     void process_commands_in_waiting_car_selection_phase();
     void process_commands_in_upgrade_shop_phase();
     void process_commands_in_countdown_phase();
-    void process_commands_in_race_phase();
+    void process_commands_in_race_phase(uint32_t elapsed_seconds);
     void process_commands_in_leaderboard_phase();
     void process_commands_in_game_finished_phase();
     void process_commands_in_return_to_lobby_phase();
@@ -91,6 +92,9 @@ class GameLoop final: public Thread {
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
     void handle_upgrade_car(const GameCommand& game_command);
+    void handle_cheat_win_race(const GameCommand& game_command, uint32_t elapsed_seconds);
+    void handle_cheat_win_game(const GameCommand& game_command, uint32_t elapsed_seconds);
+    void handle_cheat_infinite_health(const GameCommand& game_command);
 
     void update_positions(const RaceDTO& race, uint32_t elapsed_seconds);
     void set_race(const RaceDTO& race);

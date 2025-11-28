@@ -115,6 +115,12 @@ GameCommandDTO ServerProtocol::receive_game_command() {
             return GameCommandDTO(client_action, receive_movement());
         case ClientAction::GET_JSON_FILE:
             return GameCommandDTO(client_action, recv_string());
+        case ClientAction::CHEAT_WIN_RACE:
+            return GameCommandDTO(client_action);
+        case ClientAction::CHEAT_WIN_GAME:
+            return GameCommandDTO(client_action);
+        case ClientAction::CHEAT_INFINITE_HEALTH:
+            return GameCommandDTO(client_action);
         default:
             return GameCommandDTO(ClientAction::DISCONNECT);
     }
