@@ -43,7 +43,7 @@ public:
     LobbyDTO receive_lobby_info();
     GameCommandDTO receive_game_command();
 
-    void send_client_id(uint32_t client_id);
+    void send_player_id(uint32_t player_id);
     void send_car_catalogue(const CarCatalogueDTO& catalogue);
     void send_world_snapshot(const GameUpdateDTO& snapshot);
     void send_race_update(const GameUpdateDTO& snapshot);

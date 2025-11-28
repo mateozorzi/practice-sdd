@@ -79,7 +79,7 @@ void Lobby::initialize_races() {
     }
 }
 
-std::optional<GameQueues> Lobby::create_new_game(const uint32_t client_id,
+std::optional<GameQueues> Lobby::create_new_game(const uint32_t player_id,
                                                  const std::string& username,
                                                  const uint8_t max_players, const std::string& name,
                                                  RaceCatalogueDTO& selected) {
@@ -97,7 +97,7 @@ std::optional<GameQueues> Lobby::create_new_game(const uint32_t client_id,
         return std::nullopt;
     }
 
-    uint32_t game_id = client_id;
+    uint32_t game_id = player_id;
 
     auto game = std::make_unique<Game>(max_players, config, name, selected);
 
@@ -105,15 +105,15 @@ std::optional<GameQueues> Lobby::create_new_game(const uint32_t client_id,
               << "] "
                  "Creating new game with ID: "
               << game_id << " | Max players: " << (int)max_players
-              << " | (Owner has the same id): " << client_id << std::endl;
+              << " | (Owner player has the same id): " << player_id << std::endl;
 
-    auto queues = game->add_player(client_id, username);
+    auto queues = game->add_player(player_id, username);
     games.emplace(game_id, std::move(game));
 
     return queues;
 }
 
-std::optional<GameQueues> Lobby::join_existing_game(const uint32_t client_id,
+std::optional<GameQueues> Lobby::join_existing_game(const uint32_t player_id,
                                                     const uint32_t game_id,
                                                     const std::string& username) {
 
@@ -140,7 +140,7 @@ std::optional<GameQueues> Lobby::join_existing_game(const uint32_t client_id,
         return std::nullopt;
     }
 
-    auto queues = game.add_player(client_id, username);
+    auto queues = game.add_player(player_id, username);
 
     return queues;
 }
@@ -179,7 +179,7 @@ void Lobby::reap() {
     }
 }
 
-void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
+void Lobby::remove_player(const uint32_t player_id, const uint32_t game_id) {
 
     std::lock_guard lock(mtx);
 
@@ -190,29 +190,29 @@ void Lobby::remove_player(const uint32_t client_id, const uint32_t game_id) {
 
     Game& game = *it->second;
 
-    game.remove_player(client_id);
+    game.remove_player(player_id);
 
-    if (client_id == game_id && game.get_active_players() > 0) {
+    if (player_id == game_id && game.get_active_players() > 0) {
 
         auto node = games.extract(it);
-        node.key() = game.get_next_client_id();
+        node.key() = game.get_next_player_id();
         games.insert(std::move(node));
 
         std::cerr << "[" << LOBBY << "] Game ID changed: " << game_id << " -> "
-                  << game.get_next_client_id() << std::endl;
+                  << game.get_next_player_id() << std::endl;
     }
 }
 
 
-uint32_t Lobby::get_updated_game_id(const uint32_t client_id) {
+uint32_t Lobby::get_game_id(const uint32_t player_id) {
 
     std::lock_guard lock(mtx);
-    
-    for (const auto& [game_id, game_ptr] : games) {
-        if (game_ptr->has_player(client_id))
+
+    for (const auto& [game_id, game_ptr]: games) {
+        if (game_ptr->has_player(player_id))
             return game_id;
     }
-    
+
     return 0;
 }
 

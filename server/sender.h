@@ -17,7 +17,7 @@ class Sender final {
 
     ServerProtocol& server_protocol;
     Lobby& lobby;
-    uint32_t client_id;
+    uint32_t player_id;
     Queue<GameUpdateDTO>& snapshot_queue;
     std::atomic_bool keep_running;
 
@@ -26,7 +26,7 @@ public:
     Sender(const Sender&) = delete;
     Sender& operator=(const Sender&) = delete;
 
-    explicit Sender(ServerProtocol& server_protocol, Lobby& lobby, uint32_t client_id,
+    explicit Sender(ServerProtocol& server_protocol, Lobby& lobby, uint32_t player_id,
                     Queue<GameUpdateDTO>& snapshot_queue);
 
     void run();

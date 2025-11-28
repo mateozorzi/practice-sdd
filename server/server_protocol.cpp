@@ -190,9 +190,9 @@ RaceCatalogueDTO ServerProtocol::receive_races() {
     return RaceCatalogueDTO(std::move(races));
 }
 
-void ServerProtocol::send_client_id(const uint32_t client_id) {
+void ServerProtocol::send_player_id(const uint32_t player_id) {
 
-    add_uint32_to_buffer(client_id);
+    add_uint32_to_buffer(player_id);
 
     send_buffer();
 }

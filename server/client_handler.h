@@ -24,7 +24,7 @@ class ClientHandler final: public Thread {
     ServerProtocol server_protocol;
     Lobby& lobby;
     const ServerConfig& server_config;
-    const uint32_t client_id;
+    const uint32_t player_id;
     std::string username = "Player";
     bool is_in_lobby = true;
     RaceCatalogueDTO selected_races;

@@ -42,8 +42,8 @@ void ServerProtocolTest::TearDown() {
 }
 
 // SEND
-TEST_F(ServerProtocolTest, send_client_id) {
-    uint32_t client_id = 123456789;
+TEST_F(ServerProtocolTest, send_player_id) {
+    uint32_t player_id = 123456789;
 
     std::vector<uint8_t> captured_bytes;
 
@@ -54,7 +54,7 @@ TEST_F(ServerProtocolTest, send_client_id) {
                 return len;
             });
 
-    protocol->send_client_id(client_id);
+    protocol->send_player_id(player_id);
 
     EXPECT_EQ(captured_bytes.size(), 4);
     // check client id bytes equal to client_id
@@ -62,7 +62,7 @@ TEST_F(ServerProtocolTest, send_client_id) {
                            (static_cast<uint32_t>(captured_bytes[1]) << 16) |
                            (static_cast<uint32_t>(captured_bytes[2]) << 8) |
                            (static_cast<uint32_t>(captured_bytes[3]));
-    EXPECT_EQ(received_id, client_id);
+    EXPECT_EQ(received_id, player_id);
 }
 
 TEST_F(ServerProtocolTest, send_car_catalogue) {
