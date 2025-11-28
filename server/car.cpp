@@ -270,6 +270,10 @@ void Car::set_layer(CarLayer layer) {
 }
 
 void Car::reset_car_velocity() {
+    moving_up = false;
+    moving_down = false;
+    moving_left = false;
+    moving_right = false;
     box2d_body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
     box2d_body->SetAngularVelocity(0.0f);
     box2d_body->SetAwake(false);
