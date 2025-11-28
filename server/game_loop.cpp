@@ -54,7 +54,7 @@ void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteratio
 void GameLoop::process_commands_in_waiting_car_selection_phase() {
 
     GameCommand game_command;
-    std::cout<<"Processing commands in WAITING_CAR_SELECTION phase."<<std::endl;
+
     while (command_queue.try_pop(game_command)) {
 
         ClientAction action = game_command.get_client_action();
@@ -164,7 +164,7 @@ void GameLoop::process_commands_in_game_finished_phase() {
     }
 }
 
-void GameLoop::process_commands_in_return_to_lobby_phase(){
+void GameLoop::process_commands_in_return_to_lobby_phase() {
     GameCommand game_command;
     while (command_queue.try_pop(game_command)) {
 
@@ -185,7 +185,7 @@ void GameLoop::handle_waiting_car_selection_phase() {
 
     process_commands_in_waiting_car_selection_phase();
 
-    if (all_player_in_game()) {
+    if (all_player_in_game() && players.size() == max_players) {
 
         std::cerr << "[" << GAME_LOOP << "] Switching to upgrade shop phase." << std::endl;
         current_phase = GamePhase::UPGRADE_SHOP;
@@ -217,7 +217,6 @@ void GameLoop::handle_upgrade_shop_phase() {
 
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
         game_monitor.broadcast(game_update);
-
     }
 
     fixed_sleep(now);
@@ -252,31 +251,31 @@ void GameLoop::handle_in_race_phase() {
     const auto elapsed = now - *phase_start;
 
     double elapsed_seconds = std::chrono::duration<double>(elapsed).count();
-    //check_race_times(elapsed_seconds);
-    
+    // check_race_times(elapsed_seconds);
+
     update_positions(selected_races.races[current_race_index], elapsed_seconds);
-    
+
     check_alive_players();
-    
-    
+
+
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-    
+
     process_commands_in_race_phase();
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
-        
+
         std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
         current_phase = GamePhase::LEADERBOARD;
         phase_start = std::nullopt;
         LeaderboardDTO leaderboard = create_leaderboard();
         (void)leaderboard;
-        
+
         GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
         game_monitor.broadcast(game_update);
 
         GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
         game_monitor.broadcast(l);
     }
-    
+
     fixed_sleep(now);
 }
 
@@ -301,7 +300,7 @@ void GameLoop::handle_leaderboard_phase() {
 
             set_race(selected_races.races[current_race_index]);
         } else {
-            std::cout<< "[" << GAME_LOOP << "] Switching to game finished phase." << std::endl;
+            std::cout << "[" << GAME_LOOP << "] Switching to game finished phase." << std::endl;
             current_phase = GamePhase::GAME_FINISHED;
             final_leaderboard = create_final_leaderboard();
             (void)final_leaderboard;
@@ -325,10 +324,10 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands_in_game_finished_phase();
 
-    
+
     if (elapsed_time >= game_finish_seconds) {
         phase_start = std::nullopt;
-        std::cout<< "[" << GAME_LOOP << "] Switching to return to lobby phase." << std::endl;
+        std::cout << "[" << GAME_LOOP << "] Switching to return to lobby phase." << std::endl;
         current_phase = GamePhase::RETURN_TO_LOBBY;
         // Commented for now, should implement client-side.
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
@@ -337,12 +336,11 @@ void GameLoop::handle_game_finished_phase() {
     fixed_sleep(now);
 }
 
-void GameLoop::handle_return_to_lobby(){
-    //disconnect all players
-    if(!players.empty()){
+void GameLoop::handle_return_to_lobby() {
+    // disconnect all players
+    if (!players.empty()) {
         process_commands_in_return_to_lobby_phase();
     }
-    
 }
 
 
@@ -371,6 +369,8 @@ uint32_t GameLoop::get_next_client_id() const {
 
     return players.begin()->first;
 }
+
+bool GameLoop::has_started() const { return current_phase != GamePhase::WAITING_CAR_SELECTION; }
 
 
 void GameLoop::add_player(const uint32_t client_id, const std::string& username) {

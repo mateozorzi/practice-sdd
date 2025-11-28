@@ -77,8 +77,9 @@ PlayerDTO Player::get_info() const {
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
-    std::cout<<"[" << PLAYER << "] Getting  race stats for player with ID: " << client_id << std::endl;
-    std::cout <<"Race time: "<< race_time << std::endl;
+    std::cout << "[" << PLAYER << "] Getting  race stats for player with ID: " << client_id
+              << std::endl;
+    std::cout << "Race time: " << race_time << std::endl;
     return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
 }
 
@@ -131,8 +132,8 @@ bool Player::is_dead() const { return health == 0; }
 
 void Player::handle_car_movement(const MovementDTO& movement_dto) {
 
-    if (car){
-        if (is_in_race()){
+    if (car) {
+        if (is_in_race()) {
             car->handle_movement(movement_dto);
         }
     }
@@ -169,7 +170,7 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
             return finished;
         } else {
             n_lap += 1;
-            id_next_checkpoint = 1; 
+            id_next_checkpoint = 1;
         }
     } else if (static_cast<int>(id_next_checkpoint) < static_cast<int>(race.size_checkpoints)) {
         id_next_checkpoint += 1;
@@ -232,7 +233,7 @@ void Player::set_in_game() { in_game = true; }
 
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
-    if (car){
+    if (car) {
         penalty = true;
         if (upgrade.upgrade == ButtonType::Health) {
             std::cout << "Actual health: " << health << std::endl;
@@ -241,7 +242,6 @@ void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game
             return;
         }
         car->set_upgrade(upgrade, game_config);
-
     }
 }
 

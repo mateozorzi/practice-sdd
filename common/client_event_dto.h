@@ -15,7 +15,7 @@ struct BuyUpgradeDTO {
 struct ClientActionDTO{
     ClientAction action;
 
-    ClientActionDTO(ClientAction action): action(action) {}
+    explicit ClientActionDTO(ClientAction action): action(action) {}
 };
 
 using ClientEventDTO = std::variant<ClientActionDTO, MovementDTO, BuyUpgradeDTO>;

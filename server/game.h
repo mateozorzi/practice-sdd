@@ -21,7 +21,6 @@ class Game {
 
 
     const uint8_t max_players;
-    const uint32_t game_id;
     const ServerConfig& config;
     std::string name;
     Queue<GameCommand> command_queue;
@@ -33,8 +32,8 @@ public:
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
 
-    explicit Game(uint32_t game_id, uint8_t max_players, const ServerConfig& config,
-                  std::string name, RaceCatalogueDTO& selected);
+    explicit Game(uint8_t max_players, const ServerConfig& config, std::string name,
+                  RaceCatalogueDTO& selected);
 
     bool is_full() const;
     bool is_empty() const;
