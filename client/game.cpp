@@ -29,19 +29,17 @@ void Game::run() {
         while (keep_running) {
             bool phase_changed = false;
             phase_changed = phase->run();
-            if (phase_changed) {
-                change_phase();
-            }
             if(!keep_running){
                 std::cout << "Exiting main game loop." << std::endl;
                 break;
+            }
+            if (phase_changed) {
+                change_phase();
             }
         }
     } catch (const std::exception& e) {
         this->keep_running = false;
     }
-    std::cout<<"Client disconnected from the server."<<std::endl;
-    input_handler.handle_disconnect();
 
     if(receiver.is_alive()){
         this->receiver.stop();
@@ -310,12 +308,12 @@ bool Game::update_leaderboard() {
 
         if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
             game_state.phase = Phase::GAME_FINISHED;
+
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
             if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
                 LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
-                leaderboard = std::move(leaderboard_recv);  // Avoiding cppcheck error.
-                // show leaderboard
+                leaderboard = std::move(leaderboard_recv);
             }
         } else if (dto.gameloop_action == GameLoopAction::START_SHOP) {
             game_state.phase = Phase::UPGRADE;
@@ -345,12 +343,12 @@ bool Game::update_game_finished() {
 
         if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
             this->keep_running = false;
+            input_handler.handle_disconnect();
             return true;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
             if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
                 LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
-                leaderboard = std::move(leaderboard_recv);  // Avoiding cppcheck error.
-                // show leaderboard
+                leaderboard = std::move(leaderboard_recv);
             }
         }
     }
