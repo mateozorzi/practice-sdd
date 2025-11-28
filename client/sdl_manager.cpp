@@ -87,7 +87,6 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     const int car_screen_x = static_cast<int>((player.x_position - view_rect.x) * scale_x);
     const int car_screen_y = static_cast<int>((player.y_position - view_rect.y) * scale_y);
     const SDL2pp::Rect sprite_rect = get_car_sprite_rect(model);
-
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(cars_texture, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
@@ -216,9 +215,17 @@ void SDLManager::render(LocalInfo& game_state) {
 
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 
-    // Render NPCs on ground layer
+    // Para calcular si el auto esta fuera de la vista del jugador
+    const int car_world_size = static_cast<int>(CAR_RENDER_SIZE / scale_x);
+    const int car_world_half = car_world_size / 2;
+
+    // Render NPCs on ground layer (si estan en pantalla)
     for (const auto& npc: game_state.npcs) {
-        render_npc(npc, view_rect, scale_x, scale_y, cars_texture);
+        SDL2pp::Rect npc_rect(npc.x_position - car_world_half, npc.y_position - car_world_half,
+                              car_world_size, car_world_size);
+        if (camera.on_screen(npc_rect)) {
+            render_npc(npc, view_rect, scale_x, scale_y, cars_texture);
+        }
     }
 
     // Renderizar autos desde el suelo
@@ -226,16 +233,20 @@ void SDLManager::render(LocalInfo& game_state) {
         render_player(my_car, my_player.model, true, view_rect, scale_x, scale_y, cars_texture);
     }
 
+    // Renderizar otros jugadores en suelo (si estan en pantalla)
     for (const auto& [pid, pinfo]: game_state.players) {
         if (pinfo.layer != CarLayer::ON_BRIDGE) {
-            CarPositionDTO pos;
-            pos.x_position = pinfo.x;
-            pos.y_position = pinfo.y;
-            pos.angle = pinfo.angle;
-            pos.layer = pinfo.layer;
-            pos.next = pinfo.checkpoint;
-
-            render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
+            SDL2pp::Rect player_rect(pinfo.x - car_world_half, pinfo.y - car_world_half,
+                                     car_world_size, car_world_size);
+            if (camera.on_screen(player_rect)) {
+                CarPositionDTO pos;
+                pos.x_position = pinfo.x;
+                pos.y_position = pinfo.y;
+                pos.angle = pinfo.angle;
+                pos.layer = pinfo.layer;
+                pos.next = pinfo.checkpoint;
+                render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
+            }
         }
     }
 
@@ -246,16 +257,20 @@ void SDLManager::render(LocalInfo& game_state) {
         render_player(my_car, my_player.model, true, view_rect, scale_x, scale_y, cars_texture);
     }
 
+    // Renderizar otros jugadores en puentes (si estan en pantalla)
     for (const auto& [pid, pinfo]: game_state.players) {
         if (pinfo.layer == CarLayer::ON_BRIDGE) {
-            CarPositionDTO pos;
-            pos.x_position = pinfo.x;
-            pos.y_position = pinfo.y;
-            pos.angle = pinfo.angle;
-            pos.layer = pinfo.layer;
-            pos.next = pinfo.checkpoint;
-
-            render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
+            SDL2pp::Rect player_rect(pinfo.x - car_world_half, pinfo.y - car_world_half,
+                                     car_world_size, car_world_size);
+            if (camera.on_screen(player_rect)) {
+                CarPositionDTO pos;
+                pos.x_position = pinfo.x;
+                pos.y_position = pinfo.y;
+                pos.angle = pinfo.angle;
+                pos.layer = pinfo.layer;
+                pos.next = pinfo.checkpoint;
+                render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
+            }
         }
     }
 
