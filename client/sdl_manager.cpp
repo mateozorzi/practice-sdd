@@ -75,7 +75,7 @@ SDL2pp::Rect SDLManager::get_view_rect_with_shake() {
 
 void SDLManager::render_player(const CarPositionDTO& player, const std::string& model,
                                bool is_moving, const SDL2pp::Rect& view_rect, double scale_x,
-                               double scale_y) {
+                               double scale_y, SDL2pp::Texture& cars_texture) {
     const int car_screen_x = static_cast<int>((player.x_position - view_rect.x) * scale_x);
     const int car_screen_y = static_cast<int>((player.y_position - view_rect.y) * scale_y);
     SDL2pp::Rect sprite_rect = SDL2pp::Rect(DEFAULT_SPRITE_X, DEFAULT_SPRITE_Y, DEFAULT_SPRITE_W, DEFAULT_SPRITE_H);
@@ -86,23 +86,21 @@ void SDLManager::render_player(const CarPositionDTO& player, const std::string& 
     }
 
     // Usar solo sprite vertical y rotarlo con SDL
-    SDL2pp::Texture& cars = resources.get_texture(CARS_SPRITE_PATH);
-    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
+    renderer.Copy(cars_texture, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
                   static_cast<double>(player.angle), SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     sounds.play_engine_sound(is_moving);
 }
 
 void SDLManager::render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
-                             double scale_y) {
+                             double scale_y, SDL2pp::Texture& cars_texture) {
     const int car_screen_x = static_cast<int>((npc.x_position - view_rect.x) * scale_x);
     const int car_screen_y = static_cast<int>((npc.y_position - view_rect.y) * scale_y);
 
     // Use a default NPC car sprite (Compact car)
     SDL2pp::Rect sprite_rect = SDL2pp::Rect(NPC_SPRITE_X, NPC_SPRITE_Y, NPC_SPRITE_SIZE, NPC_SPRITE_SIZE);
 
-    SDL2pp::Texture& cars = resources.get_texture(CARS_SPRITE_PATH);
-    renderer.Copy(cars, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
+    renderer.Copy(cars_texture, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
                   static_cast<double>(npc.angle + NPC_ANGLE_OFFSET), SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
@@ -149,9 +147,7 @@ void SDLManager::render_hud_minimap(int player_x, int player_y) {
 }
 
 void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view,
-                              double scale_x, double scale_y) {
-    SDL2pp::Texture& map = resources.get_texture(map_name);
-
+                              double scale_x, double scale_y, SDL2pp::Texture& map_texture) {
     for (const auto& src_rect: rects) {
         if (!camera.on_screen(src_rect))
             continue;
@@ -163,16 +159,18 @@ void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2
         const int dh = static_cast<int>(src_rect.h * scale_y);
         const SDL2pp::Rect dst_rect(dx, dy, dw, dh);
 
-        renderer.Copy(map, src_rect, dst_rect);
+        renderer.Copy(map_texture, src_rect, dst_rect);
     }
 }
 
-void SDLManager::render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y) {
-    render_layer(bridges_rects, view_rect, scale_x, scale_y);
+void SDLManager::render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
+                                SDL2pp::Texture& map_texture) {
+    render_layer(bridges_rects, view_rect, scale_x, scale_y, map_texture);
 }
 
-void SDLManager::render_decorations(const SDL2pp::Rect& view_rect, double scale_x, double scale_y) {
-    render_layer(decorations_rects, view_rect, scale_x, scale_y);
+void SDLManager::render_decorations(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
+                                    SDL2pp::Texture& map_texture) {
+    render_layer(decorations_rects, view_rect, scale_x, scale_y, map_texture);
 }
 
 void SDLManager::render(LocalInfo& game_state) {
@@ -233,36 +231,40 @@ void SDLManager::render(LocalInfo& game_state) {
     const double scale_x = static_cast<double>(SCREEN_WIDTH) / view_rect.w;
     const double scale_y = static_cast<double>(SCREEN_HEIGHT) / view_rect.h;
 
+    // Solo una busqueda en hash map
     SDL2pp::Texture& map = resources.get_texture(map_name);
+    SDL2pp::Texture& cars_texture = resources.get_texture(CARS_SPRITE_PATH);
+    SDL2pp::Texture& arrow_texture = resources.get_texture(ARROW_SPRITE_PATH);
+
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 
     // Render NPCs on ground layer
     for (const auto& npc: game_state.npcs) {
-        render_npc(npc, view_rect, scale_x, scale_y);
+        render_npc(npc, view_rect, scale_x, scale_y, cars_texture);
     }
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer != CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y);
+            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y, cars_texture);
         }
     }
 
-    render_bridges(view_rect, scale_x, scale_y);
+    render_bridges(view_rect, scale_x, scale_y, map);
 
     for (const auto& [car_player, car_pos]: cars) {
         if (car_pos.layer == CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y);
+            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y, cars_texture);
         }
     }
 
-    render_decorations(view_rect, scale_x, scale_y);
+    render_decorations(view_rect, scale_x, scale_y, map);
 
     render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
 
     render_hud_health(game_state.player.life, game_state.player.max_life);
     render_hud_minimap(pos_x, pos_y);
     render_stats(cars);
-    render_hint(my_car, view_rect, scale_x, scale_y);
+    render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 
     // animations.render_explosion(iteration_counter);
 
@@ -426,7 +428,7 @@ double SDLManager::calculate_angle_to_checkpoint(const CarPositionDTO& player,
 }
 
 void SDLManager::render_hint(const CarPositionDTO& player, const SDL2pp::Rect& view, double scale_x,
-                             double scale_y) {
+                             double scale_y, SDL2pp::Texture& arrow_texture) {
     double angle = calculate_angle_to_checkpoint(player, player.next);
 
     const int car_screen_x = static_cast<int>((player.x_position - view.x) * scale_x);
@@ -434,8 +436,7 @@ void SDLManager::render_hint(const CarPositionDTO& player, const SDL2pp::Rect& v
 
     SDL2pp::Rect dst(car_screen_x - ARROW_WIDTH / 2, car_screen_y - ARROW_VERTICAL_OFFSET, ARROW_WIDTH, ARROW_HEIGHT);
 
-    SDL2pp::Texture& arrow = resources.get_texture(ARROW_SPRITE_PATH);
-    renderer.Copy(arrow, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
+    renderer.Copy(arrow_texture, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
 void SDLManager::load_city(const std::string& city_name) {
