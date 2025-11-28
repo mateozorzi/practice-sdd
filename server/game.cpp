@@ -20,11 +20,11 @@ bool Game::is_empty() const { return game_loop.is_empty(); }
 
 
 std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Game::add_player(
-        const uint32_t client_id, const std::string& username) {
+        const uint32_t player_id, const std::string& username) {
 
-    Queue<GameUpdateDTO>& snapshot_queue = game_monitor.register_client(client_id);
+    Queue<GameUpdateDTO>& snapshot_queue = game_monitor.register_player(player_id);
 
-    game_loop.add_player(client_id, username);
+    game_loop.add_player(player_id, username);
 
     if (!game_loop.is_alive())
         game_loop.start();
@@ -32,10 +32,10 @@ std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Game::add_player(
     return {command_queue, snapshot_queue};
 }
 
-void Game::remove_player(const uint32_t client_id) {
+void Game::remove_player(const uint32_t player_id) {
 
-    game_loop.remove_player(client_id);
-    game_monitor.remove_client(client_id);
+    game_loop.remove_player(player_id);
+    game_monitor.remove_player(player_id);
 }
 
 const std::string Game::get_name() const { return name; }
@@ -44,15 +44,12 @@ uint8_t Game::get_max_players() const { return max_players; }
 
 uint8_t Game::get_active_players() const { return game_loop.get_active_players(); }
 
-uint32_t Game::get_next_client_id() const { return game_loop.get_next_client_id(); }
+uint32_t Game::get_next_player_id() const { return game_loop.get_next_player_id(); }
 
 
 bool Game::has_started() const { return game_loop.has_started(); }
 
-bool Game::has_player(const uint32_t client_id) const {
-
-    return game_loop.has_player(client_id);
-}
+bool Game::has_player(const uint32_t player_id) const { return game_loop.has_player(player_id); }
 
 
 void Game::stop() {

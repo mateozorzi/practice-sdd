@@ -35,10 +35,10 @@ public:
 
     explicit GameMonitor(const ServerConfig& config);
 
-    Queue<GameUpdateDTO>& register_client(uint32_t client_id);
-    void unregister_client(uint32_t client_id);
+    Queue<GameUpdateDTO>& register_player(uint32_t player_id);
+    void unregister_player(uint32_t player_id);
     void broadcast(const GameUpdateDTO& info);
-    void remove_client(uint32_t client_id);
+    void remove_player(uint32_t player_id);
     void stop();
 
     ~GameMonitor();

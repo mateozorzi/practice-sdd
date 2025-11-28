@@ -7,11 +7,11 @@
 #include "../common/liberror.h"
 
 
-Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
+Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t player_id,
                Queue<GameUpdateDTO>& snapshot_queue):
         server_protocol(server_protocol),
         lobby(lobby),
-        client_id(client_id),
+        player_id(player_id),
         snapshot_queue(snapshot_queue),
         keep_running(true) {}
 
@@ -26,22 +26,15 @@ void Sender::run() {
 
                 auto variant_snapshot = snapshot_queue.pop();
 
-                if (variant_snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-                    // WorldSnapshotDTO
-                    // std::cout<< "[SENDER] Sending WorldSnapshotDTO to client: " << client_id <<
-                    // std::endl;
+                if (variant_snapshot.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS)
                     this->server_protocol.send_world_snapshot(variant_snapshot);
-                } else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_RACE) {
-                    // RaceDTO
-                    std::cout << "[SENDER] Sending RaceDTO to client: " << client_id << std::endl;
+                else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_RACE)
+
                     this->server_protocol.send_race_update(variant_snapshot);
-                } else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
+                else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD)
                     this->server_protocol.send_leaderboard_update(variant_snapshot);
-                } else if (std::holds_alternative<std::monostate>(variant_snapshot.data)) {
-                    // if data is type monostate, send gameloopaction
+                else if (std::holds_alternative<std::monostate>(variant_snapshot.data))
                     this->server_protocol.send_game_action(variant_snapshot);
-                }
-                // std::cout<< "[SENDER] ignoring snapshot: " << client_id << std::endl;
 
             } catch (const ClosedQueue&) {
 
