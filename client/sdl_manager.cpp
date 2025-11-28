@@ -176,39 +176,14 @@ void SDLManager::render_decorations(const SDL2pp::Rect& view_rect, double scale_
 void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
 
-    std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars;
-
-    for (const auto& [pid, pinfo]: game_state.players) {
-        PlayerDTO p;
-        p.id = pid;
-        p.car.model = pinfo.model;
-
-        CarPositionDTO pos;
-        pos.x_position = pinfo.x;
-        pos.y_position = pinfo.y;
-        pos.angle = pinfo.angle;
-        pos.layer = pinfo.layer;
-        pos.next = pinfo.checkpoint;
-
-        cars.emplace_back(p, pos);
-    }
-
+    // Uso directo de game_state.player
+    const PlayerInfo& my_player = game_state.player;
     CarPositionDTO my_car;
-    bool found = false;
-    uint32_t my_id = game_state.id;
-
-    for (const auto& [car_player, car_pos]: cars) {
-        if (car_player.id == my_id) {
-            my_car = car_pos;
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        SDL_Delay(RENDER_DELAY_MS);
-        return;
-    }
+    my_car.x_position = my_player.x;
+    my_car.y_position = my_player.y;
+    my_car.angle = my_player.angle;
+    my_car.layer = my_player.layer;
+    my_car.next = my_player.checkpoint;
 
     const uint32_t pos_x = my_car.x_position;
     const uint32_t pos_y = my_car.y_position;
@@ -243,17 +218,41 @@ void SDLManager::render(LocalInfo& game_state) {
         render_npc(npc, view_rect, scale_x, scale_y, cars_texture);
     }
 
-    for (const auto& [car_player, car_pos]: cars) {
-        if (car_pos.layer != CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y, cars_texture);
+    // Renderizar autos desde el suelo
+    if (my_car.layer != CarLayer::ON_BRIDGE) {
+        render_player(my_car, my_player.model, true, view_rect, scale_x, scale_y, cars_texture);
+    }
+
+    for (const auto& [pid, pinfo]: game_state.players) {
+        CarPositionDTO pos;
+        pos.x_position = pinfo.x;
+        pos.y_position = pinfo.y;
+        pos.angle = pinfo.angle;
+        pos.layer = pinfo.layer;
+        pos.next = pinfo.checkpoint;
+
+        if (pos.layer != CarLayer::ON_BRIDGE) {
+            render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
         }
     }
 
     render_bridges(view_rect, scale_x, scale_y, map);
 
-    for (const auto& [car_player, car_pos]: cars) {
-        if (car_pos.layer == CarLayer::ON_BRIDGE) {
-            render_player(car_pos, car_player.car.model, true, view_rect, scale_x, scale_y, cars_texture);
+    // Renderizar jugadores sobre puentes
+    if (my_car.layer == CarLayer::ON_BRIDGE) {
+        render_player(my_car, my_player.model, true, view_rect, scale_x, scale_y, cars_texture);
+    }
+
+    for (const auto& [pid, pinfo]: game_state.players) {
+        CarPositionDTO pos;
+        pos.x_position = pinfo.x;
+        pos.y_position = pinfo.y;
+        pos.angle = pinfo.angle;
+        pos.layer = pinfo.layer;
+        pos.next = pinfo.checkpoint;
+
+        if (pos.layer == CarLayer::ON_BRIDGE) {
+            render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
         }
     }
 
@@ -263,7 +262,26 @@ void SDLManager::render(LocalInfo& game_state) {
 
     render_hud_health(game_state.player.life, game_state.player.max_life);
     render_hud_minimap(pos_x, pos_y);
-    render_stats(cars);
+    
+    // Para renderizar las stats. TODO
+    std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars_for_stats;
+    for (const auto& [pid, pinfo]: game_state.players) {
+        PlayerDTO p;
+        p.id = pid;
+        p.car.model = pinfo.model;
+        p.username = "";  // Sin campo username
+
+        CarPositionDTO pos;
+        pos.x_position = pinfo.x;
+        pos.y_position = pinfo.y;
+        pos.angle = pinfo.angle;
+        pos.layer = pinfo.layer;
+        pos.next = pinfo.checkpoint;
+
+        cars_for_stats.emplace_back(p, pos);
+    }
+    render_stats(cars_for_stats);
+    
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 
     // animations.render_explosion(iteration_counter);

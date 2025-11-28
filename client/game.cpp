@@ -70,7 +70,7 @@ void Game::detect_events(const WorldSnapshotDTO& snapshot) {
 }
 
 void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
-    if (player.id == game_state.player.id) {
+    if (player.id == game_state.id) {
         PlayerInfo& info = game_state.player;
         info.id = player.id;
         info.x = car.x_position;
