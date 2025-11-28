@@ -58,6 +58,9 @@ private:
 
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
+
+    SDL2pp::Rect get_car_sprite_rect(const std::string &model) const;
+
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving,
                        const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
                        SDL2pp::Texture& cars_texture);

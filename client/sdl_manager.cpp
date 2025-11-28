@@ -73,17 +73,20 @@ SDL2pp::Rect SDLManager::get_view_rect_with_shake() {
     return view_rect;
 }
 
+SDL2pp::Rect SDLManager::get_car_sprite_rect(const std::string& model) const {
+    auto it = CAR_SPRITES.find(model);
+    if (it != CAR_SPRITES.end()) {
+        return it->second;
+    }
+    return SDL2pp::Rect(DEFAULT_SPRITE_X, DEFAULT_SPRITE_Y, DEFAULT_SPRITE_W, DEFAULT_SPRITE_H);
+}
+
 void SDLManager::render_player(const CarPositionDTO& player, const std::string& model,
                                bool is_moving, const SDL2pp::Rect& view_rect, double scale_x,
                                double scale_y, SDL2pp::Texture& cars_texture) {
     const int car_screen_x = static_cast<int>((player.x_position - view_rect.x) * scale_x);
     const int car_screen_y = static_cast<int>((player.y_position - view_rect.y) * scale_y);
-    SDL2pp::Rect sprite_rect = SDL2pp::Rect(DEFAULT_SPRITE_X, DEFAULT_SPRITE_Y, DEFAULT_SPRITE_W, DEFAULT_SPRITE_H);
-
-    auto it = CAR_SPRITES.find(model);
-    if (it != CAR_SPRITES.end()) {
-        sprite_rect = it->second;
-    }
+    const SDL2pp::Rect sprite_rect = get_car_sprite_rect(model);
 
     // Usar solo sprite vertical y rotarlo con SDL
     renderer.Copy(cars_texture, sprite_rect, SDL2pp::Rect(car_screen_x - CAR_RENDER_OFFSET, car_screen_y - CAR_RENDER_OFFSET, CAR_RENDER_SIZE, CAR_RENDER_SIZE),
@@ -224,14 +227,14 @@ void SDLManager::render(LocalInfo& game_state) {
     }
 
     for (const auto& [pid, pinfo]: game_state.players) {
-        CarPositionDTO pos;
-        pos.x_position = pinfo.x;
-        pos.y_position = pinfo.y;
-        pos.angle = pinfo.angle;
-        pos.layer = pinfo.layer;
-        pos.next = pinfo.checkpoint;
+        if (pinfo.layer != CarLayer::ON_BRIDGE) {
+            CarPositionDTO pos;
+            pos.x_position = pinfo.x;
+            pos.y_position = pinfo.y;
+            pos.angle = pinfo.angle;
+            pos.layer = pinfo.layer;
+            pos.next = pinfo.checkpoint;
 
-        if (pos.layer != CarLayer::ON_BRIDGE) {
             render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
         }
     }
@@ -244,14 +247,14 @@ void SDLManager::render(LocalInfo& game_state) {
     }
 
     for (const auto& [pid, pinfo]: game_state.players) {
-        CarPositionDTO pos;
-        pos.x_position = pinfo.x;
-        pos.y_position = pinfo.y;
-        pos.angle = pinfo.angle;
-        pos.layer = pinfo.layer;
-        pos.next = pinfo.checkpoint;
+        if (pinfo.layer == CarLayer::ON_BRIDGE) {
+            CarPositionDTO pos;
+            pos.x_position = pinfo.x;
+            pos.y_position = pinfo.y;
+            pos.angle = pinfo.angle;
+            pos.layer = pinfo.layer;
+            pos.next = pinfo.checkpoint;
 
-        if (pos.layer == CarLayer::ON_BRIDGE) {
             render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
         }
     }
