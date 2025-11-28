@@ -235,12 +235,12 @@ bool InputManager::handle_cheats(const SDL_Event& event) {
         handle_cheat_race_winner();
         return true;
     } else if (event.key.keysym.sym == SDLK_2) {
-        // infinite health cheat
-        handle_infinite_health();
-        return true;
-    } else if (event.key.keysym.sym == SDLK_3) {
         // game winner cheat
         handle_cheat_game_winner();
+        return true;
+    } else if (event.key.keysym.sym == SDLK_3) {
+        // infinite health cheat
+        handle_infinite_health();
         return true;
     }
     return false;

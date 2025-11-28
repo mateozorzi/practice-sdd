@@ -126,6 +126,15 @@ void GameLoop::handle_cheat_win_race(const GameCommand& game_command, const uint
     }
 }
 
+void GameLoop::handle_cheat_win_game(const GameCommand& game_command, const uint32_t elapsed_seconds) {
+    //clean the leaderboard vector. Finish the race for all players with timeout time except for the cheater
+    //activate the flag to finish the game after leaderboard
+    handle_cheat_win_race(game_command, elapsed_seconds);
+    leaderboards.clear();
+    LeaderboardDTO leaderboard = create_leaderboard();
+    cheat_game_winner_activated = true;
+}
+
 void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
 
     GameCommand game_command;
@@ -148,7 +157,9 @@ void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
             handle_cheat_win_race(game_command, elapsed_seconds);
             continue;
         } else if (action == ClientAction::CHEAT_WIN_GAME) {
-
+            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_client_id() << " used cheat: WIN_GAME" << std::endl;
+            handle_cheat_win_game(game_command, elapsed_seconds);
+            continue;
         } else if (action == ClientAction::CHEAT_INFINITE_HEALTH) {
         
         }
@@ -287,18 +298,31 @@ void GameLoop::handle_in_race_phase() {
 
     process_commands_in_race_phase(elapsed_seconds);
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
-
-        std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
-        current_phase = GamePhase::LEADERBOARD;
         phase_start = std::nullopt;
-        LeaderboardDTO leaderboard = create_leaderboard();
-        (void)leaderboard;
 
-        GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
-        game_monitor.broadcast(game_update);
+        if (cheat_game_winner_activated) {
+            std::cerr << "[" << GAME_LOOP << "] Cheat WIN_GAME activated. Finishing game." << std::endl;
+            current_phase = GamePhase::GAME_FINISHED;
+            final_leaderboard = create_final_leaderboard();
 
-        GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
-        game_monitor.broadcast(l);
+            GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, std::monostate{});
+            game_monitor.broadcast(game_update);
+
+            GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, final_leaderboard);
+            game_monitor.broadcast(l);
+
+        } else {
+            std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
+            current_phase = GamePhase::LEADERBOARD;
+            LeaderboardDTO leaderboard = create_leaderboard();
+            (void)leaderboard;
+
+            GameUpdateDTO game_update(GameLoopAction::LEADERBOARD, std::monostate{});
+            game_monitor.broadcast(game_update);
+
+            GameUpdateDTO l(GameLoopAction::SEND_LEADERBOARD, leaderboard);
+            game_monitor.broadcast(l);
+        }
     }
 
     fixed_sleep(now);
@@ -328,7 +352,6 @@ void GameLoop::handle_leaderboard_phase() {
             std::cout << "[" << GAME_LOOP << "] Switching to game finished phase." << std::endl;
             current_phase = GamePhase::GAME_FINISHED;
             final_leaderboard = create_final_leaderboard();
-            (void)final_leaderboard;
 
             // Commented for now, should implement client-side.
             GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, std::monostate{});
