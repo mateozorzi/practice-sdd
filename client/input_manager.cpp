@@ -101,6 +101,12 @@ bool InputManager::handle_waiting() {
         if (event.type == SDL_QUIT) {
             return false;
         }
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -121,6 +127,12 @@ bool InputManager::handle_buy_events(int time) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT)
             return false;
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
         if (handle_click(event, time))
             continue;
         if (handle_shop_movement(event, time))
@@ -136,6 +148,12 @@ bool InputManager::handle_countdown() {
             return false;
         }
         // cheats
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -146,6 +164,12 @@ bool InputManager::handle_leaderboard() {
         if (event.type == SDL_QUIT) {
             return false;
         }
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -155,6 +179,12 @@ bool InputManager::handle_game_finished() {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             return false;
+        }
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
         }
     }
     return true;
@@ -168,6 +198,7 @@ bool InputManager::handle_movement() {
         }
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
                 return false;
             }
             handle_keydown(event);
