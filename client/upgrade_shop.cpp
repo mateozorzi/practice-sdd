@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "client_constants.h"
+#include "camera.h"
 
 constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
 constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
@@ -68,7 +69,7 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
     }
 }
 
-void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name) {
+void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name, const Camera& camera) {
     (void)player_time;  // Aumenta segun compre mejoras
     (void)player_car;   // Para poner el auto al lado de botones de mejoras
 
@@ -76,6 +77,11 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     if (!isOpen) {
         return;
     }
+
+    SDL2pp::Texture& map = resources.get_texture(map_name);
+    SDL2pp::Rect view_rect = camera.get_view_rect();
+    //in the bacground the city map is rendered, not render all the map, only a portion
+    renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, window_width, window_height));
 
     SDL2pp::Color shop_color(COLOR_SHOP_BG_R, COLOR_SHOP_BG_G, COLOR_SHOP_BG_B,
                              COLOR_SHOP_BG_A);

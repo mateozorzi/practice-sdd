@@ -260,9 +260,11 @@ void GameLoop::handle_upgrade_shop_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to countdown phase." << std::endl;
         current_phase = GamePhase::COUNTDOWN;
         phase_start = std::nullopt;
+        update_positions(selected_races.races[current_race_index], 0);
 
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
         game_monitor.broadcast(game_update);
+
     }
 
     fixed_sleep(now);

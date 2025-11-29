@@ -190,6 +190,7 @@ bool Game::update_upgrade() {
     bool pop = true;
     WorldSnapshotDTO last;
     reset_events();
+    bool got_snapshot = false;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (pop) {
         if (!updates.try_pop(dto)) {
@@ -197,8 +198,16 @@ bool Game::update_upgrade() {
             continue;
         }
 
+        if (got_snapshot) {
+            update_game_state_from_snapshot(last);
+            got_snapshot = false;
+        }
+
         if (dto.gameloop_action == GameLoopAction::START_COUNTDOWN) {
             game_state.phase = Phase::COUNTDOWN;
+            if (got_snapshot) {
+                update_game_state_from_snapshot(last);
+            }
             sdl.close_shop();
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_RACE) {
@@ -210,6 +219,14 @@ bool Game::update_upgrade() {
                     current_city = race.city;
                     sdl.load_city(race.city);
                 }
+            }
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
+                std::cout<< "Received snapshot during countdown phase." <<std::endl;
+                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                detect_events(snapshot);
+                last = std::move(snapshot);
+                got_snapshot = true;
             }
         }
     }
@@ -228,7 +245,7 @@ void Game::handle_countdown_events() { this->keep_running = input_handler.handle
 bool Game::update_countdown() {
     GameUpdateDTO dto;
     WorldSnapshotDTO last;
-    //bool got_snapshot = false;
+    bool got_snapshot = false;
     bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
@@ -238,6 +255,10 @@ bool Game::update_countdown() {
             continue;
         }
 
+        if (got_snapshot) {
+            update_game_state_from_snapshot(last);
+        }
+
         if (dto.gameloop_action == GameLoopAction::START_RACE) {
             game_state.phase = Phase::IN_RACE;
             return false;
@@ -245,11 +266,10 @@ bool Game::update_countdown() {
 
         if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                std::cout<< "Received snapshot during countdown phase." <<std::endl;
-                /*WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
+                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
                 detect_events(snapshot);
                 last = std::move(snapshot);
-                got_snapshot = true;*/
+                got_snapshot = true;
             }
         }
     }
@@ -261,7 +281,7 @@ bool Game::update_countdown() {
 
 void Game::show_countdown() {
     sdl.clear_screen();
-    sdl.render_countdown();
+    sdl.render_countdown(game_state);
     sdl.show_screen();
 }
 
