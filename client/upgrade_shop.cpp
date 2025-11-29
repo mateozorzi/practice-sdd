@@ -5,6 +5,9 @@
 
 #include "client_constants.h"
 
+constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
+constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
+
 UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                          ResourceManager& resources, Sounds& sounds, int window_width,
                          int window_height, const std::string& font_path):
@@ -132,10 +135,10 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
 
         // Texto del boton
         if (!btn.text.empty()) {
-            std::string button_text = btn.text + ": " + std::to_string(btn.cost) + SHOP_SECONDS_TEXT;
+            std::string button_text = btn.text /*+ ": " + std::to_string(btn.cost) + SHOP_SECONDS_TEXT*/;
             SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
             SDL2pp::Texture& text_texture =
-                    resources.get_text(button_text, font_path, SHOP_FONT_SIZE, text_color);
+                    resources.get_text(button_text, font_path, LEADERBOARD_HEADER_FONT_SIZE, text_color);
 
             int text_x = btn.rect.x + (btn.rect.w - text_texture.GetWidth()) / 2;
             int text_y = btn.rect.y + (btn.rect.h - text_texture.GetHeight()) / 2;

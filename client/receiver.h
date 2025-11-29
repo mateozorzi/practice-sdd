@@ -26,6 +26,7 @@ public:
     GameState get_game_state() const;
     Queue<GameUpdateDTO>& get_car_positions_queue();
     void run() override;
+    void close_queue();
 };
 
 #endif  // RECEIVER_H

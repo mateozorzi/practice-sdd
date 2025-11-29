@@ -31,6 +31,7 @@ void Game::run() {
             phase_changed = phase->run();
             if(!keep_running){
                 std::cout << "Exiting main game loop." << std::endl;
+                receiver.close_queue();
                 break;
             }
             if (phase_changed) {
@@ -41,12 +42,10 @@ void Game::run() {
         this->keep_running = false;
     }
 
-    
     if(receiver.is_alive()){
         this->receiver.stop();
         this->receiver.join();
     }
-    //check_for_last_updates();
 }
 
 void Game::check_for_last_updates() {
@@ -266,7 +265,9 @@ void Game::show_countdown() {
     sdl.show_screen();
 }
 
-void Game::handle_race_events() { this->keep_running = input_handler.handle_movement(); }
+void Game::handle_race_events() { 
+    this->keep_running = input_handler.handle_movement();
+}
 
 bool Game::update_race() {
     GameUpdateDTO dto;

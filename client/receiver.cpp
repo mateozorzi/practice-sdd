@@ -22,3 +22,7 @@ void Receiver::run() {
         }
     }
 }
+
+void Receiver::close_queue() {
+    car_positions_queue.close();
+}
