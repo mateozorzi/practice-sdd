@@ -21,7 +21,7 @@ UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                   (window_height - window_height * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN) / 2,
                   window_width * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN,
                   window_height * SHOP_SIZE_RATIO_NUM / SHOP_SIZE_RATIO_DEN),
-        isOpen(true),
+        isOpen(false),
         window_width(window_width),
         window_height(window_height) {
 

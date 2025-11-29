@@ -219,6 +219,9 @@ bool Game::update_upgrade() {
                     current_city = race.city;
                     sdl.load_city(race.city);
                 }
+                if (!sdl.is_shop_open()){
+                    sdl.toggle_shop();
+                }
             }
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
