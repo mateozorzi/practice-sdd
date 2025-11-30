@@ -31,6 +31,7 @@ void ServerProtocol::add_player_to_buffer(const PlayerDTO& player) {
     add_string_to_buffer(player.car.model);
     add_uint16_to_buffer(player.health);
     add_uint8_to_buffer(static_cast<uint8_t>(player.dead));
+    add_uint16_to_buffer(player.max_health);
 }
 
 void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint) {

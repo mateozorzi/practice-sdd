@@ -25,7 +25,7 @@ void Client::run() {
     // lobby ui a
     bool open_lobby = true;
     while(open_lobby){
-        PlayerDTO player("", -1, CarDTO(), -1, false);
+        PlayerDTO player;
         menu.lobby(player);
         if (static_cast<int>(player.id) == -1) {
             open_lobby = false;
