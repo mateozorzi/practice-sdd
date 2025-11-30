@@ -5,6 +5,7 @@
 #include "../common/game_update_dto.h"
 #include "../common/race_dto.h"
 #include "../common/world_snapshot_dto.h"
+#include "../common/liberror.h"
 
 Receiver::Receiver(ClientProtocol& protocol): protocol(protocol), car_positions_queue() {}
 
@@ -17,7 +18,10 @@ void Receiver::run() {
         try {
             GameUpdateDTO car_position = protocol.receive_update();
             car_positions_queue.push(car_position);
-        } catch (const std::exception& e) {
+        } catch(const LibError& e) {
+            break;
+
+        }catch (const std::exception& e) {
             break;
         }
     }

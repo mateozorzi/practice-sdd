@@ -31,7 +31,6 @@ void Game::run() {
             phase_changed = phase->run();
             if(!keep_running){
                 std::cout << "Exiting main game loop." << std::endl;
-                receiver.close_queue();
                 break;
             }
             if (phase_changed) {
@@ -149,17 +148,14 @@ void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
 void Game::handle_waiting_events() { this->keep_running = input_handler.handle_waiting(); }
 
 bool Game::update_waiting() {
+
     GameUpdateDTO dto;
-    bool pop = true;
     WorldSnapshotDTO last;
     bool got_snapshot = false;
     reset_events();
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (pop) {
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
+
+    while (updates.try_pop(dto)) {
 
         if (dto.gameloop_action == GameLoopAction::START_SHOP) {
             game_state.phase = Phase::UPGRADE;
@@ -183,20 +179,16 @@ void Game::handle_upgrade_events() {
 }
 
 bool Game::update_upgrade() {
+
     if (!sdl.is_shop_open()) {
         sdl.toggle_shop();
     }
     GameUpdateDTO dto;
-    bool pop = true;
     WorldSnapshotDTO last;
     reset_events();
     bool got_snapshot = false;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (pop) {
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
+    while (updates.try_pop(dto)) {
 
         if (got_snapshot) {
             update_game_state_from_snapshot(last);
@@ -246,17 +238,13 @@ void Game::show_upgrade() {
 void Game::handle_countdown_events() { this->keep_running = input_handler.handle_countdown(); }
 
 bool Game::update_countdown() {
+
     GameUpdateDTO dto;
     WorldSnapshotDTO last;
     bool got_snapshot = false;
-    bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
-    while (pop) {
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
+    while (updates.try_pop(dto)) {
 
         if (got_snapshot) {
             update_game_state_from_snapshot(last);
@@ -276,38 +264,27 @@ bool Game::update_countdown() {
             }
         }
     }
-    /*if (got_snapshot) {
-        update_game_state_from_snapshot(last);
-    }*/
     return true;
 }
 
 void Game::show_countdown() {
+
     sdl.clear_screen();
     sdl.render_countdown(game_state);
     sdl.show_screen();
 }
 
-void Game::handle_race_events() { 
-    this->keep_running = input_handler.handle_movement();
-}
+
+void Game::handle_race_events() { this->keep_running = input_handler.handle_movement(); }
+
 
 bool Game::update_race() {
     GameUpdateDTO dto;
     WorldSnapshotDTO last;
     bool got_snapshot = false;
-    bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
-    while (pop) {
-        if (this->keep_running == false) {
-            std::cout<< "Exiting race update loop early." <<std::endl;
-            return true;
-        }
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
+    while (updates.try_pop(dto)) {
 
         if (dto.gameloop_action == GameLoopAction::LEADERBOARD) {
             game_state.phase = Phase::LEADERBOARD;
@@ -345,6 +322,7 @@ bool Game::update_race() {
 }
 
 void Game::show_race() {
+
     sdl.clear_screen();
     sdl.render(game_state);
     sdl.show_screen();
@@ -353,15 +331,10 @@ void Game::show_race() {
 void Game::handle_leaderboard_events() { this->keep_running = input_handler.handle_leaderboard(); }
 
 bool Game::update_leaderboard() {
+
     GameUpdateDTO dto;
-    bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (pop) {
-        //std::cout << "Checking for leaderboard updates..." << std::endl;
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
+    while (updates.try_pop(dto)) {
 
         if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
             game_state.phase = Phase::GAME_FINISHED;
@@ -381,6 +354,7 @@ bool Game::update_leaderboard() {
 }
 
 void Game::show_leaderboard() {
+
     sdl.clear_screen();
     sdl.render_leaderboard(leaderboard, "Leaderboard");
     sdl.show_screen();
@@ -389,14 +363,10 @@ void Game::show_leaderboard() {
 void Game::handle_game_finished_events() {this->keep_running = input_handler.handle_game_finished();}
 
 bool Game::update_game_finished() {
+
     GameUpdateDTO dto;
-    bool pop = true;
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (pop) {
-        if (!updates.try_pop(dto)) {
-            pop = false;
-            continue;
-        }
+    while (updates.try_pop(dto)) {
 
         if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
             this->keep_running = false;
@@ -420,6 +390,7 @@ void Game::show_game_finished() {
 
 
 void Game::change_phase() {
+
     switch (this->game_state.phase) {
         case Phase::WAITING_FOR_CAR_SELECTION:
             phase = std::make_unique<WaitingForGamePhase>(*this, 0);
