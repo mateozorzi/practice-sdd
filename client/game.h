@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+
 #include "client_protocol.h"
 #include "game_phase.h"
 #include "game_state.h"
@@ -12,16 +13,17 @@
 #include "receiver.h"
 #include "sdl_manager.h"
 
+
 class Game {
-private:
+
     ClientProtocol& protocol;
     SDLManager sdl;
     InputManager input_handler;
     Receiver receiver;
     LocalInfo game_state;
     std::unique_ptr<GamePhase> phase;
-    bool keep_running;
-    std::string current_city;  // Ciudad del mapa actualmente cargado
+    bool keep_running = true;
+    std::string current_city = "";
     LeaderboardDTO leaderboard;
 
     friend class GamePhase;
@@ -69,9 +71,12 @@ private:
 
     void update_player(const PlayerDTO& player, const CarPositionDTO& car);
     void check_for_last_updates();
+
+
 public:
     explicit Game(ClientProtocol& protocol, uint32_t id);
     void run();
 };
+
 
 #endif
