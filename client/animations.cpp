@@ -89,7 +89,7 @@ SDL2pp::Point Animations::get_camera_shake() {
         return SDL2pp::Point(0, 0);
     }
 
-    int magnitude = 5;
+    int magnitude = 3;
     int dx = (std::rand() % (2 * magnitude + 1)) - magnitude;
     int dy = (std::rand() % (2 * magnitude + 1)) - magnitude;
 
