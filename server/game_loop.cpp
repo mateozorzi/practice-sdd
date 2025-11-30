@@ -504,6 +504,11 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
               << "Player with ID: " << game_command.get_player_id() << " has disconnected."
               << std::endl;
 
+    GameUpdateDTO return_to_lobby(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
+    game_monitor.send_update_to_player(return_to_lobby, game_command.get_player_id());
+
+    std::cerr << "Sent 'Return to Lobby' action to the player with ID: " << game_command.get_player_id() << std::endl;
+
     game_monitor.unregister_player(game_command.get_player_id());
 }
 
