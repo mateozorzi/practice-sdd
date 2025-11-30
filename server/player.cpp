@@ -37,9 +37,9 @@ const CarDTO Player::get_car() const {
 
     CarDTO empty_car;
 
-    if (car)
+    if (car){
         return car->get_configuration();
-
+    }    
     return empty_car;
 }
 
@@ -73,7 +73,7 @@ uint32_t Player::get_recorded_time() const { return race_time; }
 
 PlayerDTO Player::get_info() const {
 
-    return PlayerDTO(username, client_id, get_car(), health, dead);
+    return PlayerDTO(username, client_id, get_car(), health, dead, base_health);
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
@@ -93,7 +93,10 @@ void Player::start_race() {
     n_lap = 1;
     race_time = 0;
     dead = false;
+    std::cout<<"car health: "<<car->get_configuration().health<<std::endl;
+    base_health = car->get_configuration().health;
     health = base_health;
+    infinite_health = false;
 }
 
 bool Player::is_in_race() const { return in_race; }
@@ -239,6 +242,7 @@ void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game
             std::cout << "Actual health: " << health << std::endl;
             health += static_cast<uint16_t>(game_config.health_upgrade);
             std::cout << "Upgraded health: " << health << std::endl;
+            base_health += static_cast<uint16_t>(game_config.health_upgrade);
             return;
         }
         car->set_upgrade(upgrade, game_config);

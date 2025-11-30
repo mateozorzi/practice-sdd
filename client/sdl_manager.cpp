@@ -192,6 +192,92 @@ void SDLManager::render_decorations(const SDL2pp::Rect& view_rect, double scale_
     render_layer(decorations_rects, view_rect, scale_x, scale_y, map_texture);
 }
 
+void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Rect& view_rect,
+                                const CarPositionDTO& my_car, const PlayerInfo& my_player,
+                                const LocalInfo& game_state, SDL2pp::Texture& cars_texture, SDL2pp::Texture& map,
+                                SDL2pp::Texture& arrow_texture) {
+    // Para calcular si el auto esta fuera de la vista del jugador
+    const int car_world_size = static_cast<int>(CAR_RENDER_SIZE / scale_x);
+    const int car_world_half = car_world_size / 2;
+
+    // Render NPCs on ground layer (si estan en pantalla)
+    for (const auto& npc: game_state.npcs) {
+        SDL2pp::Rect npc_rect(npc.x_position - car_world_half, npc.y_position - car_world_half,
+                              car_world_size, car_world_size);
+        if (camera.on_screen(npc_rect)) {
+            render_npc(npc, view_rect, scale_x, scale_y, cars_texture);
+        }
+    }
+
+    // Renderizar autos desde el suelo
+    if (my_car.layer != CarLayer::ON_BRIDGE) {
+        render_player(my_car, my_player.model, true, view_rect, scale_x, scale_y, cars_texture);
+    }
+
+    // Renderizar otros jugadores en suelo (si estan en pantalla)
+    for (const auto& [pid, pinfo]: game_state.players) {
+        if (pinfo.layer != CarLayer::ON_BRIDGE) {
+            SDL2pp::Rect player_rect(pinfo.x - car_world_half, pinfo.y - car_world_half,
+                                     car_world_size, car_world_size);
+            if (camera.on_screen(player_rect)) {
+                CarPositionDTO pos;
+                pos.x_position = pinfo.x;
+                pos.y_position = pinfo.y;
+                pos.angle = pinfo.angle;
+                pos.layer = pinfo.layer;
+                pos.next = pinfo.checkpoint;
+                render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
+            }
+        }
+    }
+
+    render_bridges(view_rect, scale_x, scale_y, map);
+
+    // Renderizar jugadores sobre puentes
+    if (my_car.layer == CarLayer::ON_BRIDGE) {
+        render_player(my_car, my_player.model, true, view_rect, scale_x, scale_y, cars_texture);
+    }
+
+    // Renderizar otros jugadores en puentes (si estan en pantalla)
+    for (const auto& [pid, pinfo]: game_state.players) {
+        if (pinfo.layer == CarLayer::ON_BRIDGE) {
+            SDL2pp::Rect player_rect(pinfo.x - car_world_half, pinfo.y - car_world_half,
+                                     car_world_size, car_world_size);
+            if (camera.on_screen(player_rect)) {
+                CarPositionDTO pos;
+                pos.x_position = pinfo.x;
+                pos.y_position = pinfo.y;
+                pos.angle = pinfo.angle;
+                pos.layer = pinfo.layer;
+                pos.next = pinfo.checkpoint;
+                render_player(pos, pinfo.model, true, view_rect, scale_x, scale_y, cars_texture);
+            }
+        }
+    }
+
+    // Para renderizar las stats. TODO
+    std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars_for_stats;
+    for (const auto& [pid, pinfo]: game_state.players) {
+        PlayerDTO p;
+        p.id = pid;
+        p.car.model = pinfo.model;
+        p.username = "";  // Sin campo username
+
+        CarPositionDTO pos;
+        pos.x_position = pinfo.x;
+        pos.y_position = pinfo.y;
+        pos.angle = pinfo.angle;
+        pos.layer = pinfo.layer;
+        pos.next = pinfo.checkpoint;
+
+        cars_for_stats.emplace_back(p, pos);
+    }
+
+    render_stats(cars_for_stats);
+    render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
+    render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
+}
+
 void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
 
@@ -318,7 +404,6 @@ void SDLManager::render(LocalInfo& game_state) {
     render_stats(cars_for_stats);
     
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
-
     // animations.render_explosion(iteration_counter);
 
     show_screen();
@@ -335,8 +420,36 @@ void SDLManager::render_waiting() {
     show_screen();
 }
 
-void SDLManager::render_countdown() {
+void SDLManager::render_countdown(const LocalInfo& game_state) {
+    const PlayerInfo& my_player = game_state.player;
+    CarPositionDTO my_car;
+    my_car.x_position = my_player.x;
+    my_car.y_position = my_player.y;
+    my_car.angle = my_player.angle;
+    my_car.layer = my_player.layer;
+    my_car.next = my_player.checkpoint;
+
+    const uint32_t pos_x = my_car.x_position;
+    const uint32_t pos_y = my_car.y_position;
+    
+    update_camera(pos_x, pos_y);
     clear_screen();
+    
+    //render map in the background
+    update_camera(pos_x, pos_y);
+    SDL2pp::Rect view_rect = get_view_rect_with_shake();
+    SDL2pp::Texture& map = resources.get_texture(map_name);
+
+    renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
+    SDL2pp::Texture& cars_texture = resources.get_texture(CARS_SPRITE_PATH);
+    SDL2pp::Texture& arrow_texture = resources.get_texture(ARROW_SPRITE_PATH);
+
+    const double scale_x = static_cast<double>(SCREEN_WIDTH) / view_rect.w;
+    const double scale_y = static_cast<double>(SCREEN_HEIGHT) / view_rect.h;
+
+    render_players(scale_x, scale_y, view_rect, my_car, my_player, game_state, cars_texture, map, arrow_texture);
+
+
     const std::string text = "The race will start soon...";
     SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
     SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, TEXT_COUNTDOWN_SIZE, text_color);
@@ -501,7 +614,7 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT, map_name); }
+void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT, map_name, camera); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
 

@@ -7,7 +7,7 @@
 
 enum class ClientAction : uint8_t {
 
-    DISCONNECT = 0x00,
+    DISCONNECT = 0x0D,
     SEND_CAR_SELECTION = 0x01,
     SEND_UPGRADE = 0x02,
     SEND_CAR_MOVEMENT = 0x03,

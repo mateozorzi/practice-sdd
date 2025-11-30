@@ -16,9 +16,10 @@ struct PlayerDTO {
     CarDTO car;
     uint16_t health;
     bool dead;
+    uint16_t max_health;
 
     PlayerDTO(const std::string& username, const uint32_t id, const CarDTO& car, uint16_t health,
-              bool dead);
+              bool dead, uint16_t max_health);
     explicit PlayerDTO(const std::string& username);
     PlayerDTO();
 };

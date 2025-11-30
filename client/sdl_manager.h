@@ -92,7 +92,7 @@ public:
     void clear_screen();
     void render(LocalInfo& game_state);
     void render_waiting();
-    void render_countdown();
+    void render_countdown(const LocalInfo& game_state);
     void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string title);
     void render_winner();
     void show_screen();
@@ -108,6 +108,10 @@ public:
     bool is_shop_open();
     void toggle_shop();
     void play_upgrade_sound();
+    void render_players(double scale_x, double scale_y, const SDL2pp::Rect& view_rect,
+                        const CarPositionDTO& my_car, const PlayerInfo& my_player,
+                        const LocalInfo& game_state, SDL2pp::Texture& cars_texture, SDL2pp::Texture& map,
+                        SDL2pp::Texture& arrow_texture);
 };
 
 #endif

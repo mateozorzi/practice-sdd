@@ -184,7 +184,8 @@ PlayerDTO ClientProtocol::receive_player() {
     CarDTO car(car_model);
     const uint16_t health = recv_uint16();
     const bool dead = static_cast<bool>(recv_uint8());
-    return PlayerDTO(username, id, car, health, dead);
+    const uint16_t max_health = recv_uint16();
+    return PlayerDTO(username, id, car, health, dead, max_health);
 }
 
 WorldSnapshotDTO ClientProtocol::receive_update_positions() {
@@ -230,8 +231,6 @@ GameUpdateDTO ClientProtocol::receive_update() {
 
     std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO> data;
     const uint8_t update_type = recv_uint8();
-    // std::cout << "[ClientProtocol] Receiving game update of type: " <<
-    // static_cast<int>(update_type) << std::endl;
     if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
         data = receive_update_positions();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_RACE)) {
@@ -323,7 +322,14 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
     return RaceCatalogueDTO(std::move(races));
 }
 
-uint32_t ClientProtocol::receive_id() { return recv_uint32(); }
+uint32_t ClientProtocol::receive_id() { 
+    uint8_t action = recv_uint8();
+    while(static_cast<LobbyAction>(action) != LobbyAction::SEND_ID) {
+        std::cout << "[ClientProtocol] Waiting for SEND_ID action, received: " << static_cast<int>(action) << std::endl;
+        action = recv_uint8();
+    }
+    return recv_uint32(); 
+}
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
 

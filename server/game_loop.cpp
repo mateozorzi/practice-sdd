@@ -255,9 +255,11 @@ void GameLoop::handle_upgrade_shop_phase() {
         std::cerr << "[" << GAME_LOOP << "] Switching to countdown phase." << std::endl;
         current_phase = GamePhase::COUNTDOWN;
         phase_start = std::nullopt;
+        update_positions(selected_races.races[current_race_index], 0);
 
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
         game_monitor.broadcast(game_update);
+
     }
 
     fixed_sleep(now);
@@ -293,6 +295,7 @@ void GameLoop::handle_in_race_phase() {
 
     double elapsed_seconds = std::chrono::duration<double>(elapsed).count();
     // check_race_times(elapsed_seconds);
+    process_commands_in_race_phase(elapsed_seconds);
 
     update_positions(selected_races.races[current_race_index], elapsed_seconds);
 
@@ -301,7 +304,6 @@ void GameLoop::handle_in_race_phase() {
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-    process_commands_in_race_phase(elapsed_seconds);
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
         phase_start = std::nullopt;
 
