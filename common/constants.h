@@ -7,12 +7,14 @@
 
 enum class ClientAction : uint8_t {
 
-    DISCONNECT = 0x00,
-    SEND_USERNAME = 0x01,
+    DISCONNECT = 0x0D,
+    SEND_CAR_SELECTION = 0x01,
+    SEND_UPGRADE = 0x02,
     SEND_CAR_MOVEMENT = 0x03,
-    SEND_CAR_SELECTION = 0x05,
-    GET_JSON_FILE = 0x06,
-    SEND_UPGRADE = 0x07,
+    GET_JSON_FILE = 0x04,
+    CHEAT_WIN_RACE = 0x05,
+    CHEAT_WIN_GAME = 0x06,
+    CHEAT_INFINITE_HEALTH = 0x07,
 
 };
 
@@ -27,6 +29,8 @@ enum class GameLoopAction : uint8_t {
     GAME_FINISHED = 0x16,
     RETURN_TO_LOBBY = 0x17,
     LEADERBOARD = 0x18,
+    WINNER_PHASE = 0x19,
+    DISCONNECT = 0x20,
 };
 
 

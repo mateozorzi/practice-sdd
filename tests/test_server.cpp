@@ -42,8 +42,8 @@ void ServerProtocolTest::TearDown() {
 }
 
 // SEND
-TEST_F(ServerProtocolTest, send_client_id) {
-    uint32_t client_id = 123456789;
+TEST_F(ServerProtocolTest, send_player_id) {
+    uint32_t player_id = 123456789;
 
     std::vector<uint8_t> captured_bytes;
 
@@ -54,7 +54,7 @@ TEST_F(ServerProtocolTest, send_client_id) {
                 return len;
             });
 
-    protocol->send_client_id(client_id);
+    protocol->send_player_id(player_id);
 
     EXPECT_EQ(captured_bytes.size(), 4);
     // check client id bytes equal to client_id
@@ -62,7 +62,7 @@ TEST_F(ServerProtocolTest, send_client_id) {
                            (static_cast<uint32_t>(captured_bytes[1]) << 16) |
                            (static_cast<uint32_t>(captured_bytes[2]) << 8) |
                            (static_cast<uint32_t>(captured_bytes[3]));
-    EXPECT_EQ(received_id, client_id);
+    EXPECT_EQ(received_id, player_id);
 }
 
 TEST_F(ServerProtocolTest, send_car_catalogue) {
@@ -152,7 +152,7 @@ TEST_F(ServerProtocolTest, send_car_catalogue) {
 
 TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     WorldSnapshotDTO world_snapshot;
-    PlayerDTO player1("player1", 1001, CarDTO("ModelX"), 200, false);
+    PlayerDTO player1("player1", 1001, CarDTO("ModelX"), 200, false, 200);
     CarPositionDTO car_position1(100, 150, 90, 200, CheckpointDTO(1, 'H', 1001, 1001, 20, 30),
                                  CarLayer::ON_GROUND);
     world_snapshot.add_car_position(player1, car_position1);
@@ -174,7 +174,8 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
                            SIZE_UINT32_T + player1.username.size() + SIZE_UINT32_T + SIZE_UINT32_T +
                            player1.car.model.size() + SIZE_UINT16_T + SIZE_UINT8_T +  // player1
                            4 * SIZE_UINT32_T + SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT8_T +
-                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T;  // car position1
+                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T + // car position1
+                           SIZE_UINT8_T;  //NPC size (0)
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
     // verify_data
@@ -649,9 +650,11 @@ TEST_F(ServerProtocolTest, ReceiveLobbyInfo) {
 TEST_F(ServerProtocolTest, ReceiveUsername) {
     // push mock data
     std::vector<uint8_t> mock_data{
-            0x01,                                  // event type SetUsername
+            0x07,                                  // action
+            0x00, 0x00, 0x00, 0x00,                // client id 1
             0x00, 0x00, 0x00, 0x07,                // username size 7
-            'P',  'l',  'a',  'y',  'e', 'r', '1'  // username "Player1"
+            'P',  'l',  'a',  'y',  'e', 'r', '1',  // username "Player1"
+            0x00, 0x00, 0x00
     };
 
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);
@@ -668,11 +671,10 @@ TEST_F(ServerProtocolTest, ReceiveUsername) {
                 return static_cast<int>(bytes_to_read);
             });
 
-    GameCommandDTO game_command = protocol->receive_game_command();
+    LobbyDTO lobby_action = protocol->receive_lobby_info();
     // command_data has to be PlayerDTO
-    PlayerDTO* event = std::get_if<PlayerDTO>(&game_command.command_data);
-    ASSERT_NE(event, nullptr);
-    EXPECT_EQ(event->username, "Player1");
+    EXPECT_EQ(lobby_action.action, LobbyAction::CHANGE_USERNAME);
+    EXPECT_EQ(lobby_action.lobby_name, "Player1");
 }
 
 TEST_F(ServerProtocolTest, ReceiveMovment) {
@@ -708,7 +710,7 @@ TEST_F(ServerProtocolTest, ReceiveMovment) {
 TEST_F(ServerProtocolTest, ReceiveCarSelection) {
     // push mock data
     std::vector<uint8_t> mock_data{
-            0x05,                             // event type CarSelection
+            0x01,                             // event type CarSelection
             0x00, 0x00, 0x00, 0x06,           // car model size 6
             'M',  'o',  'd',  'e',  'l', 'X'  // car model "ModelX"
     };
@@ -737,7 +739,7 @@ TEST_F(ServerProtocolTest, ReceiveCarSelection) {
 TEST_F(ServerProtocolTest, ReceiveUpgrade) {
     // push mock data
     std::vector<uint8_t> mock_data{
-            0x07,  // event type Upgrade
+            0x02,  // event type Upgrade
             0x01,  // upgrade type Speed
     };
 

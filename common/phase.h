@@ -7,7 +7,7 @@ enum class Phase {
     COUNTDOWN = 2,
     IN_RACE = 3,
     LEADERBOARD = 4,
-    GAME_FINISHED = 5
+    GAME_FINISHED = 5,
 };
 
 #endif

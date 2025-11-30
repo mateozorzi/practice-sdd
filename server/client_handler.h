@@ -24,9 +24,8 @@ class ClientHandler final: public Thread {
     ServerProtocol server_protocol;
     Lobby& lobby;
     const ServerConfig& server_config;
-    const uint32_t client_id;
+    const uint32_t player_id;
     std::string username = "Player";
-    uint32_t game_id = 0;
     bool is_in_lobby = true;
     RaceCatalogueDTO selected_races;
 
@@ -40,8 +39,8 @@ class ClientHandler final: public Thread {
 
     void exit_lobby_and_play(Queue<GameCommand>& command_queue,
                              Queue<GameUpdateDTO>& snapshot_queue);
-    void create_new_game(uint32_t client_id, uint8_t max_players, const std::string& lobby_name);
-    void join_existing_game(uint32_t client_id, uint32_t actual_game_id);
+    void create_new_game(uint8_t max_players, const std::string& lobby_name);
+    void join_existing_game(uint32_t game_id);
 
 
 public:

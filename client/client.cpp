@@ -23,15 +23,17 @@ Client::Client(const std::string& hostname, const std::string& servname):
 
 void Client::run() {
     // lobby ui a
-    PlayerDTO player("", -1, CarDTO(), -1, false);
-    bool exit_game = false;
-    do {
+    bool open_lobby = true;
+    while(open_lobby){
+        PlayerDTO player;
         menu.lobby(player);
         if (static_cast<int>(player.id) == -1) {
-            exit_game = true;
+            open_lobby = false;
             continue;
         }
 
-        Game(protocol, player.id).run();
-    } while (!exit_game);
+        Game game(protocol, player.id);
+        game.run();
+        std::cout<<"Client game ended, returning to lobby menu."<<std::endl;
+    }
 }

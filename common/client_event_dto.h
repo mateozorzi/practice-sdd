@@ -3,6 +3,7 @@
 #include <variant>
 
 #include "movement_dto.h"
+#include "constants.h"
 
 
 enum ButtonType { Health, Speed, Acceleration, Handling, None };
@@ -11,7 +12,13 @@ struct BuyUpgradeDTO {
     ButtonType upgrade;
 };
 
-using ClientEventDTO = std::variant<MovementDTO, BuyUpgradeDTO>;
+struct ClientActionDTO{
+    ClientAction action;
+
+    explicit ClientActionDTO(ClientAction action): action(action) {}
+};
+
+using ClientEventDTO = std::variant<ClientActionDTO, MovementDTO, BuyUpgradeDTO>;
 
 
 #endif

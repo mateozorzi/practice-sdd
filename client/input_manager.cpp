@@ -101,6 +101,12 @@ bool InputManager::handle_waiting() {
         if (event.type == SDL_QUIT) {
             return false;
         }
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -121,6 +127,12 @@ bool InputManager::handle_buy_events(int time) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT)
             return false;
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
         if (handle_click(event, time))
             continue;
         if (handle_shop_movement(event, time))
@@ -136,6 +148,12 @@ bool InputManager::handle_countdown() {
             return false;
         }
         // cheats
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
     }
     return true;
 }
@@ -146,10 +164,31 @@ bool InputManager::handle_leaderboard() {
         if (event.type == SDL_QUIT) {
             return false;
         }
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
     }
     return true;
 }
 
+bool InputManager::handle_game_finished() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 bool InputManager::handle_movement() {
     SDL_Event event;
@@ -159,7 +198,10 @@ bool InputManager::handle_movement() {
         }
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+                handle_disconnect();
                 return false;
+            } else if (handle_cheats(event)) {
+                return true;
             }
             handle_keydown(event);
         } else if (event.type == SDL_KEYUP) {
@@ -170,6 +212,40 @@ bool InputManager::handle_movement() {
 }
 
 bool InputManager::is_moving() const { return w || a || s || d; }
+
+void InputManager::handle_disconnect() {
+    sender.add_event(ClientActionDTO(ClientAction::DISCONNECT));
+}
+
+void InputManager::handle_cheat_race_winner() {
+    sender.add_event(ClientActionDTO(ClientAction::CHEAT_WIN_RACE));
+}
+
+void InputManager::handle_cheat_game_winner() {
+    sender.add_event(ClientActionDTO(ClientAction::CHEAT_WIN_GAME));
+}
+
+void InputManager::handle_infinite_health() {
+    sender.add_event(ClientActionDTO(ClientAction::CHEAT_INFINITE_HEALTH));
+}
+
+bool InputManager::handle_cheats(const SDL_Event& event) {
+    if (event.key.keysym.sym == SDLK_1) {
+        //win the race cheat
+        handle_cheat_race_winner();
+        return true;
+    } else if (event.key.keysym.sym == SDLK_2) {
+        // game winner cheat
+        handle_cheat_game_winner();
+        return true;
+    } else if (event.key.keysym.sym == SDLK_3) {
+        // infinite health cheat
+        handle_infinite_health();
+        return true;
+    }
+    return false;
+}
+
 
 InputManager::~InputManager() {
     if (sender.is_alive()) {

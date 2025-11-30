@@ -61,5 +61,13 @@ public:
     void show_game() override;
 };
 
+class GameFinishedPhase: public GamePhase {
+public:
+    GameFinishedPhase(Game& game, int starting_it);
+    void handle_game_events() override;
+    bool update_game_state() override;
+    void show_game() override;
+};
+
 
 #endif

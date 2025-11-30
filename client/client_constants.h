@@ -122,7 +122,7 @@ constexpr const char* JSON_SUFFIX = ".json";
 constexpr const char* DEFAULT_CITY = "Liberty City";
 
 // Upgrade Shop
-constexpr int SHOP_FONT_SIZE = 18;
+constexpr int SHOP_FONT_SIZE = 64;
 constexpr int SHOP_SIZE_RATIO_NUM = 3;
 constexpr int SHOP_SIZE_RATIO_DEN = 4;  // Shop is 3/4 of window
 constexpr int SHOP_BORDER_THICKNESS = 5;

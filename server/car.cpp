@@ -8,8 +8,10 @@
 
 Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model,
          const CarConfig& config):
-        client_id(client_id), box2d_body(nullptr), config(config), model(model) {
+        client_id(client_id), box2d_body(nullptr), config(config), model(model), base_health(config.health) {
 
+
+    
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_dynamicBody;
     box2d_body_definition.position.Set(0.0f, 0.0f);
@@ -197,7 +199,7 @@ CarPositionDTO Car::get_position_dto() const {
 
 const CarDTO Car::get_configuration() const {
 
-    CarDTO car_configuration(model);
+    CarDTO car_configuration(model, base_health, 0, 0, 0);
     return car_configuration;
 }
 
@@ -206,20 +208,6 @@ b2Body* Car::get_body() const { return box2d_body; }
 
 
 CarLayer Car::get_layer() const { return car_layer; }
-
-
-/*
-void Car::upgrade_configuration(const UpgradeDTO& upgrade) {
-
-    config.max_speed += upgrade.speed_increase;
-    config.acceleration += upgrade.acceleration_increase;
-
-    // Recalculate turn torque and drift factor based on new handling
-    handling += upgrade.handling_increase;
-    config.turn_torque = remap(handling, 30.0f, 100.0f, 0.010f, 0.028f);
-    config.drift_factor = remap(handling, 30.0f, 100.0f, 0.40f, 0.00f);
-}
-*/
 
 
 void Car::set_collision(bool colliding) { is_colliding = colliding; }
@@ -284,9 +272,11 @@ void Car::set_layer(CarLayer layer) {
 }
 
 void Car::reset_car_velocity() {
-    // Resetear velocidad lineal a cero
+    moving_up = false;
+    moving_down = false;
+    moving_left = false;
+    moving_right = false;
     box2d_body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-
-    // Resetear velocidad angular a cero
     box2d_body->SetAngularVelocity(0.0f);
+    box2d_body->SetAwake(false);
 }

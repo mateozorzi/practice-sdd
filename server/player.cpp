@@ -14,7 +14,7 @@
 
 
 Player::Player(uint32_t client_id, const std::string& username):
-        client_id(client_id), username(username), car(nullptr) {}
+        client_id(client_id), username(username), car(nullptr), infinite_health(false) {}
 
 
 void Player::create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world) {
@@ -37,9 +37,9 @@ const CarDTO Player::get_car() const {
 
     CarDTO empty_car;
 
-    if (car)
+    if (car){
         return car->get_configuration();
-
+    }    
     return empty_car;
 }
 
@@ -73,11 +73,13 @@ uint32_t Player::get_recorded_time() const { return race_time; }
 
 PlayerDTO Player::get_info() const {
 
-    return PlayerDTO(username, client_id, get_car(), health, dead);
+    return PlayerDTO(username, client_id, get_car(), health, dead, base_health);
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
-
+    std::cout << "[" << PLAYER << "] Getting  race stats for player with ID: " << client_id
+              << std::endl;
+    std::cout << "Race time: " << race_time << std::endl;
     return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
 }
 
@@ -91,7 +93,10 @@ void Player::start_race() {
     n_lap = 1;
     race_time = 0;
     dead = false;
+    std::cout<<"car health: "<<car->get_configuration().health<<std::endl;
+    base_health = car->get_configuration().health;
     health = base_health;
+    infinite_health = false;
 }
 
 bool Player::is_in_race() const { return in_race; }
@@ -101,7 +106,7 @@ void Player::finish_race() {
     has_finish_race = true;
     id_next_checkpoint = 1;
     n_lap = 1;
-    // car->reset_car_velocity();
+    car->reset_car_velocity();
 }
 
 bool Player::has_finished_race() const { return has_finish_race; }
@@ -115,8 +120,12 @@ bool Player::have_time_recorded() const {
 
 void Player::record_time(uint32_t seconds) {
     race_time = seconds;
+    std::cout << "[" << PLAYER << "] Player " << client_id << " recorded time: " << race_time
+              << " seconds." << std::endl;
     if (penalty) {
-        race_time += 10;
+        race_time += static_cast<uint32_t>(10);
+        std::cout << "[" << PLAYER << "] Penalty applied to player " << client_id
+                  << ". New recorded time: " << race_time << " seconds." << std::endl;
         penalty = false;
     }
 }
@@ -126,8 +135,11 @@ bool Player::is_dead() const { return health == 0; }
 
 void Player::handle_car_movement(const MovementDTO& movement_dto) {
 
-    if (car)
-        car->handle_movement(movement_dto);
+    if (car) {
+        if (is_in_race()) {
+            car->handle_movement(movement_dto);
+        }
+    }
 }
 
 bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint) {
@@ -152,36 +164,28 @@ bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& che
     return reached;
 }
 
-void Player::update_next_checkpoint(const RaceDTO& race) {
+bool Player::update_next_checkpoint(const RaceDTO& race) {
+    bool finished = false;
     if (static_cast<int>(id_next_checkpoint) >= static_cast<int>(race.size_checkpoints)) {
-        // Último checkpoint de la vuelta
-        // std::cout<<"Player id "<<client_id<<" reached finish line checkpoint "<<
-        // static_cast<int>(id_next_checkpoint)<<std::endl;
         if (n_lap + 1 > race.laps) {
             finish_race();
-            return;
+            finished = true;
+            return finished;
         } else {
-            // std::cout<<"Player id "<<client_id<<" completed lap "<<
-            // static_cast<int>(n_lap)<<std::endl;
             n_lap += 1;
-            id_next_checkpoint = 1;  // Reset a primer checkpoint
+            id_next_checkpoint = 1;
         }
     } else if (static_cast<int>(id_next_checkpoint) < static_cast<int>(race.size_checkpoints)) {
-        // Checkpoint normal
-        // std::cout<<"Player id "<<client_id<<" reached checkpoint "<<
-        // static_cast<int>(id_next_checkpoint)<<std::endl;
         id_next_checkpoint += 1;
     }
 
     this->next = race.checkpoints[id_next_checkpoint - 1];
-    // std::cout<<"Player id "<<client_id<<" - Lap: "<< static_cast<int>(n_lap)<<
-    //", Next checkpoint: "<<static_cast<int>(this->next.id)<<" x:
-    //"<<static_cast<int>(this->next.x)<<" y: "<<static_cast<int>(this->next.y)<<std::endl;
+    return finished;
 }
 
-void Player::update_car_position(const RaceDTO& race) {
+void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds) {
 
-    if (car) {
+    if (car && is_in_race()) {
         car->update_position();
         // update race conditions
 
@@ -197,13 +201,10 @@ void Player::update_car_position(const RaceDTO& race) {
 
 
         if (reached_checkpoint(x, y, this->next)) {
-            update_next_checkpoint(race);
-            // std::cout<<"Player id "<<client_id<<" reached checkpoint "<<
-            // static_cast<int>(id_next_checkpoint)<< " next checkpoint id
-            // "<<static_cast<int>(this->next.id)<<std::endl;
-
-            // std::cout<<"Position x: "<<static_cast<float>(x)<<" y:
-            // "<<static_cast<float>(y)<<std::endl;
+            bool finished = update_next_checkpoint(race);
+            if (finished) {
+                record_time(elapsed_seconds);
+            }
         } else {
             return;
         }
@@ -235,15 +236,30 @@ void Player::set_in_game() { in_game = true; }
 
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
-    if (car)
+    if (car) {
+        penalty = true;
+        if (upgrade.upgrade == ButtonType::Health) {
+            std::cout << "Actual health: " << health << std::endl;
+            health += static_cast<uint16_t>(game_config.health_upgrade);
+            std::cout << "Upgraded health: " << health << std::endl;
+            base_health += static_cast<uint16_t>(game_config.health_upgrade);
+            return;
+        }
         car->set_upgrade(upgrade, game_config);
+    }
+}
+
+void Player::activate_infinite_health() {
+    infinite_health = true;
 }
 
 
 bool Player::is_in_game() const { return in_game; }
 
 void Player::apply_collision_damage(uint16_t damage) {
-
+    if (infinite_health) {
+        return;
+    }
     if (health > damage)
         health -= damage;
     else

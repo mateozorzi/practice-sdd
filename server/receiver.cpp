@@ -9,11 +9,11 @@
 #include "../common/movement_dto.h"
 
 
-Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t client_id,
+Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t player_id,
                    Queue<GameCommand>& command_queue):
         server_protocol(server_protocol),
         lobby(lobby),
-        client_id(client_id),
+        player_id(player_id),
         command_queue(command_queue) {}
 
 void Receiver::handle_get_json_file(const std::string& file_path) {
@@ -36,10 +36,13 @@ void Receiver::run() {
                 continue;
             }
 
-            command_queue.push(GameCommand(client_id, std::move(game_command)));
+            command_queue.push(GameCommand(player_id, std::move(game_command)));
 
-            if (game_command.client_action == ClientAction::DISCONNECT)
+            if (game_command.client_action == ClientAction::DISCONNECT) {
+
+                _is_alive = false;
                 break;
+            }
         }
     } catch (const LibError& e) {
 
@@ -52,11 +55,10 @@ void Receiver::run() {
 
 void Receiver::stop() {
 
-    if (_keep_running) {
-
+    if (_keep_running)
         _keep_running = false;
-    }
 }
+
 
 Receiver::~Receiver() {
 

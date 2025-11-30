@@ -28,12 +28,14 @@ constexpr int POSITION_ITERATIONS = 6;
 
 
 enum class GamePhase {
+
     WAITING_CAR_SELECTION,
     UPGRADE_SHOP,
     COUNTDOWN,
     IN_RACE,
     LEADERBOARD,
-    GAME_FINISHED
+    GAME_FINISHED,
+    RETURN_TO_LOBBY
 };
 
 
@@ -57,7 +59,7 @@ class GameLoop final: public Thread {
 
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
-    b2World box2d_world;
+    b2World box2d_world = b2Vec2(0.0f, 0.0f);
     CityLoader city_loader;
     std::unordered_map<uint32_t, Player> players;
     std::vector<Npc> npcs;
@@ -65,30 +67,36 @@ class GameLoop final: public Thread {
     RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO final_leaderboard;
-    bool race_active;
+    bool race_active = false;
+    bool cheat_game_winner_activated = false;
 
     void fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time);
+
+    void process_commands_in_waiting_car_selection_phase();
+    void process_commands_in_upgrade_shop_phase();
+    void process_commands_in_countdown_phase();
+    void process_commands_in_race_phase(uint32_t elapsed_seconds);
+    void process_commands_in_leaderboard_phase();
+    void process_commands_in_game_finished_phase();
+    void process_commands_in_return_to_lobby_phase();
+
     void handle_waiting_car_selection_phase();
     void handle_upgrade_shop_phase();
     void handle_countdown_phase();
     void handle_in_race_phase();
     void handle_leaderboard_phase();
     void handle_game_finished_phase();
+    void handle_return_to_lobby();
 
-    void process_commands_in_waiting_car_selection_phase();
-    void process_commands_in_upgrade_shop_phase();
-    void process_commands_in_countdown_phase();
-    void process_commands_in_race_phase();
-    void process_commands_in_leaderboard_phase();
-    void process_commands_in_game_finished_phase();
-
-    void process_commands();
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
     void handle_disconnection(const GameCommand& game_command);
     void handle_upgrade_car(const GameCommand& game_command);
-    void handle_command(const GameCommand& game_command);
-    void update_positions(const RaceDTO& race);
+    void handle_cheat_win_race(const GameCommand& game_command, uint32_t elapsed_seconds);
+    void handle_cheat_win_game(const GameCommand& game_command, uint32_t elapsed_seconds);
+    void handle_cheat_infinite_health(const GameCommand& game_command);
+
+    void update_positions(const RaceDTO& race, uint32_t elapsed_seconds);
     void set_race(const RaceDTO& race);
     void finish_race(uint32_t timeout_time);
     LeaderboardDTO create_final_leaderboard();
@@ -101,7 +109,6 @@ class GameLoop final: public Thread {
 
     void map_configuration(const std::string& city_name);
     void load_npcs(const std::string& city_name);
-    void shop_phase();
 
 
 public:
@@ -114,16 +121,19 @@ public:
     void run() override;
     void stop() override;
 
-    void remove_player(uint32_t client_id);
+    void remove_player(uint32_t player_id);
 
     bool is_full() const;
     bool is_empty() const;
     uint8_t get_active_players() const;
+    uint32_t get_next_player_id() const;
+    bool has_started() const;
+    bool has_player(uint32_t player_id) const;
 
     void check_race_times(uint32_t seconds);
     void check_alive_players();
 
-    void add_player(uint32_t client_id, const std::string& username);
+    void add_player(uint32_t player_id, const std::string& username);
 
     ~GameLoop() override;
 };

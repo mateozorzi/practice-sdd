@@ -15,6 +15,7 @@
 
 
 void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_position_dto) {
+
     add_uint32_to_buffer(car_position_dto.client_id);
     add_uint32_to_buffer(car_position_dto.x_position);
     add_uint32_to_buffer(car_position_dto.y_position);
@@ -30,7 +31,39 @@ void ServerProtocol::add_player_to_buffer(const PlayerDTO& player) {
     add_string_to_buffer(player.car.model);
     add_uint16_to_buffer(player.health);
     add_uint8_to_buffer(static_cast<uint8_t>(player.dead));
+    add_uint16_to_buffer(player.max_health);
 }
+
+void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint) {
+
+    add_uint8_to_buffer(checkpoint.id);
+    add_string_to_buffer(std::string(1, checkpoint.orientation));
+    add_uint16_to_buffer(checkpoint.x);
+    add_uint16_to_buffer(checkpoint.y);
+    add_uint8_to_buffer(checkpoint.width);
+    add_uint8_to_buffer(checkpoint.height);
+}
+
+void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
+
+    add_string_to_buffer(race.name);
+    add_string_to_buffer(race.city);
+    add_uint8_to_buffer(race.size_checkpoints);
+
+    for (const auto& checkpoint: race.checkpoints) add_checkpoint_to_buffer(checkpoint);
+
+    add_uint8_to_buffer(race.laps);
+}
+
+void ServerProtocol::add_lobby_to_buffer(const LobbyDTO& lobby_dto) {
+
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
+    add_uint32_to_buffer(lobby_dto.lobby_id);
+    add_string_to_buffer(lobby_dto.lobby_name);
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.max_players));
+    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.active_players));
+}
+
 
 PlayerDTO ServerProtocol::receive_username() {
 
@@ -73,18 +106,22 @@ GameCommandDTO ServerProtocol::receive_game_command() {
 
     switch (client_action) {
 
-        case ClientAction::SEND_USERNAME:
-            return GameCommandDTO(client_action, receive_username());
-        case ClientAction::SEND_CAR_MOVEMENT:
-            return GameCommandDTO(client_action, receive_movement());
+        case ClientAction::DISCONNECT:
+            return GameCommandDTO(client_action);
         case ClientAction::SEND_CAR_SELECTION:
             return GameCommandDTO(client_action, receive_car_selection());
         case ClientAction::SEND_UPGRADE:
             return GameCommandDTO(client_action, receive_upgrade());
-        case ClientAction::DISCONNECT:
-            return GameCommandDTO(client_action);
+        case ClientAction::SEND_CAR_MOVEMENT:
+            return GameCommandDTO(client_action, receive_movement());
         case ClientAction::GET_JSON_FILE:
             return GameCommandDTO(client_action, recv_string());
+        case ClientAction::CHEAT_WIN_RACE:
+            return GameCommandDTO(client_action);
+        case ClientAction::CHEAT_WIN_GAME:
+            return GameCommandDTO(client_action);
+        case ClientAction::CHEAT_INFINITE_HEALTH:
+            return GameCommandDTO(client_action);
         default:
             return GameCommandDTO(ClientAction::DISCONNECT);
     }
@@ -107,6 +144,7 @@ void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto
 }
 
 BuyUpgradeDTO ServerProtocol::receive_upgrade() {
+
     const uint8_t upgrade = recv_uint8();
     const ButtonType upgrade_type = static_cast<ButtonType>(upgrade);
 
@@ -121,11 +159,14 @@ CarDTO ServerProtocol::receive_car_selection() {
 }
 
 RaceDTO ServerProtocol::receive_race() {
+
     const std::string name = recv_string();
     const std::string city = recv_string();
     const uint8_t size_checkpoints = recv_uint8();
     std::vector<CheckpointDTO> checkpoints;
+
     for (uint8_t i = 0; i < size_checkpoints; ++i) {
+
         const uint8_t id = recv_uint8();
         const char orientation = static_cast<char>(recv_string()[0]);
         const uint16_t x = recv_uint16();
@@ -134,40 +175,45 @@ RaceDTO ServerProtocol::receive_race() {
         const uint8_t height = recv_uint8();
         checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
     }
+
     const uint8_t laps = recv_uint8();
+
     return RaceDTO(name, city, std::move(checkpoints), laps);
 }
 
 RaceCatalogueDTO ServerProtocol::receive_races() {
+
     uint8_t size = recv_uint8();
     std::vector<RaceDTO> races;
-    for (uint8_t i = 0; i < size; ++i) {
-        races.push_back(receive_race());
-    }
+
+    for (uint8_t i = 0; i < size; ++i) races.push_back(receive_race());
 
     return RaceCatalogueDTO(std::move(races));
 }
 
-void ServerProtocol::send_client_id(const uint32_t client_id) {
-
-    add_uint32_to_buffer(client_id);
+void ServerProtocol::send_player_id(const uint32_t player_id) {
+    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::SEND_ID));
+    add_uint32_to_buffer(player_id);
 
     send_buffer();
 }
 
 void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
     const WorldSnapshotDTO& world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
     add_uint8_to_buffer(world_snapshot.size);
 
     for (const auto& car_position: world_snapshot.get_car_positions()) {
+
         add_player_to_buffer(car_position.first);
         add_car_position_to_buffer(car_position.second);
     }
 
-    // Send NPC data
     add_uint8_to_buffer(world_snapshot.npc_size);
+
     for (const auto& npc: world_snapshot.get_npc_positions()) {
+
         add_uint32_to_buffer(npc.npc_id);
         add_uint32_to_buffer(npc.x_position);
         add_uint32_to_buffer(npc.y_position);
@@ -178,6 +224,7 @@ void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
 }
 
 void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
 
     const RaceDTO& race = std::get<RaceDTO>(snapshot.data);
@@ -186,6 +233,7 @@ void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot) {
 }
 
 void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
 
     const LeaderboardDTO& leaderboard = std::get<LeaderboardDTO>(snapshot.data);
@@ -193,6 +241,7 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
     add_uint8_to_buffer(leaderboard.n_players);
 
     for (const auto& player_stats: leaderboard.players) {
+
         add_uint32_to_buffer(player_stats.client_id);
         add_string_to_buffer(player_stats.username);
         add_uint8_to_buffer(player_stats.position);
@@ -210,15 +259,6 @@ void ServerProtocol::send_lobby_response(const LobbyDTO& lobby_dto) {
     send_buffer();
 }
 
-void ServerProtocol::add_lobby_to_buffer(const LobbyDTO& lobby_dto) {
-
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
-    add_uint32_to_buffer(lobby_dto.lobby_id);
-    add_string_to_buffer(lobby_dto.lobby_name);
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.max_players));
-    add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.active_players));
-}
-
 void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue) {
 
     add_uint8_to_buffer(lobby_catalogue.size);
@@ -226,25 +266,6 @@ void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalog
     for (const auto& lobby: lobby_catalogue.lobbies) add_lobby_to_buffer(lobby);
 
     send_buffer();
-}
-
-void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint) {
-    add_uint8_to_buffer(checkpoint.id);
-    add_string_to_buffer(std::string(1, checkpoint.orientation));
-    add_uint16_to_buffer(checkpoint.x);
-    add_uint16_to_buffer(checkpoint.y);
-    add_uint8_to_buffer(checkpoint.width);
-    add_uint8_to_buffer(checkpoint.height);
-}
-
-void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
-    add_string_to_buffer(race.name);
-    add_string_to_buffer(race.city);
-    add_uint8_to_buffer(race.size_checkpoints);
-
-    for (const auto& checkpoint: race.checkpoints) add_checkpoint_to_buffer(checkpoint);
-
-    add_uint8_to_buffer(race.laps);
 }
 
 void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
@@ -257,9 +278,11 @@ void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
 }
 
 void ServerProtocol::send_json_file(const std::string& file_path) {
+
     std::ifstream file(file_path);
+
     if (!file.is_open()) {
-        // Send empty JSON object if file doesn't exist
+
         add_string_to_buffer("{}");
         send_buffer();
         return;
@@ -273,6 +296,7 @@ void ServerProtocol::send_json_file(const std::string& file_path) {
 }
 
 void ServerProtocol::send_game_action(const GameUpdateDTO& game_action) {
+
     add_uint8_to_buffer(static_cast<uint8_t>(game_action.gameloop_action));
     send_buffer();
 }

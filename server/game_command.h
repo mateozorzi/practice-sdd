@@ -20,7 +20,7 @@
 class GameCommand {
 
 
-    uint32_t client_id;
+    uint32_t player_id;
     ClientAction client_action;
     std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO,
                  BuyUpgradeDTO>
@@ -33,9 +33,9 @@ public:
 
     GameCommand();
 
-    explicit GameCommand(uint32_t client_id, GameCommandDTO&& dto);
+    explicit GameCommand(uint32_t player_id, GameCommandDTO&& dto);
 
-    uint32_t get_client_id() const;
+    uint32_t get_player_id() const;
     ClientAction get_client_action() const;
 
     template <typename T>

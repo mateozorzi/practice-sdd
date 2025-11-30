@@ -39,8 +39,9 @@ class Player {
     bool dead = false;
     uint16_t base_health = 0;
     bool penalty = false;
+    bool infinite_health = false;
 
-    void update_next_checkpoint(const RaceDTO& race);
+    bool update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
 
 
@@ -64,12 +65,13 @@ public:
     uint16_t get_health() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
-    void update_car_position(const RaceDTO& race);
+    void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds);
     void set_car_collision(bool colliding);
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     void set_car_layer(CarLayer layer);
     void set_in_game();
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
+    void activate_infinite_health();
 
     bool is_in_game() const;
     void start_race();

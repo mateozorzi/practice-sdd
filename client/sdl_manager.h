@@ -14,6 +14,7 @@
 #include "common/car_position_dto.h"
 #include "common/npc_dto.h"
 #include "common/player_dto.h"
+#include "../common/leaderboard_dto.h"
 
 #include "animations.h"
 #include "camera.h"
@@ -91,8 +92,9 @@ public:
     void clear_screen();
     void render(LocalInfo& game_state);
     void render_waiting();
-    void render_countdown();
-    void render_leaderboard();
+    void render_countdown(const LocalInfo& game_state);
+    void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string title);
+    void render_winner();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
@@ -106,6 +108,10 @@ public:
     bool is_shop_open();
     void toggle_shop();
     void play_upgrade_sound();
+    void render_players(double scale_x, double scale_y, const SDL2pp::Rect& view_rect,
+                        const CarPositionDTO& my_car, const PlayerInfo& my_player,
+                        const LocalInfo& game_state, SDL2pp::Texture& cars_texture, SDL2pp::Texture& map,
+                        SDL2pp::Texture& arrow_texture);
 };
 
 #endif

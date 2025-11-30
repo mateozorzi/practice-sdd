@@ -43,7 +43,6 @@ public:
     using CommonProtocol::CommonProtocol;
 
     void ask_for_race_catalogue();
-    void send_username(const std::string& username);
     void send_event(const ClientEventDTO& event);
     void handle_move(const MovementDTO& dto);
 

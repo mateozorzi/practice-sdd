@@ -33,7 +33,13 @@ public:
     bool handle_buy_events(int time);
     bool handle_countdown();
     bool handle_leaderboard();
+    bool handle_game_finished();
     bool is_moving() const;
+    void handle_disconnect();
+    void handle_cheat_race_winner();
+    void handle_cheat_game_winner();
+    void handle_infinite_health();
+    bool handle_cheats(const SDL_Event& event);
     ~InputManager();
 };
 

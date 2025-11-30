@@ -42,8 +42,6 @@ void Acceptor::reap() {
         if (!client->is_alive()) {
 
             client->join();
-            std::cout << "[" << ACCEPTOR << "] "
-                      << "Reaping dead client." << std::endl;
             return true;
         }
 

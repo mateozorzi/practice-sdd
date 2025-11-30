@@ -23,6 +23,7 @@ class Car {
     b2Body* box2d_body;
     CarConfig config;
     std::string model;
+    uint16_t base_health;
 
     bool moving_up = false;
     bool moving_down = false;
