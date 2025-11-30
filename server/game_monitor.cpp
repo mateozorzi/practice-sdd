@@ -52,6 +52,19 @@ void GameMonitor::broadcast(const GameUpdateDTO& info) {
     }
 }
 
+void GameMonitor::send_update_to_player(const GameUpdateDTO& info, const uint32_t player_id) {
+
+    std::lock_guard lock(mtx);
+
+    const auto it = snapshot_queues.find(player_id);
+
+    if (it == snapshot_queues.end())
+        return;
+
+    it->second->try_push(info);
+}
+
+
 
 void GameMonitor::remove_player(const uint32_t player_id) {
 

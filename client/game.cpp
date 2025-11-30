@@ -25,26 +25,28 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
 void Game::run() {
 
     this->receiver.start();
+
     try {
+
         while (keep_running) {
+
             bool phase_changed = false;
             phase_changed = phase->run();
-            if(!keep_running){
-                std::cout << "Exiting main game loop." << std::endl;
-                break;
-            }
+
+            if(!receiver.is_alive()) 
+                keep_running = false;
+
             if (phase_changed) {
                 change_phase();
             }
         }
+
     } catch (const std::exception& e) {
         this->keep_running = false;
     }
 
-    if(receiver.is_alive()){
-        this->receiver.stop();
-        this->receiver.join();
-    }
+    this->receiver.stop();
+    this->receiver.join();
 }
 
 void Game::check_for_last_updates() {
