@@ -293,15 +293,22 @@ void SDLManager::render(LocalInfo& game_state) {
     const uint32_t pos_x = my_car.x_position;
     const uint32_t pos_y = my_car.y_position;
 
-    /* if (!animations.is_explosion_active(iteration_counter)) {
-        animations.start_explosion(iteration_counter,
-                                   SDL2pp::Point(pos_x, pos_y));
-    } */
-
     if (game_state.player.life <= 0 && !game_state.player.died) {
         game_state.player.died = true;
-        animations.start_camera_shake(iteration_counter);
+        if (!animations.is_explosion_active(iteration_counter)) {
+            animations.start_explosion(iteration_counter,
+                                       SDL2pp::Point(pos_x, pos_y));
+            animations.start_camera_shake(iteration_counter);
+        }
     }
+
+    if (previous_life > game_state.player.life && game_state.player.life > 0) {
+        animations.start_camera_shake(iteration_counter);
+        sounds.play_crash_sound();
+    }
+
+    // Actualizar vida anterior para la próxima iteración
+    previous_life = game_state.player.life;
 
     update_camera(pos_x, pos_y);
     clear_screen();

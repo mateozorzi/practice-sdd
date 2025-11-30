@@ -50,6 +50,7 @@ private:
     std::vector<SDL2pp::Rect> bridges_rects;
     std::vector<SDL2pp::Rect> decorations_rects;
     int iteration_counter = 0;
+    int previous_life = 0;
     std::string map_name;
     std::string decoration;
     std::string bridges;
