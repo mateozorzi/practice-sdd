@@ -98,6 +98,9 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
         info.checkpoint = car.next;
         info.model = player.car.model;
         info.finish_race = player.finish_race;
+        info.current_lap = car.current_lap;
+        info.race_lap = car.race_lap;
+        info.username = player.username;
         return;
     }
 
@@ -114,6 +117,9 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
     info.layer = car.layer;
     info.checkpoint = car.next;
     info.finish_race = player.finish_race;
+    info.current_lap = car.current_lap;
+    info.race_lap = car.race_lap;
+    info.username = player.username;
 }
 
 void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {

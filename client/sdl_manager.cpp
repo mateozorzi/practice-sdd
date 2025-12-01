@@ -257,25 +257,8 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
         }
     }
 
-    // Para renderizar las stats. TODO
-    std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars_for_stats;
-    for (const auto& [pid, pinfo]: game_state.players) {
-        PlayerDTO p;
-        p.id = pid;
-        p.car.model = pinfo.model;
-        p.username = "";  // Sin campo username
+    render_stats(my_player);
 
-        CarPositionDTO pos;
-        pos.x_position = pinfo.x;
-        pos.y_position = pinfo.y;
-        pos.angle = pinfo.angle;
-        pos.layer = pinfo.layer;
-        pos.next = pinfo.checkpoint;
-
-        cars_for_stats.emplace_back(p, pos);
-    }
-
-    render_stats(cars_for_stats);
     render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 }
@@ -386,29 +369,12 @@ void SDLManager::render(LocalInfo& game_state) {
     render_hud_health(game_state.player.life, game_state.player.max_life);
     render_hud_minimap(pos_x, pos_y);
 
-    // Para renderizar las stats. TODO
-    std::vector<std::pair<PlayerDTO, CarPositionDTO>> cars_for_stats;
-    for (const auto& [pid, pinfo]: game_state.players) {
-        PlayerDTO p;
-        p.id = pid;
-        p.car.model = pinfo.model;
-        p.username = "";  // Sin campo username
-
-        CarPositionDTO pos;
-        pos.x_position = pinfo.x;
-        pos.y_position = pinfo.y;
-        pos.angle = pinfo.angle;
-        pos.layer = pinfo.layer;
-        pos.next = pinfo.checkpoint;
-
-        cars_for_stats.emplace_back(p, pos);
-    }
-    render_stats(cars_for_stats);
+    render_stats(my_player);
 
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
     // animations.render_explosion(iteration_counter);
 
-    if(my_player.finish_race){
+    if (my_player.finish_race) {
         render_center_box("You have finished the race!");
     }
 
@@ -421,8 +387,8 @@ void SDLManager::render_waiting() {
     renderer.Copy(*waiting_room_background, SDL2pp::NullOpt, SDL2pp::NullOpt);
 
     const std::string text = "Waiting for players...";
-    SDL2pp::Color text_color(255, 255, 255, 255); // blanco
-    SDL2pp::Color outline_color(0, 0, 0, 255);    // negro
+    SDL2pp::Color text_color(255, 255, 255, 255);  // blanco
+    SDL2pp::Color outline_color(0, 0, 0, 255);     // negro
 
     SDL2pp::Texture& text_texture =
             resources.get_text(text, FONT_PATH, TEXT_WAITING_SIZE, text_color);
@@ -430,7 +396,7 @@ void SDLManager::render_waiting() {
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
 
-    int o = 2; // grosor del borde
+    int o = 2;  // grosor del borde
 
     draw_row(text, text_x - o, text_y - o, outline_color, TEXT_WAITING_SIZE);
     draw_row(text, text_x + o, text_y - o, outline_color, TEXT_WAITING_SIZE);
@@ -489,8 +455,8 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
 
-    int o = 2; // grosor del borde
-    SDL2pp::Color outline_color(0, 0, 0, 255);    // negro
+    int o = 2;                                  // grosor del borde
+    SDL2pp::Color outline_color(0, 0, 0, 255);  // negro
 
     draw_row(text, text_x - o, text_y - o, outline_color, TEXT_COUNTDOWN_SIZE);
     draw_row(text, text_x + o, text_y - o, outline_color, TEXT_COUNTDOWN_SIZE);
@@ -525,7 +491,7 @@ void SDLManager::render_center_box(const std::string& message) {
 
     SDL2pp::Rect board_rect(rect_x, rect_y, rect_w, rect_h);
 
-    SDL2pp::Color bg_color(30, 30, 30, 200);   
+    SDL2pp::Color bg_color(30, 30, 30, 200);
     SDL2pp::Color border_color(255, 215, 0, 255);
     int border = 5;
 
@@ -537,23 +503,21 @@ void SDLManager::render_center_box(const std::string& message) {
     // Bordes
     renderer.SetDrawBlendMode(SDL_BLENDMODE_NONE);
     renderer.SetDrawColor(border_color);
-    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, rect_w, border)); // top
-    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y + rect_h - border, rect_w, border)); // bottom
-    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, border, rect_h)); // left
-    renderer.FillRect(SDL2pp::Rect(rect_x + rect_w - border, rect_y, border, rect_h)); // right
+    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, rect_w, border));                    // top
+    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y + rect_h - border, rect_w, border));  // bottom
+    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, border, rect_h));                    // left
+    renderer.FillRect(SDL2pp::Rect(rect_x + rect_w - border, rect_y, border, rect_h));  // right
 
     // Texto
     SDL2pp::Color text_color(255, 215, 0, 255);
     SDL2pp::Texture& msg_texture =
-        resources.get_text(message, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+            resources.get_text(message, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
 
     int msg_x = rect_x + (rect_w - msg_texture.GetWidth()) / 2;
     int msg_y = rect_y + (rect_h - msg_texture.GetHeight()) / 2;
 
     renderer.Copy(msg_texture, SDL2pp::NullOpt,
-                  SDL2pp::Rect(msg_x, msg_y,
-                               msg_texture.GetWidth(),
-                               msg_texture.GetHeight()));
+                  SDL2pp::Rect(msg_x, msg_y, msg_texture.GetWidth(), msg_texture.GetHeight()));
 
     // Restaurar estado
     renderer.SetDrawBlendMode(prev_blend);
@@ -573,7 +537,7 @@ void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Col
                   SDL2pp::Rect(x, y, text_texture.GetWidth(), text_texture.GetHeight()));
 }
 
-void SDLManager::render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars) {
+void SDLManager::render_stats(const PlayerInfo& player) {
     int box_w = SCREEN_WIDTH * STATS_BOX_WIDTH_RATIO / STATS_BOX_DIVISOR;
     int box_h = SCREEN_HEIGHT * STATS_BOX_HEIGHT_RATIO / STATS_BOX_DIVISOR;
     int box_x = (SCREEN_WIDTH - box_w) / 2;
@@ -582,7 +546,7 @@ void SDLManager::render_stats(const std::vector<std::pair<PlayerDTO, CarPosition
     SDL2pp::Rect stats{box_x, box_y, box_w, box_h};
 
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
-    renderer.SetDrawColor(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, COLOR_BLACK_ALPHA);
+    renderer.SetDrawColor(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, 0);
     renderer.DrawRect(stats);
 
     SDL2pp::Color text_color =
@@ -593,17 +557,12 @@ void SDLManager::render_stats(const std::vector<std::pair<PlayerDTO, CarPosition
     int font_size = box_h / STATS_FONT_SIZE_DIVISOR;
     int spacing = font_size + STATS_SPACING_OFFSET;
 
-    std::string separation = "     ";
-    std::string header = "Jugador" + separation + "Tiempo";
-
-    draw_row(header, text_x, text_y, text_color, font_size);
-
-    for (const auto& [player, car_pos]: cars) {
-        std::string name = player.username;
-        std::string time = "N/A";
-        std::string player_result = name + separation + time;
-        draw_row(player_result, text_x, text_y + spacing, text_color, font_size);
-    }
+    std::string player_name = "Jugador: " + player.username;
+    draw_row(player_name, text_x, text_y, text_color, font_size);
+    text_y += spacing;
+    std::string player_lap =
+            "Vuelta: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
+    draw_row(player_lap, text_x, text_y, text_color, font_size);
 }
 
 void SDLManager::load_bridges_rects(const nlohmann::json& bridges_rects_data) {

@@ -2,6 +2,8 @@
 #define CLIENT_CONSTANTS_H
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
 // Screen dimensions
 constexpr int SCREEN_WIDTH = 1920;
@@ -120,9 +122,9 @@ constexpr const char* BRIDGES_PREFIX = "server/world/bridges_";
 constexpr const char* JSON_SUFFIX = ".json";
 
 static const std::vector<std::string> WAITING_ROOMS = {
-    "client/assets/backgrounds/waitingroom1.png",
-    "client/assets/backgrounds/waitingroom2.png",
-    "client/assets/backgrounds/waitingroom3.png",
+        "client/assets/backgrounds/waitingroom1.png",
+        "client/assets/backgrounds/waitingroom2.png",
+        "client/assets/backgrounds/waitingroom3.png",
 };
 
 // Default city

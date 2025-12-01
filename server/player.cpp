@@ -51,11 +51,13 @@ b2Body* Player::get_car_body() const {
     return nullptr;
 }
 
-CarPositionDTO Player::get_car_position() const {
+CarPositionDTO Player::get_car_position(const RaceDTO& race) const {
 
     if (car) {
         CarPositionDTO actual = car->get_position_dto();
         actual.next = this->next;
+        actual.current_lap = n_lap;
+        actual.race_lap = race.laps;
         return actual;
     }
     return CarPositionDTO(client_id, 0, 0, 0);

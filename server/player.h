@@ -56,7 +56,7 @@ public:
     uint32_t get_client_id() const;
     const std::string& get_username() const;
     const CarDTO get_car() const;
-    CarPositionDTO get_car_position() const;
+    CarPositionDTO get_car_position(const RaceDTO& race) const;
     b2Body* get_car_body() const;
     CarLayer get_car_layer() const;
     uint32_t get_recorded_time() const;
