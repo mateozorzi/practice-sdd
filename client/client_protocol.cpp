@@ -325,12 +325,9 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
 
 uint32_t ClientProtocol::receive_id() {
 
-    uint8_t action = recv_uint8();
+    uint32_t player_id = recv_uint32();
 
-    while(static_cast<LobbyAction>(action) != LobbyAction::SEND_ID)
-        action = recv_uint8();
-
-    return recv_uint32(); 
+    return player_id; 
 }
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {

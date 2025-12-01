@@ -58,7 +58,6 @@ class Game {
     bool update_race();
     void show_race();
 
-
     void handle_leaderboard_events();
     bool update_leaderboard();
     void show_leaderboard();

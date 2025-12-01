@@ -34,9 +34,6 @@ void Game::run() {
             bool phase_changed = false;
             phase_changed = phase->run();
 
-            if(!receiver.is_alive()) 
-                keep_running = false;
-
             if (phase_changed) {
                 change_phase();
             }
@@ -135,7 +132,7 @@ void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
     game_state.npcs = snapshot.get_npc_positions();
 }
 
-void Game::handle_waiting_events() { this->keep_running = input_handler.handle_waiting(); }
+void Game::handle_waiting_events() { input_handler.handle_waiting(); }
 
 bool Game::update_waiting() {
 
@@ -143,11 +140,18 @@ bool Game::update_waiting() {
     WorldSnapshotDTO last;
     bool got_snapshot = false;
     reset_events();
+    
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
     while (updates.try_pop(dto)) {
 
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+
+            this->keep_running = false;
+            return true;
+        }
         if (dto.gameloop_action == GameLoopAction::START_SHOP) {
+
             game_state.phase = Phase::UPGRADE;
             if (got_snapshot)
                 update_game_state_from_snapshot(last);
@@ -164,7 +168,7 @@ void Game::show_waiting() {
     sdl.show_screen();
 }
 
-void Game::handle_upgrade_events() { this->keep_running = input_handler.handle_buy_events(game_state.player.time); }
+void Game::handle_upgrade_events() { input_handler.handle_buy_events(game_state.player.time); }
 
 bool Game::update_upgrade() {
 
@@ -183,6 +187,12 @@ bool Game::update_upgrade() {
             got_snapshot = false;
         }
 
+
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+
+            this->keep_running = false;
+            return true;
+        }
         if (dto.gameloop_action == GameLoopAction::START_COUNTDOWN) {
 
             game_state.phase = Phase::COUNTDOWN;
@@ -226,7 +236,7 @@ void Game::show_upgrade() {
     sdl.show_screen();
 }
 
-void Game::handle_countdown_events() { this->keep_running = input_handler.handle_countdown(); }
+void Game::handle_countdown_events() { input_handler.handle_countdown(); }
 
 bool Game::update_countdown() {
 
@@ -241,6 +251,12 @@ bool Game::update_countdown() {
             update_game_state_from_snapshot(last);
         }
 
+
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+
+            this->keep_running = false;
+            return true;
+        }
         if (dto.gameloop_action == GameLoopAction::START_RACE) {
             game_state.phase = Phase::IN_RACE;
             return false;
@@ -266,7 +282,7 @@ void Game::show_countdown() {
 }
 
 
-void Game::handle_race_events() { this->keep_running = input_handler.handle_movement(); }
+void Game::handle_race_events() { input_handler.handle_movement(); }
 
 
 bool Game::update_race() {
@@ -278,6 +294,12 @@ bool Game::update_race() {
 
     while (updates.try_pop(dto)) {
 
+
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+
+            this->keep_running = false;
+            return true;
+        }
         if (dto.gameloop_action == GameLoopAction::LEADERBOARD) {
 
             game_state.phase = Phase::LEADERBOARD;
@@ -325,7 +347,7 @@ void Game::show_race() {
     sdl.show_screen();
 }
 
-void Game::handle_leaderboard_events() { this->keep_running = input_handler.handle_leaderboard(); }
+void Game::handle_leaderboard_events() { input_handler.handle_leaderboard(); }
 
 bool Game::update_leaderboard() {
 
@@ -333,6 +355,12 @@ bool Game::update_leaderboard() {
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (updates.try_pop(dto)) {
 
+
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+
+            this->keep_running = false;
+            return true;
+        }
         if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
 
             game_state.phase = Phase::GAME_FINISHED;
@@ -360,7 +388,7 @@ void Game::show_leaderboard() {
     sdl.show_screen();
 }
 
-void Game::handle_game_finished_events() { this->keep_running = input_handler.handle_game_finished(); }
+void Game::handle_game_finished_events() { input_handler.handle_game_finished(); }
 
 bool Game::update_game_finished() {
 
@@ -371,7 +399,6 @@ bool Game::update_game_finished() {
         if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
 
             this->keep_running = false;
-            input_handler.handle_disconnect();
             return true;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
 

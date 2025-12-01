@@ -22,9 +22,6 @@ enum class LobbyAction : uint8_t {
     CREATE_OR_JOIN_ERROR = 0x11,
     MIN_PLAYERS_ERROR = 0x12,
     MAX_PLAYERS_ERROR = 0x13,
-
-    SEND_ID = 0x99,
-
 };
 
 
