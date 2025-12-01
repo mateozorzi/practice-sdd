@@ -259,6 +259,9 @@ void GameLoop::handle_countdown_phase() {
     auto elapsed_time = now - *phase_start;
 
     process_commands_in_countdown_phase();
+    update_positions(selected_races.races[current_race_index], 0);
+
+    box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
     if (elapsed_time >= countdown_seconds) {
 
@@ -366,8 +369,6 @@ void GameLoop::handle_game_finished_phase() {
     process_commands_in_game_finished_phase();
 
     if (elapsed_time >= game_finish_seconds) {
-
-        std::cout << "[" << GAME_LOOP << "] Disconnecting all players." << std::endl;
 
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
         game_monitor.broadcast(game_update);
@@ -512,7 +513,9 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
 
     // Update NPC positions
     for (auto& npc: npcs) {
-        npc.update();
+        if (current_phase == GamePhase::IN_RACE) {
+            npc.update();
+        }
         world_snapshot.add_npc_position(npc.get_position());
     }
 

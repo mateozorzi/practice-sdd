@@ -244,6 +244,7 @@ bool Game::update_countdown() {
 
         if (got_snapshot) {
             update_game_state_from_snapshot(last);
+            got_snapshot = false;
         }
 
 
@@ -354,11 +355,13 @@ bool Game::update_leaderboard() {
         if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
 
             this->keep_running = false;
+            sdl.close_leaderboard();
             return true;
         }
         if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
 
             game_state.phase = Phase::GAME_FINISHED;
+            sdl.close_leaderboard();
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
 
@@ -366,6 +369,7 @@ bool Game::update_leaderboard() {
 
                 LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
                 leaderboard = std::move(leaderboard_recv);
+                sdl.open_leaderboard();
             }
         } else if (dto.gameloop_action == GameLoopAction::START_SHOP) {
 
@@ -394,6 +398,7 @@ bool Game::update_game_finished() {
         if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
 
             this->keep_running = false;
+            sdl.close_leaderboard();
             return true;
         } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
 
@@ -401,6 +406,7 @@ bool Game::update_game_finished() {
 
                 LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
                 leaderboard = std::move(leaderboard_recv);
+                sdl.open_leaderboard();
             }
         }
     }

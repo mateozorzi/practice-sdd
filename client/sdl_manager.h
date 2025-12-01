@@ -20,6 +20,7 @@
 #include "camera.h"
 #include "client_constants.h"
 #include "game_state.h"
+#include "leaderboard_info.h"
 #include "resource_manager.h"
 #include "sounds.h"
 #include "upgrade_shop.h"
@@ -53,6 +54,7 @@ private:
     std::string map_name;
     std::string decoration;
     std::string bridges;
+    LeaderboardInfo leaderboard_info;
 
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
@@ -107,6 +109,11 @@ public:
     void close_shop();
     bool is_shop_open();
     void toggle_shop();
+
+    void close_leaderboard();
+    void open_leaderboard();
+    bool is_leaderboard_open();
+
     void play_upgrade_sound();
     void render_players(double scale_x, double scale_y, const SDL2pp::Rect& view_rect,
                         const CarPositionDTO& my_car, const PlayerInfo& my_player,
