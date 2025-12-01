@@ -209,20 +209,6 @@ void GameLoop::process_commands_in_game_finished_phase() {
     }
 }
 
-void GameLoop::process_commands_in_return_to_lobby_phase() {
-    GameCommand game_command;
-    while (command_queue.try_pop(game_command)) {
-
-        ClientAction action = game_command.get_client_action();
-
-        if (action == ClientAction::DISCONNECT) {
-
-            handle_disconnection(game_command);
-            continue;
-        }
-    }
-}
-
 
 void GameLoop::handle_waiting_car_selection_phase() {
 
@@ -379,23 +365,16 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands_in_game_finished_phase();
 
-
     if (elapsed_time >= game_finish_seconds) {
-        phase_start = std::nullopt;
-        std::cout << "[" << GAME_LOOP << "] Switching to return to lobby phase." << std::endl;
-        current_phase = GamePhase::RETURN_TO_LOBBY;
+
+        std::cout << "[" << GAME_LOOP << "] Disconnecting all players." << std::endl;
 
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
         game_monitor.broadcast(game_update);
+
+        game_monitor.stop();
     }
     fixed_sleep(now);
-}
-
-void GameLoop::handle_return_to_lobby() {
-    // disconnect all players
-    if (!players.empty()) {
-        process_commands_in_return_to_lobby_phase();
-    }
 }
 
 
@@ -789,9 +768,6 @@ void GameLoop::run() {
                     break;
                 case (GamePhase::GAME_FINISHED):
                     handle_game_finished_phase();
-                    break;
-                case (GamePhase::RETURN_TO_LOBBY):
-                    handle_return_to_lobby();
                     break;
             }
         }
