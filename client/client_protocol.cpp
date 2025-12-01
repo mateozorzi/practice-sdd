@@ -184,7 +184,8 @@ PlayerDTO ClientProtocol::receive_player() {
     const uint16_t health = recv_uint16();
     const bool dead = static_cast<bool>(recv_uint8());
     const uint16_t max_health = recv_uint16();
-    return PlayerDTO(username, id, car, health, dead, max_health);
+    const bool finish_race = static_cast<bool>(recv_uint8());
+    return PlayerDTO(username, id, car, health, dead, max_health, finish_race);
 }
 
 WorldSnapshotDTO ClientProtocol::receive_update_positions() {

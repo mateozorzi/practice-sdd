@@ -24,6 +24,7 @@ struct PlayerInfo {
     bool crashed = false;
     CarLayer layer = CarLayer::ON_GROUND;
     CheckpointDTO checkpoint = CheckpointDTO{};
+    bool finish_race = false;
 };
 
 struct LocalInfo {

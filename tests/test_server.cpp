@@ -152,7 +152,7 @@ TEST_F(ServerProtocolTest, send_car_catalogue) {
 
 TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     WorldSnapshotDTO world_snapshot;
-    PlayerDTO player1("player1", 1001, CarDTO("ModelX"), 200, false, 200);
+    PlayerDTO player1("player1", 1001, CarDTO("ModelX"), 200, false, 200, false);
     CarPositionDTO car_position1(100, 150, 90, 200, CheckpointDTO(1, 'H', 1001, 1001, 20, 30),
                                  CarLayer::ON_GROUND);
     world_snapshot.add_car_position(player1, car_position1);

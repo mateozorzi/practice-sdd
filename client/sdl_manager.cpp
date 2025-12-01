@@ -31,6 +31,11 @@ SDLManager::SDLManager():
         leaderboard_info(renderer, mixer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     load_city(DEFAULT_CITY);
+
+    int idx = std::rand() % WAITING_ROOMS.size();
+    const std::string& selected = WAITING_ROOMS[idx];
+
+    waiting_room_background = &resources.get_texture(selected);
 }
 
 void SDLManager::set_minimap() {
@@ -403,20 +408,45 @@ void SDLManager::render(LocalInfo& game_state) {
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
     // animations.render_explosion(iteration_counter);
 
+    if(my_player.finish_race){
+        render_center_box("You have finished the race!");
+    }
+
     show_screen();
 }
 
 void SDLManager::render_waiting() {
     clear_screen();
+
+    renderer.Copy(*waiting_room_background, SDL2pp::NullOpt, SDL2pp::NullOpt);
+
     const std::string text = "Waiting for players...";
-    SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Color text_color(255, 255, 255, 255); // blanco
+    SDL2pp::Color outline_color(0, 0, 0, 255);    // negro
+
     SDL2pp::Texture& text_texture =
             resources.get_text(text, FONT_PATH, TEXT_WAITING_SIZE, text_color);
+
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+
+    int o = 2; // grosor del borde
+
+    draw_row(text, text_x - o, text_y - o, outline_color, TEXT_WAITING_SIZE);
+    draw_row(text, text_x + o, text_y - o, outline_color, TEXT_WAITING_SIZE);
+    draw_row(text, text_x - o, text_y + o, outline_color, TEXT_WAITING_SIZE);
+    draw_row(text, text_x + o, text_y + o, outline_color, TEXT_WAITING_SIZE);
+
+    draw_row(text, text_x - o, text_y, outline_color, TEXT_WAITING_SIZE);
+    draw_row(text, text_x + o, text_y, outline_color, TEXT_WAITING_SIZE);
+    draw_row(text, text_x, text_y - o, outline_color, TEXT_WAITING_SIZE);
+    draw_row(text, text_x, text_y + o, outline_color, TEXT_WAITING_SIZE);
+
     draw_row(text, text_x, text_y, text_color, TEXT_WAITING_SIZE);
+
     show_screen();
 }
+
 
 void SDLManager::render_countdown(const LocalInfo& game_state) {
     SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
@@ -458,6 +488,21 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
             resources.get_text(text, FONT_PATH, TEXT_COUNTDOWN_SIZE, text_color);
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
+
+    int o = 2; // grosor del borde
+    SDL2pp::Color outline_color(0, 0, 0, 255);    // negro
+
+    draw_row(text, text_x - o, text_y - o, outline_color, TEXT_COUNTDOWN_SIZE);
+    draw_row(text, text_x + o, text_y - o, outline_color, TEXT_COUNTDOWN_SIZE);
+    draw_row(text, text_x - o, text_y + o, outline_color, TEXT_COUNTDOWN_SIZE);
+    draw_row(text, text_x + o, text_y + o, outline_color, TEXT_COUNTDOWN_SIZE);
+
+    draw_row(text, text_x - o, text_y, outline_color, TEXT_COUNTDOWN_SIZE);
+    draw_row(text, text_x + o, text_y, outline_color, TEXT_COUNTDOWN_SIZE);
+    draw_row(text, text_x, text_y - o, outline_color, TEXT_COUNTDOWN_SIZE);
+    draw_row(text, text_x, text_y + o, outline_color, TEXT_COUNTDOWN_SIZE);
+
+
     draw_row(text, text_x, text_y, text_color, TEXT_COUNTDOWN_SIZE);
     renderer.SetDrawBlendMode(prev_blend);
     renderer.SetDrawColor(prev_color);
@@ -468,16 +513,55 @@ void SDLManager::render_leaderboard(const LeaderboardDTO& leaderboard, const std
     leaderboard_info.render(leaderboard, title, map_name, camera);
 }
 
-void SDLManager::render_winner() {
-    clear_screen();
-    const std::string text = "Winner!";
-    SDL2pp::Color text_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
-    SDL2pp::Texture& text_texture =
-            resources.get_text(text, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
-    int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
-    int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
-    draw_row(text, text_x, text_y, text_color, TEXT_LEADERBOARD_SIZE);
-    show_screen();
+void SDLManager::render_center_box(const std::string& message) {
+
+    SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
+    SDL_Color prev_color = renderer.GetDrawColor();
+
+    int rect_w = SCREEN_WIDTH * 1 / 2;
+    int rect_h = SCREEN_HEIGHT * 1 / 6;
+    int rect_x = (SCREEN_WIDTH - rect_w) / 2;
+    int rect_y = (SCREEN_HEIGHT - rect_h) / 2;
+
+    SDL2pp::Rect board_rect(rect_x, rect_y, rect_w, rect_h);
+
+    SDL2pp::Color bg_color(30, 30, 30, 200);   
+    SDL2pp::Color border_color(255, 215, 0, 255);
+    int border = 5;
+
+    // Fondo transparente
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.SetDrawColor(bg_color);
+    renderer.FillRect(board_rect);
+
+    // Bordes
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_NONE);
+    renderer.SetDrawColor(border_color);
+    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, rect_w, border)); // top
+    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y + rect_h - border, rect_w, border)); // bottom
+    renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, border, rect_h)); // left
+    renderer.FillRect(SDL2pp::Rect(rect_x + rect_w - border, rect_y, border, rect_h)); // right
+
+    // Texto
+    SDL2pp::Color text_color(255, 215, 0, 255);
+    SDL2pp::Texture& msg_texture =
+        resources.get_text(message, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+
+    int msg_x = rect_x + (rect_w - msg_texture.GetWidth()) / 2;
+    int msg_y = rect_y + (rect_h - msg_texture.GetHeight()) / 2;
+
+    renderer.Copy(msg_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(msg_x, msg_y,
+                               msg_texture.GetWidth(),
+                               msg_texture.GetHeight()));
+
+    // Restaurar estado
+    renderer.SetDrawBlendMode(prev_blend);
+    renderer.SetDrawColor(prev_color);
+}
+
+void SDLManager::render_finish_race() {
+    render_center_box("You have finished the race!\n Waiting for other players...");
 }
 
 void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,

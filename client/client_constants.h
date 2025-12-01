@@ -98,11 +98,11 @@ constexpr double FULL_CIRCLE_DEGREES = 360.0;
 // Text rendering positions
 constexpr int TEXT_WAITING_X = 700;
 constexpr int TEXT_WAITING_Y = 500;
-constexpr int TEXT_WAITING_SIZE = 48;
+constexpr int TEXT_WAITING_SIZE = 72;
 
 constexpr int TEXT_COUNTDOWN_X = 600;
 constexpr int TEXT_COUNTDOWN_Y = 500;
-constexpr int TEXT_COUNTDOWN_SIZE = 48;
+constexpr int TEXT_COUNTDOWN_SIZE = 72;
 
 constexpr int TEXT_LEADERBOARD_X = 850;
 constexpr int TEXT_LEADERBOARD_Y = 100;
@@ -118,6 +118,12 @@ constexpr const char* MAP_BACKGROUND_SUFFIX = ".png";
 constexpr const char* DECORATIONS_PREFIX = "server/world/decorations_";
 constexpr const char* BRIDGES_PREFIX = "server/world/bridges_";
 constexpr const char* JSON_SUFFIX = ".json";
+
+static const std::vector<std::string> WAITING_ROOMS = {
+    "client/assets/backgrounds/waitingroom1.png",
+    "client/assets/backgrounds/waitingroom2.png",
+    "client/assets/backgrounds/waitingroom3.png",
+};
 
 // Default city
 constexpr const char* DEFAULT_CITY = "Liberty City";

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include <nlohmann/json.hpp>
 
@@ -55,6 +56,7 @@ private:
     std::string decoration;
     std::string bridges;
     LeaderboardInfo leaderboard_info;
+    SDL2pp::Texture* waiting_room_background;
 
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
@@ -96,7 +98,8 @@ public:
     void render_waiting();
     void render_countdown(const LocalInfo& game_state);
     void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title);
-    void render_winner();
+    void render_center_box(const std::string& text);
+    void render_finish_race();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
