@@ -1,11 +1,11 @@
 #ifndef SDL_MANAGER_H
 #define SDL_MANAGER_H
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <memory>
 
 #include <nlohmann/json.hpp>
 
@@ -102,7 +102,7 @@ public:
     void render_finish_race();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
-    void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
+    void render_stats(const PlayerInfo& player);
     nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);
 

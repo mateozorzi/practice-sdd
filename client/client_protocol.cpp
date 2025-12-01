@@ -161,8 +161,10 @@ CarPositionDTO ClientProtocol::receive_car_position() {
     const uint32_t angle = recv_uint32();
     const CheckpointDTO next = receive_checkpoint();
     const uint8_t layer = recv_uint8();
+    const uint8_t current_lap = recv_uint8();
+    const uint8_t race_lap = recv_uint8();
     return CarPositionDTO(client_id, x_position, y_position, angle, next,
-                          static_cast<CarLayer>(layer));
+                          static_cast<CarLayer>(layer), current_lap, race_lap);
 }
 
 std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {

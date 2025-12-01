@@ -508,7 +508,7 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
 
         player.update_car_position(race, elapsed_seconds);
         PlayerDTO player_dto = player.get_info();
-        world_snapshot.add_car_position(player_dto, player.get_car_position());
+        world_snapshot.add_car_position(player_dto, player.get_car_position(race));
     }
 
     // Update NPC positions
