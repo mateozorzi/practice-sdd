@@ -21,13 +21,12 @@
 
 void ClientProtocol::ask_for_race_catalogue() {
 
-    std::cout << "Requesting race catalogue from server..." << std::endl;
     add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::LIST_RACES));
     add_uint32_to_buffer(0);
     add_string_to_buffer("");
     add_uint8_to_buffer(0);
     add_uint8_to_buffer(0);
-    add_uint8_to_buffer(0);  // race = 0
+    add_uint8_to_buffer(0);
     send_buffer();
 }
 
@@ -276,12 +275,14 @@ LobbyDTO ClientProtocol::receive_lobby() {
 LobbyCatalogueDTO ClientProtocol::receive_lobby_catalogue() {
 
     uint8_t size = recv_uint8();
-    std::cout << "Received lobby catalogue of size: " << static_cast<int>(size) << std::endl;
     std::vector<LobbyDTO> lobbies;
+
     for (uint8_t i = 0; i < size; ++i) {
+
         LobbyDTO lobby = receive_lobby();
         lobbies.push_back(lobby);
     }
+
     return LobbyCatalogueDTO(std::move(lobbies));
 }
 
@@ -314,37 +315,31 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
 
     uint8_t size = recv_uint8();
     std::vector<RaceDTO> races;
-    for (uint8_t i = 0; i < size; ++i) {
-        races.push_back(receive_race());
-    }
-    std::cout << "Received race catalogue of size: " << static_cast<int>(size) << std::endl;
+
+    for (uint8_t i = 0; i < size; ++i) races.push_back(receive_race());
+
 
     return RaceCatalogueDTO(std::move(races));
 }
 
-uint32_t ClientProtocol::receive_id() { 
-    uint8_t action = recv_uint8();
-    while(static_cast<LobbyAction>(action) != LobbyAction::SEND_ID) {
-        std::cout << "[ClientProtocol] Waiting for SEND_ID action, received: " << static_cast<int>(action) << std::endl;
-        action = recv_uint8();
-    }
-    return recv_uint32(); 
+uint32_t ClientProtocol::receive_id() {
+
+    uint32_t player_id = recv_uint32();
+
+    return player_id;
 }
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
 
-    // Send request for JSON file
     add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_JSON_FILE));
     add_string_to_buffer(file_path);
     send_buffer();
 
-    // Receive JSON content as string
     std::string json_content = recv_string();
 
     std::cout << "LOADING JSON: " << file_path << "\n";
     std::cout << "JSON SIZE: " << json_content.size() << "\n";
 
-    // Parse and return JSON
     return nlohmann::json::parse(json_content);
 }
 

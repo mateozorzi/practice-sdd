@@ -8,13 +8,13 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../common/leaderboard_dto.h"
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
 #include "common/npc_dto.h"
 #include "common/player_dto.h"
-#include "../common/leaderboard_dto.h"
 
 #include "animations.h"
 #include "camera.h"
@@ -60,21 +60,21 @@ private:
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
 
-    SDL2pp::Rect get_car_sprite_rect(const std::string &model) const;
+    SDL2pp::Rect get_car_sprite_rect(const std::string& model) const;
 
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving,
                        const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
                        SDL2pp::Texture& cars_texture);
-    void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
-                    SDL2pp::Texture& cars_texture);
+    void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
+                    double scale_y, SDL2pp::Texture& cars_texture);
     void render_hud_health(int health, int max_health);
     void render_hud_minimap(int player_x, int player_y);
     void render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view_rect,
-                     double scale_x, double scale_y, SDL2pp::Texture& map_texture);
+                      double scale_x, double scale_y, SDL2pp::Texture& map_texture);
     void render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
-                       SDL2pp::Texture& map_texture);
+                        SDL2pp::Texture& map_texture);
     void render_decorations(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
-                           SDL2pp::Texture& map_texture);
+                            SDL2pp::Texture& map_texture);
     void render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view_rect,
                             double scale_x, double scale_y);
     double calculate_angle_to_checkpoint(const CarPositionDTO& player,
@@ -93,7 +93,7 @@ public:
     void render(LocalInfo& game_state);
     void render_waiting();
     void render_countdown(const LocalInfo& game_state);
-    void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string title);
+    void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title);
     void render_winner();
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
@@ -110,8 +110,8 @@ public:
     void play_upgrade_sound();
     void render_players(double scale_x, double scale_y, const SDL2pp::Rect& view_rect,
                         const CarPositionDTO& my_car, const PlayerInfo& my_player,
-                        const LocalInfo& game_state, SDL2pp::Texture& cars_texture, SDL2pp::Texture& map,
-                        SDL2pp::Texture& arrow_texture);
+                        const LocalInfo& game_state, SDL2pp::Texture& cars_texture,
+                        SDL2pp::Texture& map, SDL2pp::Texture& arrow_texture);
 };
 
 #endif

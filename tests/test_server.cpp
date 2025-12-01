@@ -174,8 +174,8 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
                            SIZE_UINT32_T + player1.username.size() + SIZE_UINT32_T + SIZE_UINT32_T +
                            player1.car.model.size() + SIZE_UINT16_T + SIZE_UINT8_T +  // player1
                            4 * SIZE_UINT32_T + SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT8_T +
-                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T + // car position1
-                           SIZE_UINT8_T;  //NPC size (0)
+                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T +  // car position1
+                           SIZE_UINT8_T;                           // NPC size (0)
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
     // verify_data
@@ -649,13 +649,11 @@ TEST_F(ServerProtocolTest, ReceiveLobbyInfo) {
 
 TEST_F(ServerProtocolTest, ReceiveUsername) {
     // push mock data
-    std::vector<uint8_t> mock_data{
-            0x07,                                  // action
-            0x00, 0x00, 0x00, 0x00,                // client id 1
-            0x00, 0x00, 0x00, 0x07,                // username size 7
-            'P',  'l',  'a',  'y',  'e', 'r', '1',  // username "Player1"
-            0x00, 0x00, 0x00
-    };
+    std::vector<uint8_t> mock_data{0x07,                                   // action
+                                   0x00, 0x00, 0x00, 0x00,                 // client id 1
+                                   0x00, 0x00, 0x00, 0x07,                 // username size 7
+                                   'P',  'l',  'a',  'y',  'e', 'r', '1',  // username "Player1"
+                                   0x00, 0x00, 0x00};
 
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);
     size_t read_pos = 0;

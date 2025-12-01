@@ -38,8 +38,11 @@ void Receiver::run() {
 
             command_queue.push(GameCommand(player_id, std::move(game_command)));
 
-            if (game_command.client_action == ClientAction::DISCONNECT)
+            if (game_command.client_action == ClientAction::DISCONNECT) {
+
+                _is_alive = false;
                 break;
+            }
         }
     } catch (const LibError& e) {
 
@@ -52,11 +55,10 @@ void Receiver::run() {
 
 void Receiver::stop() {
 
-    if (_keep_running) {
-
+    if (_keep_running)
         _keep_running = false;
-    }
 }
+
 
 Receiver::~Receiver() {
 

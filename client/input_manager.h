@@ -1,5 +1,7 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
+
+
 #include <SDL2/SDL_events.h>
 
 #include "sdl_manager.h"
@@ -8,7 +10,7 @@
 
 
 class InputManager {
-private:
+
     SDLManager& sdl;
     Sender sender;
 
@@ -17,29 +19,31 @@ private:
     bool s = false;
     bool d = false;
     bool click_buy = false;
+    bool player_disconnected = false;
 
-    bool handle_keydown(const SDL_Event& event);
-    bool handle_keyup(const SDL_Event& event);
-    bool handle_click(const SDL_Event& event, int time);
-    bool handle_shop_movement(const SDL_Event& event, int time);
+    void try_move(bool& movement, MovementDTO move);
+    void try_stop(bool& movement, MovementDTO move);
 
-    bool try_move(bool& movement, MovementDTO move);
-    bool try_stop(bool& movement, MovementDTO move);
+    void handle_keydown(const SDL_Event& event);
+    void handle_keyup(const SDL_Event& event);
+    void handle_click(const SDL_Event& event, int time);
+    void handle_shop_movement(const SDL_Event& event, int time);
+
 
 public:
     explicit InputManager(SDLManager& sdl, ClientProtocol& protocol);
-    bool handle_waiting();
-    bool handle_movement();
-    bool handle_buy_events(int time);
-    bool handle_countdown();
-    bool handle_leaderboard();
-    bool handle_game_finished();
+    void handle_waiting();
+    void handle_buy_events(int time);
+    void handle_countdown();
+    void handle_movement();
+    void handle_leaderboard();
+    void handle_game_finished();
     bool is_moving() const;
     void handle_disconnect();
     void handle_cheat_race_winner();
     void handle_cheat_game_winner();
     void handle_infinite_health();
-    bool handle_cheats(const SDL_Event& event);
+    void handle_cheats(const SDL_Event& event);
     ~InputManager();
 };
 

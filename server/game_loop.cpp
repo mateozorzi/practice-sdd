@@ -107,14 +107,15 @@ void GameLoop::process_commands_in_countdown_phase() {
     }
 }
 
-void GameLoop::handle_cheat_win_race(const GameCommand& game_command, const uint32_t elapsed_seconds) {
-    //finish race to the player to send the leaderboard
-    //to the rest finish race with timeout time
+void GameLoop::handle_cheat_win_race(const GameCommand& game_command,
+                                     const uint32_t elapsed_seconds) {
+    // finish race to the player to send the leaderboard
+    // to the rest finish race with timeout time
     uint32_t player_id = game_command.get_player_id();
-    for (auto& [id, player] : players) {
+    for (auto& [id, player]: players) {
         if (id != player_id) {
             player.finish_race();
-            //convert race_timeout to uint32_t seconds
+            // convert race_timeout to uint32_t seconds
             uint32_t race_timeout = static_cast<uint32_t>(race_timeout_seconds.count());
             player.record_time(race_timeout);
         } else {
@@ -124,12 +125,12 @@ void GameLoop::handle_cheat_win_race(const GameCommand& game_command, const uint
     }
 }
 
-void GameLoop::handle_cheat_win_game(const GameCommand& game_command, const uint32_t elapsed_seconds) {
-    //clean the leaderboard vector. Finish the race for all players with timeout time except for the cheater
-    //activate the flag to finish the game after leaderboard
+void GameLoop::handle_cheat_win_game(const GameCommand& game_command,
+                                     const uint32_t elapsed_seconds) {
+
     handle_cheat_win_race(game_command, elapsed_seconds);
     leaderboards.clear();
-    LeaderboardDTO leaderboard = create_leaderboard();
+    create_leaderboard();
     cheat_game_winner_activated = true;
 }
 
@@ -158,15 +159,18 @@ void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
             handle_car_movement(game_command);
             continue;
         } else if (action == ClientAction::CHEAT_WIN_RACE) {
-            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id() << " used cheat: WIN_RACE" << std::endl;
+            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id()
+                      << " used cheat: WIN_RACE" << std::endl;
             handle_cheat_win_race(game_command, elapsed_seconds);
             continue;
         } else if (action == ClientAction::CHEAT_WIN_GAME) {
-            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id() << " used cheat: WIN_GAME" << std::endl;
+            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id()
+                      << " used cheat: WIN_GAME" << std::endl;
             handle_cheat_win_game(game_command, elapsed_seconds);
             continue;
         } else if (action == ClientAction::CHEAT_INFINITE_HEALTH) {
-            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id() << " used cheat: INFINITE_HEALTH" << std::endl;
+            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id()
+                      << " used cheat: INFINITE_HEALTH" << std::endl;
             handle_cheat_infinite_health(game_command);
             continue;
         }
@@ -228,7 +232,6 @@ void GameLoop::handle_waiting_car_selection_phase() {
 
     if (all_player_in_game() && players.size() == max_players) {
 
-        std::cerr << "[" << GAME_LOOP << "] Switching to upgrade shop phase." << std::endl;
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
 
@@ -252,14 +255,12 @@ void GameLoop::handle_upgrade_shop_phase() {
 
     if (elapsed >= upgrade_shop_seconds) {
 
-        std::cerr << "[" << GAME_LOOP << "] Switching to countdown phase." << std::endl;
         current_phase = GamePhase::COUNTDOWN;
         phase_start = std::nullopt;
         update_positions(selected_races.races[current_race_index], 0);
 
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
         game_monitor.broadcast(game_update);
-
     }
 
     fixed_sleep(now);
@@ -275,7 +276,6 @@ void GameLoop::handle_countdown_phase() {
 
     if (elapsed_time >= countdown_seconds) {
 
-        std::cerr << "[" << GAME_LOOP << "] Switching to in race phase." << std::endl;
         current_phase = GamePhase::IN_RACE;
         phase_start = std::nullopt;
 
@@ -308,7 +308,8 @@ void GameLoop::handle_in_race_phase() {
         phase_start = std::nullopt;
 
         if (cheat_game_winner_activated) {
-            std::cerr << "[" << GAME_LOOP << "] Cheat WIN_GAME activated. Finishing game." << std::endl;
+            std::cerr << "[" << GAME_LOOP << "] Cheat WIN_GAME activated. Finishing game."
+                      << std::endl;
             current_phase = GamePhase::GAME_FINISHED;
             final_leaderboard = create_final_leaderboard();
 
@@ -319,7 +320,7 @@ void GameLoop::handle_in_race_phase() {
             game_monitor.broadcast(l);
 
         } else {
-            std::cerr << "[" << GAME_LOOP << "] Switching to leaderboard phase." << std::endl;
+
             current_phase = GamePhase::LEADERBOARD;
             LeaderboardDTO leaderboard = create_leaderboard();
             (void)leaderboard;
@@ -356,7 +357,7 @@ void GameLoop::handle_leaderboard_phase() {
 
             set_race(selected_races.races[current_race_index]);
         } else {
-            std::cout << "[" << GAME_LOOP << "] Switching to game finished phase." << std::endl;
+
             current_phase = GamePhase::GAME_FINISHED;
             final_leaderboard = create_final_leaderboard();
 
@@ -406,8 +407,7 @@ void GameLoop::remove_player(const uint32_t player_id) {
         players.erase(it);
 
     std::cerr << "[" << GAME_LOOP << "] "
-              << "Player with ID: " << player_id << " has been removed from the Game World."
-              << std::endl;
+              << "Removing player with ID: " << player_id << std::endl;
 }
 
 bool GameLoop::is_full() const { return players.size() >= max_players; }
@@ -432,10 +432,9 @@ bool GameLoop::has_player(const uint32_t player_id) const {
 
     if (it != players.end())
         return true;
-    
-    return false;;   
-}
 
+    return false;
+}
 
 
 void GameLoop::add_player(const uint32_t player_id, const std::string& username) {
@@ -506,8 +505,6 @@ void GameLoop::handle_disconnection(const GameCommand& game_command) {
 
     GameUpdateDTO return_to_lobby(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
     game_monitor.send_update_to_player(return_to_lobby, game_command.get_player_id());
-
-    std::cerr << "Sent 'Return to Lobby' action to the player with ID: " << game_command.get_player_id() << std::endl;
 
     game_monitor.unregister_player(game_command.get_player_id());
 }
