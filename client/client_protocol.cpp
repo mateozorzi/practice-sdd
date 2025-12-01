@@ -316,9 +316,8 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
     uint8_t size = recv_uint8();
     std::vector<RaceDTO> races;
 
-    for (uint8_t i = 0; i < size; ++i)
-        races.push_back(receive_race());
-    
+    for (uint8_t i = 0; i < size; ++i) races.push_back(receive_race());
+
 
     return RaceCatalogueDTO(std::move(races));
 }
@@ -327,7 +326,7 @@ uint32_t ClientProtocol::receive_id() {
 
     uint32_t player_id = recv_uint32();
 
-    return player_id; 
+    return player_id;
 }
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {

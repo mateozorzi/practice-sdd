@@ -1,14 +1,13 @@
 #include "game.h"
 
-
 #include <utility>
 
-
+#include "../common/client_event_dto.h"
 #include "../common/constants.h"
+#include "../common/leaderboard_dto.h"
 #include "../common/queue.h"
 #include "../common/race_dto.h"
-#include "../common/client_event_dto.h"
-#include "../common/leaderboard_dto.h"
+
 #include "sender.h"
 
 
@@ -65,7 +64,7 @@ void Game::reset_events() {
 void Game::detect_events(const WorldSnapshotDTO& snapshot) {
 
     for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
-    
+
         const uint32_t& id = playerDTO.id;
         auto it = game_state.players.find(id);
 
@@ -120,7 +119,7 @@ void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
     game_state.players.clear();
 
     for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
-    
+
         if (playerDTO.username == game_state.player.model || playerDTO.id == game_state.player.id) {
 
             update_player(playerDTO, carPos);
@@ -137,10 +136,8 @@ void Game::handle_waiting_events() { input_handler.handle_waiting(); }
 bool Game::update_waiting() {
 
     GameUpdateDTO dto;
-    WorldSnapshotDTO last;
-    bool got_snapshot = false;
     reset_events();
-    
+
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
 
     while (updates.try_pop(dto)) {
@@ -153,8 +150,6 @@ bool Game::update_waiting() {
         if (dto.gameloop_action == GameLoopAction::START_SHOP) {
 
             game_state.phase = Phase::UPGRADE;
-            if (got_snapshot)
-                update_game_state_from_snapshot(last);
             return false;
         }
     }

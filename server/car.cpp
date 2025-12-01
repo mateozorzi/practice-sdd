@@ -8,10 +8,13 @@
 
 Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model,
          const CarConfig& config):
-        client_id(client_id), box2d_body(nullptr), config(config), model(model), base_health(config.health) {
+        client_id(client_id),
+        box2d_body(nullptr),
+        config(config),
+        model(model),
+        base_health(config.health) {
 
 
-    
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_dynamicBody;
     box2d_body_definition.position.Set(0.0f, 0.0f);

@@ -37,9 +37,9 @@ const CarDTO Player::get_car() const {
 
     CarDTO empty_car;
 
-    if (car){
+    if (car) {
         return car->get_configuration();
-    }    
+    }
     return empty_car;
 }
 
@@ -93,7 +93,7 @@ void Player::start_race() {
     n_lap = 1;
     race_time = 0;
     dead = false;
-    std::cout<<"car health: "<<car->get_configuration().health<<std::endl;
+    std::cout << "car health: " << car->get_configuration().health << std::endl;
     base_health = car->get_configuration().health;
     health = base_health;
     infinite_health = false;
@@ -249,9 +249,7 @@ void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game
     }
 }
 
-void Player::activate_infinite_health() {
-    infinite_health = true;
-}
+void Player::activate_infinite_health() { infinite_health = true; }
 
 
 bool Player::is_in_game() const { return in_game; }

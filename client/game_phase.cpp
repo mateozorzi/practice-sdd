@@ -11,10 +11,10 @@ GamePhase::GamePhase(Game& game, int starting_it): game(game), it(starting_it), 
 bool GamePhase::run() {
     bool loop = true;
     bool request_phase_change = false;
-    const uint32_t frame_delay = 1000 / FPS_CLIENT;  // Delay en milisegundos para 60 FPS
+    const Uint32 frame_delay = 1000 / FPS_CLIENT;
     while (loop) {
-        uint32_t frame_start = SDL_GetTicks();
-        
+        Uint32 frame_start = SDL_GetTicks();
+
         show_game();
         handle_game_events();
         if (!game.keep_running)
@@ -24,12 +24,11 @@ bool GamePhase::run() {
             loop = false;
         }
 
-        if (!game.keep_running){
+        if (!game.keep_running) {
             break;
         }
-        
-        // Control de frame rate para evitar consumo excesivo de CPU
-        uint32_t frame_time = SDL_GetTicks() - frame_start;
+
+        Uint32 frame_time = SDL_GetTicks() - frame_start;
         if (frame_time < frame_delay) {
             SDL_Delay(frame_delay - frame_time);
         }
@@ -68,6 +67,6 @@ bool LeaderboardPhase::update_game_state() { return game.update_leaderboard(); }
 void LeaderboardPhase::show_game() { game.show_leaderboard(); }
 
 GameFinishedPhase::GameFinishedPhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
-void GameFinishedPhase::handle_game_events() {game.handle_game_finished_events(); }
+void GameFinishedPhase::handle_game_events() { game.handle_game_finished_events(); }
 bool GameFinishedPhase::update_game_state() { return game.update_game_finished(); }
-void GameFinishedPhase::show_game() {game.show_game_finished(); }
+void GameFinishedPhase::show_game() { game.show_game_finished(); }

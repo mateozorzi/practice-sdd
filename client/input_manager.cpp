@@ -1,5 +1,6 @@
 #include "input_manager.h"
 
+
 InputManager::InputManager(SDLManager& sdl, ClientProtocol& protocol): sdl(sdl), sender(protocol) {
     sender.start();
 }
@@ -82,7 +83,7 @@ void InputManager::handle_click(const SDL_Event& event, int time) {
 
         auto opt_button = sdl.interact_button(mouse_x, mouse_y, time);
         if (opt_button.has_value()) {
-    
+
             ButtonType button = opt_button.value();
             sdl.play_upgrade_sound();
 
@@ -128,13 +129,16 @@ void InputManager::handle_waiting() {
 
     while (SDL_PollEvent(&event)) {
 
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT || player_disconnected)
             return;
 
         if (event.type == SDL_KEYDOWN) {
 
-            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q)
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+
                 handle_disconnect();
+                return;
+            }
         }
     }
 }
@@ -145,13 +149,16 @@ void InputManager::handle_buy_events(int time) {
 
     while (SDL_PollEvent(&event)) {
 
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT || player_disconnected)
             return;
 
         if (event.type == SDL_KEYDOWN) {
 
-            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q)
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+
                 handle_disconnect();
+                return;
+            }
         }
 
         handle_click(event, time);
@@ -165,13 +172,16 @@ void InputManager::handle_countdown() {
 
     while (SDL_PollEvent(&event)) {
 
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT || player_disconnected)
             return;
 
         if (event.type == SDL_KEYDOWN) {
 
-            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q)
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+
                 handle_disconnect();
+                return;
+            }
         }
     }
 }
@@ -182,13 +192,16 @@ void InputManager::handle_movement() {
 
     while (SDL_PollEvent(&event)) {
 
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT || player_disconnected)
             return;
 
         if (event.type == SDL_KEYDOWN) {
-    
-            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q)
+
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+
                 handle_disconnect();
+                return;
+            }
 
             handle_cheats(event);
             handle_keydown(event);
@@ -204,14 +217,17 @@ void InputManager::handle_leaderboard() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-    
-        if (event.type == SDL_QUIT)
+
+        if (event.type == SDL_QUIT || player_disconnected)
             return;
 
         if (event.type == SDL_KEYDOWN) {
-    
-            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q)
+
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+
                 handle_disconnect();
+                return;
+            }
         }
     }
 }
@@ -222,13 +238,16 @@ void InputManager::handle_game_finished() {
 
     while (SDL_PollEvent(&event)) {
 
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT || player_disconnected)
             return;
 
         if (event.type == SDL_KEYDOWN) {
 
-            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q)
+            if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) {
+
                 handle_disconnect();
+                return;
+            }
         }
     }
 }
@@ -238,6 +257,7 @@ bool InputManager::is_moving() const { return w || a || s || d; }
 void InputManager::handle_disconnect() {
 
     sender.add_event(ClientActionDTO(ClientAction::DISCONNECT));
+    player_disconnected = true;
 }
 
 void InputManager::handle_cheat_race_winner() {

@@ -65,7 +65,6 @@ void GameMonitor::send_update_to_player(const GameUpdateDTO& info, const uint32_
 }
 
 
-
 void GameMonitor::remove_player(const uint32_t player_id) {
 
     std::lock_guard lock(mtx);

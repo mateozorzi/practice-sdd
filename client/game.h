@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 
-
 #include "client_protocol.h"
 #include "game_phase.h"
 #include "game_state.h"

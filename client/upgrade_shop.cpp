@@ -1,10 +1,9 @@
 #include "upgrade_shop.h"
 
 #include <optional>
-#include <optional>
 
-#include "client_constants.h"
 #include "camera.h"
+#include "client_constants.h"
 
 constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
 constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
@@ -45,7 +44,6 @@ UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
         SDL2pp::Rect button_rect(button_x, button_y, button_width, button_height);
         buttons.push_back({button_rect, buttons_text[i], buttons_type[i]});
     }
-    
 }
 
 void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
@@ -69,7 +67,8 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
     }
 }
 
-void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name, const Camera& camera) {
+void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name,
+                         const Camera& camera) {
     (void)player_time;  // Aumenta segun compre mejoras
     (void)player_car;   // Para poner el auto al lado de botones de mejoras
 
@@ -80,16 +79,15 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
 
     SDL2pp::Texture& map = resources.get_texture(map_name);
     SDL2pp::Rect view_rect = camera.get_view_rect();
-    //in the bacground the city map is rendered, not render all the map, only a portion
+    // in the bacground the city map is rendered, not render all the map, only a portion
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, window_width, window_height));
 
-    SDL2pp::Color shop_color(COLOR_SHOP_BG_R, COLOR_SHOP_BG_G, COLOR_SHOP_BG_B,
-                             COLOR_SHOP_BG_A);
+    SDL2pp::Color shop_color(COLOR_SHOP_BG_R, COLOR_SHOP_BG_G, COLOR_SHOP_BG_B, COLOR_SHOP_BG_A);
     SDL2pp::Color border_color(COLOR_BLACK_R, COLOR_BLACK_G, COLOR_BLACK_B, COLOR_BLACK_A);
     SDL2pp::Color button_color(COLOR_SHOP_BUTTON_R, COLOR_SHOP_BUTTON_G, COLOR_SHOP_BUTTON_B,
                                COLOR_SHOP_BUTTON_A);
     SDL2pp::Color button_hover_color(COLOR_SHOP_BUTTON_HOVER_R, COLOR_SHOP_BUTTON_HOVER_G,
-                                      COLOR_SHOP_BUTTON_HOVER_B, COLOR_SHOP_BUTTON_HOVER_A);
+                                     COLOR_SHOP_BUTTON_HOVER_B, COLOR_SHOP_BUTTON_HOVER_A);
     int border_thickness = SHOP_BORDER_THICKNESS;
 
     // Fondo de tienda
@@ -141,10 +139,11 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
 
         // Texto del boton
         if (!btn.text.empty()) {
-            std::string button_text = btn.text /*+ ": " + std::to_string(btn.cost) + SHOP_SECONDS_TEXT*/;
+            std::string button_text =
+                    btn.text /*+ ": " + std::to_string(btn.cost) + SHOP_SECONDS_TEXT*/;
             SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
-            SDL2pp::Texture& text_texture =
-                    resources.get_text(button_text, font_path, LEADERBOARD_HEADER_FONT_SIZE, text_color);
+            SDL2pp::Texture& text_texture = resources.get_text(
+                    button_text, font_path, LEADERBOARD_HEADER_FONT_SIZE, text_color);
 
             int text_x = btn.rect.x + (btn.rect.w - text_texture.GetWidth()) / 2;
             int text_y = btn.rect.y + (btn.rect.h - text_texture.GetHeight()) / 2;
@@ -156,8 +155,8 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     }
 
     // In the background the city map is rendered
-    //SDL2pp::Texture& map_texture = resources.get_texture(map_name);
-    //renderer.Copy(map_texture, SDL2pp::NullOpt, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
+    // SDL2pp::Texture& map_texture = resources.get_texture(map_name);
+    // renderer.Copy(map_texture, SDL2pp::NullOpt, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
     (void)map_name;
 }
 
