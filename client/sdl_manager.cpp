@@ -14,21 +14,7 @@
 
 #include "client_constants.h"
 #include "game_state.h"
-
-// Constantes para el leaderboard
-constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
-constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
-constexpr int LEADERBOARD_ENTRY_FONT_SIZE = 32;
-constexpr int LEADERBOARD_TITLE_SPACING = 40;
-constexpr int LEADERBOARD_ENTRY_SPACING = 25;
-constexpr int LEADERBOARD_HEADER_ENTRY_SPACING = 50;
-constexpr int LEADERBOARD_SEPARATOR_SPACING = 30;
-
-// Anchos de columnas
-constexpr int COLUMN_POS_WIDTH = 100;
-constexpr int COLUMN_NAME_WIDTH = 200;
-constexpr int COLUMN_TIME_WIDTH = 100;
-constexpr int COLUMN_POINTS_WIDTH = 100;
+#include "leaderboard_info.h"
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
@@ -41,7 +27,8 @@ SDLManager::SDLManager():
         camera(CAMERA_VIEW_WIDTH, CAMERA_VIEW_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT),
         sounds(mixer, resources),
         animations(renderer, camera, resources),
-        shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
+        shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH),
+        leaderboard_info(renderer, mixer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     load_city(DEFAULT_CITY);
 }
@@ -432,6 +419,9 @@ void SDLManager::render_waiting() {
 }
 
 void SDLManager::render_countdown(const LocalInfo& game_state) {
+    SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
+    SDL_Color prev_color = renderer.GetDrawColor();
+
     const PlayerInfo& my_player = game_state.player;
     CarPositionDTO my_car;
     my_car.x_position = my_player.x;
@@ -469,100 +459,13 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
     draw_row(text, text_x, text_y, text_color, TEXT_COUNTDOWN_SIZE);
-    // in the background the city map is rendered
-    // SDL2pp::Texture& map_texture = resources.get_texture(map_name);
-    // renderer.Copy(map_texture, SDL2pp::NullOpt, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
+    renderer.SetDrawBlendMode(prev_blend);
+    renderer.SetDrawColor(prev_color);
     show_screen();
 }
 
 void SDLManager::render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title) {
-    clear_screen();
-
-    const int TABLE_WIDTH =
-            COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH + COLUMN_TIME_WIDTH + COLUMN_POINTS_WIDTH;
-    const int TABLE_START_X = (SCREEN_WIDTH - TABLE_WIDTH) / 2;
-
-    SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
-    SDL2pp::Color header_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
-    SDL2pp::Color entry_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
-
-    // Título
-    SDL2pp::Texture& title_texture =
-            resources.get_text(title, FONT_PATH, LEADERBOARD_TITLE_FONT_SIZE, title_color);
-    int title_x = (SCREEN_WIDTH - title_texture.GetWidth()) / 2;
-    int title_y = 50;
-    renderer.Copy(
-            title_texture, SDL2pp::NullOpt,
-            SDL2pp::Rect(title_x, title_y, title_texture.GetWidth(), title_texture.GetHeight()));
-
-    // Encabezados
-    int header_y = title_y + title_texture.GetHeight() + LEADERBOARD_TITLE_SPACING;
-
-    std::vector<std::string> headers = {"POS", "NAME", "TIME", "PTS"};
-    int current_x = TABLE_START_X;
-
-    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH, COLUMN_TIME_WIDTH,
-                                        COLUMN_POINTS_WIDTH};
-
-    for (size_t i = 0; i < headers.size(); ++i) {
-        SDL2pp::Texture& header_texture = resources.get_text(
-                headers[i], FONT_PATH, LEADERBOARD_HEADER_FONT_SIZE, header_color);
-        renderer.Copy(header_texture, SDL2pp::NullOpt,
-                      SDL2pp::Rect(current_x + 10, header_y, header_texture.GetWidth(),
-                                   header_texture.GetHeight()));
-
-        current_x += column_widths[i];
-    }
-
-    // Entradas
-    int entry_y = header_y + 60;
-
-    for (const auto& entry: leaderboard.players) {
-        current_x = TABLE_START_X;
-
-        // Posición
-        std::string pos_text = std::to_string(entry.position);
-        SDL2pp::Texture& pos_texture =
-                resources.get_text(pos_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
-        renderer.Copy(pos_texture, SDL2pp::NullOpt,
-                      SDL2pp::Rect(current_x + 10, entry_y, pos_texture.GetWidth(),
-                                   pos_texture.GetHeight()));
-        current_x += COLUMN_POS_WIDTH;
-
-        // Nombre
-        SDL2pp::Texture& name_texture = resources.get_text(
-                entry.username, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
-        renderer.Copy(name_texture, SDL2pp::NullOpt,
-                      SDL2pp::Rect(current_x + 10, entry_y, name_texture.GetWidth(),
-                                   name_texture.GetHeight()));
-        current_x += COLUMN_NAME_WIDTH;
-
-        // Tiempo
-        std::string time_text;
-        if (entry.points == 0) {
-            time_text = "DSQ";
-        } else {
-            time_text = std::to_string(entry.total_time) + " seg";
-        }
-        SDL2pp::Texture& time_texture =
-                resources.get_text(time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
-        renderer.Copy(time_texture, SDL2pp::NullOpt,
-                      SDL2pp::Rect(current_x + 10, entry_y, time_texture.GetWidth(),
-                                   time_texture.GetHeight()));
-        current_x += COLUMN_TIME_WIDTH;
-
-        // Puntos
-        std::string points_text = std::to_string(entry.points);
-        SDL2pp::Texture& points_texture = resources.get_text(
-                points_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
-        renderer.Copy(points_texture, SDL2pp::NullOpt,
-                      SDL2pp::Rect(current_x + 10, entry_y, points_texture.GetWidth(),
-                                   points_texture.GetHeight()));
-
-        entry_y += 30;
-    }
-
-    show_screen();
+    leaderboard_info.render(leaderboard, title, map_name, camera);
 }
 
 void SDLManager::render_winner() {
@@ -649,6 +552,10 @@ void SDLManager::close_shop() { shop.close_shop(); }
 bool SDLManager::is_shop_open() { return shop.is_shop_open(); }
 
 void SDLManager::toggle_shop() { shop.toggle_shop(); }
+
+void SDLManager::close_leaderboard() { leaderboard_info.close_leaderboard(); }
+void SDLManager::open_leaderboard() { leaderboard_info.open_leaderboard(); }
+bool SDLManager::is_leaderboard_open() { return leaderboard_info.is_leaderboard_open(); }
 
 void SDLManager::play_upgrade_sound() { sounds.play_upgrade_sound(); }
 
