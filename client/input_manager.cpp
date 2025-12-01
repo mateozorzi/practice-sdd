@@ -288,6 +288,9 @@ void InputManager::handle_cheats(const SDL_Event& event) {
 
 InputManager::~InputManager() {
 
+    if (!player_disconnected)
+        handle_disconnect();
+
     if (sender.is_alive()) {
 
         sender.stop();
