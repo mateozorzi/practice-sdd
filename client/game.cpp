@@ -97,6 +97,7 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
         info.layer = car.layer;
         info.checkpoint = car.next;
         info.model = player.car.model;
+        info.finish_race = player.finish_race;
         return;
     }
 
@@ -112,6 +113,7 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
     info.angle = car.angle;
     info.layer = car.layer;
     info.checkpoint = car.next;
+    info.finish_race = player.finish_race;
 }
 
 void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {

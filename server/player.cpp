@@ -73,7 +73,7 @@ uint32_t Player::get_recorded_time() const { return race_time; }
 
 PlayerDTO Player::get_info() const {
 
-    return PlayerDTO(username, client_id, get_car(), health, dead, base_health);
+    return PlayerDTO(username, client_id, get_car(), health, dead, base_health, has_finish_race);
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
