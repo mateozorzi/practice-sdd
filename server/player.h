@@ -24,7 +24,7 @@ constexpr std::string_view PLAYER = "PLAYER";
 
 class Player {
 
-    uint32_t client_id;
+    uint32_t player_id;
     std::string username;
     std::unique_ptr<Car> car;
     uint16_t health = 0;
@@ -49,11 +49,11 @@ public:
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    explicit Player(uint32_t client_id, const std::string& username);
+    explicit Player(uint32_t player_id, const std::string& username);
 
-    void create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world);
+    void create_car(const std::string& car_model, const ServerConfig& car_config, b2World& box2d_world);
 
-    uint32_t get_client_id() const;
+    uint32_t get_id() const;
     const std::string& get_username() const;
     const CarDTO get_car() const;
     CarPositionDTO get_car_position(const RaceDTO& race) const;

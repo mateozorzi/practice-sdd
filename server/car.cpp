@@ -6,32 +6,32 @@
 
 #include "../common/constants.h"
 
-Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model,
-         const CarConfig& config):
-        client_id(client_id),
+Car::Car(uint32_t player_id, b2World& box2d_world, const std::string& model,
+         const ServerConfig& server_config):
+        player_id(player_id),
         box2d_body(nullptr),
-        config(config),
-        model(model),
-        base_health(config.health) {
+        server_config(server_config),
+        car_config(find_car_config(model, server_config.physics)),
+        base_health(car_config.health) {
 
 
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_dynamicBody;
     box2d_body_definition.position.Set(0.0f, 0.0f);
     box2d_body_definition.angle = 0.0f;
-    box2d_body_definition.linearDamping = config.linear_damping;
-    box2d_body_definition.angularDamping = config.angular_damping;
+    box2d_body_definition.linearDamping = car_config.linear_damping;
+    box2d_body_definition.angularDamping = car_config.angular_damping;
 
     box2d_body = box2d_world.CreateBody(&box2d_body_definition);
 
     b2PolygonShape box2d_polygon_shape;
-    box2d_polygon_shape.SetAsBox(config.width / 2.0f, config.height / 2.0f);
+    box2d_polygon_shape.SetAsBox(car_config.width / 2.0f, car_config.height / 2.0f);
 
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
-    box2d_fixture_definition.density = config.density;
-    box2d_fixture_definition.friction = config.friction;
-    box2d_fixture_definition.restitution = config.restitution;
+    box2d_fixture_definition.density = car_config.density;
+    box2d_fixture_definition.friction = car_config.friction;
+    box2d_fixture_definition.restitution = car_config.restitution;
 
     b2Fixture* box2d_fixture = box2d_body->CreateFixture(&box2d_fixture_definition);
 
@@ -43,8 +43,22 @@ Car::Car(uint32_t client_id, b2World& box2d_world, const std::string& model,
     // Set mass explicitly
     b2MassData mass_data;
     box2d_body->GetMassData(&mass_data);
-    mass_data.mass = config.mass;
+    mass_data.mass = car_config.mass;
     box2d_body->SetMassData(&mass_data);
+}
+
+
+const CarConfig& Car::find_car_config(const std::string& model, const PhysicsConfig& physics) {
+
+    if (model == physics.compact.model)     return physics.compact;
+    if (model == physics.sport.model)       return physics.sport;
+    if (model == physics.convertible.model) return physics.convertible;
+    if (model == physics.sedan.model)       return physics.sedan;
+    if (model == physics.jeep.model)        return physics.jeep;
+    if (model == physics.rally.model)       return physics.rally;
+    if (model == physics.truck.model)       return physics.truck;
+
+    return physics.compact;
 }
 
 
@@ -52,44 +66,40 @@ void Car::set_position_for_race(const std::vector<CheckpointDTO>& checkpoints) {
     CheckpointDTO start_position = checkpoints[0];
     CheckpointDTO second_position = checkpoints[1];
 
-    // cars are placed in the first checkpoint, but facing the second one
-
-    float start_x = static_cast<float>(start_position.x) / PIXELS_PER_METER;
-    float start_y = static_cast<float>(start_position.y) / PIXELS_PER_METER;
+    float start_x = static_cast<float>(start_position.x) / server_config.world.pixels_per_meter;
+    float start_y = static_cast<float>(start_position.y) / server_config.world.pixels_per_meter;
     float angle = 0.0f;
 
-    // first checkpoint is horizontal
     if (start_position.orientation == HORIZONTAL) {
-        // second checkpoint is above or below
 
-        if (second_position.y >= start_position.y) {  // above
+        if (second_position.y >= start_position.y) {
             angle = b2_pi;
             start_y -= 1.0f;
-        } else {  // below
+        } else {
             angle = 0.0f;
             start_y += 1.0f;
         }
-    } else if (start_position.orientation == VERTICAL) {  // first checkpoint is vertical
-        // second checkpoint is to the left or right
-        if (second_position.x <= start_position.x) {  // left
+    } else if (start_position.orientation == VERTICAL) {
+
+        if (second_position.x <= start_position.x) {
             angle = 3.0f * b2_pi / 2.0f;
             start_x += 1.0f;
-        } else {  // right
+        } else {
             angle = b2_pi / 2.0f;
             start_x -= 1.0f;
         }
-    } else {                                         // first checkpoint in intersection
-        if (second_position.y > start_position.y) {  // above
+    } else {
+        if (second_position.y > start_position.y) {
             angle = b2_pi;
             start_y -= 1.0f;
-        } else if (second_position.y < start_position.y) {  // below
+        } else if (second_position.y < start_position.y) {
             angle = 0.0f;
             start_y += 1.0f;
-        } else {                                         // same y, must be left or right
-            if (second_position.x < start_position.x) {  // left
+        } else {
+            if (second_position.x < start_position.x) {
                 angle = 3.0f * b2_pi / 2.0f;
                 start_x += 1.0f;
-            } else {  // right
+            } else {
                 angle = b2_pi / 2.0f;
                 start_x -= 1.0f;
             }
@@ -104,20 +114,20 @@ void Car::detect_linear_movement() {
 
     b2Vec2 forward_vector = box2d_body->GetWorldVector(b2Vec2(0.0f, 1.0f));
 
-    b2Vec2 force = box2d_body->GetMass() * config.acceleration * forward_vector;
+    b2Vec2 force = box2d_body->GetMass() * car_config.acceleration * forward_vector;
 
     if (moving_up)
         box2d_body->ApplyForceToCenter(-force, true);
 
     if (moving_down)
-        box2d_body->ApplyForceToCenter(config.braking_factor * force, true);
+        box2d_body->ApplyForceToCenter(car_config.braking_factor * force, true);
 
     b2Vec2 velocity = box2d_body->GetLinearVelocity();
     float current_speed = velocity.Length();
 
-    if (current_speed > config.max_speed) {
+    if (current_speed > car_config.max_speed) {
 
-        float scale = config.max_speed / current_speed;
+        float scale = car_config.max_speed / current_speed;
         b2Vec2 limited_velocity(scale * velocity);
         box2d_body->SetLinearVelocity(limited_velocity);
     }
@@ -128,12 +138,12 @@ void Car::detect_rotation() {
     b2Vec2 velocity = box2d_body->GetLinearVelocity();
     float current_speed = velocity.Length();
 
-    if (current_speed > config.min_turn_speed) {
+    if (current_speed > car_config.min_turn_speed) {
 
         if (moving_left)
-            box2d_body->ApplyTorque(-config.turn_torque, true);
+            box2d_body->ApplyTorque(-car_config.turn_torque, true);
         if (moving_right)
-            box2d_body->ApplyTorque(config.turn_torque, true);
+            box2d_body->ApplyTorque(car_config.turn_torque, true);
     }
 }
 
@@ -143,7 +153,7 @@ void Car::detect_drifting() {
     b2Vec2 velocity = box2d_body->GetLinearVelocity();
 
     b2Vec2 lateral_velocity = b2Dot(velocity, right_vector) * right_vector;
-    b2Vec2 lateral_impulse = -config.drift_factor * box2d_body->GetMass() * lateral_velocity;
+    b2Vec2 lateral_impulse = -car_config.drift_factor * box2d_body->GetMass() * lateral_velocity;
 
     box2d_body->ApplyLinearImpulseToCenter(lateral_impulse, true);
 }
@@ -177,13 +187,20 @@ void Car::update_position() {
     detect_drifting();
 }
 
+
+uint16_t Car::get_max_health() const {
+
+    return car_config.health;
+}
+
+
 CarPositionDTO Car::get_position_dto() const {
 
     b2Vec2 position_meters = box2d_body->GetPosition();
     float angle_radians = box2d_body->GetAngle();
 
-    uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * PIXELS_PER_METER);
-    uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * PIXELS_PER_METER);
+    uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * server_config.world.pixels_per_meter);
+    uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * server_config.world.pixels_per_meter);
 
     float angle_degrees_float = angle_radians * (180.0f / b2_pi);
 
@@ -196,13 +213,13 @@ CarPositionDTO Car::get_position_dto() const {
     if (angle_degrees >= 360)
         angle_degrees = 0;
 
-    return CarPositionDTO(client_id, x_pixels, y_pixels, angle_degrees, CheckpointDTO(), car_layer);
+    return CarPositionDTO(player_id, x_pixels, y_pixels, angle_degrees, CheckpointDTO(), car_layer);
 }
 
 
 const CarDTO Car::get_configuration() const {
 
-    CarDTO car_configuration(model, base_health, 0, 0, 0);
+    CarDTO car_configuration(car_config.model, base_health, 0, 0, 0);
     return car_configuration;
 }
 
@@ -220,27 +237,27 @@ void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_co
 
     if (upgrade.upgrade == ButtonType::Speed) {
 
-        std::cout << "Upgrading speed for player id: " << client_id << std::endl;
-        std::cout << "Current speed: " << config.max_speed << std::endl;
-        config.max_speed += static_cast<float>(game_config.speed_upgrade);
-        std::cout << "New speed: " << config.max_speed << std::endl;
+        std::cout << "Upgrading speed for player id: " << player_id << std::endl;
+        std::cout << "Current speed: " << car_config.max_speed << std::endl;
+        car_config.max_speed += static_cast<float>(game_config.speed_upgrade);
+        std::cout << "New speed: " << car_config.max_speed << std::endl;
     } else if (upgrade.upgrade == ButtonType::Acceleration) {
 
-        std::cout << "Upgrading acceleration for player id: " << client_id << std::endl;
-        std::cout << "Current acceleration: " << config.acceleration << std::endl;
-        config.acceleration += static_cast<float>(game_config.acceleration_upgrade);
-        std::cout << "New acceleration: " << config.acceleration << std::endl;
+        std::cout << "Upgrading acceleration for player id: " << player_id << std::endl;
+        std::cout << "Current acceleration: " << car_config.acceleration << std::endl;
+        car_config.acceleration += static_cast<float>(game_config.acceleration_upgrade);
+        std::cout << "New acceleration: " << car_config.acceleration << std::endl;
     } else if (upgrade.upgrade == ButtonType::Handling) {
 
-        std::cout << "Upgrading handling for player id: " << client_id << std::endl;
-        std::cout << "Current turn_torque: " << config.turn_torque << std::endl;
-        std::cout << "Current drift_factor: " << config.drift_factor << std::endl;
+        std::cout << "Upgrading handling for player id: " << player_id << std::endl;
+        std::cout << "Current turn_torque: " << car_config.turn_torque << std::endl;
+        std::cout << "Current drift_factor: " << car_config.drift_factor << std::endl;
 
-        config.turn_torque += static_cast<float>(game_config.handling_upgrade) * 0.0001f;
-        config.drift_factor = std::max(0.0f, config.drift_factor - 0.05f);
+        car_config.turn_torque += static_cast<float>(game_config.handling_upgrade) * 0.0001f;
+        car_config.drift_factor = std::max(0.0f, car_config.drift_factor - 0.05f);
 
-        std::cout << "New turn_torque: " << config.turn_torque << std::endl;
-        std::cout << "New drift_factor: " << config.drift_factor << std::endl;
+        std::cout << "New turn_torque: " << car_config.turn_torque << std::endl;
+        std::cout << "New drift_factor: " << car_config.drift_factor << std::endl;
     }
 }
 

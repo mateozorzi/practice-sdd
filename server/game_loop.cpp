@@ -459,7 +459,7 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
         if (it != players.end()) {
 
             CarConfig car_config = get_car_config(car_dto);
-            it->second.create_car(car_dto, car_config, box2d_world);
+            it->second.create_car(car_dto.model, server_config, box2d_world);
             it->second.set_in_game();
         }
     }

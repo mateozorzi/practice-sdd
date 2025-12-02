@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <box2d/box2d.h>
+#include "server_config.h"
 
 
 enum class SensorType {
@@ -18,17 +19,17 @@ enum class SensorType {
 class CityUtils {
 
     b2World& box2d_world;
+    const ServerConfig& server_config;
 
     std::array<b2Vec2, 4> obtain_b2_vertices(const std::vector<std::vector<int>>& polygon) const;
 
-    float meters_to_pixels(float meters) const;
     float pixels_to_meters(float pixels) const;
 
 public:
     CityUtils(const CityUtils&) = delete;
     CityUtils& operator=(const CityUtils&) = delete;
 
-    explicit CityUtils(b2World& box2d_world);
+    explicit CityUtils(b2World& box2d_world, const ServerConfig& server_config);
 
     std::vector<std::vector<std::vector<int>>> load_polygons_from_file(
             const std::string& file_path);

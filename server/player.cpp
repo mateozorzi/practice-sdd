@@ -13,23 +13,23 @@
 #include "server_config.h"
 
 
-Player::Player(uint32_t client_id, const std::string& username):
-        client_id(client_id), username(username), car(nullptr), infinite_health(false) {}
+Player::Player(uint32_t player_id, const std::string& username):
+        player_id(player_id), username(username), car(nullptr), infinite_health(false) {}
 
 
-void Player::create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world) {
+void Player::create_car(const std::string& car_model, const ServerConfig& server_config, b2World& box2d_world) {
 
-    car = std::make_unique<Car>(client_id, box2d_world, car_dto.model, car_config);
+    car = std::make_unique<Car>(player_id, box2d_world, car_model, server_config);
 
-    base_health = static_cast<uint16_t>(car_config.health);
+    base_health = car->get_max_health();
     health = base_health;
 
-    std::cout << "[" << PLAYER << "] Created car for player with ID: " << client_id
-              << " | Car model: " << car_dto.model << " | HP: " << health << std::endl;
+    std::cout << "[" << PLAYER << "] Created car for player with ID: " << player_id
+              << " | Car model: " << car_model << " | HP: " << health << std::endl;
 }
 
 
-uint32_t Player::get_client_id() const { return client_id; }
+uint32_t Player::get_id() const { return player_id; }
 
 const std::string& Player::get_username() const { return username; }
 
@@ -60,7 +60,7 @@ CarPositionDTO Player::get_car_position(const RaceDTO& race) const {
         actual.race_lap = race.laps;
         return actual;
     }
-    return CarPositionDTO(client_id, 0, 0, 0);
+    return CarPositionDTO(player_id, 0, 0, 0);
 }
 
 CarLayer Player::get_car_layer() const {
@@ -75,28 +75,28 @@ uint32_t Player::get_recorded_time() const { return race_time; }
 
 PlayerDTO Player::get_info() const {
 
-    return PlayerDTO(username, client_id, get_car(), health, dead, base_health, has_finish_race);
+    return PlayerDTO(username, player_id, get_car(), health, dead, base_health, has_finish_race);
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
-    std::cout << "[" << PLAYER << "] Getting  race stats for player with ID: " << client_id
+    std::cout << "[" << PLAYER << "] Getting  race stats for player with ID: " << player_id
               << std::endl;
     std::cout << "Race time: " << race_time << std::endl;
-    return PlayerRaceStatsDTO(client_id, username, 0, 0, race_time);
+    return PlayerRaceStatsDTO(player_id, username, 0, 0, race_time);
 }
 
 uint16_t Player::get_health() const { return health; }
 
 
 void Player::start_race() {
+
     in_race = true;
     has_finish_race = false;
     id_next_checkpoint = 1;
     n_lap = 1;
     race_time = 0;
     dead = false;
-    std::cout << "car health: " << car->get_configuration().health << std::endl;
-    base_health = car->get_configuration().health;
+    base_health = car->get_max_health();
     health = base_health;
     infinite_health = false;
 }
@@ -122,11 +122,11 @@ bool Player::have_time_recorded() const {
 
 void Player::record_time(uint32_t seconds) {
     race_time = seconds;
-    std::cout << "[" << PLAYER << "] Player " << client_id << " recorded time: " << race_time
+    std::cout << "[" << PLAYER << "] Player " << player_id << " recorded time: " << race_time
               << " seconds." << std::endl;
     if (penalty) {
         race_time += static_cast<uint32_t>(10);
-        std::cout << "[" << PLAYER << "] Penalty applied to player " << client_id
+        std::cout << "[" << PLAYER << "] Penalty applied to player " << player_id
                   << ". New recorded time: " << race_time << " seconds." << std::endl;
         penalty = false;
     }

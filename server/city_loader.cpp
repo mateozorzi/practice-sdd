@@ -8,7 +8,7 @@
 #include "world_creation_exception.h"
 
 
-CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config): box2d_world(box2d_world), server_config(server_config), city_utils(box2d_world) {}
+CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config): box2d_world(box2d_world), server_config(server_config), city_utils(box2d_world, server_config) {}
 
 
 std::string CityLoader::normalize_city_name(const std::string& city_name) const {

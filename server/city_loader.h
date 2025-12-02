@@ -5,7 +5,6 @@
 #include <string>
 
 #include "city_utils.h"
-#include "server_config.h"
 
 
 class CityLoader {
