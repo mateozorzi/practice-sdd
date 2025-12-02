@@ -15,6 +15,7 @@ private:
     SDL2pp::Mixer& mixer;
     ResourceManager& resources;
     std::unordered_map<uint32_t, int> crash_channels;
+    int current_channel = 1;
     int engine_channel = 0;
     int upgrade_channel = 0;
     EngineState engine_state;

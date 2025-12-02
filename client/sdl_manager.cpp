@@ -300,6 +300,13 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.crashed = false;
     }
 
+    for (auto& [pid, pinfo] : game_state.players) {
+        if (pinfo.crashed) {
+            sounds.play_crash_sound(pid);
+            pinfo.crashed = false;
+        }
+    }
+
     update_camera(pos_x, pos_y);
     clear_screen();
 

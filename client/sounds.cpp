@@ -8,8 +8,6 @@ Sounds::Sounds(SDL2pp::Mixer& mixer, ResourceManager& resources):
         mixer(mixer), resources(resources) {}
 
 void Sounds::initialize_channels(const std::vector<uint32_t>& ids) {
-    int current_channel = 1;
-
     for (const auto& id : ids) crash_channels[id] = current_channel++;
 
     engine_channel = current_channel++;
@@ -40,7 +38,13 @@ void Sounds::play_upgrade_sound() {
 void Sounds::play_crash_sound(const uint32_t id) {
     SDL2pp::Chunk& crash_sound = resources.get_sound("client/assets/sounds/crash.wav");
     auto it = crash_channels.find(id);
-    if (it == crash_channels.end() || it->second == -1) return;
+    if (it == crash_channels.end()) {
+        int new_channel = current_channel++;
+        crash_channels[id] = new_channel;
+        it = crash_channels.find(id);
+    }
+
+    if (it->second == -1) return;
 
     mixer.PlayChannel(it->second, crash_sound);
 }
