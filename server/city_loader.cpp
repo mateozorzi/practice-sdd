@@ -84,7 +84,7 @@ void CityLoader::load_city(const std::string& city_name) {
 
     load_collidables(city_loader_config.collidables.on_ground_collidable_file, CATEGORY_GROUND,
                      MASK_GROUND);
-    load_collidables(city_loader_config.collidables.on_ground_collidable_file, CATEGORY_BRIDGE,
+    load_collidables(city_loader_config.collidables.on_bridge_collidable_file, CATEGORY_BRIDGE,
                      MASK_BRIDGE);
 
     load_sensors(city_loader_config.sensors.on_bridge_sensor_file, SensorType::ON_BRIDGE,
