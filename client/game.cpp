@@ -49,36 +49,55 @@ void Game::run() {
 
 
 void Game::reset_events() {
-
     for (auto& [username, p]: game_state.players) {
 
         p.crashed = false;
-        p.died = false;
         p.isMoving = false;
     }
     game_state.player.crashed = false;
     game_state.player.isMoving = false;
-    game_state.player.died = false;
 }
 
 void Game::detect_events(const WorldSnapshotDTO& snapshot) {
+    auto check_and_flag = [this](PlayerInfo& info, const PlayerDTO& dto, const CarPositionDTO& carPos) {
+        // Detectar movimiento
+        if (info.x != (int)carPos.x_position || info.y != (int)carPos.y_position ||
+            info.angle != (int)carPos.angle) {
+            info.isMoving = true;
+        }
 
+        // Detectar muerte
+        if (dto.dead && !info.died) {
+            info.died = true;
+            return;
+        }
+
+        // Detectar choque (reduccion de vida)
+        if (dto.health < info.life && dto.health > 0) {
+            info.crashed = true;
+        }
+    };
+
+    // Detectar eventos cliente
     for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
+        if (playerDTO.id == game_state.id) {
+            check_and_flag(game_state.player, playerDTO, carPos);
+            break;
+        }
+    }
 
+    // Detectar eventos para jugadores
+    for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
         const uint32_t& id = playerDTO.id;
-        auto it = game_state.players.find(id);
+        
+        if (id == game_state.id)
+            continue;
 
+        auto it = game_state.players.find(id);
         if (it == game_state.players.end())
             continue;
 
-        PlayerInfo& prev = it->second;
-        bool moved = false;
-
-        if (prev.x != (int)carPos.x_position || prev.y != (int)carPos.y_position ||
-            prev.angle != (int)carPos.angle)
-            moved = true;
-
-        prev.isMoving = moved;
+        check_and_flag(it->second, playerDTO, carPos);
     }
 }
 
