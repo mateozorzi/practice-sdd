@@ -10,7 +10,8 @@
 #include "world_creation_exception.h"
 
 
-CityUtils::CityUtils(b2World& box2d_world, const ServerConfig& server_config): box2d_world(box2d_world), server_config(server_config) {}
+CityUtils::CityUtils(b2World& box2d_world, const ServerConfig& server_config):
+        box2d_world(box2d_world), server_config(server_config) {}
 
 
 std::array<b2Vec2, 4> CityUtils::obtain_b2_vertices(
@@ -31,7 +32,9 @@ std::array<b2Vec2, 4> CityUtils::obtain_b2_vertices(
     return vertices;
 }
 
-float CityUtils::pixels_to_meters(const float pixels) const { return pixels / server_config.world.pixels_per_meter; }
+float CityUtils::pixels_to_meters(const float pixels) const {
+    return pixels / server_config.world.pixels_per_meter;
+}
 
 
 std::vector<std::vector<std::vector<int>>> CityUtils::load_polygons_from_file(

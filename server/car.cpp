@@ -50,13 +50,20 @@ Car::Car(uint32_t player_id, b2World& box2d_world, const std::string& model,
 
 const CarConfig& Car::find_car_config(const std::string& model, const PhysicsConfig& physics) {
 
-    if (model == physics.compact.model)     return physics.compact;
-    if (model == physics.sport.model)       return physics.sport;
-    if (model == physics.convertible.model) return physics.convertible;
-    if (model == physics.sedan.model)       return physics.sedan;
-    if (model == physics.jeep.model)        return physics.jeep;
-    if (model == physics.rally.model)       return physics.rally;
-    if (model == physics.truck.model)       return physics.truck;
+    if (model == physics.compact.model)
+        return physics.compact;
+    if (model == physics.sport.model)
+        return physics.sport;
+    if (model == physics.convertible.model)
+        return physics.convertible;
+    if (model == physics.sedan.model)
+        return physics.sedan;
+    if (model == physics.jeep.model)
+        return physics.jeep;
+    if (model == physics.rally.model)
+        return physics.rally;
+    if (model == physics.truck.model)
+        return physics.truck;
 
     return physics.compact;
 }
@@ -188,10 +195,7 @@ void Car::update_position() {
 }
 
 
-uint16_t Car::get_max_health() const {
-
-    return car_config.health;
-}
+uint16_t Car::get_max_health() const { return car_config.health; }
 
 
 CarPositionDTO Car::get_position_dto() const {
@@ -199,8 +203,10 @@ CarPositionDTO Car::get_position_dto() const {
     b2Vec2 position_meters = box2d_body->GetPosition();
     float angle_radians = box2d_body->GetAngle();
 
-    uint32_t x_pixels = static_cast<uint32_t>(position_meters.x * server_config.world.pixels_per_meter);
-    uint32_t y_pixels = static_cast<uint32_t>(position_meters.y * server_config.world.pixels_per_meter);
+    uint32_t x_pixels =
+            static_cast<uint32_t>(position_meters.x * server_config.world.pixels_per_meter);
+    uint32_t y_pixels =
+            static_cast<uint32_t>(position_meters.y * server_config.world.pixels_per_meter);
 
     float angle_degrees_float = angle_radians * (180.0f / b2_pi);
 

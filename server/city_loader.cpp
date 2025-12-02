@@ -8,7 +8,10 @@
 #include "world_creation_exception.h"
 
 
-CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config): box2d_world(box2d_world), server_config(server_config), city_utils(box2d_world, server_config) {}
+CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config):
+        box2d_world(box2d_world),
+        server_config(server_config),
+        city_utils(box2d_world, server_config) {}
 
 
 std::string CityLoader::normalize_city_name(const std::string& city_name) const {
@@ -21,6 +24,21 @@ std::string CityLoader::normalize_city_name(const std::string& city_name) const 
     std::replace(modified_city_name.begin(), modified_city_name.end(), ' ', '_');
 
     return modified_city_name;
+}
+
+const CityLoaderConfig& CityLoader::obtain_city_loader_config(
+        const std::string& city_normalized_name) const {
+
+    if (city_normalized_name == "liberty_city")
+        return server_config.world.liberty_city;
+
+    if (city_normalized_name == "san_andreas")
+        return server_config.world.san_andreas;
+
+    if (city_normalized_name == "vice_city")
+        return server_config.world.vice_city;
+
+    throw std::runtime_error("Unknown city: " + city_normalized_name);
 }
 
 
@@ -71,11 +89,7 @@ void CityLoader::load_city(const std::string& city_name) {
     if (city_loaded)
         cleanup_city();
 
-    const CityLoaderConfig& city_loader_config =
-        (city_normalized_name == "liberty_city") ? server_config.world.liberty_city :
-        (city_normalized_name == "san_andreas") ? server_config.world.san_andreas :
-        (city_normalized_name == "vice_city") ? server_config.world.vice_city :
-        throw std::runtime_error("Unknown city: " + city_normalized_name);
+    const CityLoaderConfig& city_loader_config = obtain_city_loader_config(city_normalized_name);
 
     load_collidables(city_loader_config.collidables.on_ground_collidable_file, CATEGORY_GROUND,
                      MASK_GROUND);

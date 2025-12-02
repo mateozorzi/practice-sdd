@@ -15,6 +15,8 @@ class CityLoader {
 
     bool city_loaded = false;
     std::string normalize_city_name(const std::string& city_name) const;
+    const CityLoaderConfig& obtain_city_loader_config(
+            const std::string& city_normalized_name) const;
 
     void load_collidables(const std::string&, uint16_t category, uint16_t mask);
     void load_sensors(const std::string&, SensorType, uint16_t category, uint16_t mask);

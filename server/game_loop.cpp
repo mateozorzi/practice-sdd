@@ -427,29 +427,6 @@ void GameLoop::add_player(const uint32_t player_id, const std::string& username)
               << std::endl;
 }
 
-CarConfig GameLoop::get_car_config(const CarDTO& car_dto) {
-
-    std::string car_model = car_dto.model;
-
-    if (car_model == server_config.physics.compact.model)
-        return server_config.physics.compact;
-    else if (car_model == server_config.physics.sport.model)
-        return server_config.physics.sport;
-    else if (car_model == server_config.physics.convertible.model)
-        return server_config.physics.convertible;
-    else if (car_model == server_config.physics.sedan.model)
-        return server_config.physics.sedan;
-    else if (car_model == server_config.physics.jeep.model)
-        return server_config.physics.jeep;
-    else if (car_model == server_config.physics.rally.model)
-        return server_config.physics.rally;
-    else if (car_model == server_config.physics.truck.model)
-        return server_config.physics.truck;
-    else
-        return server_config.physics.compact;
-}
-
-
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
     if (auto car = game_command.get_data<CarDTO>()) {
@@ -458,7 +435,6 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
         auto it = players.find(player_id);
         if (it != players.end()) {
 
-            CarConfig car_config = get_car_config(car_dto);
             it->second.create_car(car_dto.model, server_config, box2d_world);
             it->second.set_in_game();
         }

@@ -27,7 +27,6 @@ class CollisionListener: public b2ContactListener {
     void handle_collision(b2Contact& contact);
 
 public:
-
     CollisionListener(const CollisionListener&) = delete;
     CollisionListener& operator=(const CollisionListener&) = delete;
 

@@ -99,7 +99,6 @@ class GameLoop final: public Thread {
     LeaderboardDTO create_final_leaderboard();
     LeaderboardDTO create_leaderboard();
     void send_race(const RaceDTO& race);
-    CarConfig get_car_config(const CarDTO& car_dto);
 
     bool all_player_in_game() const;
     bool player_in_race() const;
@@ -113,7 +112,8 @@ public:
     GameLoop& operator=(const GameLoop&) = delete;
 
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                      uint8_t max_players, const ServerConfig& server_config, RaceCatalogueDTO& selected);
+                      uint8_t max_players, const ServerConfig& server_config,
+                      RaceCatalogueDTO& selected);
 
     void run() override;
     void stop() override;
