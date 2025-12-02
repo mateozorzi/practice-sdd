@@ -53,8 +53,9 @@ public:
 
     RaceCatalogueDTO list_races();
 
+    void stop();
 
-    ~Lobby() = default;
+    ~Lobby();
 };
 
 

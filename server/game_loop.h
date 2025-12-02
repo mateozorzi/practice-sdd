@@ -35,7 +35,6 @@ enum class GamePhase {
     IN_RACE,
     LEADERBOARD,
     GAME_FINISHED,
-    RETURN_TO_LOBBY
 };
 
 
@@ -43,7 +42,7 @@ class GameLoop final: public Thread {
 
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
 
-    const ServerConfig& config;
+    const ServerConfig& server_config;
     const uint8_t max_players;
     GamePhase current_phase = GamePhase::WAITING_CAR_SELECTION;
     const std::chrono::milliseconds game_iteration_duration;
@@ -78,7 +77,6 @@ class GameLoop final: public Thread {
     void process_commands_in_race_phase(uint32_t elapsed_seconds);
     void process_commands_in_leaderboard_phase();
     void process_commands_in_game_finished_phase();
-    void process_commands_in_return_to_lobby_phase();
 
     void handle_waiting_car_selection_phase();
     void handle_upgrade_shop_phase();
@@ -86,7 +84,6 @@ class GameLoop final: public Thread {
     void handle_in_race_phase();
     void handle_leaderboard_phase();
     void handle_game_finished_phase();
-    void handle_return_to_lobby();
 
     void handle_car_selection(const GameCommand& game_command);
     void handle_car_movement(const GameCommand& game_command);
@@ -102,7 +99,6 @@ class GameLoop final: public Thread {
     LeaderboardDTO create_final_leaderboard();
     LeaderboardDTO create_leaderboard();
     void send_race(const RaceDTO& race);
-    CarConfig get_car_config(const ServerConfig& server_config, const CarDTO& car_dto);
 
     bool all_player_in_game() const;
     bool player_in_race() const;
@@ -116,7 +112,8 @@ public:
     GameLoop& operator=(const GameLoop&) = delete;
 
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                      uint8_t max_players, const ServerConfig& config, RaceCatalogueDTO& selected);
+                      uint8_t max_players, const ServerConfig& server_config,
+                      RaceCatalogueDTO& selected);
 
     void run() override;
     void stop() override;

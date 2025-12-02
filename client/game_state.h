@@ -24,6 +24,10 @@ struct PlayerInfo {
     bool crashed = false;
     CarLayer layer = CarLayer::ON_GROUND;
     CheckpointDTO checkpoint = CheckpointDTO{};
+    bool finish_race = false;
+    uint8_t current_lap = 0;
+    uint8_t race_lap = 0;
+    std::string username = "";
 };
 
 struct LocalInfo {

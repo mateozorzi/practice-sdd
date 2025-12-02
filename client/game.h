@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 
-
 #include "client_protocol.h"
 #include "game_phase.h"
 #include "game_state.h"
@@ -57,7 +56,6 @@ class Game {
     void handle_race_events();
     bool update_race();
     void show_race();
-
 
     void handle_leaderboard_events();
     bool update_leaderboard();

@@ -19,10 +19,10 @@
 
 class Car {
 
-    uint32_t client_id;
+    uint32_t player_id;
     b2Body* box2d_body;
-    CarConfig config;
-    std::string model;
+    const ServerConfig& server_config;
+    CarConfig car_config;
     uint16_t base_health;
 
     bool moving_up = false;
@@ -32,6 +32,8 @@ class Car {
     bool is_colliding = false;
     CarLayer car_layer = CarLayer::ON_GROUND;
 
+    const CarConfig& find_car_config(const std::string& model, const PhysicsConfig& physics);
+
     void detect_linear_movement();
     void detect_rotation();
     void detect_drifting();
@@ -40,13 +42,15 @@ public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;
 
-    explicit Car(uint32_t client_id, b2World& box2d_world, const std::string& model,
-                 const CarConfig& config);
+    explicit Car(uint32_t player_id, b2World& box2d_world, const std::string& model,
+                 const ServerConfig& server_config);
 
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
 
     void handle_movement(const MovementDTO& movement_dto);
     void update_position();
+
+    uint16_t get_max_health() const;
     CarPositionDTO get_position_dto() const;
 
     const CarDTO get_configuration() const;

@@ -161,8 +161,10 @@ CarPositionDTO ClientProtocol::receive_car_position() {
     const uint32_t angle = recv_uint32();
     const CheckpointDTO next = receive_checkpoint();
     const uint8_t layer = recv_uint8();
+    const uint8_t current_lap = recv_uint8();
+    const uint8_t race_lap = recv_uint8();
     return CarPositionDTO(client_id, x_position, y_position, angle, next,
-                          static_cast<CarLayer>(layer));
+                          static_cast<CarLayer>(layer), current_lap, race_lap);
 }
 
 std::vector<CarPositionDTO> ClientProtocol::receive_car_positions() {
@@ -184,7 +186,8 @@ PlayerDTO ClientProtocol::receive_player() {
     const uint16_t health = recv_uint16();
     const bool dead = static_cast<bool>(recv_uint8());
     const uint16_t max_health = recv_uint16();
-    return PlayerDTO(username, id, car, health, dead, max_health);
+    const bool finish_race = static_cast<bool>(recv_uint8());
+    return PlayerDTO(username, id, car, health, dead, max_health, finish_race);
 }
 
 WorldSnapshotDTO ClientProtocol::receive_update_positions() {
@@ -316,21 +319,17 @@ RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
     uint8_t size = recv_uint8();
     std::vector<RaceDTO> races;
 
-    for (uint8_t i = 0; i < size; ++i)
-        races.push_back(receive_race());
-    
+    for (uint8_t i = 0; i < size; ++i) races.push_back(receive_race());
+
 
     return RaceCatalogueDTO(std::move(races));
 }
 
 uint32_t ClientProtocol::receive_id() {
 
-    uint8_t action = recv_uint8();
+    uint32_t player_id = recv_uint32();
 
-    while(static_cast<LobbyAction>(action) != LobbyAction::SEND_ID)
-        action = recv_uint8();
-
-    return recv_uint32(); 
+    return player_id;
 }
 
 nlohmann::json ClientProtocol::get_json(const std::string& file_path) {

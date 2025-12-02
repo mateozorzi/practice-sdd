@@ -2,6 +2,8 @@
 #define CLIENT_CONSTANTS_H
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
 // Screen dimensions
 constexpr int SCREEN_WIDTH = 1920;
@@ -17,7 +19,7 @@ constexpr int CAMERA_VIEW_HEIGHT = 288;
 
 // Minimap dimensions
 constexpr int MINIMAP_SCALE_DIVISOR = 5;  // Screen size / MINIMAP_SCALE_DIVISOR
-constexpr int MINIMAP_WIDTH = SCREEN_WIDTH / MINIMAP_SCALE_DIVISOR;   // 384
+constexpr int MINIMAP_WIDTH = SCREEN_WIDTH / MINIMAP_SCALE_DIVISOR;    // 384
 constexpr int MINIMAP_HEIGHT = SCREEN_HEIGHT / MINIMAP_SCALE_DIVISOR;  // 216
 constexpr int MINIMAP_MARGIN = 20;
 constexpr int MINIMAP_BORDER_THICKNESS = 2;
@@ -98,11 +100,11 @@ constexpr double FULL_CIRCLE_DEGREES = 360.0;
 // Text rendering positions
 constexpr int TEXT_WAITING_X = 700;
 constexpr int TEXT_WAITING_Y = 500;
-constexpr int TEXT_WAITING_SIZE = 48;
+constexpr int TEXT_WAITING_SIZE = 72;
 
 constexpr int TEXT_COUNTDOWN_X = 600;
 constexpr int TEXT_COUNTDOWN_Y = 500;
-constexpr int TEXT_COUNTDOWN_SIZE = 48;
+constexpr int TEXT_COUNTDOWN_SIZE = 72;
 
 constexpr int TEXT_LEADERBOARD_X = 850;
 constexpr int TEXT_LEADERBOARD_Y = 100;
@@ -112,11 +114,18 @@ constexpr int TEXT_LEADERBOARD_SIZE = 64;
 constexpr const char* FONT_PATH = "client/assets/fonts/UrbanHaze.ttf";
 constexpr const char* CARS_SPRITE_PATH = "client/assets/sprites/cars-no-background.png";
 constexpr const char* ARROW_SPRITE_PATH = "client/assets/sprites/arrow.png";
-constexpr const char* MAP_BACKGROUND_PREFIX = "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - ";
+constexpr const char* MAP_BACKGROUND_PREFIX =
+        "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - ";
 constexpr const char* MAP_BACKGROUND_SUFFIX = ".png";
 constexpr const char* DECORATIONS_PREFIX = "server/world/decorations_";
 constexpr const char* BRIDGES_PREFIX = "server/world/bridges_";
 constexpr const char* JSON_SUFFIX = ".json";
+
+static const std::vector<std::string> WAITING_ROOMS = {
+        "client/assets/backgrounds/waitingroom1.png",
+        "client/assets/backgrounds/waitingroom2.png",
+        "client/assets/backgrounds/waitingroom3.png",
+};
 
 // Default city
 constexpr const char* DEFAULT_CITY = "Liberty City";
@@ -129,8 +138,8 @@ constexpr int SHOP_BORDER_THICKNESS = 5;
 constexpr int SHOP_TITLE_Y_OFFSET = 15;
 
 constexpr int SHOP_BUTTON_WIDTH_RATIO_NUM = 3;
-constexpr int SHOP_BUTTON_WIDTH_RATIO_DEN = 5;  // 3/5 of shop width
-constexpr int SHOP_BUTTON_HEIGHT_DIVISOR = 8;   // 1/8 of shop height
+constexpr int SHOP_BUTTON_WIDTH_RATIO_DEN = 5;   // 3/5 of shop width
+constexpr int SHOP_BUTTON_HEIGHT_DIVISOR = 8;    // 1/8 of shop height
 constexpr int SHOP_BUTTON_SPACING_DIVISOR = 20;  // 1/20 of shop height
 constexpr int SHOP_BUTTON_START_Y_DIVISOR = 4;   // 1/4 of shop height
 constexpr int SHOP_BUTTON_BORDER_THICKNESS = 2;
@@ -156,4 +165,3 @@ constexpr const char* SHOP_TITLE_TEXT = "UPGRADE SHOP";
 constexpr const char* SHOP_SECONDS_TEXT = " seconds";
 
 #endif
-

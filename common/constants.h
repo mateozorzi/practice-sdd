@@ -62,9 +62,5 @@ constexpr int MAX_PATH_LENGTH = 4096;
 constexpr std::string_view EXCEPTION = "Exception";
 constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
 
-// WORLD
-// TODO: remove, now in yaml
-constexpr float PIXELS_PER_METER = 30.0f;
-
 
 #endif

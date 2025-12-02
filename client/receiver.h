@@ -5,13 +5,11 @@
 #include <variant>
 #include <vector>
 
-
 #include "../common/race_dto.h"
 #include "../common/world_snapshot_dto.h"
 #include "common/car_position_dto.h"
 #include "common/queue.h"
 #include "common/thread.h"
-
 
 #include "client_protocol.h"
 
@@ -28,7 +26,6 @@ class Receiver: public Thread {
 
 
 public:
-
     explicit Receiver(ClientProtocol& protocol);
 
     GameState get_game_state() const;

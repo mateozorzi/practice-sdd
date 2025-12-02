@@ -86,26 +86,12 @@ std::optional<GameQueues> Lobby::create_new_game(const uint32_t player_id,
 
     std::lock_guard lock(mtx);
 
-    if (games.size() >= config.server.max_concurrent_games) {
-
-        std::cerr << "[" << LOBBY
-                  << "] "
-                     "Max number of concurrent games ("
-                  << config.server.max_concurrent_games
-                  << ") has been reached. Cannot create the game." << std::endl;
-
+    if (games.size() >= config.server.max_concurrent_games)
         return std::nullopt;
-    }
 
     uint32_t game_id = player_id;
 
     auto game = std::make_unique<Game>(max_players, config, name, selected);
-
-    std::cerr << "[" << LOBBY
-              << "] "
-                 "Creating new game with ID: "
-              << game_id << " | Max players: " << (int)max_players
-              << " | (Owner player has the same id): " << player_id << std::endl;
 
     auto queues = game->add_player(player_id, username);
     games.emplace(game_id, std::move(game));
@@ -121,24 +107,12 @@ std::optional<GameQueues> Lobby::join_existing_game(const uint32_t player_id,
 
     auto it = games.find(game_id);
 
-    if (it == games.end()) {
-
-        std::cerr << "[" << LOBBY
-                  << "] "
-                     "Game "
-                  << (int)game_id << " not found." << std::endl;
-
+    if (it == games.end())
         return std::nullopt;
-    }
 
     Game& game = *(it->second);
-    if (game.is_full()) {
-
-        std::cerr << "[" << LOBBY << "] "
-                  << "Game with ID: " << game_id << " is full." << std::endl;
-
+    if (game.is_full())
         return std::nullopt;
-    }
 
     auto queues = game.add_player(player_id, username);
 
@@ -168,14 +142,11 @@ void Lobby::reap() {
     for (auto it = games.begin(); it != games.end();) {
 
         const Game& game = *it->second;
-        if (game.is_empty()) {
-            std::cerr << "[" << LOBBY << "] "
-                      << "Game with ID: " << (int)it->first << " is now empty, removing it."
-                      << std::endl;
+
+        if (game.is_empty())
             it = games.erase(it);
-        } else {
+        else 
             ++it;
-        }
     }
 }
 
@@ -197,9 +168,6 @@ void Lobby::remove_player(const uint32_t player_id, const uint32_t game_id) {
         auto node = games.extract(it);
         node.key() = game.get_next_player_id();
         games.insert(std::move(node));
-
-        std::cerr << "[" << LOBBY << "] Game ID changed: " << game_id << " -> "
-                  << game.get_next_player_id() << std::endl;
     }
 }
 
@@ -209,6 +177,7 @@ uint32_t Lobby::get_game_id(const uint32_t player_id) {
     std::lock_guard lock(mtx);
 
     for (const auto& [game_id, game_ptr]: games) {
+
         if (game_ptr->has_player(player_id))
             return game_id;
     }
@@ -218,7 +187,30 @@ uint32_t Lobby::get_game_id(const uint32_t player_id) {
 
 
 RaceCatalogueDTO Lobby::list_races() {
+
     std::lock_guard lock(mtx);
 
     return RaceCatalogueDTO(std::move(races));
+}
+
+
+void Lobby::stop() {
+
+    std::lock_guard lock(mtx);
+
+    for (auto it = games.begin(); it != games.end();)
+        it = games.erase(it);
+}
+
+
+Lobby::~Lobby() {
+
+    std::cerr << "[" << LOBBY << "] Stopping." << std::endl;
+    try {
+
+        Lobby::stop();
+    } catch (const std::exception& e) {
+
+        std::cerr << "[" << LOBBY << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();
+    }
 }

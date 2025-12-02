@@ -22,6 +22,8 @@ void ServerProtocol::add_car_position_to_buffer(const CarPositionDTO& car_positi
     add_uint32_to_buffer(car_position_dto.angle);
     add_checkpoint_to_buffer(car_position_dto.next);
     add_uint8_to_buffer(static_cast<uint8_t>(car_position_dto.layer));
+    add_uint8_to_buffer(car_position_dto.current_lap);
+    add_uint8_to_buffer(car_position_dto.race_lap);
 }
 
 void ServerProtocol::add_player_to_buffer(const PlayerDTO& player) {
@@ -32,6 +34,7 @@ void ServerProtocol::add_player_to_buffer(const PlayerDTO& player) {
     add_uint16_to_buffer(player.health);
     add_uint8_to_buffer(static_cast<uint8_t>(player.dead));
     add_uint16_to_buffer(player.max_health);
+    add_uint8_to_buffer(static_cast<uint8_t>(player.finish_race));
 }
 
 void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint) {
@@ -192,7 +195,7 @@ RaceCatalogueDTO ServerProtocol::receive_races() {
 }
 
 void ServerProtocol::send_player_id(const uint32_t player_id) {
-    add_uint8_to_buffer(static_cast<uint8_t>(LobbyAction::SEND_ID));
+
     add_uint32_to_buffer(player_id);
 
     send_buffer();

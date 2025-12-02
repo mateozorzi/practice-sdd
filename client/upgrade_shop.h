@@ -9,9 +9,9 @@
 
 #include "../common/client_event_dto.h"
 
+#include "camera.h"
 #include "resource_manager.h"
 #include "sounds.h"
-#include "camera.h"
 
 struct ShopButton {
     SDL2pp::Rect rect;

@@ -1,6 +1,7 @@
 #ifndef SDL_MANAGER_H
 #define SDL_MANAGER_H
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -8,18 +9,19 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../common/leaderboard_dto.h"
 #include "SDL2pp/Renderer.hh"
 #include "SDL2pp/SDL.hh"
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
 #include "common/npc_dto.h"
 #include "common/player_dto.h"
-#include "../common/leaderboard_dto.h"
 
 #include "animations.h"
 #include "camera.h"
 #include "client_constants.h"
 #include "game_state.h"
+#include "leaderboard_info.h"
 #include "resource_manager.h"
 #include "sounds.h"
 #include "upgrade_shop.h"
@@ -54,6 +56,8 @@ private:
     std::string map_name;
     std::string decoration;
     std::string bridges;
+    LeaderboardInfo leaderboard_info;
+    SDL2pp::Texture* waiting_room_background;
 
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
@@ -61,21 +65,21 @@ private:
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
 
-    SDL2pp::Rect get_car_sprite_rect(const std::string &model) const;
+    SDL2pp::Rect get_car_sprite_rect(const std::string& model) const;
 
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving,
                        const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
                        SDL2pp::Texture& cars_texture);
-    void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
-                    SDL2pp::Texture& cars_texture);
+    void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
+                    double scale_y, SDL2pp::Texture& cars_texture);
     void render_hud_health(int health, int max_health);
     void render_hud_minimap(int player_x, int player_y);
     void render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view_rect,
-                     double scale_x, double scale_y, SDL2pp::Texture& map_texture);
+                      double scale_x, double scale_y, SDL2pp::Texture& map_texture);
     void render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
-                       SDL2pp::Texture& map_texture);
+                        SDL2pp::Texture& map_texture);
     void render_decorations(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
-                           SDL2pp::Texture& map_texture);
+                            SDL2pp::Texture& map_texture);
     void render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view_rect,
                             double scale_x, double scale_y);
     double calculate_angle_to_checkpoint(const CarPositionDTO& player,
@@ -94,11 +98,11 @@ public:
     void render(LocalInfo& game_state);
     void render_waiting();
     void render_countdown(const LocalInfo& game_state);
-    void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string title);
-    void render_winner();
+    void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title);
+    void render_center_box(const std::string& text, SDL2pp::Color border_color);
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
-    void render_stats(const std::vector<std::pair<PlayerDTO, CarPositionDTO>>& cars);
+    void render_stats(const PlayerInfo& player);
     nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
@@ -108,11 +112,16 @@ public:
     void close_shop();
     bool is_shop_open();
     void toggle_shop();
+
+    void close_leaderboard();
+    void open_leaderboard();
+    bool is_leaderboard_open();
+
     void play_upgrade_sound();
     void render_players(double scale_x, double scale_y, const SDL2pp::Rect& view_rect,
                         const CarPositionDTO& my_car, const PlayerInfo& my_player,
-                        const LocalInfo& game_state, SDL2pp::Texture& cars_texture, SDL2pp::Texture& map,
-                        SDL2pp::Texture& arrow_texture);
+                        const LocalInfo& game_state, SDL2pp::Texture& cars_texture,
+                        SDL2pp::Texture& map, SDL2pp::Texture& arrow_texture);
 };
 
 #endif

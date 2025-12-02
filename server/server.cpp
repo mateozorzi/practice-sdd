@@ -29,6 +29,7 @@ void Server::run() {
 
 void Server::stop() {
 
+    lobby.stop();
     clients_acceptor.stop();
 
     clients_acceptor.join();
@@ -37,9 +38,10 @@ void Server::stop() {
 
 Server::~Server() {
 
+    std::cerr << "[" << SERVER << "] Stopping." << std::endl;
     try {
 
-        stop();
+        Server::stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << SERVER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
