@@ -26,7 +26,7 @@ physics:
       drift_factor: 0.85
       turn_torque: 0.040
       mass: 1.0
-      health: 80
+      health: 30
   
     sport:
       model: "Sport"

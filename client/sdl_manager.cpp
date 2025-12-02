@@ -374,8 +374,10 @@ void SDLManager::render(LocalInfo& game_state) {
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
     // animations.render_explosion(iteration_counter);
 
-    if (my_player.finish_race) {
-        render_center_box("You have finished the race!");
+    if(my_player.died){
+        render_center_box("Your car exploded!", SDL2pp::Color(255, 0, 0, 255));
+    } else if (my_player.finish_race) {
+        render_center_box("You have finished the race!", SDL2pp::Color(255, 215, 0, 255));
     }
 
     show_screen();
@@ -479,7 +481,7 @@ void SDLManager::render_leaderboard(const LeaderboardDTO& leaderboard, const std
     leaderboard_info.render(leaderboard, title, map_name, camera);
 }
 
-void SDLManager::render_center_box(const std::string& message) {
+void SDLManager::render_center_box(const std::string& message, SDL2pp::Color color) {
 
     SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
     SDL_Color prev_color = renderer.GetDrawColor();
@@ -492,7 +494,6 @@ void SDLManager::render_center_box(const std::string& message) {
     SDL2pp::Rect board_rect(rect_x, rect_y, rect_w, rect_h);
 
     SDL2pp::Color bg_color(30, 30, 30, 200);
-    SDL2pp::Color border_color(255, 215, 0, 255);
     int border = 5;
 
     // Fondo transparente
@@ -502,16 +503,15 @@ void SDLManager::render_center_box(const std::string& message) {
 
     // Bordes
     renderer.SetDrawBlendMode(SDL_BLENDMODE_NONE);
-    renderer.SetDrawColor(border_color);
+    renderer.SetDrawColor(color);
     renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, rect_w, border));                    // top
     renderer.FillRect(SDL2pp::Rect(rect_x, rect_y + rect_h - border, rect_w, border));  // bottom
     renderer.FillRect(SDL2pp::Rect(rect_x, rect_y, border, rect_h));                    // left
     renderer.FillRect(SDL2pp::Rect(rect_x + rect_w - border, rect_y, border, rect_h));  // right
 
     // Texto
-    SDL2pp::Color text_color(255, 215, 0, 255);
     SDL2pp::Texture& msg_texture =
-            resources.get_text(message, FONT_PATH, TEXT_LEADERBOARD_SIZE, text_color);
+            resources.get_text(message, FONT_PATH, TEXT_LEADERBOARD_SIZE, color);
 
     int msg_x = rect_x + (rect_w - msg_texture.GetWidth()) / 2;
     int msg_y = rect_y + (rect_h - msg_texture.GetHeight()) / 2;
@@ -522,10 +522,6 @@ void SDLManager::render_center_box(const std::string& message) {
     // Restaurar estado
     renderer.SetDrawBlendMode(prev_blend);
     renderer.SetDrawColor(prev_color);
-}
-
-void SDLManager::render_finish_race() {
-    render_center_box("You have finished the race!\n Waiting for other players...");
 }
 
 void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,

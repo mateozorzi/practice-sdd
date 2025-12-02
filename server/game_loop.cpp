@@ -286,10 +286,9 @@ void GameLoop::handle_in_race_phase() {
     // check_race_times(elapsed_seconds);
     process_commands_in_race_phase(elapsed_seconds);
 
-    update_positions(selected_races.races[current_race_index], elapsed_seconds);
-
     check_alive_players();
 
+    update_positions(selected_races.races[current_race_index], elapsed_seconds);
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 

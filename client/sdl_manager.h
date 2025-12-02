@@ -98,8 +98,7 @@ public:
     void render_waiting();
     void render_countdown(const LocalInfo& game_state);
     void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title);
-    void render_center_box(const std::string& text);
-    void render_finish_race();
+    void render_center_box(const std::string& text, SDL2pp::Color border_color);
     void show_screen();
     void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
     void render_stats(const PlayerInfo& player);
