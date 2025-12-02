@@ -1,7 +1,6 @@
 #include "city_loader.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include "../common/constants.h"
 
@@ -74,20 +73,12 @@ void CityLoader::load_sensors(const std::string& file, SensorType type, uint16_t
 }
 
 
-void CityLoader::cleanup_city() {
-
-    city_utils.cleanup();
-
-    std::cout << "[CITY] Cleaning up previous city..." << std::endl;
-}
-
-
 void CityLoader::load_city(const std::string& city_name) {
 
     std::string city_normalized_name = normalize_city_name(city_name);
 
     if (city_loaded)
-        cleanup_city();
+        city_utils.cleanup();
 
     const CityLoaderConfig& city_loader_config = obtain_city_loader_config(city_normalized_name);
 
@@ -102,6 +93,4 @@ void CityLoader::load_city(const std::string& city_name) {
                  CATEGORY_SENSOR, MASK_SENSOR);
 
     city_loaded = true;
-
-    std::cout << "[CITY] Loaded world for city: " << city_name << std::endl << std::endl;
 }

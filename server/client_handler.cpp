@@ -227,6 +227,7 @@ void ClientHandler::stop() {
 
 ClientHandler::~ClientHandler() {
 
+    std::cerr << "[" << CLIENT_HANDLER << "] Stopping." << std::endl;
     try {
 
         ClientHandler::stop();

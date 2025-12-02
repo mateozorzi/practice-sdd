@@ -75,8 +75,6 @@ void GameMonitor::remove_player(const uint32_t player_id) {
         return;
 
     snapshot_queues.erase(it);
-    std::cerr << "[" << GAME_MONITOR << "] "
-              << "Removing player with ID: " << player_id << std::endl;
 }
 
 
@@ -98,9 +96,10 @@ void GameMonitor::stop() {
 
 GameMonitor::~GameMonitor() {
 
+    std::cerr << "[" << GAME_MONITOR << "] Stopping." << std::endl;
     try {
 
-        stop();
+        GameMonitor::stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME_MONITOR << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();

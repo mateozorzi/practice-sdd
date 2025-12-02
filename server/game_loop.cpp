@@ -159,18 +159,12 @@ void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
             handle_car_movement(game_command);
             continue;
         } else if (action == ClientAction::CHEAT_WIN_RACE) {
-            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id()
-                      << " used cheat: WIN_RACE" << std::endl;
             handle_cheat_win_race(game_command, elapsed_seconds);
             continue;
         } else if (action == ClientAction::CHEAT_WIN_GAME) {
-            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id()
-                      << " used cheat: WIN_GAME" << std::endl;
             handle_cheat_win_game(game_command, elapsed_seconds);
             continue;
         } else if (action == ClientAction::CHEAT_INFINITE_HEALTH) {
-            std::cerr << "[" << GAME_LOOP << "] Player " << game_command.get_player_id()
-                      << " used cheat: INFINITE_HEALTH" << std::endl;
             handle_cheat_infinite_health(game_command);
             continue;
         }
@@ -370,8 +364,7 @@ void GameLoop::handle_game_finished_phase() {
 
     if (elapsed_time >= game_finish_seconds) {
 
-        GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
-        game_monitor.broadcast(game_update);
+        GameLoop::stop();
 
         game_monitor.stop();
     }
@@ -383,11 +376,10 @@ void GameLoop::remove_player(const uint32_t player_id) {
 
     const auto it = players.find(player_id);
 
-    if (it != players.end())
-        players.erase(it);
+    if (it == players.end())
+        return;
 
-    std::cerr << "[" << GAME_LOOP << "] "
-              << "Removing player with ID: " << player_id << std::endl;
+    players.erase(it);
 }
 
 bool GameLoop::is_full() const { return players.size() >= max_players; }
@@ -420,11 +412,6 @@ bool GameLoop::has_player(const uint32_t player_id) const {
 void GameLoop::add_player(const uint32_t player_id, const std::string& username) {
 
     players.try_emplace(player_id, player_id, username);
-
-    std::cerr << "[" << GAME_LOOP << "] "
-              << "Player with ID: " << player_id << " has joined the game. | Username: " << username
-              << std::endl
-              << std::endl;
 }
 
 void GameLoop::handle_car_selection(const GameCommand& game_command) {
@@ -455,10 +442,6 @@ void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
 void GameLoop::handle_disconnection(const GameCommand& game_command) {
 
-    std::cerr << "[" << GAME_LOOP << "] "
-              << "Player with ID: " << game_command.get_player_id() << " has disconnected."
-              << std::endl;
-
     GameUpdateDTO return_to_lobby(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
     game_monitor.send_update_to_player(return_to_lobby, game_command.get_player_id());
 
@@ -487,11 +470,10 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
         world_snapshot.add_car_position(player_dto, player.get_car_position(race));
     }
 
-    // Update NPC positions
     for (auto& npc: npcs) {
-        if (current_phase == GamePhase::IN_RACE) {
+
+        if (current_phase == GamePhase::IN_RACE)
             npc.update();
-        }
         world_snapshot.add_npc_position(npc.get_position());
     }
 
@@ -760,6 +742,8 @@ void GameLoop::stop() {
         _keep_running = false;
 
     try {
+        GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
+        game_monitor.broadcast(game_update);
 
         players.clear();
     } catch (const std::exception&) {}
@@ -768,6 +752,7 @@ void GameLoop::stop() {
 
 GameLoop::~GameLoop() {
 
+    std::cerr << "[" << GAME_LOOP << "] Stopping." << std::endl;
     try {
 
         GameLoop::stop();

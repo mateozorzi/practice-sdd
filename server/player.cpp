@@ -24,9 +24,6 @@ void Player::create_car(const std::string& car_model, const ServerConfig& server
 
     base_health = car->get_max_health();
     health = base_health;
-
-    std::cout << "[" << PLAYER << "] Created car for player with ID: " << player_id
-              << " | Car model: " << car_model << " | HP: " << health << std::endl;
 }
 
 
@@ -80,9 +77,7 @@ PlayerDTO Player::get_info() const {
 }
 
 PlayerRaceStatsDTO Player::get_race_stats() const {
-    std::cout << "[" << PLAYER << "] Getting  race stats for player with ID: " << player_id
-              << std::endl;
-    std::cout << "Race time: " << race_time << std::endl;
+
     return PlayerRaceStatsDTO(player_id, username, 0, 0, race_time);
 }
 
@@ -122,9 +117,9 @@ bool Player::have_time_recorded() const {
 }
 
 void Player::record_time(uint32_t seconds) {
+
     race_time = seconds;
-    std::cout << "[" << PLAYER << "] Player " << player_id << " recorded time: " << race_time
-              << " seconds." << std::endl;
+
     if (penalty) {
         race_time += static_cast<uint32_t>(10);
         std::cout << "[" << PLAYER << "] Penalty applied to player " << player_id
@@ -139,20 +134,18 @@ bool Player::is_dead() const { return health == 0; }
 void Player::handle_car_movement(const MovementDTO& movement_dto) {
 
     if (car) {
-        if (is_in_race()) {
+        if (is_in_race())
             car->handle_movement(movement_dto);
-        }
     }
 }
 
 bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint) {
+
     bool reached = false;
 
-    if (static_cast<int>(checkpoint.id) != id_next_checkpoint) {
+    if (static_cast<int>(checkpoint.id) != id_next_checkpoint)
         return reached;
-    }
 
-    // conteined in checkpoint?
     if ((static_cast<int>(x) <=
                  static_cast<int>(checkpoint.x) + (static_cast<int>(checkpoint.width / 2)) &&
          static_cast<int>(x) >=
@@ -161,16 +154,20 @@ bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& che
                  static_cast<int>(checkpoint.y) + (static_cast<int>(checkpoint.height / 2)) &&
          static_cast<int>(y) >=
                  static_cast<int>(checkpoint.y) - (static_cast<int>(checkpoint.height / 2)))) {
-        // player reached checkpoint
+
         reached = true;
     }
     return reached;
 }
 
 bool Player::update_next_checkpoint(const RaceDTO& race) {
+
     bool finished = false;
+
     if (static_cast<int>(id_next_checkpoint) >= static_cast<int>(race.size_checkpoints)) {
+
         if (n_lap + 1 > race.laps) {
+    
             finish_race();
             finished = true;
             return finished;
@@ -179,10 +176,12 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
             id_next_checkpoint = 1;
         }
     } else if (static_cast<int>(id_next_checkpoint) < static_cast<int>(race.size_checkpoints)) {
+
         id_next_checkpoint += 1;
     }
 
     this->next = race.checkpoints[id_next_checkpoint - 1];
+
     return finished;
 }
 
@@ -190,24 +189,21 @@ void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds) 
 
     if (car && is_in_race()) {
         car->update_position();
-        // update race conditions
 
         if (health == 0 && !dead) {
             finish_race();
             dead = true;
         }
 
-        // check if player reached next checkpoint
         CarPositionDTO actual = car->get_position_dto();
         uint32_t x = actual.x_position;
         uint32_t y = actual.y_position;
 
-
         if (reached_checkpoint(x, y, this->next)) {
+
             bool finished = update_next_checkpoint(race);
-            if (finished) {
+            if (finished)
                 record_time(elapsed_seconds);
-            }
         } else {
             return;
         }
@@ -240,6 +236,7 @@ void Player::set_in_game() { in_game = true; }
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
     if (car) {
+
         penalty = true;
         if (upgrade.upgrade == ButtonType::Health) {
             std::cout << "Actual health: " << health << std::endl;
@@ -254,13 +251,12 @@ void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game
 
 void Player::activate_infinite_health() { infinite_health = true; }
 
-
 bool Player::is_in_game() const { return in_game; }
 
 void Player::apply_collision_damage(uint16_t damage) {
-    if (infinite_health) {
+
+    if (infinite_health)
         return;
-    }
     if (health > damage)
         health -= damage;
     else

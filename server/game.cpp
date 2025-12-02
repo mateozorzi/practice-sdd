@@ -58,15 +58,14 @@ void Game::stop() {
     game_loop.join();
 
     command_queue.close();
-    game_monitor.stop();
 }
 
 Game::~Game() {
 
+    std::cerr << "[" << GAME << "] Stopping." << std::endl;
     try {
 
         Game::stop();
-        std::cerr << "[" << GAME << "] Game stopped." << std::endl;
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();
