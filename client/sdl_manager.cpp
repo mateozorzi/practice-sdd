@@ -263,6 +263,10 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 }
 
+void SDLManager::set_sound_info(const std::vector<uint32_t> &ids) {
+    sounds.initialize_channels(ids);
+}
+
 void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
 
@@ -291,7 +295,7 @@ void SDLManager::render(LocalInfo& game_state) {
     if (game_state.player.crashed) {
         if (!animations.is_camera_shake_active(iteration_counter)) {
             animations.start_camera_shake(iteration_counter);
-            sounds.play_crash_sound();
+            sounds.play_crash_sound(game_state.id);
         }
         game_state.player.crashed = false;
     }
@@ -682,3 +686,4 @@ void SDLManager::load_city(const std::string& city_name) {
     load_bridges_rects(load_json_file(bridges));
     load_decorations_rects(load_json_file(decoration));
 }
+

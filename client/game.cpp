@@ -175,7 +175,12 @@ bool Game::update_waiting() {
             return true;
         }
         if (dto.gameloop_action == GameLoopAction::START_SHOP) {
-
+            std::vector<uint32_t> ids;
+            ids.push_back(game_state.id);
+            for (const auto& [id, player]: game_state.players) {
+                ids.push_back(id);
+            }
+            sdl.set_sound_info(ids);
             game_state.phase = Phase::UPGRADE;
             return false;
         }

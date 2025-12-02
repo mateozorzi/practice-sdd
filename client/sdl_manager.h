@@ -121,6 +121,8 @@ public:
                         const CarPositionDTO& my_car, const PlayerInfo& my_player,
                         const LocalInfo& game_state, SDL2pp::Texture& cars_texture,
                         SDL2pp::Texture& map, SDL2pp::Texture& arrow_texture);
+
+    void set_sound_info(const std::vector<uint32_t>& ids);
 };
 
 #endif
