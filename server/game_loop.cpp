@@ -18,19 +18,19 @@
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
-                   const uint8_t max_players, const ServerConfig& config,
+                   const uint8_t max_players, const ServerConfig& server_config,
                    RaceCatalogueDTO& selected):
-        config(config),
+        server_config(server_config),
         max_players(max_players),
-        game_iteration_duration(1000 / config.game.game_fps),
-        upgrade_shop_seconds(config.game.wait_seconds_upgrade_shop),
-        countdown_seconds(config.game.wait_seconds_countdown),
-        race_timeout_seconds(config.game.timeout_seconds_race),
-        leaderboard_seconds(config.game.wait_seconds_leaderboard),
-        game_finish_seconds(config.game.wait_seconds_game_finished),
+        game_iteration_duration(1000 / server_config.game.game_fps),
+        upgrade_shop_seconds(server_config.game.wait_seconds_upgrade_shop),
+        countdown_seconds(server_config.game.wait_seconds_countdown),
+        race_timeout_seconds(server_config.game.timeout_seconds_race),
+        leaderboard_seconds(server_config.game.wait_seconds_leaderboard),
+        game_finish_seconds(server_config.game.wait_seconds_game_finished),
         game_monitor(game_monitor),
         command_queue(command_queue),
-        city_loader(box2d_world),
+        city_loader(box2d_world, server_config),
         collision_listener(players),
         selected_races(selected) {
 
@@ -427,7 +427,7 @@ void GameLoop::add_player(const uint32_t player_id, const std::string& username)
               << std::endl;
 }
 
-CarConfig GameLoop::get_car_config(const ServerConfig& server_config, const CarDTO& car_dto) {
+CarConfig GameLoop::get_car_config(const CarDTO& car_dto) {
 
     std::string car_model = car_dto.model;
 
@@ -458,7 +458,7 @@ void GameLoop::handle_car_selection(const GameCommand& game_command) {
         auto it = players.find(player_id);
         if (it != players.end()) {
 
-            CarConfig car_config = get_car_config(config, car_dto);
+            CarConfig car_config = get_car_config(car_dto);
             it->second.create_car(car_dto, car_config, box2d_world);
             it->second.set_in_game();
         }
@@ -495,7 +495,7 @@ void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
         uint32_t player_id = game_command.get_player_id();
         auto it = players.find(player_id);
         if (it != players.end()) {
-            it->second.set_upgrade(upgrade->get(), config.game.upgrades);
+            it->second.set_upgrade(upgrade->get(), server_config.game.upgrades);
         }
     }
 }
