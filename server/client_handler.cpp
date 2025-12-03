@@ -218,10 +218,6 @@ void ClientHandler::stop() {
 
         server_protocol.stop();
     } catch (const LibError&) {}
-
-    const uint32_t game_id = lobby.get_game_id(player_id);
-
-    lobby.remove_player(player_id, game_id);
 }
 
 

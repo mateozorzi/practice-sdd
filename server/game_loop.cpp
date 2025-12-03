@@ -362,12 +362,9 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands_in_game_finished_phase();
 
-    if (elapsed_time >= game_finish_seconds) {
-
+    if (elapsed_time >= game_finish_seconds)
         GameLoop::stop();
-
-        game_monitor.stop();
-    }
+    
     fixed_sleep(now);
 }
 
@@ -748,12 +745,17 @@ void GameLoop::run() {
 
 void GameLoop::stop() {
 
-    if (_keep_running)
-        _keep_running = false;
+    if (_keep_running) {
 
-    try {
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
         game_monitor.broadcast(game_update);
+
+        game_monitor.unregister_all_players();
+
+        _keep_running = false;
+    }
+
+    try {
 
         players.clear();
     } catch (const std::exception&) {}

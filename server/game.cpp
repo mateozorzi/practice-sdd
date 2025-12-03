@@ -57,6 +57,8 @@ void Game::stop() {
     game_loop.stop();
     game_loop.join();
 
+    game_monitor.stop();
+
     command_queue.close();
 }
 
