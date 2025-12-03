@@ -40,6 +40,7 @@ class Player {
     bool dead = false;
     uint16_t base_health = 0;
     bool penalty = false;
+    int n_penalty = 0;
     bool infinite_health = false;
 
     bool update_next_checkpoint(const RaceDTO& race);
@@ -67,7 +68,7 @@ public:
     uint16_t get_health() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
-    void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds);
+    void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds, const GameConfig& game_config);
     void set_car_collision(bool colliding);
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     void set_car_layer(CarLayer layer);
@@ -81,7 +82,7 @@ public:
     void finish_race();
     bool has_finished_race() const;
     bool have_time_recorded() const;
-    void record_time(uint32_t seconds);
+    void record_time(uint32_t seconds, const GameConfig& game_config);
 
     bool is_dead() const;
 

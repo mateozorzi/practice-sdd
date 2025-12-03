@@ -119,6 +119,7 @@ struct GameConfig {
     unsigned int timeout_seconds_race;
     unsigned int wait_seconds_leaderboard;
     unsigned int wait_seconds_game_finished;
+    unsigned int penalty_per_upgrade;
 
     struct UpgradeConfig upgrades;
 };
