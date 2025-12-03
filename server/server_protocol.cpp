@@ -177,7 +177,8 @@ RaceDTO ServerProtocol::receive_race() {
         const uint16_t y = recv_uint16();
         const uint8_t width = recv_uint8();
         const uint8_t height = recv_uint8();
-        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
+        const bool is_finish_line = static_cast<bool>(recv_uint8());
+        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height, is_finish_line));
     }
 
     const uint8_t laps = recv_uint8();
