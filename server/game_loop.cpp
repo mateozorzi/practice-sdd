@@ -521,7 +521,7 @@ void GameLoop::load_npcs(const std::string& city_name) {
                    ::tolower);
     std::replace(normalized_city.begin(), normalized_city.end(), ' ', '_');
 
-    std::string npc_file = "server/world/npcs/npcs_" + normalized_city + ".json";
+    std::string npc_file = "/var/nfs/world/npcs/npcs_" + normalized_city + ".json";
 
     try {
         std::ifstream file(npc_file);

@@ -18,7 +18,7 @@ void Animations::render_explosions(int current_it) {
         return;
     }
 
-    SDL2pp::Texture& sprite = resources.get_texture("client/assets/sprites/explosion.png");
+    SDL2pp::Texture& sprite = resources.get_texture("/var/nfs/assets/sprites/explosion.png");
     SDL2pp::Rect view = camera.get_view_rect();
 
     for (auto& [id, animation]: explosions) {

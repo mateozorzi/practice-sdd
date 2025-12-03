@@ -258,7 +258,7 @@ void MenuInterface::set_music(QObject* parent) {
     std::cout << "Seteando audio output" << std::endl;
 
     musicPlayer->setSource(
-            QUrl::fromLocalFile("client/assets/music/Need for Speed II SE Soundtrack - Main Menu "
+            QUrl::fromLocalFile("/var/nfs/assets/music/Need for Speed II SE Soundtrack - Main Menu "
                                 "and Showcase Theme I - RonTaboga.mp3"));
     std::cout << "Seteando source" << std::endl;
 
