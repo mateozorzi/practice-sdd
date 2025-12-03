@@ -116,15 +116,17 @@ bool Player::have_time_recorded() const {
     return false;
 }
 
-void Player::record_time(uint32_t seconds) {
+void Player::record_time(uint32_t seconds, const GameConfig& game_config) {
 
     race_time = seconds;
 
     if (penalty) {
-        race_time += static_cast<uint32_t>(10);
+        int time_added = n_penalty * game_config.penalty_per_upgrade;
+        race_time += static_cast<uint32_t>(time_added);
         std::cout << "[" << PLAYER << "] Penalty applied to player " << player_id
                   << ". New recorded time: " << race_time << " seconds." << std::endl;
         penalty = false;
+        n_penalty = 0;
     }
 }
 
@@ -193,7 +195,7 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
     return finished;
 }
 
-void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds) {
+void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds, const GameConfig& game_config) {
 
     if (car && is_in_race()) {
         car->update_position();
@@ -211,7 +213,7 @@ void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds) 
 
             bool finished = update_next_checkpoint(race);
             if (finished)
-                record_time(elapsed_seconds);
+                record_time(elapsed_seconds, game_config);
         } else {
             return;
         }
@@ -243,7 +245,11 @@ void Player::set_in_game() { in_game = true; }
 
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
-    if (car) {
+    if (car && n_penalty < MAX_UPGRADES_PER_RACE) {
+        n_penalty += 1;
+        std::cout << "[Player] Player " << player_id << " bought upgrade "
+                  << static_cast<int>(upgrade.upgrade) << ". Total upgrades: " << n_penalty
+                  << std::endl;
 
         penalty = true;
         if (upgrade.upgrade == ButtonType::Health) {

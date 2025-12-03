@@ -117,10 +117,10 @@ void GameLoop::handle_cheat_win_race(const GameCommand& game_command,
             player.finish_race();
             // convert race_timeout to uint32_t seconds
             uint32_t race_timeout = static_cast<uint32_t>(race_timeout_seconds.count());
-            player.record_time(race_timeout);
+            player.record_time(race_timeout, server_config.game);
         } else {
             player.finish_race();
-            player.record_time(elapsed_seconds);
+            player.record_time(elapsed_seconds, server_config.game);
         }
     }
 }
@@ -465,7 +465,7 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
 
     for (auto& [player_id, player]: players) {
 
-        player.update_car_position(race, elapsed_seconds);
+        player.update_car_position(race, elapsed_seconds, server_config.game);
         PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position(race));
     }
@@ -584,7 +584,7 @@ void GameLoop::finish_race(uint32_t timeout_time) {
         if (!player.has_finished_race()) {
 
             player.finish_race();
-            player.record_time(timeout_time);
+            player.record_time(timeout_time, server_config.game);
         }
     }
 }
@@ -599,7 +599,7 @@ void GameLoop::check_alive_players() {
             std::cout << "Player with ID: " << player_id << " has died during the race."
                       << std::endl;
             player.finish_race();
-            player.record_time(timeout);
+            player.record_time(timeout, server_config.game);
         }
     }
 }
@@ -612,7 +612,7 @@ void GameLoop::check_race_times(uint32_t seconds) {
 
             std::cout << "Player with ID: " << player_id << " has finished the race in " << seconds
                       << " seconds." << std::endl;
-            player.record_time(seconds);
+            player.record_time(seconds, server_config.game);
         }
     }
 }

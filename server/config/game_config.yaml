@@ -6,6 +6,7 @@ game:
   timeout_seconds_race: 600
   wait_seconds_leaderboard: 5
   wait_seconds_game_finished: 5
+  penalty_per_upgrade: 10
 
   upgrades:
     health_upgrade: 50.0
