@@ -35,8 +35,10 @@ public:
 
     void play_engine_sound(bool is_moving);
     void play_upgrade_sound();
-    void play_crash_sound(uint32_t id, const SDL2pp::Point &event_pos, const SDL2pp::Point &target_pos);
-    void play_explosion_sound(uint32_t id, const SDL2pp::Point& event_pos, const SDL2pp::Point& target_pos);
+    void play_crash_sound(uint32_t id, const SDL2pp::Point& event_pos,
+                          const SDL2pp::Point& target_pos);
+    void play_explosion_sound(uint32_t id, const SDL2pp::Point& event_pos,
+                              const SDL2pp::Point& target_pos);
 
     void play_background_music(const std::string& path, int loops = -1);
     void stop_background_music();

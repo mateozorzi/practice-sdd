@@ -271,17 +271,13 @@ void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
 
-void SDLManager::play_background_music(const std::string &path, const int loops) {
+void SDLManager::play_background_music(const std::string& path, const int loops) {
     sounds.play_background_music(path, loops);
 }
 
-void SDLManager::stop_background_music() {
-    sounds.stop_background_music();
-}
+void SDLManager::stop_background_music() { sounds.stop_background_music(); }
 
-void SDLManager::set_music_volume(const int volume) {
-    sounds.set_music_volume(volume);
-}
+void SDLManager::set_music_volume(const int volume) { sounds.set_music_volume(volume); }
 
 void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
@@ -314,7 +310,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     SDL2pp::Point target_pos = camera.get_center();
 
-    // Usar flag crashed para detectar crash del jugador principal
+    // Usar flag crashed para detectar crash del cliente
     if (game_state.player.crashed) {
         if (!animations.is_camera_shake_active(iteration_counter)) {
             animations.start_camera_shake(iteration_counter);
@@ -325,7 +321,7 @@ void SDLManager::render(LocalInfo& game_state) {
     }
 
     // Unica iteracion para detectar explosiones y crashes de otros jugadores
-    for (auto& [pid, pinfo] : game_state.players) {
+    for (auto& [pid, pinfo]: game_state.players) {
         // Detectar muerte/explosion
         bool is_dead = pinfo.died || pinfo.life <= 0;
         if (is_dead && !pinfo.explosion_shown) {
@@ -336,7 +332,7 @@ void SDLManager::render(LocalInfo& game_state) {
         if (!is_dead) {
             pinfo.explosion_shown = false;
         }
-        
+
         // Detectar crash
         if (pinfo.crashed) {
             sounds.play_crash_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
