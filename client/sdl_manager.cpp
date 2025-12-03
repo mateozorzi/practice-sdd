@@ -261,10 +261,11 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
         }
     }
 
-    render_stats(my_player);
     render_decorations(view_rect, scale_x, scale_y, map);
     render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
+    render_stats(my_player);
+
 }
 
 void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
