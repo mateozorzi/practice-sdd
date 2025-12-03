@@ -1,9 +1,13 @@
 #include "menu_interface.h"
 
 #include <QApplication>
+#include <QAudioOutput>
 #include <QEventLoop>
+#include <QMediaPlayer>
 #include <QMessageBox>
+#include <QObject>
 #include <QString>
+#include <QUrl>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -23,7 +27,10 @@
 #include "Lobby/selectcars.h"
 #include "Lobby/waitingroom.h"
 
-MenuInterface::MenuInterface(ClientProtocol& protocol): protocol(protocol) {}
+#include "client_constants.h"
+
+MenuInterface::MenuInterface(ClientProtocol& protocol, int argc = 0, char** argv = nullptr):
+        protocol(protocol), app(argc, argv) {}
 
 
 bool MenuInterface::car_selection(PlayerDTO& player) {
@@ -243,12 +250,27 @@ bool MenuInterface::lobby_create(const PlayerDTO& player) {
     return closed;
 }
 
-void MenuInterface::lobby(PlayerDTO& player) {
-    int fake_argc = 0;
-    char* fake_argv[] = {nullptr};
-    QApplication app(fake_argc, fake_argv);
+void MenuInterface::set_music(QObject* parent) {
+    musicPlayer = new QMediaPlayer(parent);
+    audioOutput = new QAudioOutput(parent);
+    std::cout << "Creando audio output" << std::endl;
+    musicPlayer->setAudioOutput(audioOutput);
+    std::cout << "Seteando audio output" << std::endl;
 
+    musicPlayer->setSource(
+            QUrl::fromLocalFile("client/assets/music/Need for Speed II SE Soundtrack - Main Menu "
+                                "and Showcase Theme I - RonTaboga.mp3"));
+    std::cout << "Seteando source" << std::endl;
+
+    audioOutput->setVolume(MUSIC_VOLUME);  // Volumen entre 0 y 100
+
+    musicPlayer->setLoops(QMediaPlayer::Infinite);
+    musicPlayer->play();
+}
+
+void MenuInterface::lobby(PlayerDTO& player) {
     Lobby l;
+    set_music(&l);
     l.showMaximized();
     std::cout << "Showing lobby window" << std::endl;
 
@@ -307,4 +329,6 @@ void MenuInterface::lobby(PlayerDTO& player) {
     });
 
     app.exec();
+
+    musicPlayer->stop();
 }

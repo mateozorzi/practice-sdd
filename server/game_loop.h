@@ -63,7 +63,7 @@ class GameLoop final: public Thread {
     std::unordered_map<uint32_t, Player> players;
     std::vector<Npc> npcs;
     CollisionListener collision_listener;
-    RaceCatalogueDTO& selected_races;
+    const RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
     LeaderboardDTO final_leaderboard;
     bool race_active = false;
@@ -103,7 +103,7 @@ class GameLoop final: public Thread {
     bool all_player_in_game() const;
     bool player_in_race() const;
 
-    void map_configuration(const std::string& city_name);
+    void map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints);
     void load_npcs(const std::string& city_name);
 
 
@@ -113,7 +113,7 @@ public:
 
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                       uint8_t max_players, const ServerConfig& server_config,
-                      RaceCatalogueDTO& selected);
+                      const RaceCatalogueDTO& selected_races);
 
     void run() override;
     void stop() override;

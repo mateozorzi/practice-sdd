@@ -120,8 +120,8 @@ void SelectCircuit::read_info_races(const QStringList& races_names) {
             char orientation = cols[1].toStdString()[0];
             int xCenter = cols[2].toInt();
             int yCenter = cols[3].toInt();
-            int height = cols[4].toInt();
-            int width = cols[5].toInt();
+            int width = cols[4].toInt();
+            int height = cols[5].toInt();
 
             // QRect center in (xCenter, yCenter)
             QRect rect(xCenter - width / 2, yCenter - height / 2, width, height);

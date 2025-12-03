@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <utility>
+#include <vector>
 
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
@@ -58,26 +59,28 @@ void Game::reset_events() {
     game_state.player.isMoving = false;
 }
 
-void Game::detect_events_for_player(PlayerInfo& info, const PlayerDTO& dto, const CarPositionDTO& car_pos) {
-        // Detectar movimiento
-        if (info.x != (int)car_pos.x_position || info.y != (int)car_pos.y_position ||
-            info.angle != (int)car_pos.angle) {
-            info.isMoving = true;
-        }
+void Game::detect_events_for_player(PlayerInfo& info, const PlayerDTO& dto,
+                                    const CarPositionDTO& car_pos) {
+    // Detectar movimiento
+    if (info.x != (int)car_pos.x_position || info.y != (int)car_pos.y_position ||
+        info.angle != (int)car_pos.angle) {
+        info.isMoving = true;
+    }
 
-        // Detectar muerte
-        if (dto.dead && !info.died) {
-            info.died = true;
-            return;
-        }
+    // Detectar muerte
+    if (dto.dead && !info.died) {
+        info.died = true;
+        return;
+    }
 
-        // Detectar choque (reduccion de vida)
-        if (dto.health < info.life && dto.health > 0) {
-            info.crashed = true;
-        }
-};
+    // Detectar choque (reduccion de vida)
+    if (dto.health < info.life && dto.health > 0) {
+        info.crashed = true;
+    }
+}
 
-void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car, const std::unordered_map<uint32_t, PlayerInfo>& last_state) {
+void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car,
+                         const std::unordered_map<uint32_t, PlayerInfo>& last_state) {
     if (player.id == game_state.id) {
         PlayerInfo& info = game_state.player;
 

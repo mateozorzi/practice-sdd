@@ -1,6 +1,9 @@
 #ifndef SOUNDS_H
 #define SOUNDS_H
 
+#include <unordered_map>
+#include <vector>
+
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 

@@ -152,6 +152,9 @@ void ServerConfigLoader::load_world_config(const YAML::Node& config, ServerConfi
 
     server_config.world.pixels_per_meter = world["pixels_per_meter"].as<unsigned int>();
 
+    server_config.world.races_folder = world["races_folder"].as<std::string>();
+
+
     load_city(world["liberty_city"], server_config.world.liberty_city);
     load_city(world["san_andreas"], server_config.world.san_andreas);
     load_city(world["vice_city"], server_config.world.vice_city);

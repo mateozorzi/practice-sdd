@@ -33,7 +33,7 @@ public:
     Game& operator=(const Game&) = delete;
 
     explicit Game(uint8_t max_players, const ServerConfig& config, std::string name,
-                  RaceCatalogueDTO& selected);
+                  const RaceCatalogueDTO& selected_races);
 
     bool is_full() const;
     bool is_empty() const;

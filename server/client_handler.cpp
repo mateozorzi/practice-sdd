@@ -41,7 +41,7 @@ void ClientHandler::launch_lobby() {
                     join_existing_game(lobby_dto.lobby_id);
                     break;
                 case LobbyAction::LIST_RACES:
-                    list_load_races();
+                    list_loaded_races();
                     break;
                 case LobbyAction::SEND_RACE_SELECTION:
                     select_races(lobby_dto);
@@ -179,7 +179,7 @@ void ClientHandler::join_existing_game(const uint32_t game_id) {
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
-void ClientHandler::list_load_races() {
+void ClientHandler::list_loaded_races() {
 
     RaceCatalogueDTO races = lobby.list_races();
     server_protocol.send_races_catalogue(races);

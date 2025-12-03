@@ -24,6 +24,7 @@ constexpr std::string_view PLAYER = "PLAYER";
 
 class Player {
 
+
     uint32_t player_id;
     std::string username;
     std::unique_ptr<Car> car;

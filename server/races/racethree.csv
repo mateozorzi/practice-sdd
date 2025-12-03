@@ -1,10 +1,23 @@
-:/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - Liberty City.png,:/mask/imagenes/001 - B_STREETS - Liberty City.png
+:/circuitos/imagenes/Game Boy _ GBC - Grand Theft Auto - Backgrounds - San Andreas.png,:/mask/imagenes/002 - B_STREETS - San Andreas.png
 City,n_laps
-Liberty City,1
-id, orientation, xCenter, yCenter, height, width,
-1,H,382,256,15,98
-2,V,515,87,66,15
-3,H,646,177,15,18
-4,V,695,303,34,15
-5,H,726,392,15,34
-6,V,792,575,34,15
+San Andreas,2
+id, orientation, xCenter, yCenter, width, height
+1,V,1351,183,15,34
+2,V,1288,183,15,34
+3,I,1201,184,30,30
+4,H,1174,257,66,15
+5,H,1174,334,66,15
+6,H,1174,424,66,15
+7,I,1168,491,30,30
+8,V,1258,519,15,66
+9,I,1379,510,30,30
+10,V,1472,519,15,66
+11,V,1605,519,15,66
+12,I,1692,511,30,30
+13,H,1702,433,34,15
+14,H,1702,362,34,15
+15,H,1702,260,34,15
+16,I,1699,184,30,30
+17,V,1604,183,15,34
+18,V,1525,183,15,34
+19,V,1444,183,15,34

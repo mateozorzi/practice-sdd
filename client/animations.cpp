@@ -21,9 +21,10 @@ void Animations::render_explosions(int current_it) {
     SDL2pp::Texture& sprite = resources.get_texture("client/assets/sprites/explosion.png");
     SDL2pp::Rect view = camera.get_view_rect();
 
-    for (auto& [id, animation] : explosions) {
+    for (auto& [id, animation]: explosions) {
         int frame = current_it - animation.start_it;
-        if (frame >= animation.duration) continue;
+        if (frame >= animation.duration)
+            continue;
 
         int sprite_index = frame / animation.frame_duration;
         if (sprite_index >= animation.frames) {
