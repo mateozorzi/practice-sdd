@@ -283,12 +283,7 @@ bool Game::update_countdown() {
     return true;
 }
 
-void Game::show_countdown() {
-
-    sdl.clear_screen();
-    sdl.render_countdown(game_state);
-    sdl.show_screen();
-}
+void Game::show_countdown() { sdl.render_countdown(game_state); }
 
 
 void Game::handle_race_events() { input_handler.handle_movement(); }
