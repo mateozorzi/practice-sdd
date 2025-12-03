@@ -231,7 +231,7 @@ LeaderboardDTO ClientProtocol::receive_leaderboard() {
 
 GameUpdateDTO ClientProtocol::receive_update() {
 
-    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO> data;
+    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO, uint8_t> data;
     const uint8_t update_type = recv_uint8();
     if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPDATE_POSITIONS)) {
         data = receive_update_positions();
@@ -239,6 +239,8 @@ GameUpdateDTO ClientProtocol::receive_update() {
         data = receive_race();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_LEADERBOARD)) {
         data = receive_leaderboard();
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::COUNTDOWN_TIME)) {
+        data = recv_uint8();
     } else {
         data = std::monostate{};
     }

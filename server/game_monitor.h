@@ -37,9 +37,10 @@ public:
 
     Queue<GameUpdateDTO>& register_player(uint32_t player_id);
     void unregister_player(uint32_t player_id);
+    void unregister_all_players();
 
-    void broadcast(const GameUpdateDTO& info);
     void send_update_to_player(const GameUpdateDTO& info, uint32_t player_id);
+    void broadcast(const GameUpdateDTO& info);
 
     void remove_player(uint32_t player_id);
     void stop();

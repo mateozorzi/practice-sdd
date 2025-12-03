@@ -117,10 +117,10 @@ void GameLoop::handle_cheat_win_race(const GameCommand& game_command,
             player.finish_race();
             // convert race_timeout to uint32_t seconds
             uint32_t race_timeout = static_cast<uint32_t>(race_timeout_seconds.count());
-            player.record_time(race_timeout);
+            player.record_time(race_timeout, server_config.game);
         } else {
             player.finish_race();
-            player.record_time(elapsed_seconds);
+            player.record_time(elapsed_seconds, server_config.game);
         }
     }
 }
@@ -253,6 +253,7 @@ void GameLoop::handle_countdown_phase() {
     auto elapsed_time = now - *phase_start;
 
     process_commands_in_countdown_phase();
+    send_countdown_time(countdown_seconds - elapsed_time);
     update_positions(selected_races.races[current_race_index], 0);
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
@@ -361,12 +362,9 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands_in_game_finished_phase();
 
-    if (elapsed_time >= game_finish_seconds) {
-
+    if (elapsed_time >= game_finish_seconds)
         GameLoop::stop();
-
-        game_monitor.stop();
-    }
+    
     fixed_sleep(now);
 }
 
@@ -464,7 +462,7 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
 
     for (auto& [player_id, player]: players) {
 
-        player.update_car_position(race, elapsed_seconds);
+        player.update_car_position(race, elapsed_seconds, server_config.game);
         PlayerDTO player_dto = player.get_info();
         world_snapshot.add_car_position(player_dto, player.get_car_position(race));
     }
@@ -485,6 +483,15 @@ void GameLoop::send_race(const RaceDTO& race) {
 
     GameUpdateDTO race_update(GameLoopAction::SEND_RACE, race);
     game_monitor.broadcast(race_update);
+}
+
+void GameLoop::send_countdown_time(const std::chrono::steady_clock::duration& remaining_time) {
+
+    uint8_t seconds_left = static_cast<uint8_t>(
+            std::chrono::duration_cast<std::chrono::seconds>(remaining_time).count());
+
+    GameUpdateDTO countdown_update(GameLoopAction::COUNTDOWN_TIME, seconds_left);
+    game_monitor.broadcast(countdown_update);
 }
 
 
@@ -575,7 +582,7 @@ void GameLoop::finish_race(uint32_t timeout_time) {
         if (!player.has_finished_race()) {
 
             player.finish_race();
-            player.record_time(timeout_time);
+            player.record_time(timeout_time, server_config.game);
         }
     }
 }
@@ -590,7 +597,7 @@ void GameLoop::check_alive_players() {
             std::cout << "Player with ID: " << player_id << " has died during the race."
                       << std::endl;
             player.finish_race();
-            player.record_time(timeout);
+            player.record_time(timeout, server_config.game);
         }
     }
 }
@@ -603,7 +610,7 @@ void GameLoop::check_race_times(uint32_t seconds) {
 
             std::cout << "Player with ID: " << player_id << " has finished the race in " << seconds
                       << " seconds." << std::endl;
-            player.record_time(seconds);
+            player.record_time(seconds, server_config.game);
         }
     }
 }
@@ -738,12 +745,17 @@ void GameLoop::run() {
 
 void GameLoop::stop() {
 
-    if (_keep_running)
-        _keep_running = false;
+    if (_keep_running) {
 
-    try {
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
         game_monitor.broadcast(game_update);
+
+        game_monitor.unregister_all_players();
+
+        _keep_running = false;
+    }
+
+    try {
 
         players.clear();
     } catch (const std::exception&) {}

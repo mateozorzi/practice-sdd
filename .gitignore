@@ -3,3 +3,4 @@ tags.*
 /venv
 .vscode
 .idea
+nfs_valgrind_log

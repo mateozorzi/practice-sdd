@@ -48,6 +48,7 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
             game["wait_seconds_leaderboard"].as<unsigned int>();
     server_config.game.wait_seconds_game_finished =
             game["wait_seconds_game_finished"].as<unsigned int>();
+    server_config.game.penalty_per_upgrade = game["penalty_per_upgrade"].as<unsigned int>();
 
     if (game["upgrades"]) {
 

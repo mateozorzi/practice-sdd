@@ -18,6 +18,8 @@ enum class ClientAction : uint8_t {
 
 };
 
+constexpr int MAX_UPGRADES_PER_RACE = 4;
+
 enum class GameLoopAction : uint8_t {
 
     SEND_UPDATE_POSITIONS = 0x10,
@@ -30,7 +32,7 @@ enum class GameLoopAction : uint8_t {
     RETURN_TO_LOBBY = 0x17,
     LEADERBOARD = 0x18,
     WINNER_PHASE = 0x19,
-    DISCONNECT = 0x20,
+    COUNTDOWN_TIME = 0x20,
 };
 
 

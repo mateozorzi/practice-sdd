@@ -53,6 +53,7 @@ public:
     void send_races_catalogue(const RaceCatalogueDTO& races);
     void send_json_file(const std::string& file_path);
     void send_game_action(const GameUpdateDTO& game_action);
+    void send_countdown_time(const GameUpdateDTO& countdown_time);
 };
 
 
