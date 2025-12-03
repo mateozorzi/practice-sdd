@@ -45,6 +45,7 @@ void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint) {
     add_uint16_to_buffer(checkpoint.y);
     add_uint8_to_buffer(checkpoint.width);
     add_uint8_to_buffer(checkpoint.height);
+    add_uint8_to_buffer(static_cast<uint8_t>(checkpoint.is_finish_line));
 }
 
 void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
@@ -176,7 +177,8 @@ RaceDTO ServerProtocol::receive_race() {
         const uint16_t y = recv_uint16();
         const uint8_t width = recv_uint8();
         const uint8_t height = recv_uint8();
-        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height));
+        const bool is_finish_line = static_cast<bool>(recv_uint8());
+        checkpoints.push_back(CheckpointDTO(id, orientation, x, y, width, height, is_finish_line));
     }
 
     const uint8_t laps = recv_uint8();
