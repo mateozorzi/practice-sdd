@@ -1,6 +1,7 @@
 #ifndef ANIMATIONS_H
 #define ANIMATIONS_H
 #include <optional>
+#include <unordered_map>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>

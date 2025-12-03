@@ -3,14 +3,14 @@
 #include <QApplication>
 #include <QString>
 #include <QStringList>
-
 #include <iostream>
 
 #include "Lobby/connectioninfo.h"
 
-MenuConnection::MenuConnection(){}
+MenuConnection::MenuConnection() {}
 
 std::pair<std::string, std::string> MenuConnection::run() {
+
     int fake_argc = 0;
     char* fake_argv[] = {nullptr};
     QApplication app(fake_argc, fake_argv);
@@ -21,57 +21,54 @@ std::pair<std::string, std::string> MenuConnection::run() {
 
     std::pair<std::string, std::string> result = std::pair<std::string, std::string>("", "");
 
-    //connect confirm_connection signal
+    // connect confirm_connection signal
     QObject::connect(&c, &ConnectionInfo::emit_confirm_connection, [&](QString ip, QString port) {
-        //check that the fields are not empty or with the correct format of ip or port
-        if(ip.isEmpty() || port.isEmpty()) {
-            //return empty strings to indicate failure
+        // check that the fields are not empty or with the correct format of ip or port
+        if (ip.isEmpty() || port.isEmpty()) {
+            // return empty strings to indicate failure
             app.quit();
             return result;
         }
 
-        //check that port is a number
+        // check that port is a number
         bool ok;
         int port_num = port.toInt(&ok);
-        if(!ok || port_num < 1 || port_num > 65535) {
-            std::cout<<"Invalid port number"<<std::endl;
+        if (!ok || port_num < 1 || port_num > 65535) {
+            std::cout << "Invalid port number" << std::endl;
             app.quit();
             return result;
         }
 
-        //check ip format (basic check)
+        // check ip format (basic check)
         QStringList ip_parts = ip.split(".");
-        if(ip_parts.size() != 4) {
-            std::cout<<"Invalid IP address"<<std::endl;
+        if (ip_parts.size() != 4) {
+            std::cout << "Invalid IP address" << std::endl;
             app.quit();
             return result;
         }
-        for(const QString& part : ip_parts) {
+        for (const QString& part: ip_parts) {
             bool part_ok;
             int part_num = part.toInt(&part_ok);
-            if(!part_ok || part_num < 0 || part_num > 255) {
-                std::cout<<"Invalid IP address"<<std::endl;
+            if (!part_ok || part_num < 0 || part_num > 255) {
+                std::cout << "Invalid IP address" << std::endl;
                 app.quit();
                 return result;
             }
         }
 
         // If we reach this point, the IP and port are valid
-        std::cout << "Connecting to IP: " << ip.toStdString() << " Port: " << port.toStdString() << std::endl;
+        std::cout << "Connecting to IP: " << ip.toStdString() << " Port: " << port.toStdString()
+                  << std::endl;
         result = std::pair<std::string, std::string>(ip.toStdString(), port.toStdString());
         c.close();
         app.quit();
         return result;
     });
 
-    //connect close signal
-    QObject::connect(&c, &ConnectionInfo::emit_close, [&]() {
-        app.quit();
-
-    });
+    // connect close signal
+    QObject::connect(&c, &ConnectionInfo::emit_close, [&]() { app.quit(); });
 
     app.exec();
 
     return result;
 }
-

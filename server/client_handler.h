@@ -34,7 +34,7 @@ class ClientHandler final: public Thread {
     void update_player_username(const std::string& actual_username);
     void send_car_catalogue();
     void list_active_games();
-    void list_load_races();
+    void list_loaded_races();
     void select_races(const LobbyDTO& lobby_dto);
 
     void exit_lobby_and_play(Queue<GameCommand>& command_queue,

@@ -1,6 +1,9 @@
 #ifndef SOUNDS_H
 #define SOUNDS_H
 
+#include <unordered_map>
+#include <vector>
+
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
@@ -30,7 +33,8 @@ public:
 
     void play_engine_sound(bool is_moving);
     void play_upgrade_sound();
-    void play_crash_sound(uint32_t id, const SDL2pp::Point &event_pos, const SDL2pp::Point &target_pos);
+    void play_crash_sound(uint32_t id, const SDL2pp::Point& event_pos,
+                          const SDL2pp::Point& target_pos);
 };
 
 

@@ -7,91 +7,27 @@
 
 #include "../common/race_catalogue_dto.h"
 
+#include "race_loader.h"
 
-Lobby::Lobby(const ServerConfig& config): config(config) { initialize_races(); }
 
-void Lobby::initialize_races() {
-    // races are in races/ folder
-    std::string path_folder = "server/races/";
+Lobby::Lobby(const ServerConfig& server_config):
+        server_config(server_config),
+        races(RaceLoader(server_config.world.races_folder).load_races()) {}
 
-    // if folder does not exist, there is no races to load
-    if (!std::filesystem::exists(path_folder)) {
-        std::cerr << "[" << LOBBY << "] "
-                  << "Race folder not found, no races to load." << std::endl;
-        return;
-    }
-
-    // folder exists, load races
-    for (const auto& entry: std::filesystem::directory_iterator(path_folder)) {
-        if (entry.path().extension() == ".csv") {
-
-            std::ifstream file(entry.path());
-            std::string line;
-
-            // editor info: skip
-            std::getline(file, line);
-            // headers: City, n_laps: skip
-            std::getline(file, line);
-
-            // info city and number of laps
-            std::getline(file, line);
-            std::stringstream ss_(line);
-            std::string cell_;
-            std::vector<std::string> row_;
-
-            while (std::getline(ss_, cell_, ',')) {
-                row_.push_back(cell_);
-            }
-
-            std::string city = row_[0];
-            uint8_t n_laps = static_cast<uint8_t>(std::stoi(row_[1]));
-
-            // header: id, orientation, xCenter, yCenter, height, width,: skip
-            std::getline(file, line);
-            std::vector<CheckpointDTO> checkpoints;
-            while (std::getline(file, line)) {
-                std::stringstream ss(line);
-                std::string cell;
-                std::vector<std::string> row;
-
-                while (std::getline(ss, cell, ',')) {
-                    row.push_back(cell);
-                }
-
-                uint8_t id = static_cast<uint8_t>(std::stoi(row[0]));
-                char orientation = row[1][0];
-                uint16_t x = static_cast<uint16_t>(std::stoi(row[2]));
-                uint16_t y = static_cast<uint16_t>(std::stoi(row[3]));
-                uint8_t height = static_cast<uint8_t>(std::stoi(row[4]));
-                uint8_t width = static_cast<uint8_t>(std::stoi(row[5]));
-
-                CheckpointDTO c(id, orientation, x, y, width, height);
-                checkpoints.push_back(c);
-            }
-
-            // race name is file name withou extension
-            std::string race_name = entry.path().stem().string();
-
-            RaceDTO race(race_name, city, checkpoints, n_laps);
-
-            races.push_back(race);
-        }
-    }
-}
 
 std::optional<GameQueues> Lobby::create_new_game(const uint32_t player_id,
                                                  const std::string& username,
                                                  const uint8_t max_players, const std::string& name,
-                                                 RaceCatalogueDTO& selected) {
+                                                 const RaceCatalogueDTO& selected_races) {
 
     std::lock_guard lock(mtx);
 
-    if (games.size() >= config.server.max_concurrent_games)
+    if (games.size() >= server_config.server.max_concurrent_games)
         return std::nullopt;
 
     uint32_t game_id = player_id;
 
-    auto game = std::make_unique<Game>(max_players, config, name, selected);
+    auto game = std::make_unique<Game>(max_players, server_config, name, selected_races);
 
     auto queues = game->add_player(player_id, username);
     games.emplace(game_id, std::move(game));
@@ -145,7 +81,7 @@ void Lobby::reap() {
 
         if (game.is_empty())
             it = games.erase(it);
-        else 
+        else
             ++it;
     }
 }
@@ -198,8 +134,7 @@ void Lobby::stop() {
 
     std::lock_guard lock(mtx);
 
-    for (auto it = games.begin(); it != games.end();)
-        it = games.erase(it);
+    for (auto it = games.begin(); it != games.end();) it = games.erase(it);
 }
 
 

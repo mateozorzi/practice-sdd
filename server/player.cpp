@@ -168,7 +168,7 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
     if (static_cast<int>(id_next_checkpoint) >= static_cast<int>(race.size_checkpoints)) {
 
         if (n_lap + 1 > race.laps) {
-    
+
             finish_race();
             finished = true;
             return finished;

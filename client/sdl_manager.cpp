@@ -213,7 +213,8 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
 
     // Renderizar autos desde el suelo
     if (my_car.layer != CarLayer::ON_BRIDGE) {
-        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y, cars_texture);
+        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y,
+                      cars_texture);
     }
 
     // Renderizar otros jugadores en suelo (si estan en pantalla)
@@ -228,7 +229,8 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
                 pos.angle = pinfo.angle;
                 pos.layer = pinfo.layer;
                 pos.next = pinfo.checkpoint;
-                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y, cars_texture);
+                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y,
+                              cars_texture);
             }
         }
     }
@@ -237,7 +239,8 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
 
     // Renderizar jugadores sobre puentes
     if (my_car.layer == CarLayer::ON_BRIDGE) {
-        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y, cars_texture);
+        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y,
+                      cars_texture);
     }
 
     // Renderizar otros jugadores en puentes (si estan en pantalla)
@@ -252,7 +255,8 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
                 pos.angle = pinfo.angle;
                 pos.layer = pinfo.layer;
                 pos.next = pinfo.checkpoint;
-                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y, cars_texture);
+                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y,
+                              cars_texture);
             }
         }
     }
@@ -263,7 +267,7 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 }
 
-void SDLManager::set_sound_info(const std::vector<uint32_t> &ids) {
+void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
 
@@ -294,12 +298,12 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.explosion_shown = false;
     }
 
-    for (auto& [pid, pinfo] : game_state.players) {
+    for (auto& [pid, pinfo]: game_state.players) {
         bool is_dead = pinfo.died || pinfo.life <= 0;
         if (is_dead && !pinfo.explosion_shown) {
             animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
             pinfo.explosion_shown = true;
-    }
+        }
         if (!is_dead) {
             pinfo.explosion_shown = false;
         }
@@ -317,7 +321,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     SDL2pp::Point target_pos = camera.get_center();
 
-    for (auto& [pid, pinfo] : game_state.players) {
+    for (auto& [pid, pinfo]: game_state.players) {
         if (pinfo.crashed) {
             sounds.play_crash_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
             pinfo.crashed = false;
@@ -354,7 +358,8 @@ void SDLManager::render(LocalInfo& game_state) {
 
     // Renderizar autos desde el suelo
     if (my_car.layer != CarLayer::ON_BRIDGE) {
-        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y, cars_texture);
+        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y,
+                      cars_texture);
     }
 
     // Renderizar otros jugadores en suelo (si estan en pantalla)
@@ -369,7 +374,8 @@ void SDLManager::render(LocalInfo& game_state) {
                 pos.angle = pinfo.angle;
                 pos.layer = pinfo.layer;
                 pos.next = pinfo.checkpoint;
-                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y, cars_texture);
+                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y,
+                              cars_texture);
             }
         }
     }
@@ -378,7 +384,8 @@ void SDLManager::render(LocalInfo& game_state) {
 
     // Renderizar jugadores sobre puentes
     if (my_car.layer == CarLayer::ON_BRIDGE) {
-        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y, cars_texture);
+        render_player(my_car, my_player.model, my_player.isMoving, view_rect, scale_x, scale_y,
+                      cars_texture);
     }
 
     // Renderizar otros jugadores en puentes (si estan en pantalla)
@@ -393,7 +400,8 @@ void SDLManager::render(LocalInfo& game_state) {
                 pos.angle = pinfo.angle;
                 pos.layer = pinfo.layer;
                 pos.next = pinfo.checkpoint;
-                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y, cars_texture);
+                render_player(pos, pinfo.model, pinfo.isMoving, view_rect, scale_x, scale_y,
+                              cars_texture);
             }
         }
     }
@@ -412,7 +420,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 
-    if(my_player.died || my_player.life <= 0){
+    if (my_player.died || my_player.life <= 0) {
         render_center_box("Your car exploded!", SDL2pp::Color(255, 0, 0, 255));
     } else if (my_player.finish_race) {
         render_center_box("You have finished the race!", SDL2pp::Color(255, 215, 0, 255));
@@ -713,4 +721,3 @@ void SDLManager::load_city(const std::string& city_name) {
     load_bridges_rects(load_json_file(bridges));
     load_decorations_rects(load_json_file(decoration));
 }
-

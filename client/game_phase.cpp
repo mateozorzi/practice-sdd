@@ -6,7 +6,8 @@
 
 #include "game.h"
 
-GamePhase::GamePhase(Game& game, int starting_it, int fps): game(game), it(starting_it), FPS_CLIENT(fps) {}
+GamePhase::GamePhase(Game& game, int starting_it, int fps):
+        game(game), it(starting_it), FPS_CLIENT(fps) {}
 
 bool GamePhase::run() {
     bool loop = true;
@@ -66,7 +67,8 @@ void LeaderboardPhase::handle_game_events() { game.handle_leaderboard_events(); 
 bool LeaderboardPhase::update_game_state() { return game.update_leaderboard(); }
 void LeaderboardPhase::show_game() { game.show_leaderboard(); }
 
-GameFinishedPhase::GameFinishedPhase(Game& game, int starting_it): GamePhase(game, starting_it, 30) {}
-void GameFinishedPhase::handle_game_events() {game.handle_game_finished_events(); }
+GameFinishedPhase::GameFinishedPhase(Game& game, int starting_it):
+        GamePhase(game, starting_it, 30) {}
+void GameFinishedPhase::handle_game_events() { game.handle_game_finished_events(); }
 bool GameFinishedPhase::update_game_state() { return game.update_game_finished(); }
 void GameFinishedPhase::show_game() { game.show_game_finished(); }

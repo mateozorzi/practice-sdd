@@ -92,6 +92,7 @@ struct CityLoaderConfig {
 struct WorldConfig {
 
     unsigned int pixels_per_meter;
+    std::string races_folder;
     struct CityLoaderConfig liberty_city;
     struct CityLoaderConfig san_andreas;
     struct CityLoaderConfig vice_city;
