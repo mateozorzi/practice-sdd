@@ -165,6 +165,11 @@ install_assets() {
     sudo mkdir -p /var/nfs/world
     sudo cp -r server/world/* /var/nfs/world/
 
+    print_info "Ajustando permisos..."
+    sudo chown -R "$USER":"$USER" /var/nfs/assets
+    sudo chown -R "$USER":"$USER" /var/nfs/races
+    sudo chown -R "$USER":"$USER" /var/nfs/world
+
     print_success "Assets + races + world instalados"
 }
 
