@@ -132,7 +132,7 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
         << "n_laps"
         << "\n";
     out << city << "," << n_laps << "\n";
-    out << "id, orientation, xCenter, yCenter, height, width,"
+    out << "id, orientation, xCenter, yCenter, width, height"
         << "\n";
     for (const Checkpoint& p: checkpoints) {
         int id_checkpoint = p.id;
@@ -142,7 +142,7 @@ bool Coordinates::export_checkpoints(const QString& name, const QString& map, co
         int height = r.height();
         int width = r.width();
         out << id_checkpoint << "," << orientation << "," << center.x() << "," << center.y() << ","
-            << height << "," << width << "\n";
+            << width << "," << height << "\n";
     }
 
     archivo.close();
