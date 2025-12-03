@@ -30,6 +30,8 @@ target_sources(nfs_client
     Lobby/raceselector.cpp
     sounds.cpp
     leaderboard_info.cpp
+    Lobby/connectioninfo.cpp
+    menu_connection.cpp
 
     ${QRC_FILES}
     ${UI_FILES}
@@ -60,5 +62,7 @@ target_sources(nfs_client
     Lobby/waitingroom.h
     Lobby/raceselector.h
     leaderboard_info.h
+    Lobby/connectioninfo.h
+    menu_connection.h
 
     )

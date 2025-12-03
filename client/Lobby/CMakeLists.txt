@@ -40,6 +40,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 
         raceselector.h raceselector.cpp raceselector.ui
+        connectioninfo.h connectioninfo.cpp connectioninfo.ui
 
 
 

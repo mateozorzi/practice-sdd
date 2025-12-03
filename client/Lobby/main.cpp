@@ -8,6 +8,7 @@
 #include "lobby.h"
 #include "selectcars.h"
 #include "waitingroom.h"
+#include "connectioninfo.h"
 
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
@@ -22,6 +23,9 @@ int main(int argc, char* argv[]) {
 
     // CreateLobby c;
     // c.show();
+
+    ConnectionInfo c;
+    c.showMaximized();
 
     return a.exec();
 }
