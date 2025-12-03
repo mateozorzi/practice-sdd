@@ -21,6 +21,8 @@ private:
     EngineState engine_state;
     Uint32 engine_delay = 2500;
 
+    Uint8 calculate_distance(const SDL2pp::Point& event_pos, const SDL2pp::Point& target_pos);
+
 public:
     Sounds(SDL2pp::Mixer& mixer, ResourceManager& resources);
 
@@ -28,7 +30,7 @@ public:
 
     void play_engine_sound(bool is_moving);
     void play_upgrade_sound();
-    void play_crash_sound(uint32_t id);
+    void play_crash_sound(uint32_t id, const SDL2pp::Point &event_pos, const SDL2pp::Point &target_pos);
 };
 
 

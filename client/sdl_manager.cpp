@@ -295,14 +295,17 @@ void SDLManager::render(LocalInfo& game_state) {
     if (game_state.player.crashed) {
         if (!animations.is_camera_shake_active(iteration_counter)) {
             animations.start_camera_shake(iteration_counter);
-            sounds.play_crash_sound(game_state.id);
+            SDL2pp::Point player_pos(pos_x, pos_y);
+            sounds.play_crash_sound(game_state.id, player_pos, player_pos);
         }
         game_state.player.crashed = false;
     }
 
+    SDL2pp::Point target_pos = camera.get_center();
+
     for (auto& [pid, pinfo] : game_state.players) {
         if (pinfo.crashed) {
-            sounds.play_crash_sound(pid);
+            sounds.play_crash_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
             pinfo.crashed = false;
         }
     }
