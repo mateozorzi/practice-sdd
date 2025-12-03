@@ -342,10 +342,8 @@ bool Game::update_race() {
 }
 
 void Game::show_race() {
-
-    sdl.clear_screen();
+    // render() ya llama internamente a clear_screen() y show_screen()
     sdl.render(game_state);
-    sdl.show_screen();
 }
 
 void Game::handle_leaderboard_events() { input_handler.handle_leaderboard(); }

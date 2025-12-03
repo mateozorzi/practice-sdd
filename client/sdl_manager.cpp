@@ -22,7 +22,7 @@ SDLManager::SDLManager():
         mixer(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024),
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
                SDL_WINDOW_RESIZABLE),
-        renderer(window, -1, SDL_RENDERER_ACCELERATED),
+        renderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC),
         resources(renderer),
         camera(CAMERA_VIEW_WIDTH, CAMERA_VIEW_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT),
         sounds(mixer, resources),
@@ -312,21 +312,9 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.explosion_shown = false;
     }
 
-    SDL2pp::Point target_pos_explosion = camera.get_center();
+    SDL2pp::Point target_pos = camera.get_center();
 
-    for (auto& [pid, pinfo] : game_state.players) {
-        bool is_dead = pinfo.died || pinfo.life <= 0;
-        if (is_dead && !pinfo.explosion_shown) {
-            animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
-            sounds.play_explosion_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos_explosion);
-            pinfo.explosion_shown = true;
-        }
-        if (!is_dead) {
-            pinfo.explosion_shown = false;
-        }
-    }
-
-    // Usar flag crashed para detectar crash
+    // Usar flag crashed para detectar crash del jugador principal
     if (game_state.player.crashed) {
         if (!animations.is_camera_shake_active(iteration_counter)) {
             animations.start_camera_shake(iteration_counter);
@@ -336,9 +324,20 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.crashed = false;
     }
 
-    SDL2pp::Point target_pos = camera.get_center();
-
-    for (auto& [pid, pinfo]: game_state.players) {
+    // Unica iteracion para detectar explosiones y crashes de otros jugadores
+    for (auto& [pid, pinfo] : game_state.players) {
+        // Detectar muerte/explosion
+        bool is_dead = pinfo.died || pinfo.life <= 0;
+        if (is_dead && !pinfo.explosion_shown) {
+            animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
+            sounds.play_explosion_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
+            pinfo.explosion_shown = true;
+        }
+        if (!is_dead) {
+            pinfo.explosion_shown = false;
+        }
+        
+        // Detectar crash
         if (pinfo.crashed) {
             sounds.play_crash_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
             pinfo.crashed = false;

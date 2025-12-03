@@ -68,7 +68,7 @@ void CountdownPhase::handle_game_events() { game.handle_countdown_events(); }
 bool CountdownPhase::update_game_state() { return game.update_countdown(); }
 void CountdownPhase::show_game() { game.show_countdown(); }
 
-RacePhase::RacePhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
+RacePhase::RacePhase(Game& game, int starting_it): GamePhase(game, starting_it, 60) {}
 void RacePhase::handle_game_events() { game.handle_race_events(); }
 bool RacePhase::update_game_state() { return game.update_race(); }
 void RacePhase::show_game() { game.show_race(); }
