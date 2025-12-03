@@ -28,21 +28,19 @@ class Lobby {
 
     std::mutex mtx;
     std::unordered_map<uint32_t, std::unique_ptr<Game>> games;
-    const ServerConfig& config;
+    const ServerConfig& server_config;
     std::vector<RaceDTO> races;
-
-    void initialize_races();
 
 
 public:
     Lobby(const Lobby&) = delete;
     Lobby& operator=(const Lobby&) = delete;
 
-    explicit Lobby(const ServerConfig& config);
+    explicit Lobby(const ServerConfig& server_config);
 
     std::optional<GameQueues> create_new_game(uint32_t player_id, const std::string& username,
                                               uint8_t max_players, const std::string& name,
-                                              RaceCatalogueDTO& selected);
+                                              const RaceCatalogueDTO& selected_races);
     std::optional<GameQueues> join_existing_game(uint32_t player_id, uint32_t game_id,
                                                  const std::string& username);
     LobbyCatalogueDTO list_games();

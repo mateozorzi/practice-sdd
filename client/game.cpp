@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <utility>
+#include <vector>
 
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
@@ -49,44 +50,42 @@ void Game::run() {
 
 
 void Game::reset_events() {
-
     for (auto& [username, p]: game_state.players) {
 
         p.crashed = false;
-        p.died = false;
         p.isMoving = false;
     }
     game_state.player.crashed = false;
     game_state.player.isMoving = false;
-    game_state.player.died = false;
 }
 
-void Game::detect_events(const WorldSnapshotDTO& snapshot) {
+void Game::detect_events_for_player(PlayerInfo& info, const PlayerDTO& dto,
+                                    const CarPositionDTO& car_pos) {
+    // Detectar movimiento
+    if (info.x != (int)car_pos.x_position || info.y != (int)car_pos.y_position ||
+        info.angle != (int)car_pos.angle) {
+        info.isMoving = true;
+    }
 
-    for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
+    // Detectar muerte
+    if (dto.dead && !info.died) {
+        info.died = true;
+        return;
+    }
 
-        const uint32_t& id = playerDTO.id;
-        auto it = game_state.players.find(id);
-
-        if (it == game_state.players.end())
-            continue;
-
-        PlayerInfo& prev = it->second;
-        bool moved = false;
-
-        if (prev.x != (int)carPos.x_position || prev.y != (int)carPos.y_position ||
-            prev.angle != (int)carPos.angle)
-            moved = true;
-
-        prev.isMoving = moved;
+    // Detectar choque (reduccion de vida)
+    if (dto.health < info.life && dto.health > 0) {
+        info.crashed = true;
     }
 }
 
-void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
-
+void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car,
+                         const std::unordered_map<uint32_t, PlayerInfo>& last_state) {
     if (player.id == game_state.id) {
-
         PlayerInfo& info = game_state.player;
+
+        detect_events_for_player(info, player, car);
+
         info.id = player.id;
         info.x = car.x_position;
         info.y = car.y_position;
@@ -106,6 +105,12 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
 
     PlayerInfo& info = game_state.players[player.id];
 
+    auto last_it = last_state.find(player.id);
+    if (last_it != last_state.end()) {
+        info = last_it->second;
+        detect_events_for_player(info, player, car);
+    }
+
     info.id = player.id;
     info.model = player.car.model;
     info.life = player.health;
@@ -124,16 +129,11 @@ void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car) {
 
 void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
 
+    std::unordered_map<uint32_t, PlayerInfo> last_state = std::move(game_state.players);
     game_state.players.clear();
 
     for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
-
-        if (playerDTO.username == game_state.player.model || playerDTO.id == game_state.player.id) {
-
-            update_player(playerDTO, carPos);
-            continue;
-        }
-        update_player(playerDTO, carPos);
+        update_player(playerDTO, carPos, last_state);
     }
 
     game_state.npcs = snapshot.get_npc_positions();
@@ -156,7 +156,12 @@ bool Game::update_waiting() {
             return true;
         }
         if (dto.gameloop_action == GameLoopAction::START_SHOP) {
-
+            std::vector<uint32_t> ids;
+            ids.push_back(game_state.id);
+            for (const auto& [id, player]: game_state.players) {
+                ids.push_back(id);
+            }
+            sdl.set_sound_info(ids);
             game_state.phase = Phase::UPGRADE;
             return false;
         }
@@ -220,10 +225,7 @@ bool Game::update_upgrade() {
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
 
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-
-                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
-                detect_events(snapshot);
-                last = std::move(snapshot);
+                last = std::get<WorldSnapshotDTO>(dto.data);
                 got_snapshot = true;
             }
         }
@@ -268,9 +270,7 @@ bool Game::update_countdown() {
 
         if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
-                detect_events(snapshot);
-                last = std::move(snapshot);
+                last = std::get<WorldSnapshotDTO>(dto.data);
                 got_snapshot = true;
             }
         }
@@ -314,10 +314,7 @@ bool Game::update_race() {
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
 
             if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-
-                WorldSnapshotDTO snapshot = std::get<WorldSnapshotDTO>(dto.data);
-                detect_events(snapshot);
-                last = std::move(snapshot);
+                last = std::get<WorldSnapshotDTO>(dto.data);
                 got_snapshot = true;
             }
         } else if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {

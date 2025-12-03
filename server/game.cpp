@@ -5,13 +5,13 @@
 
 
 Game::Game(const uint8_t max_players, const ServerConfig& config, std::string name,
-           RaceCatalogueDTO& selected):
+           const RaceCatalogueDTO& selected_races):
         max_players(max_players),
         config(config),
         name(std::move(name)),
         command_queue(static_cast<size_t>(config.server.command_queue_capacity)),
         game_monitor(config),
-        game_loop(game_monitor, command_queue, max_players, config, selected) {}
+        game_loop(game_monitor, command_queue, max_players, config, selected_races) {}
 
 
 bool Game::is_full() const { return game_loop.is_full(); }

@@ -29,3 +29,7 @@ bool Camera::on_screen(const SDL2pp::Rect& game) {
     const SDL2pp::Rect view = get_view_rect();
     return view.Intersects(game);
 }
+
+SDL2pp::Point Camera::get_center() const {
+    return SDL2pp::Point(camera_x + view_width / 2, camera_y + view_height / 2);
+}

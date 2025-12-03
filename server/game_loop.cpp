@@ -19,7 +19,7 @@
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                    const uint8_t max_players, const ServerConfig& server_config,
-                   RaceCatalogueDTO& selected):
+                   const RaceCatalogueDTO& selected_races):
         server_config(server_config),
         max_players(max_players),
         game_iteration_duration(1000 / server_config.game.game_fps),
@@ -32,7 +32,7 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         command_queue(command_queue),
         city_loader(box2d_world, server_config),
         collision_listener(players),
-        selected_races(selected) {
+        selected_races(selected_races) {
 
     box2d_world.SetContactListener(&collision_listener);
 }

@@ -12,6 +12,7 @@
 MenuConnection::MenuConnection() {}
 
 std::pair<std::string, std::string> MenuConnection::run() {
+
     int fake_argc = 0;
     char* fake_argv[] = {nullptr};
     QApplication app(fake_argc, fake_argv);
