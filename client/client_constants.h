@@ -90,9 +90,6 @@ constexpr uint8_t COLOR_GOLD_A = 255;
 
 constexpr uint8_t COLOR_BLACK_ALPHA = 100;
 
-// Rendering delays
-constexpr uint32_t RENDER_DELAY_MS = 10;
-
 // Angle conversion
 constexpr double ANGLE_OFFSET_DEGREES = 90.0;
 constexpr double FULL_CIRCLE_DEGREES = 360.0;
