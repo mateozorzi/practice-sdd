@@ -15,6 +15,7 @@ private:
     SDL2pp::Mixer& mixer;
     ResourceManager& resources;
     std::unordered_map<uint32_t, int> crash_channels;
+    std::unordered_map<uint32_t, int> explosion_channels;
     int current_channel = 1;
     int engine_channel = 0;
     int upgrade_channel = 0;
@@ -31,6 +32,7 @@ public:
     void play_engine_sound(bool is_moving);
     void play_upgrade_sound();
     void play_crash_sound(uint32_t id, const SDL2pp::Point &event_pos, const SDL2pp::Point &target_pos);
+    void play_explosion_sound(uint32_t id, const SDL2pp::Point& event_pos, const SDL2pp::Point& target_pos);
 };
 
 
