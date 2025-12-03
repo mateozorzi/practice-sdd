@@ -24,7 +24,8 @@ constexpr std::string_view PLAYER = "PLAYER";
 
 class Player {
 
-    uint32_t client_id;
+
+    uint32_t player_id;
     std::string username;
     std::unique_ptr<Car> car;
     uint16_t health = 0;
@@ -39,8 +40,10 @@ class Player {
     bool dead = false;
     uint16_t base_health = 0;
     bool penalty = false;
+    int n_penalty = 0;
+    bool infinite_health = false;
 
-    void update_next_checkpoint(const RaceDTO& race);
+    bool update_next_checkpoint(const RaceDTO& race);
     bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
 
 
@@ -48,14 +51,15 @@ public:
     Player(const Player&) = delete;
     Player& operator=(const Player&) = delete;
 
-    explicit Player(uint32_t client_id, const std::string& username);
+    explicit Player(uint32_t player_id, const std::string& username);
 
-    void create_car(const CarDTO& car_dto, const CarConfig& car_config, b2World& box2d_world);
+    void create_car(const std::string& car_model, const ServerConfig& car_config,
+                    b2World& box2d_world);
 
-    uint32_t get_client_id() const;
+    uint32_t get_id() const;
     const std::string& get_username() const;
     const CarDTO get_car() const;
-    CarPositionDTO get_car_position() const;
+    CarPositionDTO get_car_position(const RaceDTO& race) const;
     b2Body* get_car_body() const;
     CarLayer get_car_layer() const;
     uint32_t get_recorded_time() const;
@@ -64,12 +68,13 @@ public:
     uint16_t get_health() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
-    void update_car_position(const RaceDTO& race);
+    void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds, const GameConfig& game_config);
     void set_car_collision(bool colliding);
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     void set_car_layer(CarLayer layer);
     void set_in_game();
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
+    void activate_infinite_health();
 
     bool is_in_game() const;
     void start_race();
@@ -77,7 +82,7 @@ public:
     void finish_race();
     bool has_finished_race() const;
     bool have_time_recorded() const;
-    void record_time(uint32_t seconds);
+    void record_time(uint32_t seconds, const GameConfig& game_config);
 
     bool is_dead() const;
 

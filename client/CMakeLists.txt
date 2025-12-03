@@ -17,6 +17,8 @@ target_sources(nfs_client
     resource_manager.cpp
     animations.cpp
     upgrade_shop.cpp
+    game.cpp
+    game_phase.cpp
 
     Lobby/lobby.cpp
     Lobby/selectcars.cpp
@@ -24,10 +26,12 @@ target_sources(nfs_client
     Lobby/createlobby.cpp
     Lobby/joinlobby.cpp
     Lobby/waitingroom.cpp
-    lobbyreceiver.cpp
     menu_interface.cpp
     Lobby/raceselector.cpp
     sounds.cpp
+    leaderboard_info.cpp
+    Lobby/connectioninfo.cpp
+    menu_connection.cpp
 
     ${QRC_FILES}
     ${UI_FILES}
@@ -45,6 +49,9 @@ target_sources(nfs_client
     resource_manager.h
     animations.h
     upgrade_shop.h
+    game.h
+    game_phase.h
+    game_state.h
 
     Lobby/lobby.h
     Lobby/selectcars.h
@@ -54,7 +61,8 @@ target_sources(nfs_client
     Lobby/joinlobby.h
     Lobby/waitingroom.h
     Lobby/raceselector.h
-    lobbyreceiver.h
-
+    leaderboard_info.h
+    Lobby/connectioninfo.h
+    menu_connection.h
 
     )

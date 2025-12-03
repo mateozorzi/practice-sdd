@@ -2,6 +2,8 @@ world:
 
   pixels_per_meter: 30
 
+  races_folder: "server/races/"
+
 
   liberty_city:
     collidables:

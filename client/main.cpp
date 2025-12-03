@@ -2,12 +2,18 @@
 #include <iostream>
 
 #include "client.h"
+#include "menu_connection.h"
 
 constexpr uint8_t SUCCESS = 0;
 constexpr uint8_t ERROR = 1;
 
 int main() try {
-    Client client("127.0.0.1", "8080");
+    MenuConnection menu_connection;
+    std::pair<std::string, std::string> connection_data = menu_connection.run();
+    if (connection_data.first.empty() || connection_data.second.empty()) {
+        return SUCCESS;
+    }
+    Client client(connection_data.first, connection_data.second);
     client.run();
     return SUCCESS;
 } catch (std::exception& e) {

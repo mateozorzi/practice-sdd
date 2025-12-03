@@ -3,6 +3,7 @@
 #include "../../common/car_catalogue_dto.h"
 #include "../../common/car_dto.h"
 
+#include "connectioninfo.h"
 #include "creategame.h"
 #include "createlobby.h"
 #include "lobby.h"
@@ -22,6 +23,9 @@ int main(int argc, char* argv[]) {
 
     // CreateLobby c;
     // c.show();
+
+    ConnectionInfo c;
+    c.showMaximized();
 
     return a.exec();
 }

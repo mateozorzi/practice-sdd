@@ -2,6 +2,7 @@
 #define EVENT_DTO_H
 #include <variant>
 
+#include "constants.h"
 #include "movement_dto.h"
 
 
@@ -11,7 +12,13 @@ struct BuyUpgradeDTO {
     ButtonType upgrade;
 };
 
-using ClientEventDTO = std::variant<MovementDTO, BuyUpgradeDTO>;
+struct ClientActionDTO {
+    ClientAction action;
+
+    explicit ClientActionDTO(ClientAction action): action(action) {}
+};
+
+using ClientEventDTO = std::variant<ClientActionDTO, MovementDTO, BuyUpgradeDTO>;
 
 
 #endif

@@ -1,15 +1,12 @@
 game:
 
   game_fps: 60
-
-  max_concurrent_games: 10
-  min_races_per_game: 2
-  max_races_per_game: 5
-  min_players_per_game: 2
-  max_players_per_game: 8
-
-  wait_time_upgrade_menu: 10
-  wait_time_final_leaderboard: 20
+  wait_seconds_upgrade_shop: 10
+  wait_seconds_countdown: 3
+  timeout_seconds_race: 600
+  wait_seconds_leaderboard: 5
+  wait_seconds_game_finished: 5
+  penalty_per_upgrade: 10
 
   upgrades:
     health_upgrade: 50.0
@@ -20,6 +17,10 @@ game:
 
 server:
   server_port: 8080
-  command_queue_capacity: 500
+  max_concurrent_games: 3
+  min_races_per_game: 1
+  max_races_per_game: 8
+  min_players_per_game: 1
+  max_players_per_game: 8
+  command_queue_capacity: 300
   snapshot_queue_capacity: 100
-  waiting_for_players_fps: 15

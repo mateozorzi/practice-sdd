@@ -9,6 +9,7 @@
 
 #include "../common/client_event_dto.h"
 
+#include "camera.h"
 #include "resource_manager.h"
 #include "sounds.h"
 
@@ -34,8 +35,7 @@ private:
     SDL2pp::Mixer& mixer;
     ResourceManager& resources;
     Sounds& sounds;
-    SDL2pp::SDLTTF ttf;
-    SDL2pp::Font font;
+    std::string font_path;
 
     std::vector<ShopButton> buttons;
     SDL2pp::Rect shop_rect;
@@ -54,10 +54,11 @@ public:
                         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
 
     void set_shop_info(const ShopInfoDTO& info);
-    void render(int player_time, Car player_car);
+    void render(int player_time, Car player_car, const std::string& map_name, const Camera& camera);
     bool is_shop_open() const;
     void toggle_shop();
     std::optional<ButtonType> interact_button(int x, int y, int time);
+    void close_shop();
 };
 
 

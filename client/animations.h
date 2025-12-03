@@ -1,6 +1,7 @@
 #ifndef ANIMATIONS_H
 #define ANIMATIONS_H
 #include <optional>
+#include <unordered_map>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
@@ -25,21 +26,22 @@ private:
         int duration = frames * frame_duration;
     };
 
-    std::optional<ExplosionAnimation> explosion;
+    std::unordered_map<uint32_t, ExplosionAnimation> explosions;
 
     struct CameraShakeAnimation {
         int start_it;
         int duration = 30;
     };
 
-    std::optional<ExplosionAnimation> camera_shake;
+    std::optional<CameraShakeAnimation> camera_shake;
 
 public:
     Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources);
 
-    void start_explosion(int current_it, SDL2pp::Point position);
-    bool is_explosion_active(int current_it);
-    void render_explosion(int current_it);
+    void start_explosion(uint32_t id, int current_it, SDL2pp::Point position);
+    bool is_explosion_active(uint32_t id) const;
+    void render_explosions(int current_it);
+    void clean_explosions(int current_it);
 
     void start_camera_shake(int current_it);
     bool is_camera_shake_active(int current_it);

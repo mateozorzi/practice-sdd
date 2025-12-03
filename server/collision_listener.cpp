@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <utility>
+#include <iostream>
 
 #include "city_utils.h"
 
@@ -88,6 +88,8 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
             player.set_car_layer(CarLayer::ON_BRIDGE);
         else if (sensor_type == SensorType::UNDER_BRIDGE)
             player.set_car_layer(CarLayer::UNDER_BRIDGE);
+        else if (sensor_type == SensorType::CHECKPOINT)
+            std::cout << "Player in checkpoint" << std::endl;
     } else {
 
         bool should_reset =
@@ -109,11 +111,6 @@ void CollisionListener::handle_two_car_collision(Player& player_a, Player& playe
     player_a.apply_collision_damage(static_cast<uint16_t>(damage));
     player_b.apply_collision_damage(static_cast<uint16_t>(damage));
 
-    std::cerr << "Player with ID: " << player_a.get_client_id()
-              << " collided - HP: " << player_a.get_health() << '\n';
-    std::cerr << "Player with ID: " << player_b.get_client_id()
-              << " collided - HP: " << player_b.get_health() << '\n';
-
     float velocity_reduction = std::min(0.5f + damage / 100.0f, 0.9f);
     float scale = 1.0f - velocity_reduction;
 
@@ -125,9 +122,6 @@ void CollisionListener::handle_static_collision(Player& player, b2Body& body, fl
 
     float damage = std::min(speed * 2.0f, 40.0f);
     player.apply_collision_damage(static_cast<uint16_t>(damage));
-
-    std::cerr << "Player with ID: " << player.get_client_id()
-              << " collided with static object - HP: " << player.get_health() << '\n';
 
     body.SetLinearVelocity(0.3f * body.GetLinearVelocity());
 }

@@ -10,7 +10,7 @@
 
 GameMonitor::GameMonitor(const ServerConfig& config): config(config) {}
 
-Queue<GameUpdateDTO>& GameMonitor::register_client(const uint32_t client_id) {
+Queue<GameUpdateDTO>& GameMonitor::register_player(const uint32_t player_id) {
 
     std::lock_guard lock(mtx);
 
@@ -18,16 +18,16 @@ Queue<GameUpdateDTO>& GameMonitor::register_client(const uint32_t client_id) {
             static_cast<size_t>(config.server.snapshot_queue_capacity));
     Queue<GameUpdateDTO>& queue_reference = *queue_pointer;
 
-    snapshot_queues[client_id] = std::move(queue_pointer);
+    snapshot_queues[player_id] = std::move(queue_pointer);
 
     return queue_reference;
 }
 
-void GameMonitor::unregister_client(const uint32_t client_id) {
+void GameMonitor::unregister_player(const uint32_t player_id) {
 
     std::lock_guard lock(mtx);
 
-    const auto it = snapshot_queues.find(client_id);
+    const auto it = snapshot_queues.find(player_id);
 
     if (it != snapshot_queues.end()) {
 
@@ -38,12 +38,37 @@ void GameMonitor::unregister_client(const uint32_t client_id) {
     }
 }
 
+void GameMonitor::unregister_all_players() {
+
+    std::lock_guard lock(mtx);
+
+    for (auto& [player_id, snapshot_queue]: snapshot_queues) {
+
+        try {
+
+            snapshot_queue->close();
+        } catch (const std::exception&) {}
+    }
+}
+
+
+void GameMonitor::send_update_to_player(const GameUpdateDTO& info, const uint32_t player_id) {
+
+    std::lock_guard lock(mtx);
+
+    const auto it = snapshot_queues.find(player_id);
+
+    if (it == snapshot_queues.end())
+        return;
+
+    it->second->try_push(info);
+}
 
 void GameMonitor::broadcast(const GameUpdateDTO& info) {
 
     std::lock_guard lock(mtx);
 
-    for (auto& [client_id, snapshot_queue]: snapshot_queues) {
+    for (auto& [player_id, snapshot_queue]: snapshot_queues) {
 
         try {
 
@@ -53,28 +78,21 @@ void GameMonitor::broadcast(const GameUpdateDTO& info) {
 }
 
 
-void GameMonitor::remove_client(const uint32_t client_id) {
+void GameMonitor::remove_player(const uint32_t player_id) {
 
     std::lock_guard lock(mtx);
 
-    const auto it = snapshot_queues.find(client_id);
+    const auto it = snapshot_queues.find(player_id);
 
-    if (it != snapshot_queues.end())
-        snapshot_queues.erase(it);
+    if (it == snapshot_queues.end())
+        return;
+
+    snapshot_queues.erase(it);
 }
-
 
 void GameMonitor::stop() {
 
     std::lock_guard lock(mtx);
-
-    for (auto& [client_id, snapshot_queue]: snapshot_queues) {
-
-        try {
-
-            snapshot_queue->close();
-        } catch (const std::exception&) {}
-    }
 
     snapshot_queues.clear();
 }
@@ -82,9 +100,11 @@ void GameMonitor::stop() {
 
 GameMonitor::~GameMonitor() {
 
+    std::cerr << "[" << GAME_MONITOR << "] Stopping." << std::endl;
     try {
 
-        stop();
+        unregister_all_players();
+        GameMonitor::stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << GAME_MONITOR << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();

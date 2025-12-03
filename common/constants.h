@@ -7,23 +7,33 @@
 
 enum class ClientAction : uint8_t {
 
-    DISCONNECT = 0x00,
-    SEND_USERNAME = 0x01,
+    DISCONNECT = 0x0D,
+    SEND_CAR_SELECTION = 0x01,
+    SEND_UPGRADE = 0x02,
     SEND_CAR_MOVEMENT = 0x03,
-    SEND_CAR_SELECTION = 0x05,
-    GET_JSON_FILE = 0x06,
-    SEND_UPGRADE = 0x07,
+    GET_JSON_FILE = 0x04,
+    CHEAT_WIN_RACE = 0x05,
+    CHEAT_WIN_GAME = 0x06,
+    CHEAT_INFINITE_HEALTH = 0x07,
 
 };
 
+constexpr int MAX_UPGRADES_PER_RACE = 4;
+
 enum class GameLoopAction : uint8_t {
 
+    DISCONNECT = 0xDD,
     SEND_UPDATE_POSITIONS = 0x10,
     SEND_RACE = 0x11,
-    SEND_RACE_FINISHED = 0x12,
+    START_RACE = 0x12,
     SEND_LEADERBOARD = 0x13,
     START_SHOP = 0x14,
-    CLOSE_SHOP = 0x15,
+    START_COUNTDOWN = 0x15,
+    GAME_FINISHED = 0x16,
+    RETURN_TO_LOBBY = 0x17,
+    LEADERBOARD = 0x18,
+    WINNER_PHASE = 0x19,
+    COUNTDOWN_TIME = 0x20,
 };
 
 
@@ -54,10 +64,6 @@ constexpr int MAX_PATH_LENGTH = 4096;
 // EXCEPTIONS
 constexpr std::string_view EXCEPTION = "Exception";
 constexpr std::string_view EXCEPTION_IN_DESTRUCTOR = "Exception in destructor";
-
-// WORLD
-// TODO: remove, now in yaml
-constexpr float PIXELS_PER_METER = 30.0f;
 
 
 #endif

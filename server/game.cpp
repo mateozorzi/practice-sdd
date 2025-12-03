@@ -4,15 +4,14 @@
 #include "../common/race_catalogue_dto.h"
 
 
-Game::Game(const uint32_t game_id, const uint8_t max_players, const ServerConfig& config,
-           std::string name, RaceCatalogueDTO& selected):
+Game::Game(const uint8_t max_players, const ServerConfig& config, std::string name,
+           const RaceCatalogueDTO& selected_races):
         max_players(max_players),
-        game_id(game_id),
         config(config),
         name(std::move(name)),
         command_queue(static_cast<size_t>(config.server.command_queue_capacity)),
         game_monitor(config),
-        game_loop(game_monitor, command_queue, max_players, config, selected) {}
+        game_loop(game_monitor, command_queue, max_players, config, selected_races) {}
 
 
 bool Game::is_full() const { return game_loop.is_full(); }
@@ -21,24 +20,22 @@ bool Game::is_empty() const { return game_loop.is_empty(); }
 
 
 std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&> Game::add_player(
-        const uint32_t client_id, const std::string& username) {
+        const uint32_t player_id, const std::string& username) {
 
-    Queue<GameUpdateDTO>& snapshot_queue = game_monitor.register_client(client_id);
+    Queue<GameUpdateDTO>& snapshot_queue = game_monitor.register_player(player_id);
 
-    game_loop.add_player(client_id, username);
+    game_loop.add_player(player_id, username);
 
-    if (game_loop.is_full())
+    if (!game_loop.is_alive())
         game_loop.start();
 
     return {command_queue, snapshot_queue};
 }
 
-void Game::remove_player(const uint32_t client_id) {
+void Game::remove_player(const uint32_t player_id) {
 
-    game_monitor.remove_client(client_id);
-
-    std::cerr << "[" << GAME << "] "
-              << "Removing player with ID: " << client_id << std::endl;
+    game_loop.remove_player(player_id);
+    game_monitor.remove_player(player_id);
 }
 
 const std::string Game::get_name() const { return name; }
@@ -47,8 +44,12 @@ uint8_t Game::get_max_players() const { return max_players; }
 
 uint8_t Game::get_active_players() const { return game_loop.get_active_players(); }
 
+uint32_t Game::get_next_player_id() const { return game_loop.get_next_player_id(); }
 
-bool Game::has_started() const { return game_loop.is_alive(); }
+
+bool Game::has_started() const { return game_loop.has_started(); }
+
+bool Game::has_player(const uint32_t player_id) const { return game_loop.has_player(player_id); }
 
 
 void Game::stop() {
@@ -56,15 +57,14 @@ void Game::stop() {
     game_loop.stop();
     game_loop.join();
 
-    command_queue.close();
     game_monitor.stop();
 
-    std::cerr << "[" << GAME << "] "
-              << "Game with ID: " << game_id << " stopped." << std::endl;
+    command_queue.close();
 }
 
 Game::~Game() {
 
+    std::cerr << "[" << GAME << "] Stopping." << std::endl;
     try {
 
         Game::stop();

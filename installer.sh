@@ -82,7 +82,8 @@ install_dependencies() {
     sudo apt install -y \
         qt6-base-dev \
         qt6-tools-dev \
-        qt6-l10n-tools
+        qt6-l10n-tools \
+        qt6-multimedia-dev 
 
     print_info "Instalando JSON y YAML..."
     sudo apt install -y \
@@ -170,6 +171,7 @@ show_summary() {
     print_info "Resumen:"
     echo "  ✓ Dependencias instaladas"
     echo "  ✓ Proyecto compilado"
+    echo "  ✓ Tests ejecutados"
     echo ""
     print_info "Los ejecutables están en la carpeta: $(pwd)/build/"
     echo ""
@@ -179,6 +181,28 @@ show_summary() {
         print_info "Ejecutables encontrados:"
         find build -maxdepth 1 -type f -executable -exec echo "  - {}" \;
     fi
+}
+
+run_tests() {
+    echo ""
+    echo "=========================================="
+    echo "        EJECUTANDO TESTS"
+    echo "=========================================="
+    echo ""
+    
+    # Verificar si el ejecutable de tests existe
+    if [ ! -f "build/nfs_tests" ]; then
+        print_error "No se encontró el ejecutable de tests: build/nfs_tests"
+        return 1
+    fi
+    
+    # Navegar al directorio build y ejecutar tests
+    cd build
+    echo "Ejecutando tests..."
+    echo ""
+    
+    # Ejecutar los tests con verbosity
+    ./nfs_tests
 }
 
 # Función principal
@@ -202,6 +226,9 @@ main() {
     
     # Compilar proyecto
     compile_project
+
+    # Ejecutar tests
+    run_tests
     
     # Mostrar resumen
     show_summary

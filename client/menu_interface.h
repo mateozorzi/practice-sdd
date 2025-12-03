@@ -1,6 +1,10 @@
 #ifndef MENU_INTERFACE_H
 #define MENU_INTERFACE_H
 
+#include <QApplication>
+#include <QAudioOutput>
+#include <QMediaPlayer>
+
 #include "../common/player_dto.h"
 
 #include "client_protocol.h"
@@ -8,16 +12,19 @@
 class MenuInterface {
 private:
     ClientProtocol& protocol;
+    QApplication app;
+    QMediaPlayer* musicPlayer;
+    QAudioOutput* audioOutput;
 
 public:
-    explicit MenuInterface(ClientProtocol& protocol);
-    PlayerDTO lobby();
+    MenuInterface(ClientProtocol& protocol, int argc, char** argv);
+    void set_music(QObject* parent);
+    void lobby(PlayerDTO& player);
     bool car_selection(PlayerDTO& player);
-    bool waiting_room(const bool is_owner, const LobbyDTO& lobby);
-    bool lobby_create(PlayerDTO& player);
+    bool lobby_create(const PlayerDTO& player);
     bool select_races();
     bool create_lobby(const PlayerDTO& player);
-    bool join_lobby(PlayerDTO& player);
+    bool join_lobby();
 };
 
 

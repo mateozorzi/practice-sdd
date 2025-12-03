@@ -16,7 +16,7 @@ ClientHandler::ClientHandler(Socket&& peer_socket, Lobby& lobby, uint32_t client
         server_protocol(this->peer_socket),
         lobby(lobby),
         server_config(server_config),
-        client_id(client_id),
+        player_id(client_id),
         selected_races() {}
 
 
@@ -25,7 +25,6 @@ void ClientHandler::launch_lobby() {
     while (is_in_lobby) {
 
         try {
-
             LobbyDTO lobby_dto = server_protocol.receive_lobby_info();
             switch (lobby_dto.action) {
 
@@ -33,32 +32,32 @@ void ClientHandler::launch_lobby() {
                     update_player_username(lobby_dto.lobby_name);
                     break;
                 case LobbyAction::CREATE_LOBBY:
-                    create_new_game(client_id, lobby_dto.max_players, lobby_dto.lobby_name);
+                    create_new_game(lobby_dto.max_players, lobby_dto.lobby_name);
                     break;
                 case LobbyAction::SEND_LOBBY_LIST:
                     list_active_games();
                     break;
                 case LobbyAction::JOIN_LOBBY:
-                    join_existing_game(client_id, lobby_dto.lobby_id);
+                    join_existing_game(lobby_dto.lobby_id);
                     break;
                 case LobbyAction::LIST_RACES:
-                    list_load_races();
+                    list_loaded_races();
                     break;
                 case LobbyAction::SEND_RACE_SELECTION:
                     select_races(lobby_dto);
                     break;
                 case LobbyAction::LEAVE_LOBBY:
                 default:
-                    is_in_lobby = false;
+                    ClientHandler::stop();
                     break;
             }
         } catch (const std::exception& e) {
 
-            is_in_lobby = false;
+            ClientHandler::stop();
         }
     }
 
-    is_in_lobby = false;
+    ClientHandler::stop();
 }
 
 
@@ -66,7 +65,7 @@ void ClientHandler::update_player_username(const std::string& actual_username) {
 
     username = actual_username;
 
-    server_protocol.send_client_id(client_id);
+    server_protocol.send_player_id(player_id);
 }
 
 
@@ -108,35 +107,80 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
                                         Queue<GameUpdateDTO>& snapshot_queue) {
 
     is_in_lobby = false;
+
     send_car_catalogue();
-    Receiver receiver(server_protocol, lobby, client_id, command_queue);
+    Receiver receiver(server_protocol, lobby, player_id, command_queue);
     receiver.start();
-    Sender sender(server_protocol, lobby, client_id, snapshot_queue);
+    Sender sender(server_protocol, lobby, player_id, snapshot_queue);
     sender.run();
 
     sender.stop();
     receiver.stop();
     receiver.join();
+
+    const uint32_t game_id = lobby.get_game_id(player_id);
+
+    lobby.remove_player(player_id, game_id);
+
+    if (_keep_running)
+        is_in_lobby = true;
 }
 
-void ClientHandler::create_new_game(const uint32_t client_id, const uint8_t max_players,
-                                    const std::string& lobby_name) {
+void ClientHandler::create_new_game(const uint8_t max_players, const std::string& lobby_name) {
 
-    game_id = client_id;
-    auto [command_queue, snapshot_queue] =
-            lobby.create_new_game(client_id, username, max_players, lobby_name, selected_races);
+    lobby.reap();
+
+    if (max_players < static_cast<uint8_t>(server_config.server.min_players_per_game)) {
+
+        LobbyDTO lobby_dto(LobbyAction::MIN_PLAYERS_ERROR, 0, "",
+                           server_config.server.min_players_per_game);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    } else if (max_players > static_cast<uint8_t>(server_config.server.max_players_per_game)) {
+
+        LobbyDTO lobby_dto(LobbyAction::MAX_PLAYERS_ERROR, 0, "",
+                           server_config.server.max_players_per_game);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto result =
+            lobby.create_new_game(player_id, username, max_players, lobby_name, selected_races);
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
+
+    LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
-void ClientHandler::join_existing_game(const uint32_t client_id, const uint32_t actual_game_id) {
+void ClientHandler::join_existing_game(const uint32_t game_id) {
 
-    game_id = actual_game_id;
+    lobby.reap();
 
-    auto [command_queue, snapshot_queue] = lobby.join_existing_game(client_id, game_id, username);
+    auto result = lobby.join_existing_game(player_id, game_id, username);
+
+    if (!result.has_value()) {
+
+        LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
+        server_protocol.send_lobby_response(lobby_dto);
+        return;
+    }
+
+    auto [command_queue, snapshot_queue] = result.value();
+
+    LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_SUCCESS, 0, "", 0);
+    server_protocol.send_lobby_response(lobby_dto);
     exit_lobby_and_play(command_queue, snapshot_queue);
 }
 
-void ClientHandler::list_load_races() {
+void ClientHandler::list_loaded_races() {
 
     RaceCatalogueDTO races = lobby.list_races();
     server_protocol.send_races_catalogue(races);
@@ -149,11 +193,11 @@ void ClientHandler::select_races(const LobbyDTO& lobby_dto) {
 
 void ClientHandler::run() {
 
-    while (should_keep_running() && is_in_lobby) {
+    while (should_keep_running()) {
 
         try {
-
-            launch_lobby();
+            if (is_in_lobby)
+                launch_lobby();
         } catch (const LibError&) {
 
         } catch (const std::exception& e) {
@@ -164,19 +208,32 @@ void ClientHandler::run() {
 }
 
 
+void ClientHandler::exit_game() {
+
+    if (!is_in_lobby)
+        server_protocol.send_game_action(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
+}
+
+
 void ClientHandler::stop() {
+
+    if (_keep_running) {
+
+        _keep_running = false;
+        is_in_lobby = false;
+        exit_game();
+    }
 
     try {
 
         server_protocol.stop();
     } catch (const LibError&) {}
-
-    lobby.remove_player(client_id, game_id);
 }
 
 
 ClientHandler::~ClientHandler() {
 
+    std::cerr << "[" << CLIENT_HANDLER << "] Stopping." << std::endl;
     try {
 
         ClientHandler::stop();

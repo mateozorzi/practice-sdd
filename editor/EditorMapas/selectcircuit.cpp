@@ -21,7 +21,7 @@ void SelectCircuit::fill_table() {
     QStringList races_names = dir.entryList(QStringList() << "*.csv", QDir::Files);
     qDebug() << "size: " << races_names.size();
 
-    ui->tableRaces->clear();
+    ui->tableRaces->clearContents();
     ui->tableRaces->setRowCount(races_names.length());
 
     QStringList col = {"Name", "City", "# Checkpoints", "# laps", "Open", "Delete"};
@@ -31,6 +31,9 @@ void SelectCircuit::fill_table() {
     ui->tableRaces->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableRaces->setShowGrid(false);
     ui->tableRaces->verticalHeader()->setVisible(false);
+    ui->tableRaces->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableRaces->setFocusPolicy(Qt::NoFocus);
+    ui->tableRaces->setSelectionMode(QAbstractItemView::NoSelection);
 
     read_info_races(races_names);
 
@@ -38,7 +41,7 @@ void SelectCircuit::fill_table() {
 }
 
 void SelectCircuit::fill_races_info() {
-    for (Race& r: this->races) {
+    for (const Race& r: this->races) {
         int id = r.id;
         QString name = r.name;
         QString city = r.city;
@@ -80,14 +83,14 @@ void SelectCircuit::read_info_races(const QStringList& races_names) {
 
         QTextStream in(&file);
 
-        QString line = in.readLine();
-        QStringList images = line.split(",");
+        QString firstline = in.readLine();
+        QStringList images = firstline.split(",");
         QString map = images[0];
         QString mask = images[1];
 
-        QString info = in.readLine();  // skip header City,n_laps
+        in.readLine();  // skip header City,n_laps
 
-        info = in.readLine();
+        QString info = in.readLine();
 
         QStringList infoRace = info.split(',');
         QString cityName = infoRace[0];
@@ -117,8 +120,8 @@ void SelectCircuit::read_info_races(const QStringList& races_names) {
             char orientation = cols[1].toStdString()[0];
             int xCenter = cols[2].toInt();
             int yCenter = cols[3].toInt();
-            int height = cols[4].toInt();
-            int width = cols[5].toInt();
+            int width = cols[4].toInt();
+            int height = cols[5].toInt();
 
             // QRect center in (xCenter, yCenter)
             QRect rect(xCenter - width / 2, yCenter - height / 2, width, height);
