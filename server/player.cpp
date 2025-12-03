@@ -165,10 +165,12 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
 
     bool finished = false;
 
+    bool finish_line = false;
+
     if (static_cast<int>(id_next_checkpoint) >= static_cast<int>(race.size_checkpoints)) {
 
         if (n_lap + 1 > race.laps) {
-    
+
             finish_race();
             finished = true;
             return finished;
@@ -179,9 +181,15 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
     } else if (static_cast<int>(id_next_checkpoint) < static_cast<int>(race.size_checkpoints)) {
 
         id_next_checkpoint += 1;
+
+        if (n_lap == race.laps && id_next_checkpoint == race.size_checkpoints) {
+            std::cout << "Player " << player_id << " is about to reach finish line." << std::endl;
+            finish_line = true;
+        }
     }
 
     this->next = race.checkpoints[id_next_checkpoint - 1];
+    this->next.is_finish_line = finish_line;
 
     return finished;
 }

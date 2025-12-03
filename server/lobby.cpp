@@ -145,7 +145,7 @@ void Lobby::reap() {
 
         if (game.is_empty())
             it = games.erase(it);
-        else 
+        else
             ++it;
     }
 }
@@ -198,8 +198,7 @@ void Lobby::stop() {
 
     std::lock_guard lock(mtx);
 
-    for (auto it = games.begin(); it != games.end();)
-        it = games.erase(it);
+    for (auto it = games.begin(); it != games.end();) it = games.erase(it);
 }
 
 

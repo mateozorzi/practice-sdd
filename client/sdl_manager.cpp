@@ -281,8 +281,7 @@ void SDLManager::render(LocalInfo& game_state) {
     if (game_state.player.life <= 0 && !game_state.player.died) {
         game_state.player.died = true;
         if (!animations.is_explosion_active(iteration_counter)) {
-            animations.start_explosion(iteration_counter,
-                                       SDL2pp::Point(pos_x, pos_y));
+            animations.start_explosion(iteration_counter, SDL2pp::Point(pos_x, pos_y));
             animations.start_camera_shake(iteration_counter);
         }
     }
@@ -381,7 +380,7 @@ void SDLManager::render(LocalInfo& game_state) {
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
     // animations.render_explosion(iteration_counter);
 
-    if(my_player.died){
+    if (my_player.died) {
         render_center_box("Your car exploded!", SDL2pp::Color(255, 0, 0, 255));
     } else if (my_player.finish_race) {
         render_center_box("You have finished the race!", SDL2pp::Color(255, 215, 0, 255));

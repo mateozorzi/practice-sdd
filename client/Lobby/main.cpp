@@ -3,12 +3,12 @@
 #include "../../common/car_catalogue_dto.h"
 #include "../../common/car_dto.h"
 
+#include "connectioninfo.h"
 #include "creategame.h"
 #include "createlobby.h"
 #include "lobby.h"
 #include "selectcars.h"
 #include "waitingroom.h"
-#include "connectioninfo.h"
 
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
