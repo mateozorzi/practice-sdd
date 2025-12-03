@@ -15,7 +15,7 @@ public:
     ~ConnectionInfo();
 
 signals:
-    void emit_confirm_connection(QString ip, QString port);
+    void emit_confirm_connection(const QString& ip, const QString& port);
     void emit_close();
 
 private slots:

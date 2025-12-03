@@ -164,4 +164,8 @@ constexpr uint8_t COLOR_SHOP_BUTTON_HOVER_A = 255;
 constexpr const char* SHOP_TITLE_TEXT = "UPGRADE SHOP";
 constexpr const char* SHOP_SECONDS_TEXT = " seconds";
 
+
+// Music Volume
+constexpr int MUSIC_VOLUME = 5;  // Volume between 0 and 100
+
 #endif

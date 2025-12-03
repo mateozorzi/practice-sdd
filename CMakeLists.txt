@@ -137,6 +137,7 @@ if(NFS_CLIENT)
     set(CMAKE_AUTORCC ON)
     find_package(Qt6 COMPONENTS Core REQUIRED)
     find_package(Qt6 COMPONENTS Widgets REQUIRED)
+    find_package(Qt6 COMPONENTS Core Widgets Multimedia REQUIRED)
 
     add_executable(nfs_client)
 
@@ -155,7 +156,7 @@ if(NFS_CLIENT)
     target_compile_definitions(nfs_client PRIVATE DATA_PATH="${PROJECT_SOURCE_DIR}/client/cars")
 
     # Link the nfs_common lib target
-    target_link_libraries(nfs_client nfs_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer nlohmann_json::nlohmann_json Qt6::Widgets Qt6::Core)
+    target_link_libraries(nfs_client nfs_common SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer nlohmann_json::nlohmann_json Qt6::Widgets Qt6::Core Qt6::Multimedia)
 endif()
 
 if(NFS_SERVER)

@@ -19,17 +19,16 @@
 Client::Client(const std::string& hostname, const std::string& servname):
         client_socket(hostname.c_str(), servname.c_str()),
         protocol(client_socket),
-        menu(protocol) {}
+        menu(protocol, 0, {nullptr}) {}
 
 void Client::run() {
     // lobby ui a
-    bool open_lobby = true;
-    while (open_lobby) {
+
+    while (true) {
         PlayerDTO player;
         menu.lobby(player);
         if (static_cast<int>(player.id) == -1) {
-            open_lobby = false;
-            continue;
+            break;
         }
 
         Game game(protocol, player.id);

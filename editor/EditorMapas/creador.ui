@@ -194,6 +194,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 <pointsize>16</pointsize>
                </font>
               </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);</string>
+              </property>
               <property name="readOnly">
                <bool>true</bool>
               </property>
@@ -221,6 +224,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 <width>194</width>
                 <height>40</height>
                </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 255, 255);</string>
               </property>
               <property name="verticalScrollBarPolicy">
                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
@@ -259,6 +265,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
               </property>
               <property name="styleSheet">
                <string notr="true">border: 2px solid;
+color: rgb(255, 255, 255);
 border-color: rgb(246, 211, 45);
 </string>
               </property>
@@ -294,7 +301,8 @@ border-color: rgb(246, 211, 45);
                </font>
               </property>
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #F6D32D</string>
+               <string notr="true">border: 2px solid #F6D32D;
+color: rgb(255, 255, 255);</string>
               </property>
               <property name="readOnly">
                <bool>true</bool>
@@ -334,7 +342,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #F6D32D</string>
+               <string notr="true">border: 2px solid #F6D32D;
+color: rgb(255, 255, 255);</string>
               </property>
              </widget>
             </item>
@@ -354,7 +363,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #F6D32D</string>
+             <string notr="true">border: 2px solid #F6D32D;
+color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
             <property name="html">
              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -380,6 +393,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <font>
               <pointsize>18</pointsize>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 255, 255);</string>
             </property>
            </widget>
           </item>
