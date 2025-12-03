@@ -153,8 +153,8 @@ TEST_F(ServerProtocolTest, send_car_catalogue) {
 TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     WorldSnapshotDTO world_snapshot;
     PlayerDTO player1("player1", 1001, CarDTO("ModelX"), 200, false, 200, false);
-    CarPositionDTO car_position1(100, 150, 90, 200, CheckpointDTO(1, 'H', 1001, 1001, 20, 30),
-                                 CarLayer::ON_GROUND);
+    CarPositionDTO car_position1(100, 150, 90, 200, CheckpointDTO(1, 'H', 1001, 1001, 20, 30, false),
+                                 CarLayer::ON_GROUND, 1, 2);
     world_snapshot.add_car_position(player1, car_position1);
     GameUpdateDTO snapshot(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
 
@@ -171,10 +171,20 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     // calculate expected size
     size_t expected_size = SIZE_UINT8_T +  // gameloop action
                            SIZE_UINT8_T +  // ws size
-                           SIZE_UINT32_T + player1.username.size() + SIZE_UINT32_T + SIZE_UINT32_T +
-                           player1.car.model.size() + SIZE_UINT16_T + SIZE_UINT8_T +  // player1
-                           4 * SIZE_UINT32_T + SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT8_T +
-                           2 * SIZE_UINT16_T + 3 * SIZE_UINT8_T +  // car position1
+                           SIZE_UINT32_T + player1.username.size() //username size and username
+                           + SIZE_UINT32_T + //id
+                           SIZE_UINT32_T + player1.car.model.size() //car model size and car model
+                           + SIZE_UINT16_T + //player health
+                           SIZE_UINT8_T +  //player dead
+                           SIZE_UINT16_T + //player max health
+                           SIZE_UINT8_T + // player finish race
+                           4 * SIZE_UINT32_T + //id, x, y, angle
+                           SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT8_T + //id, orientation
+                           2 * SIZE_UINT16_T + //x,y
+                           2 * SIZE_UINT8_T + // width, height
+                           SIZE_UINT8_T + // is_finish_line
+                            SIZE_UINT8_T +  // layer
+                            SIZE_UINT8_T +  SIZE_UINT8_T + // current lap and race_lap
                            SIZE_UINT8_T;                           // NPC size (0)
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
@@ -225,6 +235,14 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     offset += 2;
     // player dead byte
     EXPECT_EQ(captured_bytes[offset], static_cast<uint8_t>(player1.dead));
+    offset += 1;
+    // player max health bytes
+    uint16_t max_health = (static_cast<uint16_t>(captured_bytes[offset]) << 8) |
+                          (static_cast<uint16_t>(captured_bytes[offset + 1]));
+    EXPECT_EQ(max_health, player1.max_health);
+    offset += 2;
+    // player finish_race byte
+    EXPECT_EQ(captured_bytes[offset], static_cast<uint8_t>(player1.finish_race));
     offset += 1;
     // car position1
     // client id bytes
@@ -284,8 +302,18 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     // next checkpoint height byte
     EXPECT_EQ(captured_bytes[offset], car_position1.next.height);
     offset += 1;
+    // next checkpoint is_finish_line byte
+    EXPECT_EQ(captured_bytes[offset], static_cast<uint8_t>(car_position1.next.is_finish_line));
+    offset += 1;
     // car layer byte
     EXPECT_EQ(captured_bytes[offset], static_cast<uint8_t>(car_position1.layer));
+    offset += 1;
+    // current lap byte
+    EXPECT_EQ(captured_bytes[offset], car_position1.current_lap);
+    offset += 1;
+    // race lap byte
+    EXPECT_EQ(captured_bytes[offset], car_position1.race_lap);
+    offset += 1;
 }
 
 TEST_F(ServerProtocolTest, SendRaceUpdate) {

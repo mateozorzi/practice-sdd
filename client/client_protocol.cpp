@@ -133,6 +133,7 @@ void ClientProtocol::send_race(const RaceDTO& race) {
         add_uint16_to_buffer(c.y);
         add_uint8_to_buffer(c.width);
         add_uint8_to_buffer(c.height);
+        add_uint8_to_buffer(static_cast<uint8_t>(c.is_finish_line));
     }
     add_uint8_to_buffer(race.laps);
 }
@@ -299,7 +300,9 @@ CheckpointDTO ClientProtocol::receive_checkpoint() {
     const uint16_t y = recv_uint16();
     const uint8_t width = recv_uint8();
     const uint8_t height = recv_uint8();
-    return CheckpointDTO(id, orientation, x, y, width, height);
+    const bool is_finish_line = static_cast<bool>(recv_uint8());
+
+    return CheckpointDTO(id, orientation, x, y, width, height, is_finish_line);
 }
 
 RaceDTO ClientProtocol::receive_race() {

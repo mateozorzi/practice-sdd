@@ -177,6 +177,11 @@ void LeaderboardInfo::fill_winner(const LeaderboardDTO& leaderboard,
                                   const SDL2pp::Rect& bottom_rect) {
     if (!leaderboard.players.empty()) {
         const auto& winner = leaderboard.players[0];
+        
+        if(winner.points == 0) {
+            // No winner
+            return;
+        }
 
         std::string win_text =
                 "WINNER: " + winner.username + " - POINTS: " + std::to_string(winner.points);
