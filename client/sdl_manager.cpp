@@ -574,7 +574,7 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint, const SDL2p
     SDL2pp::Rect dst(screen_x, screen_y, screen_w, screen_h);
 
     if (checkpoint.is_finish_line) {
-        renderer.SetDrawColor(COLOR_YELLOW_R, COLOR_YELLOW_G, COLOR_YELLOW_B, COLOR_YELLOW_ALPHA);
+        renderer.SetDrawColor(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_RED_ALPHA);
     } else {
         renderer.SetDrawColor(COLOR_RED_R, COLOR_RED_G, COLOR_RED_B, COLOR_RED_ALPHA);
     }

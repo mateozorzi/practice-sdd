@@ -299,7 +299,8 @@ CheckpointDTO ClientProtocol::receive_checkpoint() {
     const uint16_t y = recv_uint16();
     const uint8_t width = recv_uint8();
     const uint8_t height = recv_uint8();
-    return CheckpointDTO(id, orientation, x, y, width, height);
+    const bool is_finish_line = static_cast<bool>(recv_uint8());
+    return CheckpointDTO(id, orientation, x, y, width, height, is_finish_line);
 }
 
 RaceDTO ClientProtocol::receive_race() {

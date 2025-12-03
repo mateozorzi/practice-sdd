@@ -45,6 +45,7 @@ void ServerProtocol::add_checkpoint_to_buffer(const CheckpointDTO& checkpoint) {
     add_uint16_to_buffer(checkpoint.y);
     add_uint8_to_buffer(checkpoint.width);
     add_uint8_to_buffer(checkpoint.height);
+    add_uint8_to_buffer(static_cast<uint8_t>(checkpoint.is_finish_line));
 }
 
 void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
