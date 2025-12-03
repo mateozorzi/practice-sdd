@@ -273,6 +273,11 @@ bool Game::update_countdown() {
                 last = std::get<WorldSnapshotDTO>(dto.data);
                 got_snapshot = true;
             }
+        } else if (dto.gameloop_action == GameLoopAction::COUNTDOWN_TIME) {
+            if (std::holds_alternative<uint8_t>(dto.data)) {
+                uint8_t seconds_left = std::get<uint8_t>(dto.data);
+                game_state.countdown_seconds = seconds_left;
+            }
         }
     }
     return true;
