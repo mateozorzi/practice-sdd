@@ -36,7 +36,7 @@ class Game {
 
     void reset_events();
 
-    void detect_events(const WorldSnapshotDTO& snapshot);
+    void detect_events_for_player(PlayerInfo& info, const PlayerDTO& dto, const CarPositionDTO& car_pos);
 
     void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
 
@@ -67,7 +67,7 @@ class Game {
 
     void change_phase();
 
-    void update_player(const PlayerDTO& player, const CarPositionDTO& car);
+    void update_player(const PlayerDTO& player, const CarPositionDTO& car, const std::unordered_map<uint32_t, PlayerInfo>& prev_state);
     void check_for_last_updates();
 
 

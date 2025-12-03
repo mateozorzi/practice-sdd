@@ -20,6 +20,8 @@ public:
     SDL2pp::Rect get_view_rect() const;
 
     bool on_screen(const SDL2pp::Rect& game);
+
+    SDL2pp::Point get_center() const;
 };
 
 #endif  // CAMERA_H

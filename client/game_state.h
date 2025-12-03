@@ -22,6 +22,7 @@ struct PlayerInfo {
     bool isMoving = false;
     bool died = false;
     bool crashed = false;
+    bool explosion_shown = false;
     CarLayer layer = CarLayer::ON_GROUND;
     CheckpointDTO checkpoint = CheckpointDTO{};
     bool finish_race = false;
