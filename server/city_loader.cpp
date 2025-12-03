@@ -1,46 +1,45 @@
 #include "city_loader.h"
 
 #include <algorithm>
-#include <iostream>
 
 #include "../common/constants.h"
 
 #include "world_creation_exception.h"
 
 
-CityLoader::CityLoader(b2World& box2d_world): box2d_world(box2d_world), city_utils(box2d_world) {}
+CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config):
+        box2d_world(box2d_world),
+        server_config(server_config),
+        city_utils(box2d_world, server_config) {}
 
 
 std::string CityLoader::normalize_city_name(const std::string& city_name) const {
 
     std::string modified_city_name = city_name;
+
     std::transform(modified_city_name.begin(), modified_city_name.end(), modified_city_name.begin(),
                    ::tolower);
+
     std::replace(modified_city_name.begin(), modified_city_name.end(), ' ', '_');
 
     return modified_city_name;
 }
 
+const CityLoaderConfig& CityLoader::obtain_city_loader_config(
+        const std::string& city_normalized_name) const {
 
-std::string CityLoader::obtain_ground_collidables_path(const std::string& city_name) const {
+    if (city_normalized_name == "liberty_city")
+        return server_config.world.liberty_city;
 
-    return "server/world/collidables/on_ground_collidables_" + city_name + ".json";
+    if (city_normalized_name == "san_andreas")
+        return server_config.world.san_andreas;
+
+    if (city_normalized_name == "vice_city")
+        return server_config.world.vice_city;
+
+    throw std::runtime_error("Unknown city: " + city_normalized_name);
 }
 
-std::string CityLoader::obtain_bridge_collidables_path(const std::string& city_name) const {
-
-    return "server/world/collidables/on_bridge_collidables_" + city_name + ".json";
-}
-
-std::string CityLoader::obtain_on_bridge_sensors_path(const std::string& city_name) const {
-
-    return "server/world/sensors/on_bridge_sensors_" + city_name + ".json";
-}
-
-std::string CityLoader::obtain_under_bridge_sensors_path(const std::string& city_name) const {
-
-    return "server/world/sensors/under_bridge_sensors_" + city_name + ".json";
-}
 
 void CityLoader::load_collidables(const std::string& file, uint16_t category, uint16_t mask) {
 
@@ -74,29 +73,24 @@ void CityLoader::load_sensors(const std::string& file, SensorType type, uint16_t
 }
 
 
-void CityLoader::cleanup_city() {
-
-    city_utils.cleanup();
-
-    std::cout << "[CITY] Cleaning up previous city..." << std::endl;
-}
-
-
 void CityLoader::load_city(const std::string& city_name) {
 
     std::string city_normalized_name = normalize_city_name(city_name);
 
-    cleanup_city();
+    if (city_loaded)
+        city_utils.cleanup();
 
-    load_collidables(obtain_ground_collidables_path(city_normalized_name), CATEGORY_GROUND,
+    const CityLoaderConfig& city_loader_config = obtain_city_loader_config(city_normalized_name);
+
+    load_collidables(city_loader_config.collidables.on_ground_collidable_file, CATEGORY_GROUND,
                      MASK_GROUND);
-    load_collidables(obtain_bridge_collidables_path(city_normalized_name), CATEGORY_BRIDGE,
+    load_collidables(city_loader_config.collidables.on_bridge_collidable_file, CATEGORY_BRIDGE,
                      MASK_BRIDGE);
 
-    load_sensors(obtain_on_bridge_sensors_path(city_normalized_name), SensorType::ON_BRIDGE,
+    load_sensors(city_loader_config.sensors.on_bridge_sensor_file, SensorType::ON_BRIDGE,
                  CATEGORY_SENSOR, MASK_SENSOR);
-    load_sensors(obtain_under_bridge_sensors_path(city_normalized_name), SensorType::UNDER_BRIDGE,
+    load_sensors(city_loader_config.sensors.under_bridge_sensor_file, SensorType::UNDER_BRIDGE,
                  CATEGORY_SENSOR, MASK_SENSOR);
 
-    std::cout << "[CITY] Loaded world for city: " << city_name << std::endl << std::endl;
+    city_loaded = true;
 }

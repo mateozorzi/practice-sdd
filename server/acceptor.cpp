@@ -23,9 +23,6 @@ void Acceptor::run() {
                     std::move(peer_socket), lobby, client_id, server_config);
             client->start();
             clients.push_back(std::move(client));
-            std::cout << "[" << ACCEPTOR << "] "
-                      << "New client has been accepted. Number of active clients: "
-                      << clients.size() << std::endl;
         } catch (const std::exception& e) {
 
             if (!should_keep_running())
@@ -78,6 +75,7 @@ void Acceptor::stop() {
 
 Acceptor::~Acceptor() {
 
+    std::cerr << "[" << ACCEPTOR << "] Stopping." << std::endl;
     try {
 
         Acceptor::stop();

@@ -44,6 +44,8 @@ void Receiver::run() {
                 break;
             }
         }
+    } catch (const ClosedQueue&) {
+
     } catch (const LibError& e) {
 
     } catch (const std::exception& e) {
@@ -62,6 +64,7 @@ void Receiver::stop() {
 
 Receiver::~Receiver() {
 
+    std::cerr << "[" << RECEIVER << "] Stopping." << std::endl;
     try {
 
         Receiver::stop();

@@ -54,15 +54,14 @@ bool Sender::is_alive() { return keep_running; }
 
 void Sender::stop() {
 
-    if (keep_running) {
-
+    if (keep_running)
         keep_running = false;
-    }
 }
 
 
 Sender::~Sender() {
 
+    std::cerr << "[" << SENDER << "] Stopping." << std::endl;
     try {
 
         stop();

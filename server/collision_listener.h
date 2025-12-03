@@ -9,6 +9,7 @@
 
 #include "player.h"
 
+
 class CollisionListener: public b2ContactListener {
 
     std::unordered_map<uint32_t, Player>& players;
@@ -35,5 +36,6 @@ public:
     void EndContact(b2Contact* contact) override;
     void PreSolve(b2Contact* contact, const b2Manifold*) override;
 };
+
 
 #endif

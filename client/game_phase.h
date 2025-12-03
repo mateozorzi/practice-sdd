@@ -10,7 +10,7 @@ protected:
     const int FPS_CLIENT;
 
 public:
-    GamePhase(Game& game, int starting_it);
+    GamePhase(Game& game, int starting_it, int fps = 60);
     bool run();
     virtual void handle_game_events() = 0;
     virtual bool update_game_state() = 0;
