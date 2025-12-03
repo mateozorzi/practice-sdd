@@ -102,6 +102,7 @@ bool Player::is_in_race() const { return in_race; }
 void Player::finish_race() {
     in_race = false;
     has_finish_race = true;
+    infinite_health = true;
     id_next_checkpoint = 1;
     n_lap = 1;
     car->reset_car_velocity();
