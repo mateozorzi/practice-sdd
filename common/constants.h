@@ -22,6 +22,7 @@ constexpr int MAX_UPGRADES_PER_RACE = 4;
 
 enum class GameLoopAction : uint8_t {
 
+    DISCONNECT = 0xDD,
     SEND_UPDATE_POSITIONS = 0x10,
     SEND_RACE = 0x11,
     START_RACE = 0x12,

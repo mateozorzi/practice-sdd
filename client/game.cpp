@@ -23,7 +23,7 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
 }
 
 
-void Game::run() {
+bool Game::run() {
 
     this->receiver.start();
 
@@ -44,8 +44,11 @@ void Game::run() {
         this->keep_running = false;
     }
 
+    bool server_connected = receiver.is_server_connected();
     this->receiver.stop();
     this->receiver.join();
+
+    return server_connected;
 }
 
 
@@ -150,7 +153,7 @@ bool Game::update_waiting() {
 
     while (updates.try_pop(dto)) {
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -196,7 +199,7 @@ bool Game::update_upgrade() {
         }
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -258,7 +261,7 @@ bool Game::update_countdown() {
         }
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -299,7 +302,7 @@ bool Game::update_race() {
     while (updates.try_pop(dto)) {
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -352,7 +355,7 @@ bool Game::update_leaderboard() {
     while (updates.try_pop(dto)) {
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             sdl.close_leaderboard();
@@ -395,7 +398,7 @@ bool Game::update_game_finished() {
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (updates.try_pop(dto)) {
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             sdl.close_leaderboard();

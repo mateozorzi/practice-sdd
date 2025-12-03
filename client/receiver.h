@@ -23,6 +23,7 @@ class Receiver: public Thread {
     GameState game_state;
     std::mutex state_mutex;
     Queue<GameUpdateDTO> car_positions_queue;
+    bool server_connected = true;
 
 
 public:
@@ -30,6 +31,8 @@ public:
 
     GameState get_game_state() const;
     Queue<GameUpdateDTO>& get_car_positions_queue();
+
+    bool is_server_connected() const;
 
     void run() override;
     void stop() override;

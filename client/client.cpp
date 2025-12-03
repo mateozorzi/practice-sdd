@@ -22,9 +22,11 @@ Client::Client(const std::string& hostname, const std::string& servname):
         menu(protocol, 0, {nullptr}) {}
 
 void Client::run() {
-    // lobby ui a
+    
+    bool server_connected = true;
 
-    while (true) {
+    while (server_connected) {
+
         PlayerDTO player;
         menu.lobby(player);
         if (static_cast<int>(player.id) == -1) {
@@ -32,7 +34,6 @@ void Client::run() {
         }
 
         Game game(protocol, player.id);
-        game.run();
-        std::cout << "Client game ended, returning to lobby menu." << std::endl;
+        server_connected = game.run();
     }
 }
