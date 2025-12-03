@@ -92,7 +92,6 @@ void Player::start_race() {
     n_lap = 1;
     race_time = 0;
     dead = false;
-    base_health = car->get_max_health();
     health = base_health;
     infinite_health = false;
 }
