@@ -30,6 +30,7 @@ void Sounds::initialize_channels(const std::vector<uint32_t>& ids) {
 
     engine_channel = current_channel++;
     upgrade_channel = current_channel++;
+    music_channel = current_channel++;
 }
 
 void Sounds::play_engine_sound(const bool is_moving) {
@@ -93,3 +94,27 @@ void Sounds::play_explosion_sound(uint32_t id, const SDL2pp::Point &event_pos, c
     mixer.PlayChannel(it->second, crash_sound);
     mixer.SetDistance(it->second, sdl_distance);
 }
+
+void Sounds::play_background_music(const std::string &path, int loops) {
+    if (music_channel != -1) {
+        stop_background_music();
+    }
+    SDL2pp::Chunk& music = resources.get_sound(path);
+    mixer.PlayChannel(music_channel, music, loops);
+    mixer.SetVolume(music_channel, 32);
+}
+
+void Sounds::stop_background_music() {
+    if (music_channel != -1) {
+        mixer.HaltChannel(music_channel);
+        music_channel = -1;
+    }
+}
+
+void Sounds::set_music_volume(const int volume) {
+    if (music_channel != -1) {
+        mixer.SetVolume(music_channel, volume);
+    }
+}
+
+

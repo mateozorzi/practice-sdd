@@ -271,6 +271,18 @@ void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
 
+void SDLManager::play_background_music(const std::string &path, const int loops) {
+    sounds.play_background_music(path, loops);
+}
+
+void SDLManager::stop_background_music() {
+    sounds.stop_background_music();
+}
+
+void SDLManager::set_music_volume(const int volume) {
+    sounds.set_music_volume(volume);
+}
+
 void SDLManager::render(LocalInfo& game_state) {
     iteration_counter++;
 
