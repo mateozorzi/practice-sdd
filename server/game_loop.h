@@ -104,7 +104,7 @@ class GameLoop final: public Thread {
     bool all_player_in_game() const;
     bool player_in_race() const;
 
-    void map_configuration(const std::string& city_name);
+    void map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints);
     void load_npcs(const std::string& city_name);
 
 

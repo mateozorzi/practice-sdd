@@ -38,6 +38,31 @@ void GameMonitor::unregister_player(const uint32_t player_id) {
     }
 }
 
+void GameMonitor::unregister_all_players() {
+
+    std::lock_guard lock(mtx);
+
+    for (auto& [player_id, snapshot_queue]: snapshot_queues) {
+
+        try {
+
+            snapshot_queue->close();
+        } catch (const std::exception&) {}
+    }
+}
+
+
+void GameMonitor::send_update_to_player(const GameUpdateDTO& info, const uint32_t player_id) {
+
+    std::lock_guard lock(mtx);
+
+    const auto it = snapshot_queues.find(player_id);
+
+    if (it == snapshot_queues.end())
+        return;
+
+    it->second->try_push(info);
+}
 
 void GameMonitor::broadcast(const GameUpdateDTO& info) {
 
@@ -50,18 +75,6 @@ void GameMonitor::broadcast(const GameUpdateDTO& info) {
             snapshot_queue->try_push(info);
         } catch (const std::exception&) {}
     }
-}
-
-void GameMonitor::send_update_to_player(const GameUpdateDTO& info, const uint32_t player_id) {
-
-    std::lock_guard lock(mtx);
-
-    const auto it = snapshot_queues.find(player_id);
-
-    if (it == snapshot_queues.end())
-        return;
-
-    it->second->try_push(info);
 }
 
 
@@ -77,18 +90,9 @@ void GameMonitor::remove_player(const uint32_t player_id) {
     snapshot_queues.erase(it);
 }
 
-
 void GameMonitor::stop() {
 
     std::lock_guard lock(mtx);
-
-    for (auto& [player_id, snapshot_queue]: snapshot_queues) {
-
-        try {
-
-            snapshot_queue->close();
-        } catch (const std::exception&) {}
-    }
 
     snapshot_queues.clear();
 }
@@ -99,6 +103,7 @@ GameMonitor::~GameMonitor() {
     std::cerr << "[" << GAME_MONITOR << "] Stopping." << std::endl;
     try {
 
+        unregister_all_players();
         GameMonitor::stop();
     } catch (const std::exception& e) {
 

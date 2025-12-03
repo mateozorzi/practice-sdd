@@ -362,12 +362,9 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands_in_game_finished_phase();
 
-    if (elapsed_time >= game_finish_seconds) {
-
+    if (elapsed_time >= game_finish_seconds)
         GameLoop::stop();
-
-        game_monitor.stop();
-    }
+    
     fixed_sleep(now);
 }
 
@@ -510,8 +507,9 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name) {
-    city_loader.load_city(city_name);
+void GameLoop::map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints) {
+
+    city_loader.load_city(city_name, checkpoints);
     load_npcs(city_name);
 }
 
@@ -568,7 +566,7 @@ void GameLoop::set_race(const RaceDTO& race) {
 
     send_race(race);
 
-    map_configuration(race.city);
+    map_configuration(race.city, race.checkpoints);
 
     for (auto& [player_id, player]: players) {
 
@@ -747,12 +745,17 @@ void GameLoop::run() {
 
 void GameLoop::stop() {
 
-    if (_keep_running)
-        _keep_running = false;
+    if (_keep_running) {
 
-    try {
         GameUpdateDTO game_update(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
         game_monitor.broadcast(game_update);
+
+        game_monitor.unregister_all_players();
+
+        _keep_running = false;
+    }
+
+    try {
 
         players.clear();
     } catch (const std::exception&) {}

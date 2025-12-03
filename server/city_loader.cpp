@@ -41,14 +41,15 @@ const CityLoaderConfig& CityLoader::obtain_city_loader_config(
 }
 
 
-void CityLoader::load_collidables(const std::string& file, uint16_t category, uint16_t mask) {
+void CityLoader::load_collidables(const std::string& file, const uint16_t collision_category, const uint16_t collision_mask) {
 
     auto polygons = city_utils.load_polygons_from_file(file);
 
     for (const auto& polygon: polygons) {
+
         try {
 
-            city_utils.add_collidable(polygon, category, mask);
+            city_utils.add_collidable(polygon, collision_category, collision_mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding collidable: " + std::string(e.what()));
@@ -56,15 +57,16 @@ void CityLoader::load_collidables(const std::string& file, uint16_t category, ui
     }
 }
 
-void CityLoader::load_sensors(const std::string& file, SensorType type, uint16_t category,
-                              uint16_t mask) {
+void CityLoader::load_sensors(const std::string& file, SensorType type, const uint16_t collision_category,
+                              const uint16_t collision_mask) {
 
     auto sensors = city_utils.load_polygons_from_file(file);
 
     for (const auto& poly: sensors) {
+
         try {
 
-            city_utils.add_sensor(poly, type, category, mask);
+            city_utils.add_sensor(poly, type, collision_category, collision_mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding sensor: " + std::string(e.what()));
@@ -73,7 +75,22 @@ void CityLoader::load_sensors(const std::string& file, SensorType type, uint16_t
 }
 
 
-void CityLoader::load_city(const std::string& city_name) {
+void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints, const uint16_t collision_category, const uint16_t collision_mask) {
+
+    for (const auto& checkpoint: checkpoints) {
+
+        try {
+
+            city_utils.add_checkpoint(checkpoint, collision_category, collision_mask);
+        } catch (const std::exception& e) {
+
+            throw WorldCreationException("Error adding checkpoint: " + std::string(e.what()));
+        }
+    }
+}
+
+
+void CityLoader::load_city(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints) {
 
     std::string city_normalized_name = normalize_city_name(city_name);
 
@@ -91,6 +108,8 @@ void CityLoader::load_city(const std::string& city_name) {
                  CATEGORY_SENSOR, MASK_SENSOR);
     load_sensors(city_loader_config.sensors.under_bridge_sensor_file, SensorType::UNDER_BRIDGE,
                  CATEGORY_SENSOR, MASK_SENSOR);
+    
+    load_checkpoints(checkpoints, CATEGORY_SENSOR, MASK_SENSOR);
 
     city_loaded = true;
 }

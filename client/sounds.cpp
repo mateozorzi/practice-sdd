@@ -25,7 +25,8 @@ Sounds::Sounds(SDL2pp::Mixer& mixer, ResourceManager& resources):
         mixer(mixer), resources(resources) {}
 
 void Sounds::initialize_channels(const std::vector<uint32_t>& ids) {
-    for (const auto& id: ids) crash_channels[id] = current_channel++;
+    for (const auto& id : ids) crash_channels[id] = current_channel++;
+    for (const auto& id : ids) explosion_channels[id] = current_channel++;
 
     engine_channel = current_channel++;
     upgrade_channel = current_channel++;
@@ -69,6 +70,25 @@ void Sounds::play_crash_sound(const uint32_t id, const SDL2pp::Point& event_pos,
 
     if (it->second == -1)
         return;
+
+    mixer.PlayChannel(it->second, crash_sound);
+    mixer.SetDistance(it->second, sdl_distance);
+}
+
+void Sounds::play_explosion_sound(uint32_t id, const SDL2pp::Point &event_pos, const SDL2pp::Point &target_pos) {
+    const Uint8 sdl_distance = calculate_distance(event_pos, target_pos);
+
+    if (sdl_distance >= 255) return;
+
+    SDL2pp::Chunk& crash_sound = resources.get_sound("client/assets/sounds/explosion.wav");
+    auto it = crash_channels.find(id);
+    if (it == crash_channels.end()) {
+        int new_channel = current_channel++;
+        crash_channels[id] = new_channel;
+        it = crash_channels.find(id);
+    }
+
+    if (it->second == -1) return;
 
     mixer.PlayChannel(it->second, crash_sound);
     mixer.SetDistance(it->second, sdl_distance);
