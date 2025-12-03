@@ -500,8 +500,9 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name) {
-    city_loader.load_city(city_name);
+void GameLoop::map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints) {
+
+    city_loader.load_city(city_name, checkpoints);
     load_npcs(city_name);
 }
 
@@ -558,7 +559,7 @@ void GameLoop::set_race(const RaceDTO& race) {
 
     send_race(race);
 
-    map_configuration(race.city);
+    map_configuration(race.city, race.checkpoints);
 
     for (auto& [player_id, player]: players) {
 
