@@ -33,20 +33,22 @@ RaceDTO RaceLoader::load_single_race(const std::filesystem::path& path) {
     std::vector<CheckpointDTO> checkpoints;
 
     while (std::getline(file, line)) {
+
         std::stringstream string_stream_2(line);
         std::string checkpoint;
-
         std::vector<std::string> row;
         while (std::getline(string_stream_2, checkpoint, ','))
             row.push_back(checkpoint);
 
         checkpoints.emplace_back(
-            std::stoi(row[ID]),
-            row[ORIENTATION].front(),
-            std::stoi(row[X_CENTER]),
-            std::stoi(row[Y_CENTER]),
-            std::stoi(row[HEIGHT]),
-            std::stoi(row[WIDTH])
+            CheckpointDTO(
+            static_cast<uint8_t>(std::stoi(row[ID])),
+            static_cast<char>(row[ORIENTATION].front()),
+            static_cast<uint16_t>(std::stoi(row[X_CENTER])),
+            static_cast<uint16_t>(std::stoi(row[Y_CENTER])),
+            static_cast<uint8_t>(std::stoi(row[WIDTH])),
+            static_cast<uint8_t>(std::stoi(row[HEIGHT]))
+            )
         );
     }
 

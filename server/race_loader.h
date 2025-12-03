@@ -14,8 +14,8 @@ constexpr uint8_t ID = 0;
 constexpr uint8_t ORIENTATION = 1;
 constexpr uint8_t X_CENTER = 2;
 constexpr uint8_t Y_CENTER = 3;
-constexpr uint8_t HEIGHT = 4;
 constexpr uint8_t WIDTH = 5;
+constexpr uint8_t HEIGHT = 4;
 
 
 class RaceLoader {
