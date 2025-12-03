@@ -283,11 +283,25 @@ void SDLManager::render(LocalInfo& game_state) {
     const uint32_t pos_y = my_car.y_position;
 
     // Usar flag died para detectar muerte
-    if (game_state.player.died) {
-        if (!animations.is_explosion_active(iteration_counter)) {
-            animations.start_explosion(iteration_counter,
-                                       SDL2pp::Point(pos_x, pos_y));
-            animations.start_camera_shake(iteration_counter);
+    bool player_is_dead = game_state.player.died || game_state.player.life <= 0;
+    if (player_is_dead && !game_state.player.explosion_shown) {
+        animations.start_explosion(game_state.id, iteration_counter, SDL2pp::Point(pos_x, pos_y));
+        animations.start_camera_shake(iteration_counter);
+        game_state.player.explosion_shown = true;
+    }
+
+    if (!player_is_dead) {
+        game_state.player.explosion_shown = false;
+    }
+
+    for (auto& [pid, pinfo] : game_state.players) {
+        bool is_dead = pinfo.died || pinfo.life <= 0;
+        if (is_dead && !pinfo.explosion_shown) {
+            animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
+            pinfo.explosion_shown = true;
+    }
+        if (!is_dead) {
+            pinfo.explosion_shown = false;
         }
     }
 
@@ -384,6 +398,9 @@ void SDLManager::render(LocalInfo& game_state) {
         }
     }
 
+    animations.render_explosions(iteration_counter);
+    animations.clean_explosions(iteration_counter);
+
     render_decorations(view_rect, scale_x, scale_y, map);
 
     render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
@@ -395,7 +412,7 @@ void SDLManager::render(LocalInfo& game_state) {
 
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
 
-    if(my_player.died){
+    if(my_player.died || my_player.life <= 0){
         render_center_box("Your car exploded!", SDL2pp::Color(255, 0, 0, 255));
     } else if (my_player.finish_race) {
         render_center_box("You have finished the race!", SDL2pp::Color(255, 215, 0, 255));
