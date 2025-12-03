@@ -35,6 +35,8 @@ void Sender::run() {
                     this->server_protocol.send_leaderboard_update(variant_snapshot);
                 else if (std::holds_alternative<std::monostate>(variant_snapshot.data))
                     this->server_protocol.send_game_action(variant_snapshot);
+                else if (variant_snapshot.gameloop_action == GameLoopAction::COUNTDOWN_TIME)
+                    this->server_protocol.send_countdown_time(variant_snapshot);
 
             } catch (const ClosedQueue&) {
 

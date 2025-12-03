@@ -253,6 +253,7 @@ void GameLoop::handle_countdown_phase() {
     auto elapsed_time = now - *phase_start;
 
     process_commands_in_countdown_phase();
+    send_countdown_time(countdown_seconds - elapsed_time);
     update_positions(selected_races.races[current_race_index], 0);
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
@@ -485,6 +486,15 @@ void GameLoop::send_race(const RaceDTO& race) {
 
     GameUpdateDTO race_update(GameLoopAction::SEND_RACE, race);
     game_monitor.broadcast(race_update);
+}
+
+void GameLoop::send_countdown_time(const std::chrono::steady_clock::duration& remaining_time) {
+
+    uint8_t seconds_left = static_cast<uint8_t>(
+            std::chrono::duration_cast<std::chrono::seconds>(remaining_time).count());
+
+    GameUpdateDTO countdown_update(GameLoopAction::COUNTDOWN_TIME, seconds_left);
+    game_monitor.broadcast(countdown_update);
 }
 
 

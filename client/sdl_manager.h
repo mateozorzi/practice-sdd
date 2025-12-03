@@ -123,6 +123,7 @@ public:
                         SDL2pp::Texture& map, SDL2pp::Texture& arrow_texture);
 
     void set_sound_info(const std::vector<uint32_t>& ids);
+    void render_text(const std::string& text, SDL2pp::Color text_color, int size);
 };
 
 #endif

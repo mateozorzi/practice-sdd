@@ -38,6 +38,7 @@ struct LocalInfo {
     PlayerInfo player;
     std::vector<NpcDTO> npcs;
     Phase phase = Phase::WAITING_FOR_CAR_SELECTION;
+    uint8_t countdown_seconds = 0;
 };
 
 

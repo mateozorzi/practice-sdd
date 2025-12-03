@@ -99,6 +99,7 @@ class GameLoop final: public Thread {
     LeaderboardDTO create_final_leaderboard();
     LeaderboardDTO create_leaderboard();
     void send_race(const RaceDTO& race);
+    void send_countdown_time(const std::chrono::steady_clock::duration& remaining_time);
 
     bool all_player_in_game() const;
     bool player_in_race() const;

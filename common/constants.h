@@ -30,7 +30,7 @@ enum class GameLoopAction : uint8_t {
     RETURN_TO_LOBBY = 0x17,
     LEADERBOARD = 0x18,
     WINNER_PHASE = 0x19,
-    DISCONNECT = 0x20,
+    COUNTDOWN_TIME = 0x20,
 };
 
 
