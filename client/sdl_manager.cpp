@@ -291,6 +291,8 @@ void SDLManager::render(LocalInfo& game_state) {
     if (player_is_dead && !game_state.player.explosion_shown) {
         animations.start_explosion(game_state.id, iteration_counter, SDL2pp::Point(pos_x, pos_y));
         animations.start_camera_shake(iteration_counter);
+        SDL2pp::Point player_pos(pos_x, pos_y);
+        sounds.play_explosion_sound(game_state.id, player_pos, player_pos);
         game_state.player.explosion_shown = true;
     }
 
@@ -298,10 +300,13 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.explosion_shown = false;
     }
 
-    for (auto& [pid, pinfo]: game_state.players) {
+    SDL2pp::Point target_pos_explosion = camera.get_center();
+
+    for (auto& [pid, pinfo] : game_state.players) {
         bool is_dead = pinfo.died || pinfo.life <= 0;
         if (is_dead && !pinfo.explosion_shown) {
             animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
+            sounds.play_explosion_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos_explosion);
             pinfo.explosion_shown = true;
         }
         if (!is_dead) {
