@@ -23,7 +23,7 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
 }
 
 
-void Game::run() {
+bool Game::run() {
 
     this->receiver.start();
 
@@ -44,8 +44,11 @@ void Game::run() {
         this->keep_running = false;
     }
 
+    bool server_connected = receiver.is_server_connected();
     this->receiver.stop();
     this->receiver.join();
+
+    return server_connected;
 }
 
 
@@ -150,7 +153,8 @@ bool Game::update_waiting() {
 
     while (updates.try_pop(dto)) {
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -163,6 +167,10 @@ bool Game::update_waiting() {
             }
             sdl.set_sound_info(ids);
             game_state.phase = Phase::UPGRADE;
+            game_state.penalty_per_upgrade = std::get<uint8_t>(dto.data);
+            std::cout << "Penalty per upgrade received: "
+                      << static_cast<int>(game_state.penalty_per_upgrade) << " seconds."
+                      << std::endl;
             return false;
         }
     }
@@ -196,7 +204,8 @@ bool Game::update_upgrade() {
         }
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -228,6 +237,16 @@ bool Game::update_upgrade() {
                 last = std::get<WorldSnapshotDTO>(dto.data);
                 got_snapshot = true;
             }
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPGRADES_REMAINING) {
+            if (std::holds_alternative<uint8_t>(dto.data)) {
+                uint8_t upgrades_remaining = std::get<uint8_t>(dto.data);
+                game_state.player.upgrades_remaining = upgrades_remaining;
+            }
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING) {
+            if (std::holds_alternative<uint8_t>(dto.data)) {
+                uint8_t time_remaining = std::get<uint8_t>(dto.data);
+                game_state.upgrade_shop_countdown = time_remaining;
+            }
         }
     }
 
@@ -237,7 +256,9 @@ bool Game::update_upgrade() {
 void Game::show_upgrade() {
 
     sdl.clear_screen();
-    sdl.render_shop(game_state.player.time);
+    sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade),
+                    static_cast<int>(game_state.player.upgrades_remaining),
+                    static_cast<int>(game_state.upgrade_shop_countdown));
     sdl.show_screen();
 }
 
@@ -258,7 +279,8 @@ bool Game::update_countdown() {
         }
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -299,7 +321,8 @@ bool Game::update_race() {
     while (updates.try_pop(dto)) {
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -310,6 +333,7 @@ bool Game::update_race() {
             if (got_snapshot)
                 update_game_state_from_snapshot(last);
 
+            game_state.player.time = 0;
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
 
@@ -324,6 +348,11 @@ bool Game::update_race() {
                 update_game_state_from_snapshot(last);
 
             return false;
+        } else if (dto.gameloop_action == GameLoopAction::RACE_TIME) {
+            if (std::holds_alternative<uint32_t>(dto.data)) {
+                uint32_t elapsed_seconds = std::get<uint32_t>(dto.data);
+                game_state.player.time = static_cast<int>(elapsed_seconds);
+            }
         }
 
         if (game_state.phase != Phase::IN_RACE) {
@@ -352,7 +381,8 @@ bool Game::update_leaderboard() {
     while (updates.try_pop(dto)) {
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             sdl.close_leaderboard();
@@ -395,7 +425,8 @@ bool Game::update_game_finished() {
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (updates.try_pop(dto)) {
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             sdl.close_leaderboard();
@@ -430,7 +461,7 @@ void Game::change_phase() {
             break;
         case Phase::UPGRADE:
             phase = std::make_unique<UpgradePhase>(*this, 0);
-            sdl.play_background_music("client/assets/music/trance-loop.wav");
+            sdl.play_background_music("/var/nfs/assets/music/trance-loop.wav");
             break;
         case Phase::COUNTDOWN:
             phase = std::make_unique<CountdownPhase>(*this, 0);

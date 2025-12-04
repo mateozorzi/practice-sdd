@@ -122,7 +122,8 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
 
     lobby.remove_player(player_id, game_id);
 
-    is_in_lobby = true;
+    if (_keep_running)
+        is_in_lobby = true;
 }
 
 void ClientHandler::create_new_game(const uint8_t max_players, const std::string& lobby_name) {
@@ -207,12 +208,22 @@ void ClientHandler::run() {
 }
 
 
+void ClientHandler::exit_game() {
+
+    if (!is_in_lobby)
+        server_protocol.send_game_action(
+                GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
+}
+
+
 void ClientHandler::stop() {
 
-    is_in_lobby = false;
+    if (_keep_running) {
 
-    if (_keep_running)
         _keep_running = false;
+        is_in_lobby = false;
+        exit_game();
+    }
 
     try {
 

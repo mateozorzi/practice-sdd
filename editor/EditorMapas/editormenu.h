@@ -23,8 +23,6 @@ private slots:
 
 private:
     Ui::EditorMenu* ui;
-
-    QString find_races_path();
 };
 
 #endif  // EDITORMENU_H

@@ -7,7 +7,7 @@ Animations::Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManag
 
 void Animations::start_explosion(uint32_t id, int current_it, SDL2pp::Point position) {
     if (explosions.find(id) == explosions.end()) {
-        explosions[id] = ExplosionAnimation{current_it, position};
+        explosions.try_emplace(id, ExplosionAnimation{current_it, position});
     }
 }
 
@@ -20,7 +20,7 @@ void Animations::render_explosions(int current_it) {
         return;
     }
 
-    SDL2pp::Texture& sprite = resources.get_texture("client/assets/sprites/explosion.png");
+    SDL2pp::Texture& sprite = resources.get_texture("/var/nfs/assets/sprites/explosion.png");
     SDL2pp::Rect view = camera.get_view_rect();
 
     for (auto& [id, animation]: explosions) {

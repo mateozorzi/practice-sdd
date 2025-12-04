@@ -22,6 +22,7 @@ constexpr int MAX_UPGRADES_PER_RACE = 4;
 
 enum class GameLoopAction : uint8_t {
 
+    DISCONNECT = 0xDD,
     SEND_UPDATE_POSITIONS = 0x10,
     SEND_RACE = 0x11,
     START_RACE = 0x12,
@@ -33,6 +34,9 @@ enum class GameLoopAction : uint8_t {
     LEADERBOARD = 0x18,
     WINNER_PHASE = 0x19,
     COUNTDOWN_TIME = 0x20,
+    SEND_UPGRADES_REMAINING = 0x21,
+    SEND_UPGRADE_SHOP_TIME_REMAINING = 0x22,
+    RACE_TIME = 0x23,
 };
 
 

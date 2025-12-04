@@ -14,6 +14,9 @@ GameState Receiver::get_game_state() const { return game_state; }
 Queue<GameUpdateDTO>& Receiver::get_car_positions_queue() { return car_positions_queue; }
 
 
+bool Receiver::is_server_connected() const { return server_connected; }
+
+
 void Receiver::run() {
 
     try {
@@ -26,6 +29,11 @@ void Receiver::run() {
             if (car_position.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
 
                 _is_alive = false;
+                break;
+            } else if (car_position.gameloop_action == GameLoopAction::DISCONNECT) {
+
+                _is_alive = false;
+                server_connected = false;
                 break;
             }
         }

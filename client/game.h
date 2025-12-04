@@ -76,7 +76,7 @@ class Game {
 
 public:
     explicit Game(ClientProtocol& protocol, uint32_t id);
-    void run();
+    bool run();
 };
 
 

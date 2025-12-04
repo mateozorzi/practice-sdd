@@ -51,8 +51,8 @@ void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteratio
 }
 
 
-void GameLoop::process_commands_in_waiting_car_selection_phase() {
-
+void GameLoop::process_commands(const std::unordered_set<ClientAction>& allowed_actions,
+                                const uint32_t elapsed_seconds) {
     GameCommand game_command;
 
     while (command_queue.try_pop(game_command)) {
@@ -60,65 +60,104 @@ void GameLoop::process_commands_in_waiting_car_selection_phase() {
         ClientAction action = game_command.get_client_action();
 
         if (action == ClientAction::DISCONNECT) {
-
             handle_disconnection(game_command);
             continue;
-        } else if (action == ClientAction::SEND_CAR_SELECTION) {
+        }
 
-            handle_car_selection(game_command);
+        if (allowed_actions.count(action) == 0)
             continue;
+
+        switch (action) {
+            case ClientAction::SEND_CAR_SELECTION:
+                handle_car_selection(game_command);
+                break;
+
+            case ClientAction::SEND_UPGRADE:
+                handle_upgrade_car(game_command);
+                break;
+
+            case ClientAction::SEND_CAR_MOVEMENT:
+                handle_car_movement(game_command);
+                break;
+
+            case ClientAction::CHEAT_WIN_RACE:
+                handle_cheat_win_race(game_command, elapsed_seconds);
+                break;
+
+            case ClientAction::CHEAT_WIN_GAME:
+                handle_cheat_win_game(game_command, elapsed_seconds);
+                break;
+
+            case ClientAction::CHEAT_INFINITE_HEALTH:
+                handle_cheat_infinite_health(game_command);
+                break;
+
+            default:
+                break;
         }
     }
 }
 
-void GameLoop::process_commands_in_upgrade_shop_phase() {
 
-    GameCommand game_command;
+void GameLoop::handle_disconnection(const GameCommand& game_command) {
 
-    while (command_queue.try_pop(game_command)) {
+    GameUpdateDTO return_to_lobby(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
+    game_monitor.send_update_to_player(return_to_lobby, game_command.get_player_id());
 
-        ClientAction action = game_command.get_client_action();
+    game_monitor.unregister_player(game_command.get_player_id());
+}
 
-        if (action == ClientAction::DISCONNECT) {
+void GameLoop::handle_car_selection(const GameCommand& game_command) {
 
-            handle_disconnection(game_command);
-            continue;
-        } else if (action == ClientAction::SEND_UPGRADE) {
+    if (auto car = game_command.get_data<CarDTO>()) {
 
-            handle_upgrade_car(game_command);
-            continue;
+        uint32_t player_id = game_command.get_player_id();
+        CarDTO car_dto = car->get();
+        auto it = players.find(player_id);
+        if (it != players.end()) {
+
+            it->second.create_car(car_dto.model, server_config, box2d_world);
+            it->second.set_in_game();
         }
     }
 }
 
-void GameLoop::process_commands_in_countdown_phase() {
+void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
 
-    GameCommand game_command;
+    auto upgrade = game_command.get_data<BuyUpgradeDTO>();
+    if (upgrade) {
 
-    while (command_queue.try_pop(game_command)) {
+        uint32_t player_id = game_command.get_player_id();
+        auto it = players.find(player_id);
+        if (it != players.end())
+            it->second.set_upgrade(upgrade->get(), server_config.game.upgrades);
+    }
+}
 
-        ClientAction action = game_command.get_client_action();
+void GameLoop::handle_car_movement(const GameCommand& game_command) {
 
-        if (action == ClientAction::DISCONNECT) {
+    if (auto movement = game_command.get_data<MovementDTO>()) {
 
-            handle_disconnection(game_command);
-            continue;
-        }
+        uint32_t player_id = game_command.get_player_id();
+        auto it = players.find(player_id);
+        if (it != players.end())
+            it->second.handle_car_movement(movement->get());
     }
 }
 
 void GameLoop::handle_cheat_win_race(const GameCommand& game_command,
                                      const uint32_t elapsed_seconds) {
-    // finish race to the player to send the leaderboard
-    // to the rest finish race with timeout time
+
     uint32_t player_id = game_command.get_player_id();
     for (auto& [id, player]: players) {
+
         if (id != player_id) {
+
             player.finish_race();
-            // convert race_timeout to uint32_t seconds
             uint32_t race_timeout = static_cast<uint32_t>(race_timeout_seconds.count());
             player.record_time(race_timeout, server_config.game);
         } else {
+
             player.finish_race();
             player.record_time(elapsed_seconds, server_config.game);
         }
@@ -135,72 +174,19 @@ void GameLoop::handle_cheat_win_game(const GameCommand& game_command,
 }
 
 void GameLoop::handle_cheat_infinite_health(const GameCommand& game_command) {
+
     uint32_t player_id = game_command.get_player_id();
     auto it = players.find(player_id);
-    if (it != players.end()) {
+
+    if (it != players.end())
         it->second.activate_infinite_health();
-    }
 }
 
-void GameLoop::process_commands_in_race_phase(const uint32_t elapsed_seconds) {
 
-    GameCommand game_command;
+void GameLoop::transition_to(const GamePhase& next_phase) {
 
-    while (command_queue.try_pop(game_command)) {
-
-        ClientAction action = game_command.get_client_action();
-
-        if (action == ClientAction::DISCONNECT) {
-
-            handle_disconnection(game_command);
-            continue;
-        } else if (action == ClientAction::SEND_CAR_MOVEMENT) {
-
-            handle_car_movement(game_command);
-            continue;
-        } else if (action == ClientAction::CHEAT_WIN_RACE) {
-            handle_cheat_win_race(game_command, elapsed_seconds);
-            continue;
-        } else if (action == ClientAction::CHEAT_WIN_GAME) {
-            handle_cheat_win_game(game_command, elapsed_seconds);
-            continue;
-        } else if (action == ClientAction::CHEAT_INFINITE_HEALTH) {
-            handle_cheat_infinite_health(game_command);
-            continue;
-        }
-    }
-}
-
-void GameLoop::process_commands_in_leaderboard_phase() {
-
-    GameCommand game_command;
-
-    while (command_queue.try_pop(game_command)) {
-
-        ClientAction action = game_command.get_client_action();
-
-        if (action == ClientAction::DISCONNECT) {
-
-            handle_disconnection(game_command);
-            continue;
-        }
-    }
-}
-
-void GameLoop::process_commands_in_game_finished_phase() {
-
-    GameCommand game_command;
-
-    while (command_queue.try_pop(game_command)) {
-
-        ClientAction action = game_command.get_client_action();
-
-        if (action == ClientAction::DISCONNECT) {
-
-            handle_disconnection(game_command);
-            continue;
-        }
-    }
+    current_phase = next_phase;
+    phase_start = std::nullopt;
 }
 
 
@@ -208,14 +194,14 @@ void GameLoop::handle_waiting_car_selection_phase() {
 
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 
-    process_commands_in_waiting_car_selection_phase();
+    process_commands({ClientAction::SEND_CAR_SELECTION}, 0);
 
     if (all_player_in_game() && players.size() == max_players) {
 
-        current_phase = GamePhase::UPGRADE_SHOP;
-        phase_start = std::nullopt;
+        transition_to(GamePhase::UPGRADE_SHOP);
 
-        GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+        GameUpdateDTO game_update(GameLoopAction::START_SHOP,
+                                  static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
         game_monitor.broadcast(game_update);
 
         set_race(selected_races.races[current_race_index]);
@@ -224,19 +210,20 @@ void GameLoop::handle_waiting_car_selection_phase() {
     fixed_sleep(now);
 }
 
-
 void GameLoop::handle_upgrade_shop_phase() {
 
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
     const auto elapsed = now - *phase_start;
 
-    process_commands_in_upgrade_shop_phase();
+    process_commands({ClientAction::SEND_UPGRADE}, 0);
+
+    send_upgrades_remaining();
+    send_upgrade_shop_time_remaining(upgrade_shop_seconds - elapsed);
 
     if (elapsed >= upgrade_shop_seconds) {
 
-        current_phase = GamePhase::COUNTDOWN;
-        phase_start = std::nullopt;
+        transition_to(GamePhase::COUNTDOWN);
+
         update_positions(selected_races.races[current_race_index], 0);
 
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
@@ -252,7 +239,8 @@ void GameLoop::handle_countdown_phase() {
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     auto elapsed_time = now - *phase_start;
 
-    process_commands_in_countdown_phase();
+    process_commands({}, 0);
+
     send_countdown_time(countdown_seconds - elapsed_time);
     update_positions(selected_races.races[current_race_index], 0);
 
@@ -260,8 +248,7 @@ void GameLoop::handle_countdown_phase() {
 
     if (elapsed_time >= countdown_seconds) {
 
-        current_phase = GamePhase::IN_RACE;
-        phase_start = std::nullopt;
+        transition_to(GamePhase::IN_RACE);
 
         GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
         game_monitor.broadcast(game_update);
@@ -270,16 +257,23 @@ void GameLoop::handle_countdown_phase() {
     fixed_sleep(now);
 }
 
+void GameLoop::send_race_time(const uint32_t elapsed_seconds) {
+
+    GameUpdateDTO race_time_update(GameLoopAction::RACE_TIME,
+                                   static_cast<uint32_t>(elapsed_seconds));
+    game_monitor.broadcast(race_time_update);
+}
 
 void GameLoop::handle_in_race_phase() {
 
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
     const auto elapsed = now - *phase_start;
 
     double elapsed_seconds = std::chrono::duration<double>(elapsed).count();
     // check_race_times(elapsed_seconds);
-    process_commands_in_race_phase(elapsed_seconds);
+    process_commands({ClientAction::SEND_CAR_MOVEMENT, ClientAction::CHEAT_WIN_RACE,
+                      ClientAction::CHEAT_WIN_GAME, ClientAction::CHEAT_INFINITE_HEALTH},
+                     elapsed_seconds);
 
     check_alive_players();
 
@@ -287,13 +281,14 @@ void GameLoop::handle_in_race_phase() {
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
+    send_race_time(static_cast<uint32_t>(elapsed_seconds));
+
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
-        phase_start = std::nullopt;
 
         if (cheat_game_winner_activated) {
-            std::cerr << "[" << GAME_LOOP << "] Cheat WIN_GAME activated. Finishing game."
-                      << std::endl;
-            current_phase = GamePhase::GAME_FINISHED;
+
+            transition_to(GamePhase::GAME_FINISHED);
+
             final_leaderboard = create_final_leaderboard();
 
             GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, std::monostate{});
@@ -304,7 +299,8 @@ void GameLoop::handle_in_race_phase() {
 
         } else {
 
-            current_phase = GamePhase::LEADERBOARD;
+            transition_to(GamePhase::LEADERBOARD);
+
             LeaderboardDTO leaderboard = create_leaderboard();
             (void)leaderboard;
 
@@ -325,23 +321,25 @@ void GameLoop::handle_leaderboard_phase() {
 
     const auto elapsed = now - *phase_start;
 
-    process_commands_in_leaderboard_phase();
+    process_commands({}, 0);
 
     if (elapsed >= leaderboard_seconds) {
 
         phase_start = std::nullopt;
         if (current_race_index + 1 < selected_races.size) {
-            phase_start = std::nullopt;
-            current_phase = GamePhase::UPGRADE_SHOP;
+
+            transition_to(GamePhase::UPGRADE_SHOP);
             current_race_index += 1;
 
-            GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+            GameUpdateDTO game_update(GameLoopAction::START_SHOP,
+                                      static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
             game_monitor.broadcast(game_update);
 
             set_race(selected_races.races[current_race_index]);
         } else {
 
-            current_phase = GamePhase::GAME_FINISHED;
+            transition_to(GamePhase::GAME_FINISHED);
+
             final_leaderboard = create_final_leaderboard();
 
             GameUpdateDTO game_update(GameLoopAction::GAME_FINISHED, std::monostate{});
@@ -360,11 +358,11 @@ void GameLoop::handle_game_finished_phase() {
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     auto elapsed_time = now - *phase_start;
 
-    process_commands_in_game_finished_phase();
+    process_commands({}, 0);
 
     if (elapsed_time >= game_finish_seconds)
         GameLoop::stop();
-    
+
     fixed_sleep(now);
 }
 
@@ -411,51 +409,6 @@ void GameLoop::add_player(const uint32_t player_id, const std::string& username)
     players.try_emplace(player_id, player_id, username);
 }
 
-void GameLoop::handle_car_selection(const GameCommand& game_command) {
-
-    if (auto car = game_command.get_data<CarDTO>()) {
-        uint32_t player_id = game_command.get_player_id();
-        CarDTO car_dto = car->get();
-        auto it = players.find(player_id);
-        if (it != players.end()) {
-
-            it->second.create_car(car_dto.model, server_config, box2d_world);
-            it->second.set_in_game();
-        }
-    }
-}
-
-
-void GameLoop::handle_car_movement(const GameCommand& game_command) {
-
-    if (auto movement = game_command.get_data<MovementDTO>()) {
-
-        uint32_t player_id = game_command.get_player_id();
-        auto it = players.find(player_id);
-        if (it != players.end())
-            it->second.handle_car_movement(movement->get());
-    }
-}
-
-void GameLoop::handle_disconnection(const GameCommand& game_command) {
-
-    GameUpdateDTO return_to_lobby(GameLoopAction::RETURN_TO_LOBBY, std::monostate{});
-    game_monitor.send_update_to_player(return_to_lobby, game_command.get_player_id());
-
-    game_monitor.unregister_player(game_command.get_player_id());
-}
-
-void GameLoop::handle_upgrade_car(const GameCommand& game_command) {
-    auto upgrade = game_command.get_data<BuyUpgradeDTO>();
-    if (upgrade) {
-        uint32_t player_id = game_command.get_player_id();
-        auto it = players.find(player_id);
-        if (it != players.end()) {
-            it->second.set_upgrade(upgrade->get(), server_config.game.upgrades);
-        }
-    }
-}
-
 void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
 
     WorldSnapshotDTO world_snapshot;
@@ -467,12 +420,11 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
         world_snapshot.add_car_position(player_dto, player.get_car_position(race));
     }
 
-    for (auto& npc: npcs) {
+    if (current_phase == GamePhase::IN_RACE)
+        city_loader.update_npcs();
 
-        if (current_phase == GamePhase::IN_RACE)
-            npc.update();
+    for (const auto& npc: city_loader.get_npcs())
         world_snapshot.add_npc_position(npc.get_position());
-    }
 
     GameUpdateDTO update(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
 
@@ -494,6 +446,27 @@ void GameLoop::send_countdown_time(const std::chrono::steady_clock::duration& re
     game_monitor.broadcast(countdown_update);
 }
 
+void GameLoop::send_upgrades_remaining() {
+
+    for (const auto& [id, player]: players) {
+
+        uint8_t upgrades_remaining = player.get_upgrades_remaining();
+
+        GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADES_REMAINING, upgrades_remaining);
+        game_monitor.send_update_to_player(game_update, id);
+    }
+}
+
+void GameLoop::send_upgrade_shop_time_remaining(
+        const std::chrono::steady_clock::duration& remaining_time) {
+
+    uint8_t seconds_remaining = static_cast<uint8_t>(
+            std::chrono::duration_cast<std::chrono::seconds>(remaining_time).count());
+
+    GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING, seconds_remaining);
+    game_monitor.broadcast(game_update);
+}
+
 
 bool GameLoop::all_player_in_game() const {
 
@@ -507,57 +480,10 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints) {
+void GameLoop::map_configuration(const std::string& city_name,
+                                 const std::vector<CheckpointDTO>& checkpoints) {
 
     city_loader.load_city(city_name, checkpoints);
-    load_npcs(city_name);
-}
-
-void GameLoop::load_npcs(const std::string& city_name) {
-    npcs.clear();
-
-    std::string normalized_city = city_name;
-    std::transform(normalized_city.begin(), normalized_city.end(), normalized_city.begin(),
-                   ::tolower);
-    std::replace(normalized_city.begin(), normalized_city.end(), ' ', '_');
-
-    std::string npc_file = "server/world/npcs/npcs_" + normalized_city + ".json";
-
-    try {
-        std::ifstream file(npc_file);
-        if (!file) {
-            std::cout << "[GAME_LOOP] NPC file not found: " << npc_file << std::endl;
-            return;
-        }
-
-        nlohmann::json json_data;
-        file >> json_data;
-
-        if (!json_data.is_array()) {
-            std::cout << "[GAME_LOOP] Invalid NPC file format" << std::endl;
-            return;
-        }
-
-        uint32_t npc_id = 0;
-        constexpr float NPC_SPEED = 1.5f;  // Slow speed in pixels per update
-
-        for (const auto& polygon: json_data) {
-            if (polygon.is_array() && polygon.size() >= 3) {
-                std::vector<std::vector<int>> route;
-                for (const auto& point: polygon) {
-                    if (point.is_array() && point.size() >= 2) {
-                        route.push_back({point[0].get<int>(), point[1].get<int>()});
-                    }
-                }
-                npcs.emplace_back(npc_id++, route, NPC_SPEED);
-            }
-        }
-
-        std::cout << "[GAME_LOOP] Loaded " << npcs.size() << " NPCs from " << npc_file << std::endl;
-
-    } catch (const std::exception& e) {
-        std::cout << "[GAME_LOOP] Error loading NPCs: " << e.what() << std::endl;
-    }
 }
 
 void GameLoop::set_race(const RaceDTO& race) {
@@ -594,8 +520,7 @@ void GameLoop::check_alive_players() {
     for (auto& [player_id, player]: players) {
 
         if (player.is_dead() && player.is_in_race()) {
-            std::cout << "Player with ID: " << player_id << " has died during the race."
-                      << std::endl;
+
             player.finish_race();
             player.record_time(timeout, server_config.game);
         }
@@ -608,8 +533,6 @@ void GameLoop::check_race_times(uint32_t seconds) {
 
         if (player.has_finished_race() and !player.is_dead()) {
 
-            std::cout << "Player with ID: " << player_id << " has finished the race in " << seconds
-                      << " seconds." << std::endl;
             player.record_time(seconds, server_config.game);
         }
     }
@@ -650,14 +573,6 @@ LeaderboardDTO GameLoop::create_final_leaderboard() {
         position++;
     }
 
-    std::cout << "\nFinal Leaderboard: " << std::endl;
-    for (const auto& stats: final_stats) {
-        std::cout << "Position: " << static_cast<int>(stats.position)
-                  << " | Player ID: " << stats.client_id << " | Username: " << stats.username
-                  << " | Total Time: " << stats.total_time << " seconds"
-                  << " | Total Points: " << static_cast<int>(stats.points) << std::endl;
-    }
-
     return LeaderboardDTO("Final Leaderboard", final_stats);
 }
 
@@ -694,15 +609,6 @@ LeaderboardDTO GameLoop::create_leaderboard() {
     LeaderboardDTO actual(race_name, race_stats);
 
     leaderboards.push_back(actual);
-
-    // cout debug of leaderboard
-    std::cout << "\nLeaderboard for race: " << race_name << std::endl;
-    for (const auto& stats: actual.players) {
-        std::cout << "Position: " << static_cast<int>(stats.position)
-                  << " | Player ID: " << stats.client_id << " | Username: " << stats.username
-                  << " | Time: " << stats.total_time << " seconds"
-                  << " | Points: " << static_cast<int>(stats.points) << std::endl;
-    }
 
     return actual;
 }

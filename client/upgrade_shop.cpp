@@ -7,6 +7,8 @@
 
 constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
 constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
+constexpr int INFO_FONT_SIZE = 24;
+constexpr int UPGRADE_COUNTDOWN_FONT_SIZE = 32;
 
 UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                          ResourceManager& resources, Sounds& sounds, int window_width,
@@ -68,7 +70,8 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
 }
 
 void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name,
-                         const Camera& camera) {
+                         const Camera& camera, int time_penalty, int upgrades_remaining,
+                         int upgrade_shop_countdown) {
     (void)player_time;  // Aumenta segun compre mejoras
     (void)player_car;   // Para poner el auto al lado de botones de mejoras
 
@@ -115,6 +118,35 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
             title_texture, SDL2pp::NullOpt,
             SDL2pp::Rect(title_x, title_y, title_texture.GetWidth(), title_texture.GetHeight()));
 
+    // info penalty
+    std::string penalty_text = "Time penalty per Upgrade: " + std::to_string(time_penalty) + " seg";
+    SDL2pp::Color penalty_color(139, 0, 0, 255);  // DarkRed estándar
+
+
+    SDL2pp::Texture& penalty_texture =
+            resources.get_text(penalty_text, font_path, UPGRADE_COUNTDOWN_FONT_SIZE, penalty_color);
+
+    int penalty_x = shop_rect.x + (shop_rect.w - penalty_texture.GetWidth()) / 2;
+    int penalty_y = title_y + title_texture.GetHeight() + 20;  // separacion del título
+
+    renderer.Copy(penalty_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(penalty_x, penalty_y, penalty_texture.GetWidth(),
+                               penalty_texture.GetHeight()));
+
+    // info max upgrades
+    std::string max_upgrades_text = "Upgrades remaining: " + std::to_string(upgrades_remaining);
+    SDL2pp::Color max_upgrades_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+
+    SDL2pp::Texture& max_upgrades_texture =
+            resources.get_text(max_upgrades_text, font_path, INFO_FONT_SIZE, max_upgrades_color);
+
+    int max_upgrades_x = shop_rect.x + (shop_rect.w - max_upgrades_texture.GetWidth()) / 2;
+    int max_upgrades_y = penalty_y + penalty_texture.GetHeight() + 10;  // separacion de la info
+
+    renderer.Copy(max_upgrades_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(max_upgrades_x, max_upgrades_y, max_upgrades_texture.GetWidth(),
+                               max_upgrades_texture.GetHeight()));
+
     // Botones
     for (const ShopButton& btn: buttons) {
         // Fondo del boton
@@ -154,9 +186,26 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
         }
     }
 
-    // In the background the city map is rendered
-    // SDL2pp::Texture& map_texture = resources.get_texture(map_name);
-    // renderer.Copy(map_texture, SDL2pp::NullOpt, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
+    std::string countdown_text =
+            "The countdown starts in: " + std::to_string(upgrade_shop_countdown + 1) + " seg";
+
+    SDL2pp::Texture& countdown_texture =
+            resources.get_text(countdown_text, font_path, UPGRADE_COUNTDOWN_FONT_SIZE, title_color);
+
+    int max_btn_bottom = 0;
+    for (const ShopButton& btn: buttons) {
+        int bottom = btn.rect.y + btn.rect.h;
+        if (bottom > max_btn_bottom)
+            max_btn_bottom = bottom;
+    }
+
+    int countdown_x = shop_rect.x + (shop_rect.w - countdown_texture.GetWidth()) / 2;
+    int countdown_y = max_btn_bottom + 30;  // margen debajo de los botones
+
+    renderer.Copy(countdown_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(countdown_x, countdown_y, countdown_texture.GetWidth(),
+                               countdown_texture.GetHeight()));
+
     (void)map_name;
 }
 

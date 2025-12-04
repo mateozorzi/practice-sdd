@@ -33,10 +33,20 @@ void Sender::run() {
                     this->server_protocol.send_race_update(variant_snapshot);
                 else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_LEADERBOARD)
                     this->server_protocol.send_leaderboard_update(variant_snapshot);
+                else if (variant_snapshot.gameloop_action == GameLoopAction::START_SHOP)
+                    this->server_protocol.send_action_info(variant_snapshot);
                 else if (std::holds_alternative<std::monostate>(variant_snapshot.data))
                     this->server_protocol.send_game_action(variant_snapshot);
                 else if (variant_snapshot.gameloop_action == GameLoopAction::COUNTDOWN_TIME)
-                    this->server_protocol.send_countdown_time(variant_snapshot);
+                    this->server_protocol.send_action_info(variant_snapshot);
+                else if (variant_snapshot.gameloop_action ==
+                         GameLoopAction::SEND_UPGRADES_REMAINING)
+                    this->server_protocol.send_action_info(variant_snapshot);
+                else if (variant_snapshot.gameloop_action ==
+                         GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING)
+                    this->server_protocol.send_action_info(variant_snapshot);
+                else if (variant_snapshot.gameloop_action == GameLoopAction::RACE_TIME)
+                    this->server_protocol.send_race_time(variant_snapshot);
 
             } catch (const ClosedQueue&) {
 

@@ -42,6 +42,8 @@ class ClientHandler final: public Thread {
     void create_new_game(uint8_t max_players, const std::string& lobby_name);
     void join_existing_game(uint32_t game_id);
 
+    void exit_game();
+
 
 public:
     ClientHandler(const ClientHandler&) = delete;

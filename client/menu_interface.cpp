@@ -258,7 +258,7 @@ void MenuInterface::set_music(QObject* parent) {
     std::cout << "Seteando audio output" << std::endl;
 
     musicPlayer->setSource(
-            QUrl::fromLocalFile("client/assets/music/Need for Speed II SE Soundtrack - Main Menu "
+            QUrl::fromLocalFile("/var/nfs/assets/music/Need for Speed II SE Soundtrack - Main Menu "
                                 "and Showcase Theme I - RonTaboga.mp3"));
     std::cout << "Seteando source" << std::endl;
 
@@ -269,12 +269,12 @@ void MenuInterface::set_music(QObject* parent) {
 }
 
 void MenuInterface::lobby(PlayerDTO& player) {
+    QEventLoop loop;
+
     Lobby l;
     set_music(&l);
     l.showMaximized();
     std::cout << "Showing lobby window" << std::endl;
-
-    // PlayerDTO player("", -1, CarDTO(), -1, false);
 
     std::string username;
     uint32_t client_id = -1;
@@ -313,7 +313,7 @@ void MenuInterface::lobby(PlayerDTO& player) {
             } else {
                 // car selected, start the game
                 l.close();
-                app.quit();
+                loop.quit();
             }
         }
     });
@@ -325,10 +325,10 @@ void MenuInterface::lobby(PlayerDTO& player) {
         player.id = -1;
 
         l.close();
-        app.quit();
+        loop.quit();
     });
 
-    app.exec();
+    loop.exec();
 
     musicPlayer->stop();
 }
