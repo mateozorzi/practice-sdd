@@ -1,10 +1,7 @@
 #ifndef SDL_MANAGER_H
 #define SDL_MANAGER_H
-#include <map>
-#include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -15,7 +12,6 @@
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
 #include "common/npc_dto.h"
-#include "common/player_dto.h"
 
 #include "animations.h"
 #include "camera.h"
@@ -98,9 +94,10 @@ public:
     void render_waiting();
     void render_countdown(const LocalInfo& game_state);
     void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title);
-    void render_center_box(const std::string& text, SDL2pp::Color border_color);
+    void render_center_box(const std::string& text, const SDL2pp::Color& border_color);
     void show_screen();
-    void draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color, int font_size);
+    void draw_row(const std::string& sentence, int x, int y, const SDL2pp::Color& color,
+                  int font_size);
     void render_stats(const PlayerInfo& player);
     nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);
@@ -128,7 +125,7 @@ public:
     void play_background_music(const std::string& path, int loops = -1);
     void stop_background_music();
     void set_music_volume(int volume);
-    void render_text(const std::string& text, SDL2pp::Color text_color, int size);
+    void render_text(const std::string& text, const SDL2pp::Color& text_color, int size);
 };
 
 #endif

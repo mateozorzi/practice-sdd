@@ -1,13 +1,13 @@
 #ifndef LEADERBOARD_INFO_H
 #define LEADERBOARD_INFO_H
 
+#include <array>
 #include <string>
 #include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
-#include "../common/client_event_dto.h"
 #include "../common/leaderboard_dto.h"
 
 #include "camera.h"
@@ -33,7 +33,7 @@ public:
 
 
     void fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
-                          std::string title);
+                          const std::string& title);
 
 
     void fill_winner(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& bottom_rect);

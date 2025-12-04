@@ -2,15 +2,14 @@
 
 #include <algorithm>
 #include <fstream>
-#include <map>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
-#include <qforeach.h>
 
 #include "../common/leaderboard_dto.h"
-#include "../common/player_race_stats_dto.h"
 
 #include "client_constants.h"
 #include "game_state.h"
@@ -440,7 +439,7 @@ void SDLManager::render_leaderboard(const LeaderboardDTO& leaderboard, const std
     leaderboard_info.render(leaderboard, title, map_name, camera);
 }
 
-void SDLManager::render_center_box(const std::string& message, SDL2pp::Color color) {
+void SDLManager::render_center_box(const std::string& message, const SDL2pp::Color& color) {
 
     SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
     SDL_Color prev_color = renderer.GetDrawColor();
@@ -483,7 +482,7 @@ void SDLManager::render_center_box(const std::string& message, SDL2pp::Color col
     renderer.SetDrawColor(prev_color);
 }
 
-void SDLManager::draw_row(const std::string& sentence, int x, int y, SDL2pp::Color color,
+void SDLManager::draw_row(const std::string& sentence, int x, int y, const SDL2pp::Color& color,
                           int font_size) {
 
     SDL2pp::Texture& text_texture = resources.get_text(sentence, FONT_PATH, font_size, color);
@@ -660,7 +659,7 @@ void SDLManager::load_city(const std::string& city_name) {
     load_decorations_rects(load_json_file(decoration));
 }
 
-void SDLManager::render_text(const std::string& text, SDL2pp::Color text_color, int size) {
+void SDLManager::render_text(const std::string& text, const SDL2pp::Color& text_color, int size) {
     SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, size, text_color);
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;

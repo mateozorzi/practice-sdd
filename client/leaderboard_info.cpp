@@ -1,5 +1,8 @@
 #include "leaderboard_info.h"
 
+#include <string>
+#include <vector>
+
 #include "client_constants.h"
 
 // Leaderboard layout constants
@@ -11,8 +14,7 @@ constexpr int COLUMN_POINTS_WIDTH = 100;
 
 
 LeaderboardInfo::LeaderboardInfo(SDL2pp::Renderer& renderer, ResourceManager& resources,
-                                 int window_width, int window_height,
-                                 const std::string& font_path):
+                                 int window_width, int window_height, const std::string& font_path):
         renderer(renderer),
         resources(resources),
         font_path(font_path),
@@ -76,7 +78,7 @@ void LeaderboardInfo::render(const LeaderboardDTO& leaderboard, const std::strin
 }
 
 void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
-                                       std::string title) {
+                                       const std::string& title) {
     int content_y = rect.y + 30;
 
     SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);

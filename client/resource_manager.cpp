@@ -1,6 +1,6 @@
 #include "resource_manager.h"
 
-#include <memory>
+#include <string>
 
 ResourceManager::ResourceManager(SDL2pp::Renderer& renderer): renderer(renderer) {}
 
