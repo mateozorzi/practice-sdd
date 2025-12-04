@@ -68,7 +68,7 @@ private:
     void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
                     double scale_y, SDL2pp::Texture& cars_texture);
     void render_hud_health(int health, int max_health);
-    void render_hud_minimap(int player_x, int player_y);
+    void render_hud_minimap(int player_x, int player_y, const CheckpointDTO& next_checkpoint);
     void render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view_rect,
                       double scale_x, double scale_y, SDL2pp::Texture& map_texture);
     void render_bridges(const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
