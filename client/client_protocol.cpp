@@ -240,7 +240,8 @@ GameUpdateDTO ClientProtocol::receive_update() {
         data = receive_race();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_LEADERBOARD)) {
         data = receive_leaderboard();
-    } else if (update_type == static_cast<uint8_t>(GameLoopAction::COUNTDOWN_TIME)) {
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::COUNTDOWN_TIME) || 
+            update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING)) {
         data = recv_uint8();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::START_SHOP)) {
         data = recv_uint8();

@@ -224,6 +224,17 @@ void GameLoop::handle_waiting_car_selection_phase() {
     fixed_sleep(now);
 }
 
+void GameLoop::send_upgrade_shop_time_remaining(const std::chrono::steady_clock::duration& remaining_time) {
+
+    uint8_t seconds_remaining =
+            static_cast<uint8_t>(std::chrono::duration_cast<std::chrono::seconds>(
+                    remaining_time).count());
+
+    GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING,
+                              seconds_remaining);
+    game_monitor.broadcast(game_update);
+}
+
 
 void GameLoop::handle_upgrade_shop_phase() {
 
@@ -234,6 +245,7 @@ void GameLoop::handle_upgrade_shop_phase() {
     process_commands_in_upgrade_shop_phase();
 
     send_upgrades_remaining();
+    send_upgrade_shop_time_remaining(upgrade_shop_seconds - elapsed);
 
     if (elapsed >= upgrade_shop_seconds) {
 

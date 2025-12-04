@@ -240,6 +240,11 @@ bool Game::update_upgrade() {
                 uint8_t upgrades_remaining = std::get<uint8_t>(dto.data);
                 game_state.player.upgrades_remaining = upgrades_remaining;
             }
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING) {
+            if (std::holds_alternative<uint8_t>(dto.data)) {
+                uint8_t time_remaining = std::get<uint8_t>(dto.data);
+                game_state.upgrade_shop_countdown = time_remaining;
+            }
         }
     }
 
@@ -249,7 +254,7 @@ bool Game::update_upgrade() {
 void Game::show_upgrade() {
 
     sdl.clear_screen();
-    sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade), static_cast<int>(game_state.player.upgrades_remaining));
+    sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade), static_cast<int>(game_state.player.upgrades_remaining), static_cast<int>(game_state.upgrade_shop_countdown));
     sdl.show_screen();
 }
 

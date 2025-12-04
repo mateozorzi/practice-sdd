@@ -546,7 +546,7 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining) { shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining); }
+void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining, int upgrade_shop_countdown) { shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining, upgrade_shop_countdown); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
 
