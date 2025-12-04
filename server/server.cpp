@@ -29,11 +29,11 @@ void Server::run() {
 
 void Server::stop() {
 
-    lobby.stop();
-
     clients_acceptor.stop();
 
     clients_acceptor.join();
+
+    lobby.stop();
 }
 
 

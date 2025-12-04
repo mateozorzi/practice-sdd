@@ -29,6 +29,7 @@ struct PlayerInfo {
     uint8_t current_lap = 0;
     uint8_t race_lap = 0;
     std::string username = "";
+    uint8_t upgrades_remaining = 0;
 };
 
 struct LocalInfo {
@@ -39,6 +40,8 @@ struct LocalInfo {
     std::vector<NpcDTO> npcs;
     Phase phase = Phase::WAITING_FOR_CAR_SELECTION;
     uint8_t countdown_seconds = 0;
+    uint8_t upgrade_shop_countdown = 0;
+    uint8_t penalty_per_upgrade = 0;
 };
 
 

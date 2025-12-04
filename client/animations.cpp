@@ -1,5 +1,7 @@
 #include "animations.h"
 
+#include "client_constants.h"
+
 Animations::Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources):
         renderer(renderer), camera(camera), resources(resources) {}
 
@@ -36,8 +38,8 @@ void Animations::render_explosions(int current_it) {
 
         SDL2pp::Rect src(src_x, src_y, animation.frame_size, animation.frame_size);
 
-        int screen_x = (animation.position.GetX() - view.x) * 1920 / view.w;
-        int screen_y = (animation.position.GetY() - view.y) * 1920 / view.h;
+        int screen_x = (animation.position.GetX() - view.x) * SCREEN_WIDTH / view.w;
+        int screen_y = (animation.position.GetY() - view.y) * SCREEN_HEIGHT / view.h;
 
         SDL2pp::Rect dst(screen_x - animation.scale_size / 2, screen_y - animation.scale_size / 2,
                          animation.scale_size, animation.scale_size);
@@ -48,9 +50,6 @@ void Animations::render_explosions(int current_it) {
 
         if (!camera.on_screen(explosion_world))
             continue;
-
-        if (!camera.on_screen(explosion_world))
-            return;
 
         renderer.Copy(sprite, src, dst);
     }

@@ -106,7 +106,7 @@ public:
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
     void load_city(const std::string& city_name);
-    void render_shop(int time);
+    void render_shop(int time, int time_penalty, int upgrades_remaining);
 
     void close_shop();
     bool is_shop_open();
@@ -123,6 +123,10 @@ public:
                         SDL2pp::Texture& map, SDL2pp::Texture& arrow_texture);
 
     void set_sound_info(const std::vector<uint32_t>& ids);
+
+    void play_background_music(const std::string& path, int loops = -1);
+    void stop_background_music();
+    void set_music_volume(int volume);
     void render_text(const std::string& text, SDL2pp::Color text_color, int size);
 };
 

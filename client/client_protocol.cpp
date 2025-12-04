@@ -242,6 +242,10 @@ GameUpdateDTO ClientProtocol::receive_update() {
         data = receive_leaderboard();
     } else if (update_type == static_cast<uint8_t>(GameLoopAction::COUNTDOWN_TIME)) {
         data = recv_uint8();
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::START_SHOP)) {
+        data = recv_uint8();
+    } else if (update_type == static_cast<uint8_t>(GameLoopAction::SEND_UPGRADES_REMAINING)) {
+        data = recv_uint8();
     } else {
         data = std::monostate{};
     }

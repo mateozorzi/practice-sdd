@@ -127,7 +127,9 @@ void InputManager::handle_waiting() {
 
     SDL_Event event;
 
-    while (SDL_PollEvent(&event)) {
+    // Usar WaitEventTimeout para reducir uso de CPU en fase de espera
+    // Bloquea hasta que llegue un evento o pasen 16ms (~60fps para UI responsive)
+    while (SDL_WaitEventTimeout(&event, 16)) {
 
         if (event.type == SDL_QUIT || player_disconnected)
             return;
@@ -170,6 +172,7 @@ void InputManager::handle_countdown() {
 
     SDL_Event event;
 
+    // Usar PollEvent aquí porque el countdown necesita actualizar UI frecuentemente
     while (SDL_PollEvent(&event)) {
 
         if (event.type == SDL_QUIT || player_disconnected)
@@ -216,7 +219,8 @@ void InputManager::handle_leaderboard() {
 
     SDL_Event event;
 
-    while (SDL_PollEvent(&event)) {
+    // Usar WaitEventTimeout para reducir uso de CPU en fase de leaderboard
+    while (SDL_WaitEventTimeout(&event, 16)) {
 
         if (event.type == SDL_QUIT || player_disconnected)
             return;
@@ -236,7 +240,8 @@ void InputManager::handle_game_finished() {
 
     SDL_Event event;
 
-    while (SDL_PollEvent(&event)) {
+    // Usar WaitEventTimeout para reducir uso de CPU en pantalla final
+    while (SDL_WaitEventTimeout(&event, 16)) {
 
         if (event.type == SDL_QUIT || player_disconnected)
             return;

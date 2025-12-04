@@ -12,27 +12,39 @@ GamePhase::GamePhase(Game& game, int starting_it, int fps):
 bool GamePhase::run() {
     bool loop = true;
     bool request_phase_change = false;
-    const Uint32 frame_delay = 1000 / FPS_CLIENT;
-    while (loop) {
-        Uint32 frame_start = SDL_GetTicks();
+    const Uint32 rate = 1000 / FPS_CLIENT;
+    Uint32 t1 = SDL_GetTicks();
 
-        show_game();
+    while (loop) {
         handle_game_events();
+
         if (!game.keep_running)
             break;
+
         if (!update_game_state()) {
             request_phase_change = true;
             loop = false;
         }
 
-        if (!game.keep_running) {
+        if (!game.keep_running)
             break;
+
+        show_game();
+
+        Uint32 t2 = SDL_GetTicks();
+        Sint32 rest = static_cast<Sint32>(rate) - static_cast<Sint32>(t2 - t1);
+
+        if (rest < 0) {
+            Uint32 behind = static_cast<Uint32>(-rest);
+            rest = static_cast<Sint32>(rate - (behind % rate));
+            Uint32 lost = behind + static_cast<Uint32>(rest);
+            t1 += lost;
+            it += static_cast<int>(lost / rate);
         }
 
-        Uint32 frame_time = SDL_GetTicks() - frame_start;
-        if (frame_time < frame_delay) {
-            SDL_Delay(frame_delay - frame_time);
-        }
+        SDL_Delay(static_cast<Uint32>(rest));
+        t1 += rate;
+        it++;
     }
 
     return request_phase_change;
@@ -56,7 +68,7 @@ void CountdownPhase::handle_game_events() { game.handle_countdown_events(); }
 bool CountdownPhase::update_game_state() { return game.update_countdown(); }
 void CountdownPhase::show_game() { game.show_countdown(); }
 
-RacePhase::RacePhase(Game& game, int starting_it): GamePhase(game, starting_it) {}
+RacePhase::RacePhase(Game& game, int starting_it): GamePhase(game, starting_it, 60) {}
 void RacePhase::handle_game_events() { game.handle_race_events(); }
 bool RacePhase::update_game_state() { return game.update_race(); }
 void RacePhase::show_game() { game.show_race(); }

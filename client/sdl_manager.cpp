@@ -22,7 +22,7 @@ SDLManager::SDLManager():
         mixer(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024),
         window("NFS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT,
                SDL_WINDOW_RESIZABLE),
-        renderer(window, -1, SDL_RENDERER_ACCELERATED),
+        renderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC),
         resources(renderer),
         camera(CAMERA_VIEW_WIDTH, CAMERA_VIEW_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT),
         sounds(mixer, resources),
@@ -261,15 +261,24 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
         }
     }
 
-    render_stats(my_player);
     render_decorations(view_rect, scale_x, scale_y, map);
     render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
+    render_stats(my_player);
+
 }
 
 void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
+
+void SDLManager::play_background_music(const std::string& path, const int loops) {
+    sounds.play_background_music(path, loops);
+}
+
+void SDLManager::stop_background_music() { sounds.stop_background_music(); }
+
+void SDLManager::set_music_volume(const int volume) { sounds.set_music_volume(volume); }
 
 void SDLManager::render(LocalInfo& game_state) {
     SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
@@ -303,21 +312,9 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.explosion_shown = false;
     }
 
-    SDL2pp::Point target_pos_explosion = camera.get_center();
+    SDL2pp::Point target_pos = camera.get_center();
 
-    for (auto& [pid, pinfo] : game_state.players) {
-        bool is_dead = pinfo.died || pinfo.life <= 0;
-        if (is_dead && !pinfo.explosion_shown) {
-            animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
-            sounds.play_explosion_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos_explosion);
-            pinfo.explosion_shown = true;
-        }
-        if (!is_dead) {
-            pinfo.explosion_shown = false;
-        }
-    }
-
-    // Usar flag crashed para detectar crash
+    // Usar flag crashed para detectar crash del cliente
     if (game_state.player.crashed) {
         if (!animations.is_camera_shake_active(iteration_counter)) {
             animations.start_camera_shake(iteration_counter);
@@ -327,9 +324,20 @@ void SDLManager::render(LocalInfo& game_state) {
         game_state.player.crashed = false;
     }
 
-    SDL2pp::Point target_pos = camera.get_center();
-
+    // Unica iteracion para detectar explosiones y crashes de otros jugadores
     for (auto& [pid, pinfo]: game_state.players) {
+        // Detectar muerte/explosion
+        bool is_dead = pinfo.died || pinfo.life <= 0;
+        if (is_dead && !pinfo.explosion_shown) {
+            animations.start_explosion(pid, iteration_counter, SDL2pp::Point(pinfo.x, pinfo.y));
+            sounds.play_explosion_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
+            pinfo.explosion_shown = true;
+        }
+        if (!is_dead) {
+            pinfo.explosion_shown = false;
+        }
+
+        // Detectar crash
         if (pinfo.crashed) {
             sounds.play_crash_sound(pid, SDL2pp::Point{pinfo.x, pinfo.y}, target_pos);
             pinfo.crashed = false;
@@ -538,7 +546,7 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time) { shop.render(time, Car::DEFAULT, map_name, camera); }
+void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining) { shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
 
@@ -567,7 +575,7 @@ void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint, const SDL2p
     SDL2pp::Rect dst(screen_x, screen_y, screen_w, screen_h);
 
     if (checkpoint.is_finish_line) {
-        renderer.SetDrawColor(COLOR_YELLOW_R, COLOR_YELLOW_G, COLOR_YELLOW_B, COLOR_YELLOW_ALPHA);
+        renderer.SetDrawColor(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_RED_ALPHA);
     } else {
         renderer.SetDrawColor(COLOR_RED_R, COLOR_RED_G, COLOR_RED_B, COLOR_RED_ALPHA);
     }
