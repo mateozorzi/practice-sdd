@@ -276,3 +276,7 @@ void Player::apply_collision_damage(uint16_t damage) {
     else
         health = 0;
 }
+
+uint8_t Player::get_upgrades_remaining() const {
+    return static_cast<uint8_t>(MAX_UPGRADES_PER_RACE - n_penalty);
+}

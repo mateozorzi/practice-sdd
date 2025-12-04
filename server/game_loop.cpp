@@ -215,7 +215,7 @@ void GameLoop::handle_waiting_car_selection_phase() {
         current_phase = GamePhase::UPGRADE_SHOP;
         phase_start = std::nullopt;
 
-        GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+        GameUpdateDTO game_update(GameLoopAction::START_SHOP, static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
         game_monitor.broadcast(game_update);
 
         set_race(selected_races.races[current_race_index]);
@@ -232,6 +232,8 @@ void GameLoop::handle_upgrade_shop_phase() {
     const auto elapsed = now - *phase_start;
 
     process_commands_in_upgrade_shop_phase();
+
+    send_upgrades_remaining();
 
     if (elapsed >= upgrade_shop_seconds) {
 
@@ -335,7 +337,7 @@ void GameLoop::handle_leaderboard_phase() {
             current_phase = GamePhase::UPGRADE_SHOP;
             current_race_index += 1;
 
-            GameUpdateDTO game_update(GameLoopAction::START_SHOP, std::monostate{});
+            GameUpdateDTO game_update(GameLoopAction::START_SHOP, static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
             game_monitor.broadcast(game_update);
 
             set_race(selected_races.races[current_race_index]);
@@ -492,6 +494,17 @@ void GameLoop::send_countdown_time(const std::chrono::steady_clock::duration& re
 
     GameUpdateDTO countdown_update(GameLoopAction::COUNTDOWN_TIME, seconds_left);
     game_monitor.broadcast(countdown_update);
+}
+
+void GameLoop::send_upgrades_remaining() {
+
+    for (const auto& [id, player]: players) {
+
+        uint8_t upgrades_remaining = player.get_upgrades_remaining();
+
+        GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADES_REMAINING, upgrades_remaining);
+        game_monitor.send_update_to_player(game_update, id);
+    }
 }
 
 

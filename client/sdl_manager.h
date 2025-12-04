@@ -106,7 +106,7 @@ public:
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
     void load_city(const std::string& city_name);
-    void render_shop(int time);
+    void render_shop(int time, int time_penalty, int upgrades_remaining);
 
     void close_shop();
     bool is_shop_open();
