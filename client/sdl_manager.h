@@ -1,10 +1,7 @@
 #ifndef SDL_MANAGER_H
 #define SDL_MANAGER_H
-#include <map>
-#include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -15,7 +12,6 @@
 #include "SDL2pp/Window.hh"
 #include "common/car_position_dto.h"
 #include "common/npc_dto.h"
-#include "common/player_dto.h"
 
 #include "animations.h"
 #include "camera.h"

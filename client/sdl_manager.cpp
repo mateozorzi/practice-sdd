@@ -2,15 +2,11 @@
 
 #include <algorithm>
 #include <fstream>
-#include <map>
 
 #include <SDL2/SDL.h>
 #include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
-#include <qforeach.h>
 
 #include "../common/leaderboard_dto.h"
-#include "../common/player_race_stats_dto.h"
 
 #include "client_constants.h"
 #include "game_state.h"

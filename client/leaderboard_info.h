@@ -1,13 +1,13 @@
 #ifndef LEADERBOARD_INFO_H
 #define LEADERBOARD_INFO_H
 
+#include <array>
 #include <string>
 #include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
-#include "../common/client_event_dto.h"
 #include "../common/leaderboard_dto.h"
 
 #include "camera.h"
