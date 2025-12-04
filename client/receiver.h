@@ -14,14 +14,9 @@
 #include "client_protocol.h"
 
 
-struct GameState {};
-
-
 class Receiver: public Thread {
 
     ClientProtocol& protocol;
-    GameState game_state;
-    std::mutex state_mutex;
     Queue<GameUpdateDTO> car_positions_queue;
     bool server_connected = true;
 
@@ -29,7 +24,6 @@ class Receiver: public Thread {
 public:
     explicit Receiver(ClientProtocol& protocol);
 
-    GameState get_game_state() const;
     Queue<GameUpdateDTO>& get_car_positions_queue();
 
     bool is_server_connected() const;
