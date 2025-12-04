@@ -1,11 +1,9 @@
+#include "race_loader.h"
+
 #include <fstream>
 
 
-#include "race_loader.h"
-
-
-RaceLoader::RaceLoader(const std::string& race_folder)
-    : race_folder(race_folder) {}
+RaceLoader::RaceLoader(const std::string& race_folder): race_folder(race_folder) {}
 
 
 RaceDTO RaceLoader::load_single_race(const std::filesystem::path& path) {
@@ -37,19 +35,14 @@ RaceDTO RaceLoader::load_single_race(const std::filesystem::path& path) {
         std::stringstream string_stream_2(line);
         std::string checkpoint;
         std::vector<std::string> row;
-        while (std::getline(string_stream_2, checkpoint, ','))
-            row.push_back(checkpoint);
+        while (std::getline(string_stream_2, checkpoint, ',')) row.push_back(checkpoint);
 
-        checkpoints.emplace_back(
-            CheckpointDTO(
-            static_cast<uint8_t>(std::stoi(row[ID])),
-            static_cast<char>(row[ORIENTATION].front()),
-            static_cast<uint16_t>(std::stoi(row[X_CENTER])),
-            static_cast<uint16_t>(std::stoi(row[Y_CENTER])),
-            static_cast<uint8_t>(std::stoi(row[WIDTH])),
-            static_cast<uint8_t>(std::stoi(row[HEIGHT]))
-            )
-        );
+        checkpoints.emplace_back(CheckpointDTO(static_cast<uint8_t>(std::stoi(row[ID])),
+                                               static_cast<char>(row[ORIENTATION].front()),
+                                               static_cast<uint16_t>(std::stoi(row[X_CENTER])),
+                                               static_cast<uint16_t>(std::stoi(row[Y_CENTER])),
+                                               static_cast<uint8_t>(std::stoi(row[WIDTH])),
+                                               static_cast<uint8_t>(std::stoi(row[HEIGHT]))));
     }
 
     return RaceDTO(path.stem().string(), city_name, checkpoints, number_of_laps);
@@ -63,7 +56,7 @@ std::vector<RaceDTO> RaceLoader::load_races() {
     if (!std::filesystem::exists(race_folder))
         return races;
 
-    for (const auto& entry : std::filesystem::directory_iterator(race_folder)) {
+    for (const auto& entry: std::filesystem::directory_iterator(race_folder)) {
 
         if (entry.path().extension() == ".csv")
             races.push_back(load_single_race(entry.path()));

@@ -76,7 +76,6 @@ constexpr uint8_t COLOR_YELLOW_R = 255;
 constexpr uint8_t COLOR_YELLOW_G = 255;
 constexpr uint8_t COLOR_YELLOW_B = 0;
 constexpr uint8_t COLOR_YELLOW_A = 255;
-constexpr uint8_t COLOR_YELLOW_ALPHA = 200;
 
 constexpr uint8_t COLOR_WHITE_R = 255;
 constexpr uint8_t COLOR_WHITE_G = 255;
@@ -88,24 +87,20 @@ constexpr uint8_t COLOR_GOLD_G = 215;
 constexpr uint8_t COLOR_GOLD_B = 0;
 constexpr uint8_t COLOR_GOLD_A = 255;
 
-constexpr uint8_t COLOR_BLACK_ALPHA = 100;
-
 // Angle conversion
 constexpr double ANGLE_OFFSET_DEGREES = 90.0;
 constexpr double FULL_CIRCLE_DEGREES = 360.0;
 
-// Text rendering positions
-constexpr int TEXT_WAITING_X = 700;
-constexpr int TEXT_WAITING_Y = 500;
+// Text rendering sizes
 constexpr int TEXT_WAITING_SIZE = 72;
-
-constexpr int TEXT_COUNTDOWN_X = 600;
-constexpr int TEXT_COUNTDOWN_Y = 500;
-constexpr int TEXT_COUNTDOWN_SIZE = 48;
-
-constexpr int TEXT_LEADERBOARD_X = 850;
-constexpr int TEXT_LEADERBOARD_Y = 100;
 constexpr int TEXT_LEADERBOARD_SIZE = 64;
+
+// Leaderboard font sizes
+constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
+constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
+constexpr int LEADERBOARD_ENTRY_FONT_SIZE = 32;
+constexpr int INFO_FONT_SIZE = 24;
+constexpr int UPGRADE_COUNTDOWN_FONT_SIZE = 32;
 
 // Paths
 constexpr const char* FONT_PATH = "/var/nfs/assets/fonts/NFS_by_JLTV.ttf";

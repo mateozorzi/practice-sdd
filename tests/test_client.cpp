@@ -335,7 +335,7 @@ TEST_F(ClientProtocolTest, ReceiveCarPosition_WithMock) {
             0x0A,                    // next checkpoint width = 10
             0x14,                    // next checkpoint height = 20
             0x00,                    // next checkpoint is_finish_line = false
-            0x01,                     // layer = 1
+            0x01,                    // layer = 1
             0x01,                    // current lap = 1
             0x02                     // race lap = 2
     };
@@ -521,7 +521,7 @@ TEST_F(ClientProtocolTest, ReceiveRace_WithMock) {
             0x00, 0xC8,              // y = 200
             0x0A,                    // width = 10
             0x14,                    // height = 20
-            0x00,                     // is_finish_line = false
+            0x00,                    // is_finish_line = false
             // Second checkpoint
             0x02,                    // id = 2
             0x00, 0x00, 0x00, 0x01,  // orientation = 1 ('V')
@@ -530,7 +530,7 @@ TEST_F(ClientProtocolTest, ReceiveRace_WithMock) {
             0x01, 0x90,              // y = 400
             0x14,                    // width = 20
             0x1E,                    // height = 30
-            0x01,                     // is_finish_line = true
+            0x01,                    // is_finish_line = true
             0x03                     // laps = 3
     };
 
@@ -582,8 +582,8 @@ TEST_F(ClientProtocolTest, ReceiveUpdatePositions_WithMock) {
             'M', 'o', 'd', 'e', 'l',            // model
             0x00, 0x64,                         // health = 100
             0x00,                               // flag dead = false
-            0x00, 0x70,                  // max_health = 112
-            0x00,                // finish_race = false
+            0x00, 0x70,                         // max_health = 112
+            0x00,                               // finish_race = false
             // car position
             0x00, 0x00, 0x00, 0x01,  // id = 1
             0x00, 0x00, 0x00, 0x64,  // x = 100
@@ -597,8 +597,8 @@ TEST_F(ClientProtocolTest, ReceiveUpdatePositions_WithMock) {
             0x0A,                    // next checkpoint width = 10
             0x14,                    // next checkpoint height = 20
             0x00,                    // next checkpoint is_finish_line = false
-            0x01,                     // layer = 1
-            0x01,                     // current lap = 1
+            0x01,                    // layer = 1
+            0x01,                    // current lap = 1
             0x02                     // race lap = 2
     };
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);

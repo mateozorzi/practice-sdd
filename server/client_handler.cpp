@@ -211,7 +211,8 @@ void ClientHandler::run() {
 void ClientHandler::exit_game() {
 
     if (!is_in_lobby)
-        server_protocol.send_game_action(GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
+        server_protocol.send_game_action(
+                GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
 }
 
 

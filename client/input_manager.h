@@ -21,8 +21,8 @@ class InputManager {
     bool click_buy = false;
     bool player_disconnected = false;
 
-    void try_move(bool& movement, MovementDTO move);
-    void try_stop(bool& movement, MovementDTO move);
+    void try_move(bool& movement, const MovementDTO& move);
+    void try_stop(bool& movement, const MovementDTO& move);
 
     void handle_keydown(const SDL_Event& event);
     void handle_keyup(const SDL_Event& event);

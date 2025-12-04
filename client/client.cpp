@@ -22,7 +22,7 @@ Client::Client(const std::string& hostname, const std::string& servname):
         menu(protocol, 0, {nullptr}) {}
 
 void Client::run() {
-    
+
     bool server_connected = true;
 
     while (server_connected) {

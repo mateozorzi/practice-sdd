@@ -3,7 +3,6 @@
 #include <optional>
 #include <unordered_map>
 
-#include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
 #include "camera.h"
@@ -38,7 +37,7 @@ private:
 public:
     Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources);
 
-    void start_explosion(uint32_t id, int current_it, SDL2pp::Point position);
+    void start_explosion(uint32_t id, int current_it, const SDL2pp::Point& position);
     bool is_explosion_active(uint32_t id) const;
     void render_explosions(int current_it);
     void clean_explosions(int current_it);

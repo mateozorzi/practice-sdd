@@ -243,27 +243,14 @@ void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_co
 
     if (upgrade.upgrade == ButtonType::Speed) {
 
-        std::cout << "Upgrading speed for player id: " << player_id << std::endl;
-        std::cout << "Current speed: " << car_config.max_speed << std::endl;
         car_config.max_speed += static_cast<float>(game_config.speed_upgrade);
-        std::cout << "New speed: " << car_config.max_speed << std::endl;
     } else if (upgrade.upgrade == ButtonType::Acceleration) {
 
-        std::cout << "Upgrading acceleration for player id: " << player_id << std::endl;
-        std::cout << "Current acceleration: " << car_config.acceleration << std::endl;
         car_config.acceleration += static_cast<float>(game_config.acceleration_upgrade);
-        std::cout << "New acceleration: " << car_config.acceleration << std::endl;
     } else if (upgrade.upgrade == ButtonType::Handling) {
-
-        std::cout << "Upgrading handling for player id: " << player_id << std::endl;
-        std::cout << "Current turn_torque: " << car_config.turn_torque << std::endl;
-        std::cout << "Current drift_factor: " << car_config.drift_factor << std::endl;
 
         car_config.turn_torque += static_cast<float>(game_config.handling_upgrade) * 0.0001f;
         car_config.drift_factor = std::max(0.0f, car_config.drift_factor - 0.05f);
-
-        std::cout << "New turn_torque: " << car_config.turn_torque << std::endl;
-        std::cout << "New drift_factor: " << car_config.drift_factor << std::endl;
     }
 }
 

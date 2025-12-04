@@ -1,5 +1,6 @@
 #include "sounds.h"
 
+#include <string>
 #include <vector>
 
 #include <SDL2/SDL_timer.h>
@@ -11,11 +12,12 @@ Uint8 Sounds::calculate_distance(const SDL2pp::Point& event_pos, const SDL2pp::P
     const float dy = static_cast<float>(event_pos.y - target_pos.y);
     const float dist = std::sqrt(dx * dx + dy * dy);
 
-    if (dist >= 255) {
+    const float max_audible_distance = 125.0f;
+    if (dist >= max_audible_distance) {
         return 255;
     }
 
-    const float ratio = dist / 100.0f;
+    const float ratio = dist / max_audible_distance;
     const Uint8 sdl_distance = static_cast<Uint8>(ratio * 255);
 
     return sdl_distance;
@@ -45,6 +47,7 @@ void Sounds::play_engine_sound(const bool is_moving) {
 
     SDL2pp::Chunk& engine_sound = resources.get_sound("/var/nfs/assets/sounds/sfx_car_engine.wav");
     mixer.PlayChannel(engine_channel, engine_sound);
+    mixer.SetVolume(engine_channel, 64);  // Reduccion del 0.5
 
     state.last_engine_time = now;
 }
@@ -104,13 +107,12 @@ void Sounds::play_background_music(const std::string& path, int loops) {
     }
     SDL2pp::Chunk& music = resources.get_sound(path);
     mixer.PlayChannel(music_channel, music, loops);
-    mixer.SetVolume(music_channel, 32);
+    mixer.SetVolume(music_channel, 64);
 }
 
 void Sounds::stop_background_music() {
     if (music_channel != -1) {
         mixer.HaltChannel(music_channel);
-        music_channel = -1;
     }
 }
 

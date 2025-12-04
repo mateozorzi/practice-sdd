@@ -150,8 +150,7 @@ void SelectCircuit::on_pushButton_clicked() {
 
 void SelectCircuit::delete_race(const QString& race_name) {
 
-    QString path =
-            "/var/nfs/races/" + race_name + ".csv";
+    QString path = "/var/nfs/races/" + race_name + ".csv";
     QFile file(path);
     if (file.exists()) {
         file.remove();

@@ -39,13 +39,10 @@ private:
 
     std::vector<ShopButton> buttons;
     SDL2pp::Rect shop_rect;
-    SDL2pp::Rect time_rect;
-    SDL2pp::Rect car_rect;
     bool isOpen;
     int window_width;
     int window_height;
     ButtonType touched_button_type = None;
-    ButtonType last_touched_button_type = None;
 
 public:
     UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources,
@@ -54,7 +51,8 @@ public:
                         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
 
     void set_shop_info(const ShopInfoDTO& info);
-    void render(int player_time, Car player_car, const std::string& map_name, const Camera& camera, int time_penalty, int upgrades_remaining, int upgrade_shop_countdown);
+    void render(int player_time, Car player_car, const std::string& map_name, const Camera& camera,
+                int time_penalty, int upgrades_remaining, int upgrade_shop_countdown);
     bool is_shop_open() const;
     void toggle_shop();
     std::optional<ButtonType> interact_button(int x, int y, int time);

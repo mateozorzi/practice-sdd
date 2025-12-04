@@ -1,5 +1,8 @@
 #include "game.h"
 
+#include <iostream>
+#include <memory>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -153,7 +156,8 @@ bool Game::update_waiting() {
 
     while (updates.try_pop(dto)) {
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -203,7 +207,8 @@ bool Game::update_upgrade() {
         }
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -254,7 +259,9 @@ bool Game::update_upgrade() {
 void Game::show_upgrade() {
 
     sdl.clear_screen();
-    sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade), static_cast<int>(game_state.player.upgrades_remaining), static_cast<int>(game_state.upgrade_shop_countdown));
+    sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade),
+                    static_cast<int>(game_state.player.upgrades_remaining),
+                    static_cast<int>(game_state.upgrade_shop_countdown));
     sdl.show_screen();
 }
 
@@ -275,7 +282,8 @@ bool Game::update_countdown() {
         }
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -316,7 +324,8 @@ bool Game::update_race() {
     while (updates.try_pop(dto)) {
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             return true;
@@ -375,7 +384,8 @@ bool Game::update_leaderboard() {
     while (updates.try_pop(dto)) {
 
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             sdl.close_leaderboard();
@@ -418,7 +428,8 @@ bool Game::update_game_finished() {
     Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
     while (updates.try_pop(dto)) {
 
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY || dto.gameloop_action == GameLoopAction::DISCONNECT) {
+        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
+            dto.gameloop_action == GameLoopAction::DISCONNECT) {
 
             this->keep_running = false;
             sdl.close_leaderboard();

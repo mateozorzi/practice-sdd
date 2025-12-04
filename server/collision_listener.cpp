@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
-#include <iostream>
 
 #include "city_utils.h"
 
@@ -70,7 +69,8 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
     if (!sensor_fixture)
         return;
 
-    auto sensor_type = static_cast<SensorType>(sensor_fixture->GetUserData().pointer);
+    uintptr_t player_data = sensor_fixture->GetUserData().pointer;
+    auto sensor_type = static_cast<SensorType>(player_data & 0xFF);
     auto player_ptr = find_player_by_body(*car_fixture->GetBody());
 
     if (!player_ptr)
@@ -81,6 +81,14 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
 
     if (is_begin) {
 
+
+        if (sensor_type == SensorType::CHECKPOINT) {
+
+            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> 24);
+            if (player.is_next_checkpoint(checkpoint_id))
+                player.trigger_checkpoint_collision();
+        }
+
         if (current_layer != CarLayer::ON_GROUND)
             return;
 
@@ -88,8 +96,6 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
             player.set_car_layer(CarLayer::ON_BRIDGE);
         else if (sensor_type == SensorType::UNDER_BRIDGE)
             player.set_car_layer(CarLayer::UNDER_BRIDGE);
-        else if (sensor_type == SensorType::CHECKPOINT)
-            std::cout << "Player in checkpoint" << std::endl;
     } else {
 
         bool should_reset =

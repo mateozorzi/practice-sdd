@@ -1,29 +1,21 @@
 #include "leaderboard_info.h"
 
+#include <string>
+#include <vector>
+
 #include "client_constants.h"
 
-// Constantes para el leaderboard
-constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
-constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
-constexpr int LEADERBOARD_ENTRY_FONT_SIZE = 32;
-constexpr int LEADERBOARD_TITLE_SPACING = 40;
-constexpr int LEADERBOARD_ENTRY_SPACING = 25;
-constexpr int LEADERBOARD_HEADER_ENTRY_SPACING = 50;
-constexpr int LEADERBOARD_SEPARATOR_SPACING = 30;
+// Leaderboard layout constants
 constexpr int COLUMN_SPACING = 60;
-
-// Anchos de columnas
 constexpr int COLUMN_POS_WIDTH = 100;
 constexpr int COLUMN_NAME_WIDTH = 200;
 constexpr int COLUMN_TIME_WIDTH = 100;
 constexpr int COLUMN_POINTS_WIDTH = 100;
 
 
-LeaderboardInfo::LeaderboardInfo(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
-                                 ResourceManager& resources, int window_width, int window_height,
-                                 const std::string& font_path):
+LeaderboardInfo::LeaderboardInfo(SDL2pp::Renderer& renderer, ResourceManager& resources,
+                                 int window_width, int window_height, const std::string& font_path):
         renderer(renderer),
-        mixer(mixer),
         resources(resources),
         font_path(font_path),
         isOpen(false),
@@ -86,7 +78,7 @@ void LeaderboardInfo::render(const LeaderboardDTO& leaderboard, const std::strin
 }
 
 void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
-                                       std::string title) {
+                                       const std::string& title) {
     int content_y = rect.y + 30;
 
     SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
@@ -103,12 +95,13 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
     SDL2pp::Color header_color(255, 255, 255, 255);
 
     std::vector<std::string> headers = {"POS", "NAME", "TIME", "PTS"};
-    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH,
-                                        COLUMN_TIME_WIDTH, COLUMN_POINTS_WIDTH};
+    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH, COLUMN_TIME_WIDTH,
+                                        COLUMN_POINTS_WIDTH};
 
-    int table_start_x = rect.x + (rect.w - (COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH +
-                                            COLUMN_TIME_WIDTH + COLUMN_POINTS_WIDTH +
-                                            3 * COLUMN_SPACING)) / 2;
+    int table_start_x =
+            rect.x + (rect.w - (COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH + COLUMN_TIME_WIDTH +
+                                COLUMN_POINTS_WIDTH + 3 * COLUMN_SPACING)) /
+                             2;
 
     int current_x = table_start_x;
 
@@ -129,7 +122,7 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
     SDL2pp::Color entry_color(255, 255, 255, 255);
     int entry_y = header_y + 55;
 
-    for (const auto& entry : leaderboard.players) {
+    for (const auto& entry: leaderboard.players) {
         current_x = table_start_x;
 
         // POS
@@ -154,8 +147,8 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
         std::string time_text =
                 entry.points == 0 ? "DSQ" : std::to_string(entry.total_time) + " seg";
 
-        SDL2pp::Texture& time_texture = resources.get_text(
-                time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        SDL2pp::Texture& time_texture =
+                resources.get_text(time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
         renderer.Copy(time_texture, SDL2pp::NullOpt,
                       SDL2pp::Rect(current_x + 10, entry_y, time_texture.GetWidth(),
                                    time_texture.GetHeight()));
@@ -178,8 +171,8 @@ void LeaderboardInfo::fill_winner(const LeaderboardDTO& leaderboard,
                                   const SDL2pp::Rect& bottom_rect) {
     if (!leaderboard.players.empty()) {
         const auto& winner = leaderboard.players[0];
-        
-        if(winner.points == 0) {
+
+        if (winner.points == 0) {
             // No winner
             return;
         }

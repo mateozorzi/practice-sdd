@@ -1,13 +1,13 @@
 #ifndef LEADERBOARD_INFO_H
 #define LEADERBOARD_INFO_H
 
+#include <array>
 #include <string>
 #include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
-#include "../common/client_event_dto.h"
 #include "../common/leaderboard_dto.h"
 
 #include "camera.h"
@@ -16,7 +16,6 @@
 class LeaderboardInfo {
 private:
     SDL2pp::Renderer& renderer;
-    SDL2pp::Mixer& mixer;
     ResourceManager& resources;
     std::string font_path;
 
@@ -25,8 +24,8 @@ private:
     int window_height;
 
 public:
-    LeaderboardInfo(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources,
-                    int window_width, int window_height,
+    LeaderboardInfo(SDL2pp::Renderer& renderer, ResourceManager& resources, int window_width,
+                    int window_height,
                     const std::string& font_path =
                             "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
     void render(const LeaderboardDTO& leaderboard, const std::string& title,
@@ -34,7 +33,7 @@ public:
 
 
     void fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
-                          std::string title);
+                          const std::string& title);
 
 
     void fill_winner(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& bottom_rect);

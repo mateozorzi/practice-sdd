@@ -6,7 +6,7 @@ InputManager::InputManager(SDLManager& sdl, ClientProtocol& protocol): sdl(sdl),
 }
 
 
-void InputManager::try_move(bool& movement, const MovementDTO move) {
+void InputManager::try_move(bool& movement, const MovementDTO& move) {
 
     if (!movement) {
 
@@ -15,7 +15,7 @@ void InputManager::try_move(bool& movement, const MovementDTO move) {
     }
 }
 
-void InputManager::try_stop(bool& movement, const MovementDTO move) {
+void InputManager::try_stop(bool& movement, const MovementDTO& move) {
 
     if (movement) {
 

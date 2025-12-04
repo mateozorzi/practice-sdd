@@ -1,14 +1,10 @@
 #include "upgrade_shop.h"
 
 #include <optional>
+#include <string>
 
 #include "camera.h"
 #include "client_constants.h"
-
-constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
-constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
-constexpr int INFO_FONT_SIZE = 24;
-constexpr int UPGRADE_COUNTDOWN_FONT_SIZE = 32;
 
 UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                          ResourceManager& resources, Sounds& sounds, int window_width,
@@ -70,7 +66,8 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
 }
 
 void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name,
-                         const Camera& camera, int time_penalty, int upgrades_remaining, int upgrade_shop_countdown) {
+                         const Camera& camera, int time_penalty, int upgrades_remaining,
+                         int upgrade_shop_countdown) {
     (void)player_time;  // Aumenta segun compre mejoras
     (void)player_car;   // Para poner el auto al lado de botones de mejoras
 
@@ -128,10 +125,9 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     int penalty_x = shop_rect.x + (shop_rect.w - penalty_texture.GetWidth()) / 2;
     int penalty_y = title_y + title_texture.GetHeight() + 20;  // separacion del título
 
-    renderer.Copy(
-            penalty_texture, SDL2pp::NullOpt,
-            SDL2pp::Rect(penalty_x, penalty_y, penalty_texture.GetWidth(),
-                        penalty_texture.GetHeight()));
+    renderer.Copy(penalty_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(penalty_x, penalty_y, penalty_texture.GetWidth(),
+                               penalty_texture.GetHeight()));
 
     //info max upgrades
     std::string max_upgrades_text = "Upgrades remaining :  " + std::to_string(upgrades_remaining);
@@ -143,10 +139,9 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     int max_upgrades_x = shop_rect.x + (shop_rect.w - max_upgrades_texture.GetWidth()) / 2;
     int max_upgrades_y = penalty_y + penalty_texture.GetHeight() + 10;  // separacion de la info
 
-    renderer.Copy(
-            max_upgrades_texture, SDL2pp::NullOpt,
-            SDL2pp::Rect(max_upgrades_x, max_upgrades_y, max_upgrades_texture.GetWidth(),
-                        max_upgrades_texture.GetHeight()));
+    renderer.Copy(max_upgrades_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(max_upgrades_x, max_upgrades_y, max_upgrades_texture.GetWidth(),
+                               max_upgrades_texture.GetHeight()));
 
     // Botones
     for (const ShopButton& btn: buttons) {
@@ -194,7 +189,7 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
             resources.get_text(countdown_text, font_path, UPGRADE_COUNTDOWN_FONT_SIZE, title_color);
 
     int max_btn_bottom = 0;
-    for (const ShopButton& btn : buttons) {
+    for (const ShopButton& btn: buttons) {
         int bottom = btn.rect.y + btn.rect.h;
         if (bottom > max_btn_bottom)
             max_btn_bottom = bottom;
@@ -203,13 +198,9 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     int countdown_x = shop_rect.x + (shop_rect.w - countdown_texture.GetWidth()) / 2;
     int countdown_y = max_btn_bottom + 30;  // margen debajo de los botones
 
-    renderer.Copy(
-            countdown_texture, SDL2pp::NullOpt,
-            SDL2pp::Rect(countdown_x, countdown_y,
-                        countdown_texture.GetWidth(),
-                        countdown_texture.GetHeight()));
-
-    (void)map_name;
+    renderer.Copy(countdown_texture, SDL2pp::NullOpt,
+                  SDL2pp::Rect(countdown_x, countdown_y, countdown_texture.GetWidth(),
+                               countdown_texture.GetHeight()));
 }
 
 bool UpgradeShop::is_shop_open() const { return isOpen; }
@@ -230,13 +221,8 @@ std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
                 return std::nullopt;
             }
 
-            last_touched_button_type = btn.type;
-
             return btn.type;
         }
-    }
-    if (touched_button_type == None) {
-        last_touched_button_type = None;
     }
 
     return std::nullopt;
