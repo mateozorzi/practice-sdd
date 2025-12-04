@@ -84,6 +84,8 @@ public:
     bool have_time_recorded() const;
     void record_time(uint32_t seconds, const GameConfig& game_config);
 
+    uint8_t get_upgrades_remaining() const;
+
     bool is_dead() const;
 
     void apply_collision_damage(uint16_t damage);

@@ -34,6 +34,7 @@ enum class GameLoopAction : uint8_t {
     LEADERBOARD = 0x18,
     WINNER_PHASE = 0x19,
     COUNTDOWN_TIME = 0x20,
+    SEND_UPGRADES_REMAINING = 0x21,
 };
 
 

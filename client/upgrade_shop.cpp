@@ -7,6 +7,7 @@
 
 constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
 constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
+constexpr int INFO_FONT_SIZE = 24;
 
 UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                          ResourceManager& resources, Sounds& sounds, int window_width,
@@ -68,7 +69,7 @@ void UpgradeShop::set_shop_info(const ShopInfoDTO& info) {
 }
 
 void UpgradeShop::render(int player_time, Car player_car, const std::string& map_name,
-                         const Camera& camera) {
+                         const Camera& camera, int time_penalty, int upgrades_remaining) {
     (void)player_time;  // Aumenta segun compre mejoras
     (void)player_car;   // Para poner el auto al lado de botones de mejoras
 
@@ -114,6 +115,37 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     renderer.Copy(
             title_texture, SDL2pp::NullOpt,
             SDL2pp::Rect(title_x, title_y, title_texture.GetWidth(), title_texture.GetHeight()));
+
+    //info penalty
+    std::string penalty_text = "Time penalty per Upgrade: " + std::to_string(time_penalty) + " seg";
+    SDL2pp::Color penalty_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+
+    SDL2pp::Texture& penalty_texture =
+            resources.get_text(penalty_text, font_path, INFO_FONT_SIZE, penalty_color);
+
+    int penalty_x = shop_rect.x + (shop_rect.w - penalty_texture.GetWidth()) / 2;
+    int penalty_y = title_y + title_texture.GetHeight() + 20;  // separacion del título
+
+    renderer.Copy(
+            penalty_texture, SDL2pp::NullOpt,
+            SDL2pp::Rect(penalty_x, penalty_y, penalty_texture.GetWidth(),
+                        penalty_texture.GetHeight()));
+
+    //info max upgrades
+    std::string max_upgrades_text = "Upgrades remaining: " + std::to_string(upgrades_remaining);
+    //std::cout<<"upgrades remaining: "<<static_cast<int>(upgrades_remaining)<<std::endl;
+    SDL2pp::Color max_upgrades_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+
+    SDL2pp::Texture& max_upgrades_texture =
+            resources.get_text(max_upgrades_text, font_path, INFO_FONT_SIZE, max_upgrades_color);
+
+    int max_upgrades_x = shop_rect.x + (shop_rect.w - max_upgrades_texture.GetWidth()) / 2;
+    int max_upgrades_y = penalty_y + penalty_texture.GetHeight() + 20;  // separacion de la info
+
+    renderer.Copy(
+            max_upgrades_texture, SDL2pp::NullOpt,
+            SDL2pp::Rect(max_upgrades_x, max_upgrades_y, max_upgrades_texture.GetWidth(),
+                        max_upgrades_texture.GetHeight()));
 
     // Botones
     for (const ShopButton& btn: buttons) {

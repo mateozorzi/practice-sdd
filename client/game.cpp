@@ -166,6 +166,10 @@ bool Game::update_waiting() {
             }
             sdl.set_sound_info(ids);
             game_state.phase = Phase::UPGRADE;
+            game_state.penalty_per_upgrade = std::get<uint8_t>(dto.data);
+            std::cout << "Penalty per upgrade received: "
+                      << static_cast<int>(game_state.penalty_per_upgrade) << " seconds."
+                      << std::endl;
             return false;
         }
     }
@@ -231,6 +235,11 @@ bool Game::update_upgrade() {
                 last = std::get<WorldSnapshotDTO>(dto.data);
                 got_snapshot = true;
             }
+        } else if (dto.gameloop_action == GameLoopAction::SEND_UPGRADES_REMAINING) {
+            if (std::holds_alternative<uint8_t>(dto.data)) {
+                uint8_t upgrades_remaining = std::get<uint8_t>(dto.data);
+                game_state.player.upgrades_remaining = upgrades_remaining;
+            }
         }
     }
 
@@ -240,7 +249,7 @@ bool Game::update_upgrade() {
 void Game::show_upgrade() {
 
     sdl.clear_screen();
-    sdl.render_shop(game_state.player.time);
+    sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade), static_cast<int>(game_state.player.upgrades_remaining));
     sdl.show_screen();
 }
 

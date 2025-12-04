@@ -306,10 +306,10 @@ void ServerProtocol::send_game_action(const GameUpdateDTO& game_action) {
     send_buffer();
 }
 
-void ServerProtocol::send_countdown_time(const GameUpdateDTO& countdown_time) {
+void ServerProtocol::send_action_info(const GameUpdateDTO& action_info) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(countdown_time.gameloop_action));
-    const uint8_t seconds_left = std::get<uint8_t>(countdown_time.data);
-    add_uint8_to_buffer(seconds_left);
+    add_uint8_to_buffer(static_cast<uint8_t>(action_info.gameloop_action));
+    const uint8_t info = std::get<uint8_t>(action_info.data);
+    add_uint8_to_buffer(info);
     send_buffer();
 }
