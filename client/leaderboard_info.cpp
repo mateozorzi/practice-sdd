@@ -76,7 +76,7 @@ void LeaderboardInfo::render(const LeaderboardDTO& leaderboard, const std::strin
 }
 
 void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
-                                       std::string title) {
+                                       const std::string& title) {
     int content_y = rect.y + 30;
 
     SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);

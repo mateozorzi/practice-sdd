@@ -33,7 +33,7 @@ public:
 
 
     void fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
-                          std::string title);
+                          const std::string& title);
 
 
     void fill_winner(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& bottom_rect);
