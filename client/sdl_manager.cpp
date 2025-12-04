@@ -28,7 +28,7 @@ SDLManager::SDLManager():
         sounds(mixer, resources),
         animations(renderer, camera, resources),
         shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH),
-        leaderboard_info(renderer, mixer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
+        leaderboard_info(renderer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     load_city(DEFAULT_CITY);
 
@@ -412,7 +412,6 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
     clear_screen();
 
     // render map in the background
-    update_camera(pos_x, pos_y);
     SDL2pp::Rect view_rect = get_view_rect_with_shake();
     SDL2pp::Texture& map = resources.get_texture(map_name);
 

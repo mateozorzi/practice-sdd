@@ -39,13 +39,10 @@ private:
 
     std::vector<ShopButton> buttons;
     SDL2pp::Rect shop_rect;
-    SDL2pp::Rect time_rect;
-    SDL2pp::Rect car_rect;
     bool isOpen;
     int window_width;
     int window_height;
     ButtonType touched_button_type = None;
-    ButtonType last_touched_button_type = None;
 
 public:
     UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources,

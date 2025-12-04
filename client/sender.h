@@ -9,7 +9,6 @@
 class Sender: public Thread {
     ClientProtocol& protocol;
     Queue<ClientEventDTO> events_queue;
-    std::mutex queue_mutex;
 
 public:
     explicit Sender(ClientProtocol& protocol);

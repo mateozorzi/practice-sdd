@@ -5,11 +5,6 @@
 #include "camera.h"
 #include "client_constants.h"
 
-constexpr int LEADERBOARD_TITLE_FONT_SIZE = 64;
-constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
-constexpr int INFO_FONT_SIZE = 24;
-constexpr int UPGRADE_COUNTDOWN_FONT_SIZE = 32;
-
 UpgradeShop::UpgradeShop(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer,
                          ResourceManager& resources, Sounds& sounds, int window_width,
                          int window_height, const std::string& font_path):
@@ -205,8 +200,6 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     renderer.Copy(countdown_texture, SDL2pp::NullOpt,
                   SDL2pp::Rect(countdown_x, countdown_y, countdown_texture.GetWidth(),
                                countdown_texture.GetHeight()));
-
-    (void)map_name;
 }
 
 bool UpgradeShop::is_shop_open() const { return isOpen; }
@@ -227,13 +220,8 @@ std::optional<ButtonType> UpgradeShop::interact_button(int x, int y, int time) {
                 return std::nullopt;
             }
 
-            last_touched_button_type = btn.type;
-
             return btn.type;
         }
-    }
-    if (touched_button_type == None) {
-        last_touched_button_type = None;
     }
 
     return std::nullopt;
