@@ -43,14 +43,14 @@ void Sounds::play_engine_sound(const bool is_moving) {
     if (now - state.last_engine_time < engine_delay)
         return;
 
-    SDL2pp::Chunk& engine_sound = resources.get_sound("client/assets/sounds/sfx_car_engine.wav");
+    SDL2pp::Chunk& engine_sound = resources.get_sound("/var/nfs/assets/sounds/sfx_car_engine.wav");
     mixer.PlayChannel(engine_channel, engine_sound);
 
     state.last_engine_time = now;
 }
 
 void Sounds::play_upgrade_sound() {
-    SDL2pp::Chunk& upgrade_sound = resources.get_sound("client/assets/sounds/sfx_upgrade.wav");
+    SDL2pp::Chunk& upgrade_sound = resources.get_sound("/var/nfs/assets/sounds/sfx_upgrade.wav");
     mixer.PlayChannel(upgrade_channel, upgrade_sound);
 }
 
@@ -61,7 +61,7 @@ void Sounds::play_crash_sound(const uint32_t id, const SDL2pp::Point& event_pos,
     if (sdl_distance >= 255)
         return;
 
-    SDL2pp::Chunk& crash_sound = resources.get_sound("client/assets/sounds/crash.wav");
+    SDL2pp::Chunk& crash_sound = resources.get_sound("/var/nfs/assets/sounds/crash.wav");
     auto it = crash_channels.find(id);
     if (it == crash_channels.end()) {
         int new_channel = current_channel++;
@@ -83,7 +83,7 @@ void Sounds::play_explosion_sound(uint32_t id, const SDL2pp::Point& event_pos,
     if (sdl_distance >= 255)
         return;
 
-    SDL2pp::Chunk& crash_sound = resources.get_sound("client/assets/sounds/explosion.wav");
+    SDL2pp::Chunk& crash_sound = resources.get_sound("/var/nfs/assets/sounds/explosion.wav");
     auto it = crash_channels.find(id);
     if (it == crash_channels.end()) {
         int new_channel = current_channel++;

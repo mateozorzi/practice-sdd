@@ -108,20 +108,20 @@ constexpr int TEXT_LEADERBOARD_Y = 100;
 constexpr int TEXT_LEADERBOARD_SIZE = 64;
 
 // Paths
-constexpr const char* FONT_PATH = "client/assets/fonts/UrbanHaze.ttf";
-constexpr const char* CARS_SPRITE_PATH = "client/assets/sprites/cars-no-background.png";
-constexpr const char* ARROW_SPRITE_PATH = "client/assets/sprites/arrow.png";
+constexpr const char* FONT_PATH = "/var/nfs/assets/fonts/UrbanHaze.ttf";
+constexpr const char* CARS_SPRITE_PATH = "/var/nfs/assets/sprites/cars-no-background.png";
+constexpr const char* ARROW_SPRITE_PATH = "/var/nfs/assets/sprites/arrow.png";
 constexpr const char* MAP_BACKGROUND_PREFIX =
-        "client/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - ";
+        "/var/nfs/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - ";
 constexpr const char* MAP_BACKGROUND_SUFFIX = ".png";
-constexpr const char* DECORATIONS_PREFIX = "server/world/decorations_";
-constexpr const char* BRIDGES_PREFIX = "server/world/bridges_";
+constexpr const char* DECORATIONS_PREFIX = "/var/nfs/world/decorations_";
+constexpr const char* BRIDGES_PREFIX = "/var/nfs/world/bridges_";
 constexpr const char* JSON_SUFFIX = ".json";
 
 static const std::vector<std::string> WAITING_ROOMS = {
-        "client/assets/backgrounds/waitingroom1.png",
-        "client/assets/backgrounds/waitingroom2.png",
-        "client/assets/backgrounds/waitingroom3.png",
+        "/var/nfs/assets/backgrounds/waitingroom1.png",
+        "/var/nfs/assets/backgrounds/waitingroom2.png",
+        "/var/nfs/assets/backgrounds/waitingroom3.png",
 };
 
 // Default city

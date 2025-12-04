@@ -312,7 +312,7 @@ void Creador::on_Done_clicked() {
     if (checkpoints.export_checkpoints(name_circuit, map, n_laps, this->mask, this)) {
         // file create succesfully
         if (name_circuit != race.name) {
-            QString old_path = QCoreApplication::applicationDirPath() + "/../server/races/" +
+            QString old_path = "/var/nfs/races/" +
                                race.name + ".csv";
             QFile old_file(old_path);
             if (old_file.exists()) {

@@ -88,7 +88,7 @@ QString Coordinates::get_map_name(const QString& map) {
 
 bool Coordinates::export_checkpoints(const QString& name, const QString& map, const int n_laps,
                                      const QString& mask, QWidget* window) {
-    QString path = QCoreApplication::applicationDirPath() + "/../server/races";
+    QString path = "/var/nfs/races";
     QDir dir(path);
 
     if (!dir.exists() && !dir.mkpath(".")) {

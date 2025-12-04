@@ -31,40 +31,11 @@ void EditorMenu::on_pushButton_2_clicked() {
 void EditorMenu::on_pushButton_3_clicked() { QApplication::quit(); }
 
 
-QString EditorMenu::find_races_path() {
-    QDir dir(QCoreApplication::applicationDirPath());
-    dir.cdUp();
-    while (true) {
-        if (dir.exists("server")) {
-            if (!dir.cd("server")) {
-                break;
-            }
-            if (!dir.exists("races")) {
-                dir.mkdir("races");
-            }
-            if (!dir.cd("races")) {
-                break;
-            }
-            qDebug() << "path: " << dir.path();
-            return dir.path();
-        }
-
-        if (dir.dirName() == PROJECT_ROOT_NAME) {
-            break;
-        }
-
-        if (!dir.cdUp()) {
-            break;
-        }
-    }
-    return QString();
-}
-
 void EditorMenu::on_pushButton_clicked() {
     // edit a already existing race
     this->hide();
 
-    QString races_path = find_races_path();
+    QString races_path = "/var/nfs/races";
     SelectCircuit* c = new SelectCircuit(races_path);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
