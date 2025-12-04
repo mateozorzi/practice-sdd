@@ -1,5 +1,6 @@
 #include "sounds.h"
 
+#include <string>
 #include <vector>
 
 #include <SDL2/SDL_timer.h>

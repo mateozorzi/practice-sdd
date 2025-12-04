@@ -96,7 +96,8 @@ public:
     void render_leaderboard(const LeaderboardDTO& leaderboard, const std::string& title);
     void render_center_box(const std::string& text, const SDL2pp::Color& border_color);
     void show_screen();
-    void draw_row(const std::string& sentence, int x, int y, const SDL2pp::Color& color, int font_size);
+    void draw_row(const std::string& sentence, int x, int y, const SDL2pp::Color& color,
+                  int font_size);
     void render_stats(const PlayerInfo& player);
     nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);

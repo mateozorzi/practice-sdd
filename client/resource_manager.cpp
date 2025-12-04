@@ -1,5 +1,7 @@
 #include "resource_manager.h"
 
+#include <string>
+
 ResourceManager::ResourceManager(SDL2pp::Renderer& renderer): renderer(renderer) {}
 
 SDL2pp::Texture& ResourceManager::get_texture(const std::string& path) {

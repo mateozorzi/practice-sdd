@@ -1,8 +1,10 @@
 #include "client_protocol.h"
 
 #include <iostream>
+#include <string>
 #include <utility>
 #include <variant>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 

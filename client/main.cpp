@@ -1,5 +1,7 @@
 #include <exception>
 #include <iostream>
+#include <string>
+#include <utility>
 
 #include "client.h"
 #include "menu_connection.h"

@@ -1,5 +1,6 @@
 #include "receiver.h"
 
+#include <iostream>
 #include <variant>
 
 #include "../common/game_update_dto.h"

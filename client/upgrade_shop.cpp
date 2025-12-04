@@ -1,6 +1,7 @@
 #include "upgrade_shop.h"
 
 #include <optional>
+#include <string>
 
 #include "camera.h"
 #include "client_constants.h"

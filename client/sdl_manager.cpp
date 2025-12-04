@@ -2,6 +2,9 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <nlohmann/json.hpp>
