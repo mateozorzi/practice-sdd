@@ -270,8 +270,8 @@ void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
 
-void SDLManager::play_background_music(const std::string& path, const int loops) {
-    sounds.play_background_music(path, loops);
+void SDLManager::play_background_music(const int loops) {
+    sounds.play_background_music(loops);
 }
 
 void SDLManager::stop_background_music() { sounds.stop_background_music(); }

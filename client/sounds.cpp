@@ -1,5 +1,6 @@
 #include "sounds.h"
 
+#include <random>
 #include <string>
 #include <vector>
 
@@ -107,11 +108,19 @@ void Sounds::play_explosion_sound(uint32_t id, const SDL2pp::Point& event_pos,
     mixer.SetDistance(it->second, sdl_distance);
 }
 
-void Sounds::play_background_music(const std::string& path, int loops) {
+void Sounds::play_background_music(int loops) {
     if (music_channel != -1) {
         stop_background_music();
     }
-    SDL2pp::Chunk& music = resources.get_sound(path);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 1);
+    const std::vector<std::string> music_files = {
+        "/var/nfs/assets/music/trance-loop.wav",
+        "/var/nfs/assets/music/drill-drums-loop.wav"
+    };
+    const std::string& selected_music = music_files[dis(gen)];
+    SDL2pp::Chunk& music = resources.get_sound(selected_music);
     mixer.PlayChannel(music_channel, music, loops);
     mixer.SetVolume(music_channel, 64);
 }

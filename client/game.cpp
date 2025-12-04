@@ -464,7 +464,7 @@ void Game::change_phase() {
             break;
         case Phase::UPGRADE:
             phase = std::make_unique<UpgradePhase>(*this, 0);
-            sdl.play_background_music("/var/nfs/assets/music/trance-loop.wav");
+            sdl.play_background_music();
             break;
         case Phase::COUNTDOWN:
             phase = std::make_unique<CountdownPhase>(*this, 0);

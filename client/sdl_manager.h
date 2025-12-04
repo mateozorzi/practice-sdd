@@ -123,7 +123,7 @@ public:
 
     void set_sound_info(const std::vector<uint32_t>& ids);
 
-    void play_background_music(const std::string& path, int loops = -1);
+    void play_background_music(int loops = -1);
     void stop_background_music();
     void set_music_volume(int volume);
     void render_text(const std::string& text, const SDL2pp::Color& text_color, int size);
