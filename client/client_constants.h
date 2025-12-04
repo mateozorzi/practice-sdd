@@ -101,7 +101,7 @@ constexpr int TEXT_WAITING_SIZE = 72;
 
 constexpr int TEXT_COUNTDOWN_X = 600;
 constexpr int TEXT_COUNTDOWN_Y = 500;
-constexpr int TEXT_COUNTDOWN_SIZE = 72;
+constexpr int TEXT_COUNTDOWN_SIZE = 48;
 
 constexpr int TEXT_LEADERBOARD_X = 850;
 constexpr int TEXT_LEADERBOARD_Y = 100;

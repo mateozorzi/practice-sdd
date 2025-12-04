@@ -185,7 +185,7 @@ void LeaderboardInfo::fill_winner(const LeaderboardDTO& leaderboard,
         }
 
         std::string win_text =
-                "WINNER: " + winner.username + " - POINTS: " + std::to_string(winner.points);
+                "WINNER :  " + winner.username + " - POINTS :  " + std::to_string(winner.points);
 
         SDL2pp::Color win_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, 255);
 

@@ -432,7 +432,7 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
     const std::string text = "The race will start in " +
                              std::to_string(game_state.countdown_seconds+1) + " seconds";
     SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
-    render_text(text, text_color, TEXT_LEADERBOARD_SIZE);
+    render_text(text, text_color, TEXT_COUNTDOWN_SIZE);
 
     renderer.SetDrawBlendMode(prev_blend);
     renderer.SetDrawColor(prev_color);
@@ -517,7 +517,7 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     int o = 2;                                  // grosor del borde
     SDL2pp::Color outline_color(0, 0, 0, 255);  // negro
 
-    std::string player_name = "Player: " + player.username;
+    std::string player_name = "Player :  " + player.username;
 
     draw_row(player_name, text_x - o, text_y - o, outline_color, font_size);
     draw_row(player_name, text_x + o, text_y - o, outline_color, font_size);
@@ -527,7 +527,7 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     
     text_y += spacing;
 
-    std::string player_time = "Time: " + std::to_string(player.time);
+    std::string player_time = "Time :  " + std::to_string(player.time);
     draw_row(player_time, text_x - o, text_y - o, outline_color, font_size);
     draw_row(player_time, text_x + o, text_y - o, outline_color, font_size);
     draw_row(player_time, text_x - o, text_y + o, outline_color, font_size);
@@ -535,7 +535,7 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     draw_row(player_time, text_x, text_y, text_color, font_size);
     text_y += spacing;
     std::string player_lap =
-            "Lap: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
+            "Lap :  " + std::to_string(player.current_lap) + " / " + std::to_string(player.race_lap);
     
     draw_row(player_lap, text_x - o, text_y - o, outline_color, font_size);
     draw_row(player_lap, text_x + o, text_y - o, outline_color, font_size);
