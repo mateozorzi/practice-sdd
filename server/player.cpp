@@ -107,6 +107,12 @@ void Player::finish_race() {
     car->reset_car_velocity();
 }
 
+
+bool Player::is_next_checkpoint(const uint32_t checkpoint_id) const {
+
+    return static_cast<uint32_t>(id_next_checkpoint) == checkpoint_id;
+}
+
 bool Player::has_finished_race() const { return has_finish_race; }
 
 bool Player::have_time_recorded() const {
@@ -139,27 +145,6 @@ void Player::handle_car_movement(const MovementDTO& movement_dto) {
         if (is_in_race())
             car->handle_movement(movement_dto);
     }
-}
-
-bool Player::reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint) {
-
-    bool reached = false;
-
-    if (static_cast<int>(checkpoint.id) != id_next_checkpoint)
-        return reached;
-
-    if ((static_cast<int>(x) <=
-                 static_cast<int>(checkpoint.x) + (static_cast<int>(checkpoint.width / 2)) &&
-         static_cast<int>(x) >=
-                 static_cast<int>(checkpoint.x) - (static_cast<int>(checkpoint.width / 2))) &&
-        (static_cast<int>(y) <=
-                 static_cast<int>(checkpoint.y) + (static_cast<int>(checkpoint.height / 2)) &&
-         static_cast<int>(y) >=
-                 static_cast<int>(checkpoint.y) - (static_cast<int>(checkpoint.height / 2)))) {
-
-        reached = true;
-    }
-    return reached;
 }
 
 bool Player::update_next_checkpoint(const RaceDTO& race) {
@@ -195,27 +180,33 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
     return finished;
 }
 
+void Player::trigger_checkpoint_collision() {
+
+    if (!is_in_race())
+        return;
+    
+    checkpoint_triggered = true;
+}
+
 void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds, const GameConfig& game_config) {
 
     if (car && is_in_race()) {
+
         car->update_position();
 
         if (health == 0 && !dead) {
+
             finish_race();
             dead = true;
         }
 
-        CarPositionDTO actual = car->get_position_dto();
-        uint32_t x = actual.x_position;
-        uint32_t y = actual.y_position;
+        if (checkpoint_triggered) {
 
-        if (reached_checkpoint(x, y, this->next)) {
+            checkpoint_triggered = false;
 
             bool finished = update_next_checkpoint(race);
             if (finished)
                 record_time(elapsed_seconds, game_config);
-        } else {
-            return;
         }
     }
 }

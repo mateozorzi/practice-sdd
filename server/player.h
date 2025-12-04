@@ -42,9 +42,9 @@ class Player {
     bool penalty = false;
     int n_penalty = 0;
     bool infinite_health = false;
+    bool checkpoint_triggered = false;
 
     bool update_next_checkpoint(const RaceDTO& race);
-    bool reached_checkpoint(uint32_t x, uint32_t y, const CheckpointDTO& checkpoint);
 
 
 public:
@@ -79,6 +79,8 @@ public:
     bool is_in_game() const;
     void start_race();
     bool is_in_race() const;
+    bool is_next_checkpoint(uint32_t checkpoint_id) const;
+    void trigger_checkpoint_collision();
     void finish_race();
     bool has_finished_race() const;
     bool have_time_recorded() const;

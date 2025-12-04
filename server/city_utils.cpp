@@ -137,7 +137,7 @@ void CityUtils::add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collisi
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
     box2d_fixture_definition.isSensor = true;
-    box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(SensorType::CHECKPOINT);
+    box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(checkpoint.id) << 24 | static_cast<uintptr_t>(SensorType::CHECKPOINT);
     box2d_fixture_definition.filter.categoryBits = collision_category;
     box2d_fixture_definition.filter.maskBits = collision_mask;
 
