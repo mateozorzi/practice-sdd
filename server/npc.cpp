@@ -30,10 +30,10 @@ Npc::Npc(uint32_t npc_id, const std::vector<std::vector<int>>& polygon, float sp
     box2d_polygon_shape.SetAsBox(server_config.physics.compact.width, server_config.physics.compact.height);
 
     b2FixtureDef box2d_fixture_definition;
-    box2d_fixture_definition.shape = &box_shape;
+    box2d_fixture_definition.shape = &box2d_polygon_shape;
     box2d_fixture_definition.density = 1.0f;
 
-    box2d_body->CreateFixture(&fixture_def);
+    box2d_body->CreateFixture(&box2d_fixture_definition);
 
     update_angle();
 }
