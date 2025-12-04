@@ -475,6 +475,7 @@ void Game::change_phase() {
         case Phase::LEADERBOARD:
             phase = std::make_unique<LeaderboardPhase>(*this, 0);
             sdl.stop_background_music();
+            sdl.play_finished_race_sound();
             break;
         case Phase::GAME_FINISHED:
             phase = std::make_unique<GameFinishedPhase>(*this, 0);

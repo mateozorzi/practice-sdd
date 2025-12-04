@@ -32,6 +32,7 @@ void Sounds::initialize_channels(const std::vector<uint32_t>& ids) {
 
     engine_channel = current_channel++;
     upgrade_channel = current_channel++;
+    finished_race_channel = current_channel++;
     music_channel = current_channel++;
 }
 
@@ -55,6 +56,11 @@ void Sounds::play_engine_sound(const bool is_moving) {
 void Sounds::play_upgrade_sound() {
     SDL2pp::Chunk& upgrade_sound = resources.get_sound("/var/nfs/assets/sounds/sfx_upgrade.wav");
     mixer.PlayChannel(upgrade_channel, upgrade_sound);
+}
+
+void Sounds::play_finished_race_sound() {
+    SDL2pp::Chunk& finished_race_sound = resources.get_sound("/var/nfs/assets/sounds/sfx_finished_race.wav");
+    mixer.PlayChannel(finished_race_channel, finished_race_sound);
 }
 
 void Sounds::play_crash_sound(const uint32_t id, const SDL2pp::Point& event_pos,

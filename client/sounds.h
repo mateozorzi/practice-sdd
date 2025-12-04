@@ -23,6 +23,7 @@ private:
     int current_channel = 1;
     int engine_channel = -1;
     int upgrade_channel = -1;
+    int finished_race_channel = -1;
     int music_channel = -1;
     EngineState engine_state;
     Uint32 engine_delay = 2500;
@@ -36,6 +37,7 @@ public:
 
     void play_engine_sound(bool is_moving);
     void play_upgrade_sound();
+    void play_finished_race_sound();
     void play_crash_sound(uint32_t id, const SDL2pp::Point& event_pos,
                           const SDL2pp::Point& target_pos);
     void play_explosion_sound(uint32_t id, const SDL2pp::Point& event_pos,

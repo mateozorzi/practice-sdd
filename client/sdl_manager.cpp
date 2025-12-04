@@ -581,6 +581,8 @@ bool SDLManager::is_leaderboard_open() { return leaderboard_info.is_leaderboard_
 
 void SDLManager::play_upgrade_sound() { sounds.play_upgrade_sound(); }
 
+void SDLManager::play_finished_race_sound() { sounds.play_finished_race_sound(); }
+
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view,
                                     double scale_x, double scale_y) {
     SDL2pp::Rect checkpoint_rect(checkpoint.x, checkpoint.y, checkpoint.width, checkpoint.height);
