@@ -108,7 +108,7 @@ constexpr int TEXT_LEADERBOARD_Y = 100;
 constexpr int TEXT_LEADERBOARD_SIZE = 64;
 
 // Paths
-constexpr const char* FONT_PATH = "/var/nfs/assets/fonts/UrbanHaze.ttf";
+constexpr const char* FONT_PATH = "/var/nfs/assets/fonts/NFS_by_JLTV.ttf";
 constexpr const char* CARS_SPRITE_PATH = "/var/nfs/assets/sprites/cars-no-background.png";
 constexpr const char* ARROW_SPRITE_PATH = "/var/nfs/assets/sprites/arrow.png";
 constexpr const char* MAP_BACKGROUND_PREFIX =

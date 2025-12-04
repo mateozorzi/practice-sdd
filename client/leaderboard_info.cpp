@@ -10,7 +10,7 @@ constexpr int LEADERBOARD_TITLE_SPACING = 40;
 constexpr int LEADERBOARD_ENTRY_SPACING = 25;
 constexpr int LEADERBOARD_HEADER_ENTRY_SPACING = 50;
 constexpr int LEADERBOARD_SEPARATOR_SPACING = 30;
-constexpr int COLUMN_SPACING = 40;
+constexpr int COLUMN_SPACING = 60;
 
 // Anchos de columnas
 constexpr int COLUMN_POS_WIDTH = 100;

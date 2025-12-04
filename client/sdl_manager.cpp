@@ -432,7 +432,7 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
     const std::string text = "The race will start in " +
                              std::to_string(game_state.countdown_seconds+1) + " seconds";
     SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
-    render_text(text, text_color, TEXT_COUNTDOWN_SIZE);
+    render_text(text, text_color, TEXT_LEADERBOARD_SIZE);
 
     renderer.SetDrawBlendMode(prev_blend);
     renderer.SetDrawColor(prev_color);
