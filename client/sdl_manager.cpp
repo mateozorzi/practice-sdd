@@ -367,9 +367,9 @@ void SDLManager::render(LocalInfo& game_state) {
 
 
     if (my_player.died || my_player.life <= 0) {
-        render_center_box("Your car exploded!", SDL2pp::Color(255, 0, 0, 255));
+        render_center_box("Your car exploded !", SDL2pp::Color(255, 0, 0, 255));
     } else if (my_player.finish_race) {
-        render_center_box("You have finished the race!", SDL2pp::Color(255, 215, 0, 255));
+        render_center_box("You have finished the race !", SDL2pp::Color(255, 215, 0, 255));
     }
 
     renderer.SetDrawBlendMode(prev_blend);
@@ -469,7 +469,7 @@ void SDLManager::render_center_box(const std::string& message, const SDL2pp::Col
 
     // Texto
     SDL2pp::Texture& msg_texture =
-            resources.get_text(message, FONT_PATH, TEXT_LEADERBOARD_SIZE, color);
+            resources.get_text(message, FONT_PATH, LEADERBOARD_HEADER_FONT_SIZE, color);
 
     int msg_x = rect_x + (rect_w - msg_texture.GetWidth()) / 2;
     int msg_y = rect_y + (rect_h - msg_texture.GetHeight()) / 2;
