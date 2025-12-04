@@ -1,45 +1,157 @@
-# Ejemplo de CMAKE para el TP Final
+# Introducción
 
-**Importante:** el primer commit de este repositorio tiene el setup
-básico para el TP Final que incluye la instalación de la lib de Google
-Tests, `SDL2` y `SDL2pp` (el wrapper de C++).
+**Need4Speed** es un juego 2D inspirado en *Need for Speed*,
+desarrollado en C++ con SDL2, Qt y Box2D.\
+El proyecto incluye tres aplicaciones principales:
 
-El resto de los commits son a modo de ejemplo de como se pueden
-agregar mas código fuente al proyecto.
+-   **Cliente** (Corredores)
+-   **Servidor** (Sincronización de carreras)
+-   **Editor gráfico** (Creación de circuitos)
 
-Este ejemplo **no** incluye instalarse otras libs que son dependencias
-tanto de `SDL2` como de `SDL2pp` (pero si estan documentadas en el
-`CMakeFile` para Xubuntu 24.04).
+------------------------------------------------------------------------
 
-Este repo **no** incluye tampoco un instalador.
+# Instalación Automática
 
-**Se deben agregar las librerias necesarias y el instalador.**
+Desde la carpeta raíz del proyecto puede ejecutarse una instalación
+completa (dependencias y compilación):
 
-También el ejemplo usa una estructura de carpetas muy simple:
-
-```
-client/
-server/
-editor/
-common/
+``` bash
+chmod +x installer.sh
+./installer.sh
 ```
 
-Bien se puede mejorar (cambiando el cmakefile) agregando mas
-sub-carpetas.
+------------------------------------------------------------------------
 
-Asi tambien **deben** ser cambiados los *targets* del cmake (`nfs_client`,
-`nfs_server`, ...) por nombres mas acordes al TP que se este
-haciendo.
+# Ejecución del Proyecto
 
-Tambien, por default solo se compila una version *debug* sin
-optimizar. Si se quiere compilar binarios optimizados
-(lo que cmake llama *release*) se puede, solo hay modificar
-cmake.
+El proyecto consta de tres aplicaciones: **Editor**, **Servidor** y
+**Cliente**.
 
-Aprender del ejemplo para saber como extenderlo!
+## Editor
 
-**Importante:** este repositorio **no** incluye pre-commits hooks,
-ni scripts adicionales (como correr valgrind).
+Para ejecutarlo:
 
-**Eso esta a cargo de los estudiantes,** tal como fue mostrado
-en los tps individuales, recaps y hands-on.
+``` bash
+sudo nfs_editor
+```
+
+Permite:
+
+-   Crear circuitos nuevos
+-   Editar circuitos existentes
+
+------------------------------------------------------------------------
+
+## Servidor y Cliente
+
+Para iniciar una partida se necesita un servidor activo y al menos un
+cliente conectado.
+
+1.  Ejecutar el servidor:
+
+    ``` bash
+    nfs_server
+    ```
+
+2.  En otra terminal, iniciar un cliente:
+
+    ``` bash
+    nfs_client
+    ```
+
+Al iniciar el cliente, primero se debe indicar dirección IP y puerto del
+servidor.\
+Luego se ingresa el nombre de usuario para habilitar el menú principal.
+
+------------------------------------------------------------------------
+
+# Menú del Cliente
+
+El jugador puede:
+
+-   **Crear una partida**
+-   **Unirse a una partida**
+
+## Crear una partida
+
+El creador debe:
+
+1.  Elegir nombre de la partida y cantidad de jugadores.
+2.  Seleccionar uno o más circuitos (se muestra nombre, ciudad,
+    checkpoints y vueltas).
+3.  Elegir un auto. Cada auto tiene configuraciones únicas.
+
+Cuando todos los jugadores eligen auto, comienza la partida.
+
+## Unirse a una partida
+
+El jugador ve la lista de partidas disponibles (no completas).\
+Al seleccionar una, pasa al menú de elección de autos.\
+Si la partida alcanza el cupo, inicia automáticamente.
+
+------------------------------------------------------------------------
+
+# Partida
+
+## Controles
+
+-   **W**: Avanzar
+-   **A**: Izquierda
+-   **S**: Retroceder
+-   **D**: Derecha
+-   **Q**: Salir
+
+## Mejoras
+
+Antes de cada carrera, durante 10 segundos, el jugador puede mejorar
+velocidad, aceleración o vida.\
+Cada mejora agrega una penalización de 10 segundos al tiempo final de la
+carrera.\
+Máximo de 4 mejoras por carrera, persistentes para toda la partida.
+
+## Desarrollo de la carrera
+
+-   Cada carrera tiene checkpoints y varias vueltas.
+-   Los jugadores tienen una barra de vida.
+-   Colisiones con edificios o autos restan vida.
+-   Si un jugador pierde toda la vida, queda descalificado de esa
+    carrera.
+
+Al finalizar:
+
+-   Se muestra la clasificación y los puntos obtenidos.
+-   Se aplican penalizaciones por mejoras.
+
+Al terminar todas las carreras se muestra la clasificación general.\
+En caso de empate, gana el jugador con menor tiempo total.
+
+------------------------------------------------------------------------
+
+# Cheats
+
+Durante una carrera pueden activarse:
+
+-   1 Ganar carrera automáticamente
+-   2 Ganar partida automáticamente
+-   3 Activar vida infinita
+
+------------------------------------------------------------------------
+
+# Configuraciones Extras
+
+Las configuraciones del juego se pueden modificar desde archivos YAML.\
+Es posible ajustar:
+
+-   Atributos de los autos (model, speed, acceleration, handling)
+-   Valores de mejoras
+-   Parámetros del servidor (FPS, rendimiento)
+-   Aspectos visuales (tamaño de sprites, etc.)
+
+------------------------------------------------------------------------
+
+# Créditos
+Este proyecto utiliza tanto el socket, como el thread y queue provistos por la cátedra:  
+
+[sockets-en-cpp](https://github.com/eldipa/sockets-en-cpp) desarrollado por [eldipa](https://github.com/eldipa), distribuido bajo la licencia GPL v2.
+
+[hands-on-threads](https://github.com/eldipa/hands-on-threads) desarrollado por [eldipa](https://github.com/eldipa), distribuido bajo la licencia GPL v2
