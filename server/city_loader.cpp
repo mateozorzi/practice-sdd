@@ -1,10 +1,12 @@
 #include "city_loader.h"
 
 #include <algorithm>
+#include <fstream>
 
 #include "../common/constants.h"
 
 #include "world_creation_exception.h"
+#include <nlohmann/json.hpp>
 
 
 CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config):
@@ -74,6 +76,44 @@ void CityLoader::load_sensors(const std::string& file, SensorType type, const ui
     }
 }
 
+void CityLoader::load_npcs(const std::string& city_name) {
+
+    npcs.clear();
+
+    std::string normalized_city = normalize_city_name(city_name);
+    std::string npc_file = "/var/nfs/world/npcs/npcs_" + normalized_city + ".json";
+
+    try {
+        std::ifstream file(npc_file);
+        if (!file)
+            return;
+
+        nlohmann::json json_data;
+        file >> json_data;
+
+        if (!json_data.is_array())
+            return;
+
+        uint32_t npc_id = 0;
+        constexpr float NPC_SPEED = 1.5f;
+
+        for (const auto& polygon: json_data) {
+            if (polygon.is_array() && polygon.size() >= 3) {
+                std::vector<std::vector<int>> route;
+                for (const auto& point: polygon) {
+                    if (point.is_array() && point.size() >= 2) {
+                        route.push_back({point[0].get<int>(), point[1].get<int>()});
+                    }
+                }
+                npcs.emplace_back(npc_id++, route, NPC_SPEED, box2d_world, server_config);
+            }
+        }
+
+    } catch (const std::exception& e) {
+
+        throw WorldCreationException("Error adding npcs: " + std::string(e.what()));
+    }
+}
 
 void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints, const uint16_t collision_category, const uint16_t collision_mask) {
 
@@ -109,7 +149,20 @@ void CityLoader::load_city(const std::string& city_name, const std::vector<Check
     load_sensors(city_loader_config.sensors.under_bridge_sensor_file, SensorType::UNDER_BRIDGE,
                  CATEGORY_SENSOR, MASK_SENSOR);
     
+    load_npcs(city_name);
+    
     load_checkpoints(checkpoints, CATEGORY_SENSOR, MASK_SENSOR);
 
     city_loaded = true;
+}
+
+std::vector<Npc>& CityLoader::get_npcs() {
+
+    return npcs;
+}
+
+void CityLoader::update_npcs() {
+
+    for (auto& npc: npcs)
+        npc.update();
 }
