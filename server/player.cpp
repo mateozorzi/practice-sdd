@@ -1,7 +1,5 @@
 #include "player.h"
 
-#include <iostream>
-
 #include "../common/checkpoint_dto.h"
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
@@ -127,10 +125,9 @@ void Player::record_time(uint32_t seconds, const GameConfig& game_config) {
     race_time = seconds;
 
     if (penalty) {
+
         int time_added = n_penalty * game_config.penalty_per_upgrade;
         race_time += static_cast<uint32_t>(time_added);
-        std::cout << "[" << PLAYER << "] Penalty applied to player " << player_id
-                  << ". New recorded time: " << race_time << " seconds." << std::endl;
         penalty = false;
         n_penalty = 0;
     }
@@ -168,10 +165,8 @@ bool Player::update_next_checkpoint(const RaceDTO& race) {
 
         id_next_checkpoint += 1;
 
-        if (n_lap == race.laps && id_next_checkpoint == race.size_checkpoints) {
-            std::cout << "Player " << player_id << " is about to reach finish line." << std::endl;
+        if (n_lap == race.laps && id_next_checkpoint == race.size_checkpoints)
             finish_line = true;
-        }
     }
 
     this->next = race.checkpoints[id_next_checkpoint - 1];
@@ -237,16 +232,13 @@ void Player::set_in_game() { in_game = true; }
 void Player::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config) {
 
     if (car && n_penalty < MAX_UPGRADES_PER_RACE) {
+
         n_penalty += 1;
-        std::cout << "[Player] Player " << player_id << " bought upgrade "
-                  << static_cast<int>(upgrade.upgrade) << ". Total upgrades: " << n_penalty
-                  << std::endl;
 
         penalty = true;
         if (upgrade.upgrade == ButtonType::Health) {
-            std::cout << "Actual health: " << health << std::endl;
+
             health += static_cast<uint16_t>(game_config.health_upgrade);
-            std::cout << "Upgraded health: " << health << std::endl;
             base_health += static_cast<uint16_t>(game_config.health_upgrade);
             return;
         }

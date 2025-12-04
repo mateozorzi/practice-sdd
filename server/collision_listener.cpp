@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
-#include <iostream>
 
 #include "city_utils.h"
 

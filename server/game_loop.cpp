@@ -522,8 +522,7 @@ void GameLoop::check_alive_players() {
     for (auto& [player_id, player]: players) {
 
         if (player.is_dead() && player.is_in_race()) {
-            std::cout << "Player with ID: " << player_id << " has died during the race."
-                      << std::endl;
+
             player.finish_race();
             player.record_time(timeout, server_config.game);
         }
@@ -536,8 +535,6 @@ void GameLoop::check_race_times(uint32_t seconds) {
 
         if (player.has_finished_race() and !player.is_dead()) {
 
-            std::cout << "Player with ID: " << player_id << " has finished the race in " << seconds
-                      << " seconds." << std::endl;
             player.record_time(seconds, server_config.game);
         }
     }
@@ -578,14 +575,6 @@ LeaderboardDTO GameLoop::create_final_leaderboard() {
         position++;
     }
 
-    std::cout << "\nFinal Leaderboard: " << std::endl;
-    for (const auto& stats: final_stats) {
-        std::cout << "Position: " << static_cast<int>(stats.position)
-                  << " | Player ID: " << stats.client_id << " | Username: " << stats.username
-                  << " | Total Time: " << stats.total_time << " seconds"
-                  << " | Total Points: " << static_cast<int>(stats.points) << std::endl;
-    }
-
     return LeaderboardDTO("Final Leaderboard", final_stats);
 }
 
@@ -622,15 +611,6 @@ LeaderboardDTO GameLoop::create_leaderboard() {
     LeaderboardDTO actual(race_name, race_stats);
 
     leaderboards.push_back(actual);
-
-    // cout debug of leaderboard
-    std::cout << "\nLeaderboard for race: " << race_name << std::endl;
-    for (const auto& stats: actual.players) {
-        std::cout << "Position: " << static_cast<int>(stats.position)
-                  << " | Player ID: " << stats.client_id << " | Username: " << stats.username
-                  << " | Time: " << stats.total_time << " seconds"
-                  << " | Points: " << static_cast<int>(stats.points) << std::endl;
-    }
 
     return actual;
 }
