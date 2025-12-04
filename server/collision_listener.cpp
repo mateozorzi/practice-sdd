@@ -82,6 +82,14 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
 
     if (is_begin) {
 
+
+        if (sensor_type == SensorType::CHECKPOINT) {
+
+            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> 24);
+            if (player.is_next_checkpoint(checkpoint_id))
+                player.trigger_checkpoint_collision();
+        }
+
         if (current_layer != CarLayer::ON_GROUND)
             return;
 
@@ -89,12 +97,6 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
             player.set_car_layer(CarLayer::ON_BRIDGE);
         else if (sensor_type == SensorType::UNDER_BRIDGE)
             player.set_car_layer(CarLayer::UNDER_BRIDGE);
-        else if (sensor_type == SensorType::CHECKPOINT) {
-
-            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> 24);
-            if (player.is_next_checkpoint(checkpoint_id))
-                player.trigger_checkpoint_collision();
-        }
     } else {
 
         bool should_reset =
