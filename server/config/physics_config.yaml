@@ -20,7 +20,7 @@ physics:
       linear_damping: 0.8
       angular_damping: 1.8
       min_turn_speed: 0.08
-      acceleration: 5.5
+      acceleration: 4.0
       braking_factor: 0.4
       max_speed: 17.0
       drift_factor: 0.85
@@ -38,9 +38,9 @@ physics:
       linear_damping: 0.6
       angular_damping: 1.2
       min_turn_speed: 0.15
-      acceleration: 8.0
+      acceleration: 5.0
       braking_factor: 0.6
-      max_speed: 30.0
+      max_speed: 28.0
       drift_factor: 0.6
       turn_torque: 0.045
       mass: 1.0
@@ -76,7 +76,7 @@ physics:
       min_turn_speed: 0.12        
       acceleration: 5.0
       braking_factor: 0.4
-      max_speed: 20.0
+      max_speed: 18.0
       drift_factor: 0.7
       turn_torque: 0.038
       mass: 1.0
@@ -94,7 +94,7 @@ physics:
       min_turn_speed: 0.15
       acceleration: 3.5
       braking_factor: 0.35
-      max_speed: 15.0
+      max_speed: 20.0
       drift_factor: 0.5
       turn_torque: 0.035
       mass: 1.0
@@ -110,13 +110,13 @@ physics:
       linear_damping: 0.7
       angular_damping: 1.5
       min_turn_speed: 0.05
-      acceleration: 6.0
+      acceleration: 4.5
       braking_factor: 0.5
-      max_speed: 20.0
+      max_speed: 15.0
       drift_factor: 0.6
       turn_torque: 0.050
       mass: 1.0
-      health: 100
+      health: 250
 
     truck:
       model: "Truck"
