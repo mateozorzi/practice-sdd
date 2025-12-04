@@ -276,8 +276,6 @@ void MenuInterface::lobby(PlayerDTO& player) {
     l.showMaximized();
     std::cout << "Showing lobby window" << std::endl;
 
-    // PlayerDTO player("", -1, CarDTO(), -1, false);
-
     std::string username;
     uint32_t client_id = -1;
     player.id = client_id;

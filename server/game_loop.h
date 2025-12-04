@@ -103,6 +103,7 @@ class GameLoop final: public Thread {
 
     void send_upgrades_remaining();
     void send_upgrade_shop_time_remaining(const std::chrono::steady_clock::duration& remaining_time);
+    void send_race_time(const uint32_t elapsed_seconds);
 
     bool all_player_in_game() const;
     bool player_in_race() const;

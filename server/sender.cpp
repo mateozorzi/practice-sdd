@@ -43,6 +43,8 @@ void Sender::run() {
                     this->server_protocol.send_action_info(variant_snapshot);
                 else if (variant_snapshot.gameloop_action == GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING)
                     this->server_protocol.send_action_info(variant_snapshot);
+                else if (variant_snapshot.gameloop_action == GameLoopAction::RACE_TIME)
+                    this->server_protocol.send_race_time(variant_snapshot);
 
             } catch (const ClosedQueue&) {
 

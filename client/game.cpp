@@ -341,6 +341,11 @@ bool Game::update_race() {
                 update_game_state_from_snapshot(last);
 
             return false;
+        } else if (dto.gameloop_action == GameLoopAction::RACE_TIME) {
+            if (std::holds_alternative<uint32_t>(dto.data)) {
+                uint32_t elapsed_seconds = std::get<uint32_t>(dto.data);
+                game_state.player.time = static_cast<int>(elapsed_seconds);
+            }
         }
 
         if (game_state.phase != Phase::IN_RACE) {

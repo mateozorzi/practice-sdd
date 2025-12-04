@@ -54,6 +54,7 @@ public:
     void send_json_file(const std::string& file_path);
     void send_game_action(const GameUpdateDTO& game_action);
     void send_action_info(const GameUpdateDTO& action_info);
+    void send_race_time(const GameUpdateDTO& race_time);
 };
 
 

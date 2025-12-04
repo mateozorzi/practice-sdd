@@ -224,18 +224,6 @@ void GameLoop::handle_waiting_car_selection_phase() {
     fixed_sleep(now);
 }
 
-void GameLoop::send_upgrade_shop_time_remaining(const std::chrono::steady_clock::duration& remaining_time) {
-
-    uint8_t seconds_remaining =
-            static_cast<uint8_t>(std::chrono::duration_cast<std::chrono::seconds>(
-                    remaining_time).count());
-
-    GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING,
-                              seconds_remaining);
-    game_monitor.broadcast(game_update);
-}
-
-
 void GameLoop::handle_upgrade_shop_phase() {
 
     const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
@@ -284,6 +272,13 @@ void GameLoop::handle_countdown_phase() {
     fixed_sleep(now);
 }
 
+void GameLoop::send_race_time(const uint32_t elapsed_seconds) {
+
+    GameUpdateDTO race_time_update(
+            GameLoopAction::RACE_TIME, static_cast<uint32_t>(elapsed_seconds));
+    game_monitor.broadcast(race_time_update);
+}
+
 
 void GameLoop::handle_in_race_phase() {
 
@@ -300,6 +295,8 @@ void GameLoop::handle_in_race_phase() {
     update_positions(selected_races.races[current_race_index], elapsed_seconds);
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+
+    send_race_time(static_cast<uint32_t>(elapsed_seconds));
 
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
         phase_start = std::nullopt;
@@ -518,6 +515,18 @@ void GameLoop::send_upgrades_remaining() {
         game_monitor.send_update_to_player(game_update, id);
     }
 }
+
+void GameLoop::send_upgrade_shop_time_remaining(const std::chrono::steady_clock::duration& remaining_time) {
+
+    uint8_t seconds_remaining =
+            static_cast<uint8_t>(std::chrono::duration_cast<std::chrono::seconds>(
+                    remaining_time).count());
+
+    GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING,
+                              seconds_remaining);
+    game_monitor.broadcast(game_update);
+}
+
 
 
 bool GameLoop::all_player_in_game() const {

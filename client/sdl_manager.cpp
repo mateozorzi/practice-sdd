@@ -515,11 +515,14 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     int font_size = box_h / STATS_FONT_SIZE_DIVISOR;
     int spacing = font_size + STATS_SPACING_OFFSET;
 
-    std::string player_name = "Jugador: " + player.username;
+    std::string player_name = "Player: " + player.username;
     draw_row(player_name, text_x, text_y, text_color, font_size);
     text_y += spacing;
+    std::string player_time = "Time: " + std::to_string(player.time);
+    draw_row(player_time, text_x, text_y, text_color, font_size);
+    text_y += spacing;
     std::string player_lap =
-            "Vuelta: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
+            "Lap: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
     draw_row(player_lap, text_x, text_y, text_color, font_size);
 }
 
