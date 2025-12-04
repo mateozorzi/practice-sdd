@@ -171,9 +171,6 @@ bool Game::update_waiting() {
             sdl.set_sound_info(ids);
             game_state.phase = Phase::UPGRADE;
             game_state.penalty_per_upgrade = std::get<uint8_t>(dto.data);
-            std::cout << "Penalty per upgrade received: "
-                      << static_cast<int>(game_state.penalty_per_upgrade) << " seconds."
-                      << std::endl;
             return false;
         }
     }

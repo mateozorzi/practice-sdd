@@ -355,9 +355,6 @@ nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
 
     std::string json_content = recv_string();
 
-    std::cout << "LOADING JSON: " << file_path << "\n";
-    std::cout << "JSON SIZE: " << json_content.size() << "\n";
-
     return nlohmann::json::parse(json_content);
 }
 

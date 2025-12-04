@@ -41,7 +41,6 @@ void SDLManager::set_minimap() {
     minimap = SDL2pp::Texture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
                               MINIMAP_WIDTH, MINIMAP_HEIGHT);
     renderer.SetTarget(minimap.value());
-    std::cout << "Cargando minimap de " << map_name << std::endl;
     SDL2pp::Texture& map = resources.get_texture(map_name);
     renderer.Copy(map, SDL2pp::Rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT),
                   SDL2pp::Rect(0, 0, MINIMAP_WIDTH, MINIMAP_HEIGHT));

@@ -253,14 +253,11 @@ bool MenuInterface::lobby_create(const PlayerDTO& player) {
 void MenuInterface::set_music(QObject* parent) {
     musicPlayer = new QMediaPlayer(parent);
     audioOutput = new QAudioOutput(parent);
-    std::cout << "Creando audio output" << std::endl;
     musicPlayer->setAudioOutput(audioOutput);
-    std::cout << "Seteando audio output" << std::endl;
 
     musicPlayer->setSource(
             QUrl::fromLocalFile("/var/nfs/assets/music/Need for Speed II SE Soundtrack - Main Menu "
                                 "and Showcase Theme I - RonTaboga.mp3"));
-    std::cout << "Seteando source" << std::endl;
 
     audioOutput->setVolume(MUSIC_VOLUME);  // Volumen entre 0 y 100
 
@@ -274,7 +271,6 @@ void MenuInterface::lobby(PlayerDTO& player) {
     Lobby l;
     set_music(&l);
     l.showMaximized();
-    std::cout << "Showing lobby window" << std::endl;
 
     std::string username;
     uint32_t client_id = -1;
@@ -284,16 +280,12 @@ void MenuInterface::lobby(PlayerDTO& player) {
 
     // Conectás la señal del lobby con el cliente
     QObject::connect(&l, &Lobby::input_username, [&](const QString& name) {
-        std::cout << "Received username signal" << std::endl;
         username = name.toStdString();
 
         protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));
         client_id = protocol.receive_id();  // wait for server response
-        std::cout << "Received client ID from server: " << client_id << std::endl;
         player.username = username;
         player.id = client_id;
-        std::cout << "Username entered: " << player.username << std::endl;
-        std::cout << "Received client ID: " << player.id << std::endl;
 
 
         // server send car market if username valid -> enter lobby (create or join)
