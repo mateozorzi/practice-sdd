@@ -535,7 +535,7 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     draw_row(player_time, text_x, text_y, text_color, font_size);
     text_y += spacing;
     std::string player_lap =
-            "Lap :  " + std::to_string(player.current_lap) + " / " + std::to_string(player.race_lap);
+            "Lap :  " + std::to_string(player.current_lap) + " of " + std::to_string(player.race_lap);
     
     draw_row(player_lap, text_x - o, text_y - o, outline_color, font_size);
     draw_row(player_lap, text_x + o, text_y - o, outline_color, font_size);
