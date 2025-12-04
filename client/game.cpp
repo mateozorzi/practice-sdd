@@ -327,6 +327,7 @@ bool Game::update_race() {
             if (got_snapshot)
                 update_game_state_from_snapshot(last);
 
+            game_state.player.time = 0;
             return false;
         } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
 

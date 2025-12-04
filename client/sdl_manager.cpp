@@ -514,15 +514,33 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     int text_y = box_y + STATS_MARGIN;
     int font_size = box_h / STATS_FONT_SIZE_DIVISOR;
     int spacing = font_size + STATS_SPACING_OFFSET;
+    int o = 2;                                  // grosor del borde
+    SDL2pp::Color outline_color(0, 0, 0, 255);  // negro
 
     std::string player_name = "Player: " + player.username;
+
+    draw_row(player_name, text_x - o, text_y - o, outline_color, font_size);
+    draw_row(player_name, text_x + o, text_y - o, outline_color, font_size);
+    draw_row(player_name, text_x - o, text_y + o, outline_color, font_size);
+    draw_row(player_name, text_x + o, text_y + o, outline_color, font_size);
     draw_row(player_name, text_x, text_y, text_color, font_size);
+    
     text_y += spacing;
+
     std::string player_time = "Time: " + std::to_string(player.time);
+    draw_row(player_time, text_x - o, text_y - o, outline_color, font_size);
+    draw_row(player_time, text_x + o, text_y - o, outline_color, font_size);
+    draw_row(player_time, text_x - o, text_y + o, outline_color, font_size);
+    draw_row(player_time, text_x + o, text_y + o, outline_color, font_size);
     draw_row(player_time, text_x, text_y, text_color, font_size);
     text_y += spacing;
     std::string player_lap =
             "Lap: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
+    
+    draw_row(player_lap, text_x - o, text_y - o, outline_color, font_size);
+    draw_row(player_lap, text_x + o, text_y - o, outline_color, font_size);
+    draw_row(player_lap, text_x - o, text_y + o, outline_color, font_size);
+    draw_row(player_lap, text_x + o, text_y + o, outline_color, font_size);
     draw_row(player_lap, text_x, text_y, text_color, font_size);
 }
 
