@@ -6,9 +6,7 @@ constexpr float PI = 3.14159265358979323846f;
 
 Npc::Npc(uint32_t npc_id, const std::vector<std::vector<int>>& polygon, float speed,
          b2World& box2d_world, const ServerConfig& server_config):
-        npc_id(npc_id),
-        speed(speed),
-        server_config(server_config) {
+        npc_id(npc_id), speed(speed), server_config(server_config) {
 
     for (const auto& point: polygon) {
         if (point.size() >= 2) {
@@ -27,7 +25,8 @@ Npc::Npc(uint32_t npc_id, const std::vector<std::vector<int>>& polygon, float sp
     box2d_body = box2d_world.CreateBody(&box2d_body_definition);
 
     b2PolygonShape box2d_polygon_shape;
-    box2d_polygon_shape.SetAsBox(server_config.physics.compact.width, server_config.physics.compact.height);
+    box2d_polygon_shape.SetAsBox(server_config.physics.compact.width,
+                                 server_config.physics.compact.height);
 
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
@@ -108,15 +107,15 @@ void Npc::update() {
     advance_on_route();
 
     size_t next_idx = (current_segment + 1) % route.size();
-    float current_x = route[current_segment].x + 
-                      (route[next_idx].x - route[current_segment].x) * progress;
-    float current_y = route[current_segment].y + 
-                      (route[next_idx].y - route[current_segment].y) * progress;
+    current_x =
+            route[current_segment].x + (route[next_idx].x - route[current_segment].x) * progress;
+    current_y =
+            route[current_segment].y + (route[next_idx].y - route[current_segment].y) * progress;
 
     update_angle();
 
     box2d_body->SetTransform(b2Vec2(pixels_to_meters(current_x), pixels_to_meters(current_y)),
-                       current_angle * (PI / 180.0f));
+                             current_angle * (PI / 180.0f));
 }
 
 NpcDTO Npc::get_position() const {
@@ -134,7 +133,4 @@ NpcDTO Npc::get_position() const {
     return NpcDTO(npc_id, x, y, angle_deg);
 }
 
-b2Body* Npc::get_body() const {
-    return box2d_body;
-}
-
+b2Body* Npc::get_body() const { return box2d_body; }

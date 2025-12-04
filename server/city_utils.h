@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "../common/checkpoint_dto.h"
-
 #include <box2d/box2d.h>
+
+#include "../common/checkpoint_dto.h"
 
 #include "server_config.h"
 
@@ -46,7 +46,8 @@ public:
     void add_sensor(const std::vector<std::vector<int>>& polygon, SensorType sensor_type,
                     uint16_t collision_cateogry, uint16_t collision_mask);
 
-    void add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collision_category, uint16_t collision_mask);
+    void add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collision_category,
+                        uint16_t collision_mask);
 
     void cleanup();
 };

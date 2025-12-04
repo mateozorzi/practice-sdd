@@ -179,11 +179,12 @@ void Player::trigger_checkpoint_collision() {
 
     if (!is_in_race())
         return;
-    
+
     checkpoint_triggered = true;
 }
 
-void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds, const GameConfig& game_config) {
+void Player::update_car_position(const RaceDTO& race, uint32_t elapsed_seconds,
+                                 const GameConfig& game_config) {
 
     if (car && is_in_race()) {
 

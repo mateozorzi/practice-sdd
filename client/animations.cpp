@@ -7,7 +7,7 @@ Animations::Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManag
 
 void Animations::start_explosion(uint32_t id, int current_it, SDL2pp::Point position) {
     if (explosions.find(id) == explosions.end()) {
-        explosions[id] = ExplosionAnimation{current_it, position};
+        explosions.try_emplace(id, ExplosionAnimation{current_it, position});
     }
 }
 

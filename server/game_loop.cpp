@@ -52,8 +52,7 @@ void GameLoop::fixed_sleep(const std::chrono::steady_clock::time_point& iteratio
 
 
 void GameLoop::process_commands(const std::unordered_set<ClientAction>& allowed_actions,
-                                const uint32_t elapsed_seconds) 
-{
+                                const uint32_t elapsed_seconds) {
     GameCommand game_command;
 
     while (command_queue.try_pop(game_command)) {
@@ -201,7 +200,8 @@ void GameLoop::handle_waiting_car_selection_phase() {
 
         transition_to(GamePhase::UPGRADE_SHOP);
 
-        GameUpdateDTO game_update(GameLoopAction::START_SHOP, static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
+        GameUpdateDTO game_update(GameLoopAction::START_SHOP,
+                                  static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
         game_monitor.broadcast(game_update);
 
         set_race(selected_races.races[current_race_index]);
@@ -259,8 +259,8 @@ void GameLoop::handle_countdown_phase() {
 
 void GameLoop::send_race_time(const uint32_t elapsed_seconds) {
 
-    GameUpdateDTO race_time_update(
-            GameLoopAction::RACE_TIME, static_cast<uint32_t>(elapsed_seconds));
+    GameUpdateDTO race_time_update(GameLoopAction::RACE_TIME,
+                                   static_cast<uint32_t>(elapsed_seconds));
     game_monitor.broadcast(race_time_update);
 }
 
@@ -271,11 +271,9 @@ void GameLoop::handle_in_race_phase() {
 
     double elapsed_seconds = std::chrono::duration<double>(elapsed).count();
     // check_race_times(elapsed_seconds);
-    process_commands({ClientAction::SEND_CAR_MOVEMENT,
-                  ClientAction::CHEAT_WIN_RACE,
-                  ClientAction::CHEAT_WIN_GAME,
-                  ClientAction::CHEAT_INFINITE_HEALTH},
-                 elapsed_seconds);
+    process_commands({ClientAction::SEND_CAR_MOVEMENT, ClientAction::CHEAT_WIN_RACE,
+                      ClientAction::CHEAT_WIN_GAME, ClientAction::CHEAT_INFINITE_HEALTH},
+                     elapsed_seconds);
 
     check_alive_players();
 
@@ -333,7 +331,8 @@ void GameLoop::handle_leaderboard_phase() {
             transition_to(GamePhase::UPGRADE_SHOP);
             current_race_index += 1;
 
-            GameUpdateDTO game_update(GameLoopAction::START_SHOP, static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
+            GameUpdateDTO game_update(GameLoopAction::START_SHOP,
+                                      static_cast<uint8_t>(server_config.game.penalty_per_upgrade));
             game_monitor.broadcast(game_update);
 
             set_race(selected_races.races[current_race_index]);
@@ -363,7 +362,7 @@ void GameLoop::handle_game_finished_phase() {
 
     if (elapsed_time >= game_finish_seconds)
         GameLoop::stop();
-    
+
     fixed_sleep(now);
 }
 
@@ -424,7 +423,7 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
     if (current_phase == GamePhase::IN_RACE)
         city_loader.update_npcs();
 
-    for (auto& npc: city_loader.get_npcs())
+    for (const auto& npc: city_loader.get_npcs())
         world_snapshot.add_npc_position(npc.get_position());
 
     GameUpdateDTO update(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
@@ -458,17 +457,15 @@ void GameLoop::send_upgrades_remaining() {
     }
 }
 
-void GameLoop::send_upgrade_shop_time_remaining(const std::chrono::steady_clock::duration& remaining_time) {
+void GameLoop::send_upgrade_shop_time_remaining(
+        const std::chrono::steady_clock::duration& remaining_time) {
 
-    uint8_t seconds_remaining =
-            static_cast<uint8_t>(std::chrono::duration_cast<std::chrono::seconds>(
-                    remaining_time).count());
+    uint8_t seconds_remaining = static_cast<uint8_t>(
+            std::chrono::duration_cast<std::chrono::seconds>(remaining_time).count());
 
-    GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING,
-                              seconds_remaining);
+    GameUpdateDTO game_update(GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING, seconds_remaining);
     game_monitor.broadcast(game_update);
 }
-
 
 
 bool GameLoop::all_player_in_game() const {
@@ -483,7 +480,8 @@ bool GameLoop::player_in_race() const {
                        [](const auto& p) { return p.second.is_in_race(); });
 }
 
-void GameLoop::map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints) {
+void GameLoop::map_configuration(const std::string& city_name,
+                                 const std::vector<CheckpointDTO>& checkpoints) {
 
     city_loader.load_city(city_name, checkpoints);
 }

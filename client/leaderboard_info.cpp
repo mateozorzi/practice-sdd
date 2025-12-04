@@ -103,12 +103,13 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
     SDL2pp::Color header_color(255, 255, 255, 255);
 
     std::vector<std::string> headers = {"POS", "NAME", "TIME", "PTS"};
-    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH,
-                                        COLUMN_TIME_WIDTH, COLUMN_POINTS_WIDTH};
+    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH, COLUMN_TIME_WIDTH,
+                                        COLUMN_POINTS_WIDTH};
 
-    int table_start_x = rect.x + (rect.w - (COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH +
-                                            COLUMN_TIME_WIDTH + COLUMN_POINTS_WIDTH +
-                                            3 * COLUMN_SPACING)) / 2;
+    int table_start_x =
+            rect.x + (rect.w - (COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH + COLUMN_TIME_WIDTH +
+                                COLUMN_POINTS_WIDTH + 3 * COLUMN_SPACING)) /
+                             2;
 
     int current_x = table_start_x;
 
@@ -129,7 +130,7 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
     SDL2pp::Color entry_color(255, 255, 255, 255);
     int entry_y = header_y + 55;
 
-    for (const auto& entry : leaderboard.players) {
+    for (const auto& entry: leaderboard.players) {
         current_x = table_start_x;
 
         // POS
@@ -154,8 +155,8 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
         std::string time_text =
                 entry.points == 0 ? "DSQ" : std::to_string(entry.total_time) + " seg";
 
-        SDL2pp::Texture& time_texture = resources.get_text(
-                time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        SDL2pp::Texture& time_texture =
+                resources.get_text(time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
         renderer.Copy(time_texture, SDL2pp::NullOpt,
                       SDL2pp::Rect(current_x + 10, entry_y, time_texture.GetWidth(),
                                    time_texture.GetHeight()));
@@ -178,8 +179,8 @@ void LeaderboardInfo::fill_winner(const LeaderboardDTO& leaderboard,
                                   const SDL2pp::Rect& bottom_rect) {
     if (!leaderboard.players.empty()) {
         const auto& winner = leaderboard.players[0];
-        
-        if(winner.points == 0) {
+
+        if (winner.points == 0) {
             // No winner
             return;
         }

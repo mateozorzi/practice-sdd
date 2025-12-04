@@ -270,7 +270,7 @@ void MenuInterface::set_music(QObject* parent) {
 
 void MenuInterface::lobby(PlayerDTO& player) {
     QEventLoop loop;
-    
+
     Lobby l;
     set_music(&l);
     l.showMaximized();

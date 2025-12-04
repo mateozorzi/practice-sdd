@@ -14,10 +14,7 @@ GameState Receiver::get_game_state() const { return game_state; }
 Queue<GameUpdateDTO>& Receiver::get_car_positions_queue() { return car_positions_queue; }
 
 
-bool Receiver::is_server_connected() const {
-
-    return server_connected;
-}
+bool Receiver::is_server_connected() const { return server_connected; }
 
 
 void Receiver::run() {

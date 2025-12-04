@@ -68,7 +68,8 @@ public:
     uint16_t get_health() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
-    void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds, const GameConfig& game_config);
+    void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds,
+                             const GameConfig& game_config);
     void set_car_collision(bool colliding);
     void set_position_for_race(const std::vector<CheckpointDTO>& checkpoints);
     void set_car_layer(CarLayer layer);

@@ -265,7 +265,6 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
     render_checkpoints(my_car.next, view_rect, scale_x, scale_y);
     render_hint(my_car, view_rect, scale_x, scale_y, arrow_texture);
     render_stats(my_player);
-
 }
 
 void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
@@ -283,7 +282,7 @@ void SDLManager::set_music_volume(const int volume) { sounds.set_music_volume(vo
 void SDLManager::render(LocalInfo& game_state) {
     SDL_BlendMode prev_blend = renderer.GetDrawBlendMode();
     SDL_Color prev_color = renderer.GetDrawColor();
-    
+
     iteration_counter++;
 
     // Uso directo de game_state.player
@@ -359,14 +358,13 @@ void SDLManager::render(LocalInfo& game_state) {
 
     renderer.Copy(map, view_rect, SDL2pp::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 
-    render_players(scale_x, scale_y, view_rect, my_car, my_player, game_state, cars_texture,
-                   map, arrow_texture);
-    
+    render_players(scale_x, scale_y, view_rect, my_car, my_player, game_state, cars_texture, map,
+                   arrow_texture);
+
     render_hud_health(game_state.player.life, game_state.player.max_life);
     animations.render_explosions(iteration_counter);
     animations.clean_explosions(iteration_counter);
     render_hud_minimap(pos_x, pos_y);
-
 
 
     if (my_player.died || my_player.life <= 0) {
@@ -430,7 +428,7 @@ void SDLManager::render_countdown(const LocalInfo& game_state) {
 
 
     const std::string text = "The race will start in " +
-                             std::to_string(game_state.countdown_seconds+1) + " seconds";
+                             std::to_string(game_state.countdown_seconds + 1) + " seconds";
     SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
     render_text(text, text_color, TEXT_LEADERBOARD_SIZE);
 
@@ -524,7 +522,7 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     draw_row(player_name, text_x - o, text_y + o, outline_color, font_size);
     draw_row(player_name, text_x + o, text_y + o, outline_color, font_size);
     draw_row(player_name, text_x, text_y, text_color, font_size);
-    
+
     text_y += spacing;
 
     std::string player_time = "Time: " + std::to_string(player.time);
@@ -536,7 +534,7 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     text_y += spacing;
     std::string player_lap =
             "Lap: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
-    
+
     draw_row(player_lap, text_x - o, text_y - o, outline_color, font_size);
     draw_row(player_lap, text_x + o, text_y - o, outline_color, font_size);
     draw_row(player_lap, text_x - o, text_y + o, outline_color, font_size);
@@ -567,7 +565,11 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining, int upgrade_shop_countdown) { shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining, upgrade_shop_countdown); }
+void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining,
+                             int upgrade_shop_countdown) {
+    shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining,
+                upgrade_shop_countdown);
+}
 
 void SDLManager::close_shop() { shop.close_shop(); }
 
@@ -660,8 +662,7 @@ void SDLManager::load_city(const std::string& city_name) {
 }
 
 void SDLManager::render_text(const std::string& text, SDL2pp::Color text_color, int size) {
-    SDL2pp::Texture& text_texture =
-            resources.get_text(text, FONT_PATH, size, text_color);
+    SDL2pp::Texture& text_texture = resources.get_text(text, FONT_PATH, size, text_color);
     int text_x = (SCREEN_WIDTH - text_texture.GetWidth()) / 2;
     int text_y = (SCREEN_HEIGHT - text_texture.GetHeight()) / 2;
 
@@ -680,4 +681,3 @@ void SDLManager::render_text(const std::string& text, SDL2pp::Color text_color, 
 
     draw_row(text, text_x, text_y, text_color, size);
 }
-

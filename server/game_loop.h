@@ -71,7 +71,7 @@ class GameLoop final: public Thread {
     void fixed_sleep(const std::chrono::steady_clock::time_point& iteration_start_time);
 
     void process_commands(const std::unordered_set<ClientAction>& allowed_actions,
-                                uint32_t elapsed_seconds);
+                          uint32_t elapsed_seconds);
 
     void handle_disconnection(const GameCommand& game_command);
     void handle_car_selection(const GameCommand& game_command);
@@ -99,13 +99,15 @@ class GameLoop final: public Thread {
     void send_countdown_time(const std::chrono::steady_clock::duration& remaining_time);
 
     void send_upgrades_remaining();
-    void send_upgrade_shop_time_remaining(const std::chrono::steady_clock::duration& remaining_time);
+    void send_upgrade_shop_time_remaining(
+            const std::chrono::steady_clock::duration& remaining_time);
     void send_race_time(const uint32_t elapsed_seconds);
 
     bool all_player_in_game() const;
     bool player_in_race() const;
 
-    void map_configuration(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints);
+    void map_configuration(const std::string& city_name,
+                           const std::vector<CheckpointDTO>& checkpoints);
 
 
 public:

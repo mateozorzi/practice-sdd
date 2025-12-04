@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-
 #include "../common/race_dto.h"
 
 

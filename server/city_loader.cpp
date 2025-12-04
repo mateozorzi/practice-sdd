@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <fstream>
 
+#include <nlohmann/json.hpp>
+
 #include "../common/constants.h"
 
 #include "world_creation_exception.h"
-#include <nlohmann/json.hpp>
 
 
 CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config):
@@ -43,7 +44,8 @@ const CityLoaderConfig& CityLoader::obtain_city_loader_config(
 }
 
 
-void CityLoader::load_collidables(const std::string& file, const uint16_t collision_category, const uint16_t collision_mask) {
+void CityLoader::load_collidables(const std::string& file, const uint16_t collision_category,
+                                  const uint16_t collision_mask) {
 
     auto polygons = city_utils.load_polygons_from_file(file);
 
@@ -59,8 +61,8 @@ void CityLoader::load_collidables(const std::string& file, const uint16_t collis
     }
 }
 
-void CityLoader::load_sensors(const std::string& file, SensorType type, const uint16_t collision_category,
-                              const uint16_t collision_mask) {
+void CityLoader::load_sensors(const std::string& file, SensorType type,
+                              const uint16_t collision_category, const uint16_t collision_mask) {
 
     auto sensors = city_utils.load_polygons_from_file(file);
 
@@ -115,7 +117,9 @@ void CityLoader::load_npcs(const std::string& city_name) {
     }
 }
 
-void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints, const uint16_t collision_category, const uint16_t collision_mask) {
+void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints,
+                                  const uint16_t collision_category,
+                                  const uint16_t collision_mask) {
 
     for (const auto& checkpoint: checkpoints) {
 
@@ -130,7 +134,8 @@ void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints,
 }
 
 
-void CityLoader::load_city(const std::string& city_name, const std::vector<CheckpointDTO>& checkpoints) {
+void CityLoader::load_city(const std::string& city_name,
+                           const std::vector<CheckpointDTO>& checkpoints) {
 
     std::string city_normalized_name = normalize_city_name(city_name);
 
@@ -148,21 +153,17 @@ void CityLoader::load_city(const std::string& city_name, const std::vector<Check
                  CATEGORY_SENSOR, MASK_SENSOR);
     load_sensors(city_loader_config.sensors.under_bridge_sensor_file, SensorType::UNDER_BRIDGE,
                  CATEGORY_SENSOR, MASK_SENSOR);
-    
+
     load_npcs(city_name);
-    
+
     load_checkpoints(checkpoints, CATEGORY_SENSOR, MASK_SENSOR);
 
     city_loaded = true;
 }
 
-std::vector<Npc>& CityLoader::get_npcs() {
-
-    return npcs;
-}
+std::vector<Npc>& CityLoader::get_npcs() { return npcs; }
 
 void CityLoader::update_npcs() {
 
-    for (auto& npc: npcs)
-        npc.update();
+    for (auto& npc: npcs) npc.update();
 }

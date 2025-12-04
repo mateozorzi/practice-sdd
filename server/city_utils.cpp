@@ -123,21 +123,25 @@ void CityUtils::add_sensor(const std::vector<std::vector<int>>& polygon, const S
 }
 
 
-void CityUtils::add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collision_category, uint16_t collision_mask) {
+void CityUtils::add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collision_category,
+                               uint16_t collision_mask) {
 
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_staticBody;
-    box2d_body_definition.position.Set(pixels_to_meters(checkpoint.x), pixels_to_meters(checkpoint.y));
+    box2d_body_definition.position.Set(pixels_to_meters(checkpoint.x),
+                                       pixels_to_meters(checkpoint.y));
 
     b2Body* box2d_body = box2d_world.CreateBody(&box2d_body_definition);
 
     b2PolygonShape box2d_polygon_shape;
-    box2d_polygon_shape.SetAsBox(pixels_to_meters(checkpoint.width) / 2.0f, pixels_to_meters(checkpoint.height) / 2.0f);
+    box2d_polygon_shape.SetAsBox(pixels_to_meters(checkpoint.width) / 2.0f,
+                                 pixels_to_meters(checkpoint.height) / 2.0f);
 
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
     box2d_fixture_definition.isSensor = true;
-    box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(checkpoint.id) << 24 | static_cast<uintptr_t>(SensorType::CHECKPOINT);
+    box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(checkpoint.id) << 24 |
+                                                static_cast<uintptr_t>(SensorType::CHECKPOINT);
     box2d_fixture_definition.filter.categoryBits = collision_category;
     box2d_fixture_definition.filter.maskBits = collision_mask;
 
