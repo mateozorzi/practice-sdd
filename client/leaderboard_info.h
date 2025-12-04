@@ -16,7 +16,6 @@
 class LeaderboardInfo {
 private:
     SDL2pp::Renderer& renderer;
-    SDL2pp::Mixer& mixer;
     ResourceManager& resources;
     std::string font_path;
 
@@ -25,8 +24,8 @@ private:
     int window_height;
 
 public:
-    LeaderboardInfo(SDL2pp::Renderer& renderer, SDL2pp::Mixer& mixer, ResourceManager& resources,
-                    int window_width, int window_height,
+    LeaderboardInfo(SDL2pp::Renderer& renderer, ResourceManager& resources, int window_width,
+                    int window_height,
                     const std::string& font_path =
                             "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf");
     void render(const LeaderboardDTO& leaderboard, const std::string& title,
