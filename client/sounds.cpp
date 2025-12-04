@@ -110,7 +110,6 @@ void Sounds::play_background_music(const std::string& path, int loops) {
 void Sounds::stop_background_music() {
     if (music_channel != -1) {
         mixer.HaltChannel(music_channel);
-        music_channel = -1;
     }
 }
 
