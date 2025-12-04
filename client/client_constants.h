@@ -101,6 +101,7 @@ constexpr int LEADERBOARD_HEADER_FONT_SIZE = 48;
 constexpr int LEADERBOARD_ENTRY_FONT_SIZE = 32;
 constexpr int INFO_FONT_SIZE = 24;
 constexpr int UPGRADE_COUNTDOWN_FONT_SIZE = 32;
+constexpr int TEXT_COUNTDOWN_SIZE = 32;
 
 // Paths
 constexpr const char* FONT_PATH = "/var/nfs/assets/fonts/NFS_by_JLTV.ttf";
