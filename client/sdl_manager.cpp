@@ -515,11 +515,14 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     int font_size = box_h / STATS_FONT_SIZE_DIVISOR;
     int spacing = font_size + STATS_SPACING_OFFSET;
 
-    std::string player_name = "Jugador: " + player.username;
+    std::string player_name = "Player: " + player.username;
     draw_row(player_name, text_x, text_y, text_color, font_size);
     text_y += spacing;
+    std::string player_time = "Time: " + std::to_string(player.time);
+    draw_row(player_time, text_x, text_y, text_color, font_size);
+    text_y += spacing;
     std::string player_lap =
-            "Vuelta: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
+            "Lap: " + std::to_string(player.current_lap) + "/" + std::to_string(player.race_lap);
     draw_row(player_lap, text_x, text_y, text_color, font_size);
 }
 
@@ -546,7 +549,7 @@ std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
 
-void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining) { shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining); }
+void SDLManager::render_shop(int time, int time_penalty, int upgrades_remaining, int upgrade_shop_countdown) { shop.render(time, Car::DEFAULT, map_name, camera, time_penalty, upgrades_remaining, upgrade_shop_countdown); }
 
 void SDLManager::close_shop() { shop.close_shop(); }
 

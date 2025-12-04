@@ -313,3 +313,11 @@ void ServerProtocol::send_action_info(const GameUpdateDTO& action_info) {
     add_uint8_to_buffer(info);
     send_buffer();
 }
+
+void ServerProtocol::send_race_time(const GameUpdateDTO& race_time) {
+
+    add_uint8_to_buffer(static_cast<uint8_t>(race_time.gameloop_action));
+    const uint32_t elapsed_seconds = std::get<uint32_t>(race_time.data);
+    add_uint32_to_buffer(elapsed_seconds);
+    send_buffer();
+}

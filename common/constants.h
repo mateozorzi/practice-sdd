@@ -35,6 +35,8 @@ enum class GameLoopAction : uint8_t {
     WINNER_PHASE = 0x19,
     COUNTDOWN_TIME = 0x20,
     SEND_UPGRADES_REMAINING = 0x21,
+    SEND_UPGRADE_SHOP_TIME_REMAINING = 0x22,
+    RACE_TIME = 0x23,
 };
 
 

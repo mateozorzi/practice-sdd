@@ -15,11 +15,11 @@ struct GameUpdateDTO {
 
     GameLoopAction gameloop_action;
 
-    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO, uint8_t> data;
+    std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO, uint8_t, uint32_t> data;
 
     GameUpdateDTO(
             GameLoopAction gameloop_action,
-            const std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO, uint8_t>& data):
+            const std::variant<std::monostate, WorldSnapshotDTO, RaceDTO, LeaderboardDTO, uint8_t, uint32_t>& data):
             gameloop_action(gameloop_action), data(data) {}
 
     GameUpdateDTO():
