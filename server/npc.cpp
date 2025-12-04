@@ -25,8 +25,8 @@ Npc::Npc(uint32_t npc_id, const std::vector<std::vector<int>>& polygon, float sp
     box2d_body = box2d_world.CreateBody(&box2d_body_definition);
 
     b2PolygonShape box2d_polygon_shape;
-    box2d_polygon_shape.SetAsBox(server_config.physics.compact.width,
-                                 server_config.physics.compact.height);
+    box2d_polygon_shape.SetAsBox(server_config.physics.compact.width / 2.0f,
+                                 server_config.physics.compact.height / 2.0f);
 
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
