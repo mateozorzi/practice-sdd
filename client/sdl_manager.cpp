@@ -270,8 +270,8 @@ void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
 
-void SDLManager::play_background_music(const std::string& path, const int loops) {
-    sounds.play_background_music(path, loops);
+void SDLManager::play_background_music(const int loops) {
+    sounds.play_background_music(loops);
 }
 
 void SDLManager::stop_background_music() { sounds.stop_background_music(); }
@@ -580,6 +580,8 @@ void SDLManager::open_leaderboard() { leaderboard_info.open_leaderboard(); }
 bool SDLManager::is_leaderboard_open() { return leaderboard_info.is_leaderboard_open(); }
 
 void SDLManager::play_upgrade_sound() { sounds.play_upgrade_sound(); }
+
+void SDLManager::play_finished_race_sound() { sounds.play_finished_race_sound(); }
 
 void SDLManager::render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view,
                                     double scale_x, double scale_y) {
