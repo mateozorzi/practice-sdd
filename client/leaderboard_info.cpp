@@ -10,6 +10,7 @@ constexpr int LEADERBOARD_TITLE_SPACING = 40;
 constexpr int LEADERBOARD_ENTRY_SPACING = 25;
 constexpr int LEADERBOARD_HEADER_ENTRY_SPACING = 50;
 constexpr int LEADERBOARD_SEPARATOR_SPACING = 30;
+constexpr int COLUMN_SPACING = 40;
 
 // Anchos de columnas
 constexpr int COLUMN_POS_WIDTH = 100;
@@ -86,8 +87,6 @@ void LeaderboardInfo::render(const LeaderboardDTO& leaderboard, const std::strin
 
 void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const SDL2pp::Rect& rect,
                                        std::string title) {
-    int content_x = rect.x + 30;
-    (void)content_x;
     int content_y = rect.y + 30;
 
     SDL2pp::Color title_color(COLOR_GOLD_R, COLOR_GOLD_G, COLOR_GOLD_B, COLOR_GOLD_A);
@@ -101,19 +100,19 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
 
     int header_y = content_y + title_texture.GetHeight() + 40;
 
-
     SDL2pp::Color header_color(255, 255, 255, 255);
 
     std::vector<std::string> headers = {"POS", "NAME", "TIME", "PTS"};
-    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH, COLUMN_TIME_WIDTH,
-                                        COLUMN_POINTS_WIDTH};
+    std::array<int, 4> column_widths = {COLUMN_POS_WIDTH, COLUMN_NAME_WIDTH,
+                                        COLUMN_TIME_WIDTH, COLUMN_POINTS_WIDTH};
 
     int table_start_x = rect.x + (rect.w - (COLUMN_POS_WIDTH + COLUMN_NAME_WIDTH +
-                                            COLUMN_TIME_WIDTH + COLUMN_POINTS_WIDTH)) /
-                                         2;
+                                            COLUMN_TIME_WIDTH + COLUMN_POINTS_WIDTH +
+                                            3 * COLUMN_SPACING)) / 2;
 
     int current_x = table_start_x;
 
+    // ----- HEADERS -----
     for (size_t i = 0; i < headers.size(); ++i) {
         SDL2pp::Texture& header_texture = resources.get_text(
                 headers[i], FONT_PATH, LEADERBOARD_HEADER_FONT_SIZE, header_color);
@@ -122,14 +121,15 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
                       SDL2pp::Rect(current_x + 10, header_y, header_texture.GetWidth(),
                                    header_texture.GetHeight()));
 
-        current_x += column_widths[i];
+        // Espaciado entre columnas
+        current_x += column_widths[i] + COLUMN_SPACING;
     }
 
-
+    // ----- ENTRIES -----
     SDL2pp::Color entry_color(255, 255, 255, 255);
     int entry_y = header_y + 55;
 
-    for (const auto& entry: leaderboard.players) {
+    for (const auto& entry : leaderboard.players) {
         current_x = table_start_x;
 
         // POS
@@ -140,7 +140,7 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
         renderer.Copy(pos_texture, SDL2pp::NullOpt,
                       SDL2pp::Rect(current_x + 10, entry_y, pos_texture.GetWidth(),
                                    pos_texture.GetHeight()));
-        current_x += COLUMN_POS_WIDTH;
+        current_x += COLUMN_POS_WIDTH + COLUMN_SPACING;
 
         // NAME
         SDL2pp::Texture& name_texture = resources.get_text(
@@ -148,20 +148,20 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
         renderer.Copy(name_texture, SDL2pp::NullOpt,
                       SDL2pp::Rect(current_x + 10, entry_y, name_texture.GetWidth(),
                                    name_texture.GetHeight()));
-        current_x += COLUMN_NAME_WIDTH;
+        current_x += COLUMN_NAME_WIDTH + COLUMN_SPACING;
 
         // TIME
         std::string time_text =
                 entry.points == 0 ? "DSQ" : std::to_string(entry.total_time) + " seg";
 
-        SDL2pp::Texture& time_texture =
-                resources.get_text(time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
+        SDL2pp::Texture& time_texture = resources.get_text(
+                time_text, FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
         renderer.Copy(time_texture, SDL2pp::NullOpt,
                       SDL2pp::Rect(current_x + 10, entry_y, time_texture.GetWidth(),
                                    time_texture.GetHeight()));
-        current_x += COLUMN_TIME_WIDTH;
+        current_x += COLUMN_TIME_WIDTH + COLUMN_SPACING;
 
-        // POINTS
+        // PTS
         SDL2pp::Texture& points_texture = resources.get_text(
                 std::to_string(entry.points), FONT_PATH, LEADERBOARD_ENTRY_FONT_SIZE, entry_color);
 
@@ -172,6 +172,7 @@ void LeaderboardInfo::fill_leaderboard(const LeaderboardDTO& leaderboard, const 
         entry_y += 30;
     }
 }
+
 
 void LeaderboardInfo::fill_winner(const LeaderboardDTO& leaderboard,
                                   const SDL2pp::Rect& bottom_rect) {

@@ -119,10 +119,11 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
 
     //info penalty
     std::string penalty_text = "Time penalty per Upgrade: " + std::to_string(time_penalty) + " seg";
-    SDL2pp::Color penalty_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+    SDL2pp::Color penalty_color(139, 0, 0, 255);  // DarkRed estándar
+
 
     SDL2pp::Texture& penalty_texture =
-            resources.get_text(penalty_text, font_path, INFO_FONT_SIZE, penalty_color);
+            resources.get_text(penalty_text, font_path, UPGRADE_COUNTDOWN_FONT_SIZE, penalty_color);
 
     int penalty_x = shop_rect.x + (shop_rect.w - penalty_texture.GetWidth()) / 2;
     int penalty_y = title_y + title_texture.GetHeight() + 20;  // separacion del título
@@ -140,7 +141,7 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
             resources.get_text(max_upgrades_text, font_path, INFO_FONT_SIZE, max_upgrades_color);
 
     int max_upgrades_x = shop_rect.x + (shop_rect.w - max_upgrades_texture.GetWidth()) / 2;
-    int max_upgrades_y = penalty_y + penalty_texture.GetHeight() + 20;  // separacion de la info
+    int max_upgrades_y = penalty_y + penalty_texture.GetHeight() + 10;  // separacion de la info
 
     renderer.Copy(
             max_upgrades_texture, SDL2pp::NullOpt,
