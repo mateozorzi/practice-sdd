@@ -84,7 +84,7 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
 
         if (sensor_type == SensorType::CHECKPOINT) {
 
-            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> 24);
+            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> 8);
             if (player.is_next_checkpoint(checkpoint_id))
                 player.trigger_checkpoint_collision();
         }

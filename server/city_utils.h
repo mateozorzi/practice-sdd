@@ -12,7 +12,7 @@
 #include "server_config.h"
 
 
-enum class SensorType {
+enum class SensorType: uint8_t {
 
     ON_BRIDGE,
     UNDER_BRIDGE,
