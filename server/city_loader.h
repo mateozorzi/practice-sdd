@@ -1,5 +1,5 @@
-#ifndef CITY_H
-#define CITY_H
+#ifndef CITY_LOADER_H
+#define CITY_LOADER_H
 
 
 #include <string>

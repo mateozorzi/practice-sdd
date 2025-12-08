@@ -11,8 +11,7 @@
 
 
 Lobby::Lobby(const ServerConfig& server_config):
-        server_config(server_config),
-        races(RaceLoader(server_config.world.races_folder).load_races()) {}
+        server_config(server_config), races(RaceLoader(server_config).load_races()) {}
 
 
 std::optional<GameQueues> Lobby::create_new_game(const uint32_t player_id,

@@ -1,6 +1,7 @@
 #ifndef NPC_H
 #define NPC_H
 
+
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -11,15 +12,19 @@
 
 #include "server_config.h"
 
+
 struct Point {
+
     float x;
     float y;
 
     Point(float x, float y): x(x), y(y) {}
 };
 
+
 class Npc {
-private:
+
+
     uint32_t npc_id;
     std::vector<Point> route;    // Closed polygon route
     size_t current_segment = 0;  // Current segment index (from route[current_segment] to
@@ -47,5 +52,6 @@ public:
 
     b2Body* get_body() const;
 };
+
 
 #endif

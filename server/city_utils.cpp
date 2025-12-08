@@ -10,8 +10,7 @@
 #include "world_creation_exception.h"
 
 
-CityUtils::CityUtils(const ServerConfig& server_config):
-        server_config(server_config) {}
+CityUtils::CityUtils(const ServerConfig& server_config): server_config(server_config) {}
 
 
 std::array<b2Vec2, 4> CityUtils::obtain_b2_vertices(
@@ -120,8 +119,9 @@ void CityUtils::add_collidable(b2World& box2d_world, const std::vector<std::vect
     box2d_body->CreateFixture(&box2d_fixture_definition);
 }
 
-void CityUtils::add_sensor(b2World& box2d_world, const std::vector<std::vector<int>>& polygon, const SensorType type,
-                           const uint16_t collision_category, const uint16_t collision_mask) {
+void CityUtils::add_sensor(b2World& box2d_world, const std::vector<std::vector<int>>& polygon,
+                           const SensorType type, const uint16_t collision_category,
+                           const uint16_t collision_mask) {
 
     auto vertices = obtain_b2_vertices(polygon);
 
@@ -151,8 +151,8 @@ void CityUtils::add_sensor(b2World& box2d_world, const std::vector<std::vector<i
 }
 
 
-void CityUtils::add_checkpoint(b2World& box2d_world, const CheckpointDTO& checkpoint, uint16_t collision_category,
-                               uint16_t collision_mask) {
+void CityUtils::add_checkpoint(b2World& box2d_world, const CheckpointDTO& checkpoint,
+                               uint16_t collision_category, uint16_t collision_mask) {
 
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_staticBody;

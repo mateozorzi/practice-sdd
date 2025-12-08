@@ -14,8 +14,6 @@
 #include "../common/game_update_dto.h"
 #include "../common/leaderboard_dto.h"
 
-#include "world_creation_exception.h"
-
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                    const uint8_t max_players, const ServerConfig& server_config,

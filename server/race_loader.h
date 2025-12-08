@@ -8,6 +8,8 @@
 
 #include "../common/race_dto.h"
 
+#include "city_utils.h"
+
 
 constexpr uint8_t ID = 0;
 constexpr uint8_t ORIENTATION = 1;
@@ -19,17 +21,18 @@ constexpr uint8_t HEIGHT = 5;
 
 class RaceLoader {
 
+    const ServerConfig& server_config;
+    CityUtils city_utils;
 
-    RaceDTO load_single_race(const std::filesystem::path& path);
-
-    const std::string race_folder;
+    std::string load_json_file(const std::string& file_path);
+    RaceDTO load_single_race(const std::filesystem::path& file_path);
 
 
 public:
     RaceLoader(const RaceLoader&) = delete;
     RaceLoader& operator=(const RaceLoader&) = delete;
 
-    explicit RaceLoader(const std::string& race_folder);
+    explicit RaceLoader(const ServerConfig& server_config);
 
     std::vector<RaceDTO> load_races();
 };

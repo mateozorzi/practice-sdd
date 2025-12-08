@@ -1,5 +1,5 @@
-#ifndef WORLD_UTILS_H
-#define WORLD_UTILS_h
+#ifndef CITY_UTILS_H
+#define CITY_UTILS_H
 
 
 #include <string>
@@ -44,13 +44,13 @@ public:
     std::vector<std::vector<std::vector<int>>> load_polygons_from_file(
             const std::string& file_path);
 
-    void add_collidable(b2World& box2d_world, const std::vector<std::vector<int>>& polygon, uint16_t collision_cateogry,
-                        uint16_t collision_mask);
-    void add_sensor(b2World& box2d_world, const std::vector<std::vector<int>>& polygon, SensorType sensor_type,
-                    uint16_t collision_cateogry, uint16_t collision_mask);
+    void add_collidable(b2World& box2d_world, const std::vector<std::vector<int>>& polygon,
+                        uint16_t collision_cateogry, uint16_t collision_mask);
+    void add_sensor(b2World& box2d_world, const std::vector<std::vector<int>>& polygon,
+                    SensorType sensor_type, uint16_t collision_cateogry, uint16_t collision_mask);
 
-    void add_checkpoint(b2World& box2d_world, const CheckpointDTO& checkpoint, uint16_t collision_category,
-                        uint16_t collision_mask);
+    void add_checkpoint(b2World& box2d_world, const CheckpointDTO& checkpoint,
+                        uint16_t collision_category, uint16_t collision_mask);
 
     void cleanup(b2World& box2d_world);
 };

@@ -11,9 +11,7 @@
 
 
 CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config):
-        box2d_world(box2d_world),
-        server_config(server_config),
-        city_utils(server_config) {}
+        box2d_world(box2d_world), server_config(server_config), city_utils(server_config) {}
 
 
 void CityLoader::load_collidables(const std::string& file, const uint16_t collision_category,
@@ -114,7 +112,8 @@ void CityLoader::load_city(const std::string& city_name,
     if (city_loaded)
         city_utils.cleanup(box2d_world);
 
-    const CityLoaderConfig& city_loader_config = city_utils.obtain_city_loader_config(normalized_city_name);
+    const CityLoaderConfig& city_loader_config =
+            city_utils.obtain_city_loader_config(normalized_city_name);
 
     load_collidables(city_loader_config.collidables.on_ground_collidable_file, CATEGORY_GROUND,
                      MASK_GROUND);
