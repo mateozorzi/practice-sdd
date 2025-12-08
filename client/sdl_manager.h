@@ -54,8 +54,9 @@ private:
     LeaderboardInfo leaderboard_info;
     SDL2pp::Texture* waiting_room_background;
 
-
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
+
+    nlohmann::json parse_file_data(const std::string& json_data);
 
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
@@ -99,10 +100,10 @@ public:
     void draw_row(const std::string& sentence, int x, int y, const SDL2pp::Color& color,
                   int font_size);
     void render_stats(const PlayerInfo& player);
-    nlohmann::json load_json_file(const std::string& path);
     std::optional<ButtonType> interact_button(int x, int y, int time);
 
-    void load_city(const std::string& city_name);
+    void load_city(const std::string& city_name, const std::string& bridges_data,
+                   const std::string& decorations_data);
     void render_shop(int time, int time_penalty, int upgrades_remaining,
                      int upgrade_shop_countdown);
 

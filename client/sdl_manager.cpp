@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -29,7 +28,7 @@ SDLManager::SDLManager():
         shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH),
         leaderboard_info(renderer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    load_city(DEFAULT_CITY);
+    // load_city(DEFAULT_CITY);
 
     int idx = std::rand() % WAITING_ROOMS.size();
     const std::string& selected = WAITING_ROOMS[idx];
@@ -64,6 +63,21 @@ std::vector<SDL2pp::Rect> SDLManager::loadRects(const nlohmann::json& data) {
         }
     }
     return rects;
+}
+
+nlohmann::json SDLManager::parse_file_data(const std::string& json_data) {
+
+    try {
+
+        if (json_data.empty())
+            return nlohmann::json::array();
+
+        return nlohmann::json::parse(json_data);
+    } catch (const std::exception& e) {
+
+        std::cerr << "Error parsing JSON: " << e.what() << std::endl;
+        return nlohmann::json::array();
+    }
 }
 
 void SDLManager::update_camera(const int player_x, const int player_y) {
@@ -561,17 +575,6 @@ void SDLManager::load_decorations_rects(const nlohmann::json& decorations_rects_
     decorations_rects = loadRects(decorations_rects_data);
 }
 
-nlohmann::json SDLManager::load_json_file(const std::string& path) {
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        throw std::runtime_error("Could not open JSON file: " + path);
-    }
-
-    nlohmann::json data;
-    file >> data;
-    return data;
-}
-
 std::optional<ButtonType> SDLManager::interact_button(int x, int y, int time) {
     return shop.interact_button(x, y, time);
 }
@@ -656,22 +659,17 @@ void SDLManager::render_hint(const CarPositionDTO& player, const SDL2pp::Rect& v
     renderer.Copy(arrow_texture, SDL2pp::NullOpt, dst, angle, SDL2pp::NullOpt, SDL_FLIP_NONE);
 }
 
-void SDLManager::load_city(const std::string& city_name) {
-    // todo en minusculas
+void SDLManager::load_city(const std::string& city_name, const std::string& bridges_data,
+                           const std::string& decorations_data) {
 
     map_name = std::string(MAP_BACKGROUND_PREFIX) + city_name + MAP_BACKGROUND_SUFFIX;
 
-    std::string city_name_lower = city_name;
-    std::transform(city_name_lower.begin(), city_name_lower.end(), city_name_lower.begin(),
-                   ::tolower);
-    // separate city_name lower with _
-    std::replace(city_name_lower.begin(), city_name_lower.end(), ' ', '_');
-    decoration = std::string(DECORATIONS_PREFIX) + city_name_lower + JSON_SUFFIX;
-    bridges = std::string(BRIDGES_PREFIX) + city_name_lower + JSON_SUFFIX;
+    nlohmann::json parsed_bridges_data = parse_file_data(bridges_data);
+    nlohmann::json parsed_decorations_data = parse_file_data(decorations_data);
 
     set_minimap();
-    load_bridges_rects(load_json_file(bridges));
-    load_decorations_rects(load_json_file(decoration));
+    load_bridges_rects(parsed_bridges_data);
+    load_decorations_rects(parsed_decorations_data);
 }
 
 void SDLManager::render_text(const std::string& text, const SDL2pp::Color& text_color, int size) {

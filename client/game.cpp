@@ -226,7 +226,7 @@ bool Game::update_upgrade() {
                 if (current_city != race.city) {
 
                     current_city = race.city;
-                    sdl.load_city(race.city);
+                    sdl.load_city(race.city, race.bridges_data, race.decorations_data);
                 }
                 if (!sdl.is_shop_open())
                     sdl.toggle_shop();
