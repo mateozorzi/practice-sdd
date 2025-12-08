@@ -12,6 +12,8 @@ constexpr std::string_view GAME = "GAME";
 constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
 constexpr std::string_view SERVER = "SERVER";
+constexpr std::string_view SERVER_MAIN = "SERVER_MAIN";
+
 
 // Acceptor
 constexpr uint32_t FIRST_CLIENT_ID = 1;
@@ -53,11 +55,26 @@ constexpr float STATIC_COLLISION_VELOCITY_REDUCTION = 0.05f;
 constexpr float GAME_STEP = 1.0f / 60.0f;
 constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
+constexpr uint8_t INITIAL_RACE_INDEX = 0;
+
+// Main
+constexpr uint8_t SUCCESS = 0;
+constexpr uint8_t ERROR = 1;
+constexpr std::string_view UNKNOWN_EXCEPTION = "Unknown exception";
 
 // Server
 constexpr char SERVER_CMD_EXIT = 'q';
 constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
 constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
 constexpr std::string_view SERVER_CONFIG_FILEPATH = "/etc/nfs";
+
+// RaceLoader
+constexpr uint8_t ID = 0;
+constexpr uint8_t ORIENTATION = 1;
+constexpr uint8_t X_CENTER = 2;
+constexpr uint8_t Y_CENTER = 3;
+constexpr uint8_t WIDTH = 4;
+constexpr uint8_t HEIGHT = 5;
+
 
 #endif

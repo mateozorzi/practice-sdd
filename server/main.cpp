@@ -7,13 +7,7 @@
 #include "server.h"
 #include "server_config.h"
 #include "server_config_loader.h"
-
-
-constexpr uint8_t SUCCESS = 0;
-constexpr uint8_t ERROR = 1;
-
-constexpr std::string_view SERVER_MAIN = "SERVER_MAIN";
-constexpr std::string_view UNKNOWN_EXCEPTION = "Unknown exception";
+#include "server_constants.h"
 
 
 int main() {

@@ -49,7 +49,7 @@ class GameLoop final: public Thread {
     std::chrono::seconds race_timeout_seconds;
     std::chrono::seconds leaderboard_seconds;
     std::chrono::seconds game_finish_seconds;
-    uint8_t current_race_index = 0;
+    uint8_t current_race_index = INITIAL_RACE_INDEX;
 
     GameMonitor& game_monitor;
     Queue<GameCommand>& command_queue;
