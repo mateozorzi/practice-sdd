@@ -292,9 +292,11 @@ TEST_F(ClientProtocolTest, SendExit_WithMock) {
     }
 }
 
+
 TEST_F(ClientProtocolTest, SendRaceSelection_WithMock) {
-    RaceDTO race1("Race1", "City1", {}, 3);
-    RaceDTO race2("Race2", "City2", {}, 5);
+
+    RaceDTO race1("Race1", "City1", {}, 3, "[]", "[]");
+    RaceDTO race2("Race2", "City2", {}, 5, "[]", "[]");
     std::vector<RaceDTO> races = {race1, race2};
 
     std::vector<uint8_t> captured_bytes;
@@ -307,15 +309,16 @@ TEST_F(ClientProtocolTest, SendRaceSelection_WithMock) {
 
     protocol->send_races_selection(races);
 
-    // check size sent
-    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT32_T + SIZE_UINT8_T +
-                           SIZE_UINT8_T + SIZE_UINT8_T +
-                           (SIZE_UINT32_T + race1.name.size() + SIZE_UINT32_T + race1.city.size() +
-                            SIZE_UINT8_T + SIZE_UINT8_T) +
-                           (SIZE_UINT32_T + race2.name.size() + SIZE_UINT32_T + race2.city.size() +
-                            SIZE_UINT8_T + SIZE_UINT8_T);  // action + size of string + string bytes
+    auto race_size = [&](const RaceDTO& r) {
+        return (SIZE_UINT32_T + r.name.size()) + (SIZE_UINT32_T + r.city.size()) + SIZE_UINT8_T +
+               SIZE_UINT8_T + (SIZE_UINT32_T + r.bridges_data.size()) +
+               (SIZE_UINT32_T + r.decorations_data.size());
+    };
 
-    EXPECT_EQ(expected_size, captured_bytes.size());
+    size_t expected_size = SIZE_UINT8_T + SIZE_UINT32_T + SIZE_UINT32_T + SIZE_UINT8_T +
+                           SIZE_UINT8_T + SIZE_UINT8_T + race_size(race1) + race_size(race2);
+
+    EXPECT_EQ(captured_bytes.size(), expected_size);
 }
 
 
@@ -507,32 +510,32 @@ TEST_F(ClientProtocolTest, ReceiveID_WithMock) {
 
 TEST_F(ClientProtocolTest, ReceiveRace_WithMock) {
     // push mock data
-    std::vector<uint8_t> mock_data = {
-            0x00, 0x00, 0x00, 0x07,             // string size = 7
-            'R', 'a', 'c', 'e', '1', '2', '3',  // name = "Race123"
-            0x00, 0x00, 0x00, 0x04,             // string size = 4
-            'C', 'i', 't', 'y',                 // city = "City"
-            0x02,                               // checkpoints size = 2
-            // First checkpoint
-            0x01,                    // id = 1
-            0x00, 0x00, 0x00, 0x01,  // orientation = 1 ('H')
-            'H',                     // orientation = 'H'
-            0x00, 0x64,              // x = 100
-            0x00, 0xC8,              // y = 200
-            0x0A,                    // width = 10
-            0x14,                    // height = 20
-            0x00,                    // is_finish_line = false
-            // Second checkpoint
-            0x02,                    // id = 2
-            0x00, 0x00, 0x00, 0x01,  // orientation = 1 ('V')
-            'V',                     // orientation = 'V'
-            0x01, 0x2C,              // x = 300
-            0x01, 0x90,              // y = 400
-            0x14,                    // width = 20
-            0x1E,                    // height = 30
-            0x01,                    // is_finish_line = true
-            0x03                     // laps = 3
-    };
+    std::vector<uint8_t> mock_data = {0x00, 0x00, 0x00, 0x07,             // string size = 7
+                                      'R', 'a', 'c', 'e', '1', '2', '3',  // name = "Race123"
+                                      0x00, 0x00, 0x00, 0x04,             // string size = 4
+                                      'C', 'i', 't', 'y',                 // city = "City"
+                                      0x02,                               // checkpoints size = 2
+                                      // First checkpoint
+                                      0x01,                    // id = 1
+                                      0x00, 0x00, 0x00, 0x01,  // orientation = 1 ('H')
+                                      'H',                     // orientation = 'H'
+                                      0x00, 0x64,              // x = 100
+                                      0x00, 0xC8,              // y = 200
+                                      0x0A,                    // width = 10
+                                      0x14,                    // height = 20
+                                      0x00,                    // is_finish_line = false
+                                      // Second checkpoint
+                                      0x02,                    // id = 2
+                                      0x00, 0x00, 0x00, 0x01,  // orientation = 1 ('V')
+                                      'V',                     // orientation = 'V'
+                                      0x01, 0x2C,              // x = 300
+                                      0x01, 0x90,              // y = 400
+                                      0x14,                    // width = 20
+                                      0x1E,                    // height = 30
+                                      0x01,                    // is_finish_line = true
+                                      0x03,                    // laps = 3
+                                      0x00, 0x00, 0x00, 0x02, '[', ']', 0x00, 0x00, 0x00, 0x02, '[',
+                                      ']'};
 
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);
     size_t read_pos = 0;
@@ -548,25 +551,27 @@ TEST_F(ClientProtocolTest, ReceiveRace_WithMock) {
             });
     RaceDTO race = protocol->receive_race();
 
-    // Verify received data
     EXPECT_EQ(race.name, "Race123");
     EXPECT_EQ(race.city, "City");
     EXPECT_EQ(race.size_checkpoints, 2);
     EXPECT_EQ(race.laps, 3);
-    // First checkpoint
+
     EXPECT_EQ(race.checkpoints[0].id, 1);
     EXPECT_EQ(race.checkpoints[0].orientation, 'H');
     EXPECT_EQ(race.checkpoints[0].x, 100);
     EXPECT_EQ(race.checkpoints[0].y, 200);
     EXPECT_EQ(race.checkpoints[0].width, 10);
     EXPECT_EQ(race.checkpoints[0].height, 20);
-    // Second checkpoint
+
     EXPECT_EQ(race.checkpoints[1].id, 2);
     EXPECT_EQ(race.checkpoints[1].orientation, 'V');
     EXPECT_EQ(race.checkpoints[1].x, 300);
     EXPECT_EQ(race.checkpoints[1].y, 400);
     EXPECT_EQ(race.checkpoints[1].width, 20);
     EXPECT_EQ(race.checkpoints[1].height, 30);
+
+    EXPECT_EQ(race.bridges_data, "[]");
+    EXPECT_EQ(race.decorations_data, "[]");
 }
 
 TEST_F(ClientProtocolTest, ReceiveUpdatePositions_WithMock) {

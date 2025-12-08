@@ -317,8 +317,10 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     offset += 1;
 }
 
+
 TEST_F(ServerProtocolTest, SendRaceUpdate) {
-    RaceDTO race("Grand Prix", "Monaco", {}, 3);
+
+    RaceDTO race("Grand Prix", "Monaco", {}, 3, "[]", "[]");
     GameUpdateDTO snapshot(GameLoopAction::SEND_RACE, race);
 
     std::vector<uint8_t> captured_bytes;
@@ -328,46 +330,46 @@ TEST_F(ServerProtocolTest, SendRaceUpdate) {
                 captured_bytes.assign(bytes, bytes + len);
                 return len;
             });
+
     protocol->send_game_update(snapshot);
 
-    // calculate expected size
-    size_t expected_size = SIZE_UINT8_T +  // gameloop action
-                           SIZE_UINT32_T + race.name.size() + SIZE_UINT32_T + race.city.size() +
-                           SIZE_UINT8_T + SIZE_UINT8_T;
+    size_t expected_size = SIZE_UINT8_T + (SIZE_UINT32_T + race.name.size()) +
+                           (SIZE_UINT32_T + race.city.size()) + SIZE_UINT8_T + SIZE_UINT8_T +
+                           (SIZE_UINT32_T + race.bridges_data.size()) +
+                           (SIZE_UINT32_T + race.decorations_data.size());
+
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
-    // verify data
     size_t offset = 0;
-    // gameloop action
+
     EXPECT_EQ(captured_bytes[offset], static_cast<uint8_t>(snapshot.gameloop_action));
     offset += 1;
-    // size race name
-    uint32_t name_size = (static_cast<uint32_t>(captured_bytes[offset]) << 24) |
-                         (static_cast<uint32_t>(captured_bytes[offset + 1]) << 16) |
-                         (static_cast<uint32_t>(captured_bytes[offset + 2]) << 8) |
-                         (static_cast<uint32_t>(captured_bytes[offset + 3]));
-    EXPECT_EQ(name_size, race.name.size());
-    offset += 4;
-    // race name string
-    std::string name(captured_bytes.begin() + offset, captured_bytes.begin() + offset + name_size);
-    EXPECT_EQ(name, race.name);
-    offset += name_size;
-    // size race city
-    uint32_t city_size = (static_cast<uint32_t>(captured_bytes[offset]) << 24) |
-                         (static_cast<uint32_t>(captured_bytes[offset + 1]) << 16) |
-                         (static_cast<uint32_t>(captured_bytes[offset + 2]) << 8) |
-                         (static_cast<uint32_t>(captured_bytes[offset + 3]));
-    EXPECT_EQ(city_size, race.city.size());
-    offset += 4;
-    // race city string
-    std::string city(captured_bytes.begin() + offset, captured_bytes.begin() + offset + city_size);
-    EXPECT_EQ(city, race.city);
-    offset += city_size;
-    // size checkpoints byte
+
+    auto read_string = [&](const std::string& expected) {
+        uint32_t len = (captured_bytes[offset] << 24) | (captured_bytes[offset + 1] << 16) |
+                       (captured_bytes[offset + 2] << 8) | (captured_bytes[offset + 3]);
+        EXPECT_EQ(len, expected.size());
+        offset += 4;
+
+        std::string str(captured_bytes.begin() + offset, captured_bytes.begin() + offset + len);
+        EXPECT_EQ(str, expected);
+        offset += len;
+    };
+
+    read_string(race.name);
+    read_string(race.city);
+
     EXPECT_EQ(captured_bytes[offset], race.size_checkpoints);
     offset += 1;
-    // laps byte
+
     EXPECT_EQ(captured_bytes[offset], race.laps);
+    offset += 1;
+
+    read_string(race.bridges_data);
+
+    read_string(race.decorations_data);
+
+    EXPECT_EQ(offset, captured_bytes.size());
 }
 
 TEST_F(ServerProtocolTest, SendLeaderboardUpdate) {
@@ -538,9 +540,11 @@ TEST_F(ServerProtocolTest, SendLobbyCatalogue) {
     offset += 1;
 }
 
+
 TEST_F(ServerProtocolTest, SendRaceCatalogue) {
-    RaceDTO race1("Grand Prix", "Monaco", {}, 3);
-    RaceDTO race2("Speedway", "Daytona", {}, 5);
+
+    RaceDTO race1("Grand Prix", "Monaco", {}, 3, "[]", "[]");
+    RaceDTO race2("Speedway", "Daytona", {}, 5, "[]", "[]");
     std::vector<RaceDTO> races = {race1, race2};
     RaceCatalogueDTO race_catalogue(races);
 
@@ -551,83 +555,53 @@ TEST_F(ServerProtocolTest, SendRaceCatalogue) {
                 captured_bytes.assign(bytes, bytes + len);
                 return len;
             });
+
     protocol->send_races_catalogue(race_catalogue);
 
-    // calculate expected size
-    size_t expected_size = SIZE_UINT8_T +  // size catalogue
-                           (SIZE_UINT32_T + race1.name.size() + SIZE_UINT32_T + race1.city.size() +
-                            SIZE_UINT8_T + SIZE_UINT8_T) +
-                           (SIZE_UINT32_T + race2.name.size() + SIZE_UINT32_T + race2.city.size() +
-                            SIZE_UINT8_T + SIZE_UINT8_T);
+    auto race_size = [](const RaceDTO& r) {
+        return SIZE_UINT32_T + r.name.size() + SIZE_UINT32_T + r.city.size() + SIZE_UINT8_T +
+               SIZE_UINT8_T + SIZE_UINT32_T + r.bridges_data.size() + SIZE_UINT32_T +
+               r.decorations_data.size();
+    };
+
+    size_t expected_size = SIZE_UINT8_T + race_size(race1) + race_size(race2);
+
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
-    // verify data
     size_t offset = 0;
-    // size catalogue byte
+
     EXPECT_EQ(captured_bytes[offset], static_cast<uint8_t>(race_catalogue.size));
     offset += 1;
-    // race1
-    // race name size bytes
-    uint32_t race_name_size1 = (static_cast<uint32_t>(captured_bytes[offset]) << 24) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 1]) << 16) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 2]) << 8) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 3]));
-    EXPECT_EQ(race_name_size1, race1.name.size());
-    offset += 4;
-    // race name string
-    std::string race_name1(captured_bytes.begin() + offset,
-                           captured_bytes.begin() + offset + race_name_size1);
-    EXPECT_EQ(race_name1, race1.name);
-    offset += race_name_size1;
-    // race city size bytes
-    uint32_t race_city_size1 = (static_cast<uint32_t>(captured_bytes[offset]) << 24) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 1]) << 16) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 2]) << 8) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 3]));
-    EXPECT_EQ(race_city_size1, race1.city.size());
-    offset += 4;
-    // race city string
-    std::string race_city1(captured_bytes.begin() + offset,
-                           captured_bytes.begin() + offset + race_city_size1);
-    EXPECT_EQ(race_city1, race1.city);
-    offset += race_city_size1;
-    // size checkpoints byte
-    EXPECT_EQ(captured_bytes[offset], race1.size_checkpoints);
-    offset += 1;
-    // laps byte
-    EXPECT_EQ(captured_bytes[offset], race1.laps);
-    offset += 1;
-    // race2
-    // race name size bytes
-    uint32_t race_name_size2 = (static_cast<uint32_t>(captured_bytes[offset]) << 24) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 1]) << 16) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 2]) << 8) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 3]));
-    EXPECT_EQ(race_name_size2, race2.name.size());
-    offset += 4;
-    // race name string
-    std::string race_name2(captured_bytes.begin() + offset,
-                           captured_bytes.begin() + offset + race_name_size2);
-    EXPECT_EQ(race_name2, race2.name);
-    offset += race_name_size2;
-    // race city size bytes
-    uint32_t race_city_size2 = (static_cast<uint32_t>(captured_bytes[offset]) << 24) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 1]) << 16) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 2]) << 8) |
-                               (static_cast<uint32_t>(captured_bytes[offset + 3]));
-    EXPECT_EQ(race_city_size2, race2.city.size());
-    offset += 4;
-    // race city string
-    std::string race_city2(captured_bytes.begin() + offset,
-                           captured_bytes.begin() + offset + race_city_size2);
-    EXPECT_EQ(race_city2, race2.city);
-    offset += race_city_size2;
-    // size checkpoints byte
-    EXPECT_EQ(captured_bytes[offset], race2.size_checkpoints);
-    offset += 1;
-    // laps byte
-    EXPECT_EQ(captured_bytes[offset], race2.laps);
-    offset += 1;
+
+    auto check_string = [&](const std::string& expected) {
+        uint32_t len = (captured_bytes[offset] << 24) | (captured_bytes[offset + 1] << 16) |
+                       (captured_bytes[offset + 2] << 8) | (captured_bytes[offset + 3]);
+        EXPECT_EQ(len, expected.size());
+        offset += 4;
+
+        std::string s(captured_bytes.begin() + offset, captured_bytes.begin() + offset + len);
+        EXPECT_EQ(s, expected);
+        offset += len;
+    };
+
+    auto check_race = [&](const RaceDTO& r) {
+        check_string(r.name);
+        check_string(r.city);
+
+        EXPECT_EQ(captured_bytes[offset], r.size_checkpoints);
+        offset += 1;
+
+        EXPECT_EQ(captured_bytes[offset], r.laps);
+        offset += 1;
+
+        check_string(r.bridges_data);
+        check_string(r.decorations_data);
+    };
+
+    check_race(race1);
+    check_race(race2);
+
+    EXPECT_EQ(offset, captured_bytes.size());
 }
 
 // RECEIVE

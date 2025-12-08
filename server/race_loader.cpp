@@ -45,7 +45,7 @@ RaceDTO RaceLoader::load_single_race(const std::filesystem::path& path) {
                                                static_cast<uint8_t>(std::stoi(row[HEIGHT]))));
     }
 
-    return RaceDTO(path.stem().string(), city_name, checkpoints, number_of_laps);
+    return RaceDTO(path.stem().string(), city_name, checkpoints, number_of_laps, "[]", "[]");
 }
 
 

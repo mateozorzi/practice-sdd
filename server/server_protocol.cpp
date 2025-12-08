@@ -57,6 +57,8 @@ void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
     for (const auto& checkpoint: race.checkpoints) add_checkpoint_to_buffer(checkpoint);
 
     add_uint8_to_buffer(race.laps);
+    add_string_to_buffer(race.bridges_data);
+    add_string_to_buffer(race.decorations_data);
 }
 
 void ServerProtocol::add_game_to_buffer(const LobbyDTO& lobby_dto) {
@@ -104,7 +106,10 @@ RaceDTO ServerProtocol::receive_race() {
 
     const uint8_t laps = recv_uint8();
 
-    return RaceDTO(name, city, std::move(checkpoints), laps);
+    const std::string bridges_data = recv_string();
+    const std::string decorations_data = recv_string();
+
+    return RaceDTO(name, city, std::move(checkpoints), laps, bridges_data, decorations_data);
 }
 
 RaceCatalogueDTO ServerProtocol::receive_races() {

@@ -136,6 +136,8 @@ void ClientProtocol::send_race(const RaceDTO& race) {
         add_uint8_to_buffer(static_cast<uint8_t>(c.is_finish_line));
     }
     add_uint8_to_buffer(race.laps);
+    add_string_to_buffer(race.bridges_data);
+    add_string_to_buffer(race.decorations_data);
 }
 
 void ClientProtocol::send_races_selection(const std::vector<RaceDTO>& races) {
@@ -324,7 +326,10 @@ RaceDTO ClientProtocol::receive_race() {
         checkpoints.push_back(c);
     }
     const uint8_t laps = recv_uint8();
-    return RaceDTO(name, city, std::move(checkpoints), laps);
+    const std::string bridges_data = recv_string();
+    const std::string decorations_data = recv_string();
+
+    return RaceDTO(name, city, std::move(checkpoints), laps, bridges_data, decorations_data);
 }
 
 RaceCatalogueDTO ClientProtocol::receive_race_catalogue() {
