@@ -6,8 +6,6 @@
 #include <variant>
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
 #include "../common/car_catalogue_dto.h"
 #include "../common/car_dto.h"
 #include "../common/game_update_dto.h"
@@ -345,17 +343,6 @@ uint32_t ClientProtocol::receive_id() {
     uint32_t player_id = recv_uint32();
 
     return player_id;
-}
-
-nlohmann::json ClientProtocol::get_json(const std::string& file_path) {
-
-    add_uint8_to_buffer(static_cast<uint8_t>(ClientAction::GET_JSON_FILE));
-    add_string_to_buffer(file_path);
-    send_buffer();
-
-    std::string json_content = recv_string();
-
-    return nlohmann::json::parse(json_content);
 }
 
 void ClientProtocol::send_client_action(ClientAction action) {

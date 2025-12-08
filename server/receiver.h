@@ -2,8 +2,6 @@
 #define RECEIVER_H
 
 
-#include <string>
-
 #include "../common/constants.h"
 #include "../common/thread.h"
 
@@ -21,8 +19,6 @@ class Receiver final: public Thread {
     Lobby& lobby;
     uint32_t player_id;
     Queue<GameCommand>& command_queue;
-
-    void handle_get_json_file(const std::string& file_path);
 
 
 public:

@@ -59,7 +59,7 @@ void ServerProtocol::add_race_to_buffer(const RaceDTO& race) {
     add_uint8_to_buffer(race.laps);
 }
 
-void ServerProtocol::add_lobby_to_buffer(const LobbyDTO& lobby_dto) {
+void ServerProtocol::add_game_to_buffer(const LobbyDTO& lobby_dto) {
 
     add_uint8_to_buffer(static_cast<uint8_t>(lobby_dto.action));
     add_uint32_to_buffer(lobby_dto.lobby_id);
@@ -74,85 +74,6 @@ PlayerDTO ServerProtocol::receive_username() {
     const std::string& username = recv_string();
 
     return PlayerDTO(username);
-}
-
-LobbyDTO ServerProtocol::receive_lobby_info() {
-
-    const uint8_t action_byte = recv_uint8();
-    const uint32_t lobby_id = recv_uint32();
-    const std::string lobby_name = recv_string();
-    const uint8_t max_players = recv_uint8();
-    const uint8_t active_players = recv_uint8();
-
-    RaceCatalogueDTO selected_races = receive_races();
-
-    LobbyAction action = static_cast<LobbyAction>(action_byte);
-
-    return LobbyDTO(action, lobby_id, lobby_name, max_players, active_players, selected_races);
-}
-
-MovementDTO ServerProtocol::receive_movement() {
-
-    const uint8_t direction_byte = recv_uint8();
-    const uint8_t is_moving_byte = recv_uint8();
-
-    Direction direction = static_cast<Direction>(direction_byte);
-    bool is_moving = (is_moving_byte != 0);
-
-    return MovementDTO(direction, is_moving);
-}
-
-
-GameCommandDTO ServerProtocol::receive_game_command() {
-
-    const uint8_t action_byte = recv_uint8();
-    const ClientAction client_action = static_cast<ClientAction>(action_byte);
-
-    switch (client_action) {
-
-        case ClientAction::DISCONNECT:
-            return GameCommandDTO(client_action);
-        case ClientAction::SEND_CAR_SELECTION:
-            return GameCommandDTO(client_action, receive_car_selection());
-        case ClientAction::SEND_UPGRADE:
-            return GameCommandDTO(client_action, receive_upgrade());
-        case ClientAction::SEND_CAR_MOVEMENT:
-            return GameCommandDTO(client_action, receive_movement());
-        case ClientAction::GET_JSON_FILE:
-            return GameCommandDTO(client_action, recv_string());
-        case ClientAction::CHEAT_WIN_RACE:
-            return GameCommandDTO(client_action);
-        case ClientAction::CHEAT_WIN_GAME:
-            return GameCommandDTO(client_action);
-        case ClientAction::CHEAT_INFINITE_HEALTH:
-            return GameCommandDTO(client_action);
-        default:
-            return GameCommandDTO(ClientAction::DISCONNECT);
-    }
-}
-
-
-void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto) {
-
-    add_uint8_to_buffer(car_catalogue_dto.size);
-
-    for (const auto& car: car_catalogue_dto.cars) {
-        add_string_to_buffer(car.model);
-        add_uint16_to_buffer(car.health);
-        add_uint8_to_buffer(car.handling);
-        add_uint8_to_buffer(car.speed);
-        add_uint8_to_buffer(car.acceleration);
-    }
-
-    send_buffer();
-}
-
-BuyUpgradeDTO ServerProtocol::receive_upgrade() {
-
-    const uint8_t upgrade = recv_uint8();
-    const ButtonType upgrade_type = static_cast<ButtonType>(upgrade);
-
-    return BuyUpgradeDTO{upgrade_type};
 }
 
 CarDTO ServerProtocol::receive_car_selection() {
@@ -196,16 +117,70 @@ RaceCatalogueDTO ServerProtocol::receive_races() {
     return RaceCatalogueDTO(std::move(races));
 }
 
-void ServerProtocol::send_player_id(const uint32_t player_id) {
+MovementDTO ServerProtocol::receive_movement() {
 
-    add_uint32_to_buffer(player_id);
+    const uint8_t direction_byte = recv_uint8();
+    const uint8_t is_moving_byte = recv_uint8();
 
-    send_buffer();
+    Direction direction = static_cast<Direction>(direction_byte);
+    bool is_moving = (is_moving_byte != 0);
+
+    return MovementDTO(direction, is_moving);
 }
+
+BuyUpgradeDTO ServerProtocol::receive_upgrade() {
+
+    const uint8_t upgrade = recv_uint8();
+    const ButtonType upgrade_type = static_cast<ButtonType>(upgrade);
+
+    return BuyUpgradeDTO{upgrade_type};
+}
+
+
+LobbyDTO ServerProtocol::receive_lobby_info() {
+
+    const uint8_t action_byte = recv_uint8();
+    const uint32_t lobby_id = recv_uint32();
+    const std::string lobby_name = recv_string();
+    const uint8_t max_players = recv_uint8();
+    const uint8_t active_players = recv_uint8();
+
+    RaceCatalogueDTO selected_races = receive_races();
+
+    LobbyAction action = static_cast<LobbyAction>(action_byte);
+
+    return LobbyDTO(action, lobby_id, lobby_name, max_players, active_players, selected_races);
+}
+
+GameCommandDTO ServerProtocol::receive_game_command() {
+
+    const uint8_t action_byte = recv_uint8();
+    const ClientAction client_action = static_cast<ClientAction>(action_byte);
+
+    switch (client_action) {
+
+        case ClientAction::DISCONNECT:
+            return GameCommandDTO(client_action);
+        case ClientAction::SEND_CAR_SELECTION:
+            return GameCommandDTO(client_action, receive_car_selection());
+        case ClientAction::SEND_UPGRADE:
+            return GameCommandDTO(client_action, receive_upgrade());
+        case ClientAction::SEND_CAR_MOVEMENT:
+            return GameCommandDTO(client_action, receive_movement());
+        case ClientAction::CHEAT_WIN_RACE:
+            return GameCommandDTO(client_action);
+        case ClientAction::CHEAT_WIN_GAME:
+            return GameCommandDTO(client_action);
+        case ClientAction::CHEAT_INFINITE_HEALTH:
+            return GameCommandDTO(client_action);
+        default:
+            return GameCommandDTO(ClientAction::DISCONNECT);
+    }
+}
+
 
 void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
     const WorldSnapshotDTO& world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
     add_uint8_to_buffer(world_snapshot.size);
 
@@ -230,8 +205,6 @@ void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
 
 void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::SEND_RACE));
-
     const RaceDTO& race = std::get<RaceDTO>(snapshot.data);
     add_race_to_buffer(race);
     send_buffer();
@@ -239,7 +212,6 @@ void ServerProtocol::send_race_update(const GameUpdateDTO& snapshot) {
 
 void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(snapshot.gameloop_action));
 
     const LeaderboardDTO& leaderboard = std::get<LeaderboardDTO>(snapshot.data);
     add_string_to_buffer(leaderboard.race_name);
@@ -257,18 +229,33 @@ void ServerProtocol::send_leaderboard_update(const GameUpdateDTO& snapshot) {
     send_buffer();
 }
 
-void ServerProtocol::send_lobby_response(const LobbyDTO& lobby_dto) {
+void ServerProtocol::send_action_info(const GameUpdateDTO& action_info) {
 
-    add_lobby_to_buffer(lobby_dto);
+    const uint8_t info = std::get<uint8_t>(action_info.data);
+    add_uint8_to_buffer(info);
+    send_buffer();
+}
+
+void ServerProtocol::send_race_time(const GameUpdateDTO& race_time) {
+
+    const uint32_t elapsed_seconds = std::get<uint32_t>(race_time.data);
+    add_uint32_to_buffer(elapsed_seconds);
+    send_buffer();
+}
+
+
+void ServerProtocol::send_player_id(const uint32_t player_id) {
+
+    add_uint32_to_buffer(player_id);
 
     send_buffer();
 }
 
-void ServerProtocol::send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue) {
+void ServerProtocol::send_active_games(const LobbyCatalogueDTO& game_catalogue) {
 
-    add_uint8_to_buffer(lobby_catalogue.size);
+    add_uint8_to_buffer(game_catalogue.size);
 
-    for (const auto& lobby: lobby_catalogue.lobbies) add_lobby_to_buffer(lobby);
+    for (const auto& game: game_catalogue.lobbies) add_game_to_buffer(game);
 
     send_buffer();
 }
@@ -282,42 +269,62 @@ void ServerProtocol::send_races_catalogue(const RaceCatalogueDTO& races) {
     send_buffer();
 }
 
-void ServerProtocol::send_json_file(const std::string& file_path) {
+void ServerProtocol::send_lobby_response(const LobbyDTO& lobby_dto) {
 
-    std::ifstream file(file_path);
+    add_game_to_buffer(lobby_dto);
 
-    if (!file.is_open()) {
+    send_buffer();
+}
 
-        add_string_to_buffer("{}");
-        send_buffer();
-        return;
+void ServerProtocol::send_car_catalogue(const CarCatalogueDTO& car_catalogue_dto) {
+
+    add_uint8_to_buffer(car_catalogue_dto.size);
+
+    for (const auto& car: car_catalogue_dto.cars) {
+        add_string_to_buffer(car.model);
+        add_uint16_to_buffer(car.health);
+        add_uint8_to_buffer(car.handling);
+        add_uint8_to_buffer(car.speed);
+        add_uint8_to_buffer(car.acceleration);
     }
 
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string json_content = buffer.str();
-    add_string_to_buffer(json_content);
     send_buffer();
 }
 
-void ServerProtocol::send_game_action(const GameUpdateDTO& game_action) {
+void ServerProtocol::send_game_update(const GameUpdateDTO& game_update) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(game_action.gameloop_action));
+    add_uint8_to_buffer(static_cast<uint8_t>(game_update.gameloop_action));
+
+    switch (game_update.gameloop_action) {
+
+        case GameLoopAction::SEND_UPDATE_POSITIONS:
+            send_world_snapshot(game_update);
+            break;
+        case GameLoopAction::SEND_RACE:
+            send_race_update(game_update);
+            break;
+        case GameLoopAction::SEND_LEADERBOARD:
+            send_leaderboard_update(game_update);
+            break;
+        case GameLoopAction::START_SHOP:
+        case GameLoopAction::COUNTDOWN_TIME:
+        case GameLoopAction::SEND_UPGRADES_REMAINING:
+        case GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING:
+            send_action_info(game_update);
+            break;
+        case GameLoopAction::RACE_TIME:
+            send_race_time(game_update);
+            break;
+        default:
+            break;
+    }
+
     send_buffer();
 }
 
-void ServerProtocol::send_action_info(const GameUpdateDTO& action_info) {
 
-    add_uint8_to_buffer(static_cast<uint8_t>(action_info.gameloop_action));
-    const uint8_t info = std::get<uint8_t>(action_info.data);
-    add_uint8_to_buffer(info);
-    send_buffer();
-}
+void ServerProtocol::send_disconnection() {
 
-void ServerProtocol::send_race_time(const GameUpdateDTO& race_time) {
-
-    add_uint8_to_buffer(static_cast<uint8_t>(race_time.gameloop_action));
-    const uint32_t elapsed_seconds = std::get<uint32_t>(race_time.data);
-    add_uint32_to_buffer(elapsed_seconds);
+    add_uint8_to_buffer(static_cast<uint8_t>(GameLoopAction::DISCONNECT));
     send_buffer();
 }

@@ -39,7 +39,7 @@ class ClientHandler final: public Thread {
 
     void exit_lobby_and_play(Queue<GameCommand>& command_queue,
                              Queue<GameUpdateDTO>& snapshot_queue);
-    void create_new_game(uint8_t max_players, const std::string& lobby_name);
+    void create_new_game(uint8_t max_players, const std::string& game_name);
     void join_existing_game(uint32_t game_id);
 
     void exit_game();

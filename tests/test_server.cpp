@@ -167,7 +167,7 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
                 return len;
             });
 
-    protocol->send_world_snapshot(snapshot);
+    protocol->send_game_update(snapshot);
 
     // calculate expected size
     size_t expected_size = SIZE_UINT8_T +                            // gameloop action
@@ -328,7 +328,7 @@ TEST_F(ServerProtocolTest, SendRaceUpdate) {
                 captured_bytes.assign(bytes, bytes + len);
                 return len;
             });
-    protocol->send_race_update(snapshot);
+    protocol->send_game_update(snapshot);
 
     // calculate expected size
     size_t expected_size = SIZE_UINT8_T +  // gameloop action
@@ -384,7 +384,7 @@ TEST_F(ServerProtocolTest, SendLeaderboardUpdate) {
                 captured_bytes.assign(bytes, bytes + len);
                 return len;
             });
-    protocol->send_leaderboard_update(snapshot);
+    protocol->send_game_update(snapshot);
 
     // calculate expected size
     size_t expected_size =
@@ -463,7 +463,7 @@ TEST_F(ServerProtocolTest, SendLobbyCatalogue) {
                 captured_bytes.assign(bytes, bytes + len);
                 return len;
             });
-    protocol->send_lobby_catalogue(lobby_catalogue);
+    protocol->send_active_games(lobby_catalogue);
 
     // calculate expected size
     size_t expected_size = SIZE_UINT8_T +  // size catalogue

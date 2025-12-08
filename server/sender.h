@@ -1,8 +1,8 @@
 #ifndef SENDER_H
 #define SENDER_H
 
+
 #include "../common/constants.h"
-#include "../common/queue.h"
 #include "../common/thread.h"
 
 #include "lobby.h"
@@ -18,8 +18,8 @@ class Sender final {
     ServerProtocol& server_protocol;
     Lobby& lobby;
     uint32_t player_id;
-    Queue<GameUpdateDTO>& snapshot_queue;
-    std::atomic_bool keep_running;
+    Queue<GameUpdateDTO>& game_update_queue;
+    std::atomic_bool keep_running = true;
 
 
 public:
@@ -27,7 +27,7 @@ public:
     Sender& operator=(const Sender&) = delete;
 
     explicit Sender(ServerProtocol& server_protocol, Lobby& lobby, uint32_t player_id,
-                    Queue<GameUpdateDTO>& snapshot_queue);
+                    Queue<GameUpdateDTO>& game_update_queue);
 
     void run();
     bool is_alive();

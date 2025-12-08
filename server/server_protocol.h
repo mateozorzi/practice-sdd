@@ -24,7 +24,7 @@ class ServerProtocol final: public CommonProtocol {
     void add_player_to_buffer(const PlayerDTO& player);
     void add_checkpoint_to_buffer(const CheckpointDTO& checkpoint);
     void add_race_to_buffer(const RaceDTO& race);
-    void add_lobby_to_buffer(const LobbyDTO& lobby_dto);
+    void add_game_to_buffer(const LobbyDTO& lobby_dto);
 
     PlayerDTO receive_username();
     CarDTO receive_car_selection();
@@ -32,6 +32,12 @@ class ServerProtocol final: public CommonProtocol {
     RaceCatalogueDTO receive_races();
     MovementDTO receive_movement();
     BuyUpgradeDTO receive_upgrade();
+
+    void send_world_snapshot(const GameUpdateDTO& snapshot);
+    void send_race_update(const GameUpdateDTO& snapshot);
+    void send_leaderboard_update(const GameUpdateDTO& snapshot);
+    void send_action_info(const GameUpdateDTO& action_info);
+    void send_race_time(const GameUpdateDTO& race_time);
 
 
 public:
@@ -44,17 +50,14 @@ public:
     GameCommandDTO receive_game_command();
 
     void send_player_id(uint32_t player_id);
-    void send_car_catalogue(const CarCatalogueDTO& catalogue);
-    void send_world_snapshot(const GameUpdateDTO& snapshot);
-    void send_race_update(const GameUpdateDTO& snapshot);
-    void send_leaderboard_update(const GameUpdateDTO& snapshot);
-    void send_lobby_response(const LobbyDTO& lobby_dto);
-    void send_lobby_catalogue(const LobbyCatalogueDTO& lobby_catalogue);
+    void send_active_games(const LobbyCatalogueDTO& lobby_catalogue);
     void send_races_catalogue(const RaceCatalogueDTO& races);
-    void send_json_file(const std::string& file_path);
-    void send_game_action(const GameUpdateDTO& game_action);
-    void send_action_info(const GameUpdateDTO& action_info);
-    void send_race_time(const GameUpdateDTO& race_time);
+    void send_lobby_response(const LobbyDTO& lobby_dto);
+    void send_car_catalogue(const CarCatalogueDTO& catalogue);
+    void send_game_update(const GameUpdateDTO& game_update);
+
+    void send_disconnection();
+
 };
 
 

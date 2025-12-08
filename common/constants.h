@@ -11,7 +11,6 @@ enum class ClientAction : uint8_t {
     SEND_CAR_SELECTION = 0x01,
     SEND_UPGRADE = 0x02,
     SEND_CAR_MOVEMENT = 0x03,
-    GET_JSON_FILE = 0x04,
     CHEAT_WIN_RACE = 0x05,
     CHEAT_WIN_GAME = 0x06,
     CHEAT_INFINITE_HEALTH = 0x07,
@@ -60,9 +59,6 @@ constexpr uint16_t MASK_SENSOR = CATEGORY_CAR_GROUND | CATEGORY_CAR_BRIDGE | CAT
 constexpr char HORIZONTAL = 'H';
 constexpr char VERTICAL = 'V';
 constexpr char INTERSECTION = 'I';
-
-// SERVER
-constexpr int MAX_PATH_LENGTH = 4096;
 
 // EXCEPTIONS
 constexpr std::string_view EXCEPTION = "Exception";

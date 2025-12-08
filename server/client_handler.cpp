@@ -72,7 +72,7 @@ void ClientHandler::update_player_username(const std::string& actual_username) {
 void ClientHandler::list_active_games() {
 
     lobby.reap();
-    server_protocol.send_lobby_catalogue(lobby.list_games());
+    server_protocol.send_active_games(lobby.list_games());
 }
 
 
@@ -126,7 +126,7 @@ void ClientHandler::exit_lobby_and_play(Queue<GameCommand>& command_queue,
         is_in_lobby = true;
 }
 
-void ClientHandler::create_new_game(const uint8_t max_players, const std::string& lobby_name) {
+void ClientHandler::create_new_game(const uint8_t max_players, const std::string& game_name) {
 
     lobby.reap();
 
@@ -145,7 +145,7 @@ void ClientHandler::create_new_game(const uint8_t max_players, const std::string
     }
 
     auto result =
-            lobby.create_new_game(player_id, username, max_players, lobby_name, selected_races);
+            lobby.create_new_game(player_id, username, max_players, game_name, selected_races);
     if (!result.has_value()) {
 
         LobbyDTO lobby_dto(LobbyAction::CREATE_OR_JOIN_ERROR, 0, "", 0);
@@ -211,8 +211,7 @@ void ClientHandler::run() {
 void ClientHandler::exit_game() {
 
     if (!is_in_lobby)
-        server_protocol.send_game_action(
-                GameUpdateDTO(GameLoopAction::DISCONNECT, std::monostate{}));
+        server_protocol.send_disconnection();
 }
 
 
