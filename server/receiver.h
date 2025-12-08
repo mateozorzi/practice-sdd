@@ -20,6 +20,8 @@ class Receiver final: public Thread {
     uint32_t player_id;
     Queue<GameCommand>& command_queue;
 
+    void receiver_loop();
+
 
 public:
     Receiver(const Receiver&) = delete;

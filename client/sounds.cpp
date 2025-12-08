@@ -60,7 +60,8 @@ void Sounds::play_upgrade_sound() {
 }
 
 void Sounds::play_finished_race_sound() {
-    SDL2pp::Chunk& finished_race_sound = resources.get_sound("/var/nfs/assets/sounds/sfx_finished_race.wav");
+    SDL2pp::Chunk& finished_race_sound =
+            resources.get_sound("/var/nfs/assets/sounds/sfx_finished_race.wav");
     mixer.PlayChannel(finished_race_channel, finished_race_sound);
 }
 
@@ -115,10 +116,8 @@ void Sounds::play_background_music(int loops) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 1);
-    const std::vector<std::string> music_files = {
-        "/var/nfs/assets/music/trance-loop.wav",
-        "/var/nfs/assets/music/drill-drums-loop.wav"
-    };
+    const std::vector<std::string> music_files = {"/var/nfs/assets/music/trance-loop.wav",
+                                                  "/var/nfs/assets/music/drill-drums-loop.wav"};
     const std::string& selected_music = music_files[dis(gen)];
     SDL2pp::Chunk& music = resources.get_sound(selected_music);
     mixer.PlayChannel(music_channel, music, loops);

@@ -139,7 +139,8 @@ void SDLManager::render_hud_health(const int health, const int max_health) {
             SDL2pp::Rect(HEALTH_BAR_X, HEALTH_BAR_Y, current_health_width, HEALTH_BAR_HEIGHT));
 }
 
-void SDLManager::render_hud_minimap(int player_x, int player_y, const CheckpointDTO& next_checkpoint) {
+void SDLManager::render_hud_minimap(int player_x, int player_y,
+                                    const CheckpointDTO& next_checkpoint) {
     const int minimap_x = SCREEN_WIDTH - MINIMAP_WIDTH - MINIMAP_MARGIN;
     const int minimap_y = SCREEN_HEIGHT - MINIMAP_HEIGHT - MINIMAP_MARGIN;
 
@@ -166,7 +167,8 @@ void SDLManager::render_hud_minimap(int player_x, int player_y, const Checkpoint
 
     // Checkpoint en el minimapa
     const int checkpoint_minimap_x = minimap_x + (next_checkpoint.x * MINIMAP_WIDTH / WORLD_WIDTH);
-    const int checkpoint_minimap_y = minimap_y + (next_checkpoint.y * MINIMAP_HEIGHT / WORLD_HEIGHT);
+    const int checkpoint_minimap_y =
+            minimap_y + (next_checkpoint.y * MINIMAP_HEIGHT / WORLD_HEIGHT);
 
     // Dibujar checkpoint en minimapa (rojo si es normal, blanco si es la meta)
     if (next_checkpoint.is_finish_line) {
@@ -175,8 +177,8 @@ void SDLManager::render_hud_minimap(int player_x, int player_y, const Checkpoint
         renderer.SetDrawColor(COLOR_RED_R, COLOR_RED_G, COLOR_RED_B, COLOR_RED_A);
     }
     renderer.FillRect(SDL2pp::Rect(checkpoint_minimap_x - MINIMAP_PLAYER_OFFSET,
-                                   checkpoint_minimap_y - MINIMAP_PLAYER_OFFSET, MINIMAP_PLAYER_SIZE,
-                                   MINIMAP_PLAYER_SIZE));
+                                   checkpoint_minimap_y - MINIMAP_PLAYER_OFFSET,
+                                   MINIMAP_PLAYER_SIZE, MINIMAP_PLAYER_SIZE));
 }
 
 void SDLManager::render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view,
@@ -283,9 +285,7 @@ void SDLManager::set_sound_info(const std::vector<uint32_t>& ids) {
     sounds.initialize_channels(ids);
 }
 
-void SDLManager::play_background_music(const int loops) {
-    sounds.play_background_music(loops);
-}
+void SDLManager::play_background_music(const int loops) { sounds.play_background_music(loops); }
 
 void SDLManager::stop_background_music() { sounds.stop_background_music(); }
 
@@ -543,9 +543,9 @@ void SDLManager::render_stats(const PlayerInfo& player) {
     draw_row(player_time, text_x + o, text_y + o, outline_color, font_size);
     draw_row(player_time, text_x, text_y, text_color, font_size);
     text_y += spacing;
-    std::string player_lap =
-            "Lap :  " + std::to_string(player.current_lap) + " of " + std::to_string(player.race_lap);
-    
+    std::string player_lap = "Lap :  " + std::to_string(player.current_lap) + " of " +
+                             std::to_string(player.race_lap);
+
     draw_row(player_lap, text_x - o, text_y - o, outline_color, font_size);
     draw_row(player_lap, text_x + o, text_y - o, outline_color, font_size);
     draw_row(player_lap, text_x - o, text_y + o, outline_color, font_size);

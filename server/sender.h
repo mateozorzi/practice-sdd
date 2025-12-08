@@ -21,6 +21,8 @@ class Sender final {
     Queue<GameUpdateDTO>& game_update_queue;
     std::atomic_bool keep_running = true;
 
+    void sender_loop();
+
 
 public:
     Sender(const Sender&) = delete;
@@ -30,7 +32,6 @@ public:
                     Queue<GameUpdateDTO>& game_update_queue);
 
     void run();
-    bool is_alive();
     void stop();
 
     ~Sender();

@@ -28,9 +28,6 @@ class GameCommand {
 
 
 public:
-    // GameCommand(const GameCommand&) = delete;
-    // GameCommand& operator=(const GameCommand&) = delete;
-
     GameCommand();
 
     explicit GameCommand(uint32_t player_id, GameCommandDTO&& dto);

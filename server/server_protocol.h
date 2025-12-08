@@ -57,7 +57,6 @@ public:
     void send_game_update(const GameUpdateDTO& game_update);
 
     void send_disconnection();
-
 };
 
 

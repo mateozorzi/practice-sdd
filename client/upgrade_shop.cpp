@@ -114,8 +114,9 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
             title_texture, SDL2pp::NullOpt,
             SDL2pp::Rect(title_x, title_y, title_texture.GetWidth(), title_texture.GetHeight()));
 
-    //info penalty
-    std::string penalty_text = "Time penalty per Upgrade :  " + std::to_string(time_penalty) + " seg";
+    // info penalty
+    std::string penalty_text =
+            "Time penalty per Upgrade :  " + std::to_string(time_penalty) + " seg";
     SDL2pp::Color penalty_color(139, 0, 0, 255);  // DarkRed estándar
 
 
@@ -129,7 +130,7 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
                   SDL2pp::Rect(penalty_x, penalty_y, penalty_texture.GetWidth(),
                                penalty_texture.GetHeight()));
 
-    //info max upgrades
+    // info max upgrades
     std::string max_upgrades_text = "Upgrades remaining :  " + std::to_string(upgrades_remaining);
     SDL2pp::Color max_upgrades_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
 
@@ -183,7 +184,7 @@ void UpgradeShop::render(int player_time, Car player_car, const std::string& map
     }
 
     std::string countdown_text =
-        "The countdown starts in :  " + std::to_string(upgrade_shop_countdown+1) + " seg";
+            "The countdown starts in :  " + std::to_string(upgrade_shop_countdown + 1) + " seg";
 
     SDL2pp::Texture& countdown_texture =
             resources.get_text(countdown_text, font_path, UPGRADE_COUNTDOWN_FONT_SIZE, title_color);

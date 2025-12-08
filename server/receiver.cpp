@@ -1,7 +1,6 @@
 #include "receiver.h"
 
 #include <utility>
-#include <vector>
 
 #include "../common/liberror.h"
 
@@ -14,24 +13,28 @@ Receiver::Receiver(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t
         command_queue(command_queue) {}
 
 
+void Receiver::receiver_loop() {
+
+    while (should_keep_running()) {
+
+        GameCommandDTO game_command = server_protocol.receive_game_command();
+
+        command_queue.push(GameCommand(player_id, std::move(game_command)));
+
+        if (game_command.client_action == ClientAction::DISCONNECT) {
+
+            _is_alive = false;
+            break;
+        }
+    }
+}
+
+
 void Receiver::run() {
 
     try {
 
-        while (should_keep_running()) {
-
-            GameCommandDTO game_command = server_protocol.receive_game_command();
-
-            command_queue.push(GameCommand(player_id, std::move(game_command)));
-
-            if (game_command.client_action == ClientAction::DISCONNECT) {
-
-                _is_alive = false;
-                break;
-            }
-        }
-    } catch (const ClosedQueue&) {
-
+        receiver_loop();
     } catch (const LibError& e) {
 
     } catch (const std::exception& e) {

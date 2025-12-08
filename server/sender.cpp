@@ -12,24 +12,30 @@ Sender::Sender(ServerProtocol& server_protocol, Lobby& lobby, const uint32_t pla
         game_update_queue(game_update_queue) {}
 
 
+void Sender::sender_loop() {
+
+    while (keep_running) {
+
+        try {
+
+            GameUpdateDTO game_update = game_update_queue.pop();
+
+            server_protocol.send_game_update(game_update);
+
+        } catch (const ClosedQueue&) {
+
+            keep_running = false;
+            break;
+        }
+    }
+}
+
+
 void Sender::run() {
 
     try {
 
-        while (keep_running) {
-
-            try {
-
-                auto game_update = game_update_queue.pop();
-
-                server_protocol.send_game_update(game_update);
-
-            } catch (const ClosedQueue&) {
-
-                keep_running = false;
-                break;
-            }
-        }
+        sender_loop();
     } catch (const LibError&) {
 
     } catch (const std::exception& e) {
@@ -38,7 +44,6 @@ void Sender::run() {
     }
 }
 
-bool Sender::is_alive() { return keep_running; }
 
 void Sender::stop() {
 
@@ -52,7 +57,7 @@ Sender::~Sender() {
     std::cerr << "[" << SENDER << "] Stopping." << std::endl;
     try {
 
-        stop();
+        Sender::stop();
     } catch (const std::exception& e) {
 
         std::cerr << "[" << SENDER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
