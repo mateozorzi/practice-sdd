@@ -17,9 +17,6 @@ class CityLoader {
     std::vector<Npc> npcs;
 
     bool city_loaded = false;
-    std::string normalize_city_name(const std::string& city_name) const;
-    const CityLoaderConfig& obtain_city_loader_config(
-            const std::string& city_normalized_name) const;
 
     void load_collidables(const std::string& file, uint16_t collision_category,
                           uint16_t collision_mask);

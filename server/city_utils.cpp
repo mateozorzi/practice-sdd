@@ -10,8 +10,8 @@
 #include "world_creation_exception.h"
 
 
-CityUtils::CityUtils(b2World& box2d_world, const ServerConfig& server_config):
-        box2d_world(box2d_world), server_config(server_config) {}
+CityUtils::CityUtils(const ServerConfig& server_config):
+        server_config(server_config) {}
 
 
 std::array<b2Vec2, 4> CityUtils::obtain_b2_vertices(
@@ -34,6 +34,34 @@ std::array<b2Vec2, 4> CityUtils::obtain_b2_vertices(
 
 float CityUtils::pixels_to_meters(const float pixels) const {
     return pixels / server_config.world.pixels_per_meter;
+}
+
+
+std::string CityUtils::normalize_city_name(const std::string& city_name) const {
+
+    std::string modified_city_name = city_name;
+
+    std::transform(modified_city_name.begin(), modified_city_name.end(), modified_city_name.begin(),
+                   ::tolower);
+
+    std::replace(modified_city_name.begin(), modified_city_name.end(), ' ', '_');
+
+    return modified_city_name;
+}
+
+const CityLoaderConfig& CityUtils::obtain_city_loader_config(
+        const std::string& city_normalized_name) const {
+
+    if (city_normalized_name == "liberty_city")
+        return server_config.world.liberty_city;
+
+    if (city_normalized_name == "san_andreas")
+        return server_config.world.san_andreas;
+
+    if (city_normalized_name == "vice_city")
+        return server_config.world.vice_city;
+
+    throw std::runtime_error("Unknown city: " + city_normalized_name);
 }
 
 
@@ -72,7 +100,7 @@ std::vector<std::vector<std::vector<int>>> CityUtils::load_polygons_from_file(
 }
 
 
-void CityUtils::add_collidable(const std::vector<std::vector<int>>& polygon,
+void CityUtils::add_collidable(b2World& box2d_world, const std::vector<std::vector<int>>& polygon,
                                const uint16_t collision_category, const uint16_t collision_mask) {
 
     auto vertices = obtain_b2_vertices(polygon);
@@ -92,7 +120,7 @@ void CityUtils::add_collidable(const std::vector<std::vector<int>>& polygon,
     box2d_body->CreateFixture(&box2d_fixture_definition);
 }
 
-void CityUtils::add_sensor(const std::vector<std::vector<int>>& polygon, const SensorType type,
+void CityUtils::add_sensor(b2World& box2d_world, const std::vector<std::vector<int>>& polygon, const SensorType type,
                            const uint16_t collision_category, const uint16_t collision_mask) {
 
     auto vertices = obtain_b2_vertices(polygon);
@@ -123,7 +151,7 @@ void CityUtils::add_sensor(const std::vector<std::vector<int>>& polygon, const S
 }
 
 
-void CityUtils::add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collision_category,
+void CityUtils::add_checkpoint(b2World& box2d_world, const CheckpointDTO& checkpoint, uint16_t collision_category,
                                uint16_t collision_mask) {
 
     b2BodyDef box2d_body_definition;
@@ -149,7 +177,7 @@ void CityUtils::add_checkpoint(const CheckpointDTO& checkpoint, uint16_t collisi
 }
 
 
-void CityUtils::cleanup() {
+void CityUtils::cleanup(b2World& box2d_world) {
 
     std::vector<b2Body*> bodies_to_destroy;
 

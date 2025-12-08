@@ -13,35 +13,7 @@
 CityLoader::CityLoader(b2World& box2d_world, const ServerConfig& server_config):
         box2d_world(box2d_world),
         server_config(server_config),
-        city_utils(box2d_world, server_config) {}
-
-
-std::string CityLoader::normalize_city_name(const std::string& city_name) const {
-
-    std::string modified_city_name = city_name;
-
-    std::transform(modified_city_name.begin(), modified_city_name.end(), modified_city_name.begin(),
-                   ::tolower);
-
-    std::replace(modified_city_name.begin(), modified_city_name.end(), ' ', '_');
-
-    return modified_city_name;
-}
-
-const CityLoaderConfig& CityLoader::obtain_city_loader_config(
-        const std::string& city_normalized_name) const {
-
-    if (city_normalized_name == "liberty_city")
-        return server_config.world.liberty_city;
-
-    if (city_normalized_name == "san_andreas")
-        return server_config.world.san_andreas;
-
-    if (city_normalized_name == "vice_city")
-        return server_config.world.vice_city;
-
-    throw std::runtime_error("Unknown city: " + city_normalized_name);
-}
+        city_utils(server_config) {}
 
 
 void CityLoader::load_collidables(const std::string& file, const uint16_t collision_category,
@@ -53,7 +25,7 @@ void CityLoader::load_collidables(const std::string& file, const uint16_t collis
 
         try {
 
-            city_utils.add_collidable(polygon, collision_category, collision_mask);
+            city_utils.add_collidable(box2d_world, polygon, collision_category, collision_mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding collidable: " + std::string(e.what()));
@@ -66,11 +38,11 @@ void CityLoader::load_sensors(const std::string& file, SensorType type,
 
     auto sensors = city_utils.load_polygons_from_file(file);
 
-    for (const auto& poly: sensors) {
+    for (const auto& sensor: sensors) {
 
         try {
 
-            city_utils.add_sensor(poly, type, collision_category, collision_mask);
+            city_utils.add_sensor(box2d_world, sensor, type, collision_category, collision_mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding sensor: " + std::string(e.what()));
@@ -82,8 +54,8 @@ void CityLoader::load_npcs(const std::string& city_name) {
 
     npcs.clear();
 
-    std::string normalized_city = normalize_city_name(city_name);
-    std::string npc_file = "/var/nfs/world/npcs/npcs_" + normalized_city + ".json";
+    std::string normalized_city_name = city_utils.normalize_city_name(city_name);
+    std::string npc_file = "/var/nfs/world/npcs/npcs_" + normalized_city_name + ".json";
 
     try {
         std::ifstream file(npc_file);
@@ -125,7 +97,7 @@ void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints,
 
         try {
 
-            city_utils.add_checkpoint(checkpoint, collision_category, collision_mask);
+            city_utils.add_checkpoint(box2d_world, checkpoint, collision_category, collision_mask);
         } catch (const std::exception& e) {
 
             throw WorldCreationException("Error adding checkpoint: " + std::string(e.what()));
@@ -137,12 +109,12 @@ void CityLoader::load_checkpoints(const std::vector<CheckpointDTO>& checkpoints,
 void CityLoader::load_city(const std::string& city_name,
                            const std::vector<CheckpointDTO>& checkpoints) {
 
-    std::string city_normalized_name = normalize_city_name(city_name);
+    std::string normalized_city_name = city_utils.normalize_city_name(city_name);
 
     if (city_loaded)
-        city_utils.cleanup();
+        city_utils.cleanup(box2d_world);
 
-    const CityLoaderConfig& city_loader_config = obtain_city_loader_config(city_normalized_name);
+    const CityLoaderConfig& city_loader_config = city_utils.obtain_city_loader_config(normalized_city_name);
 
     load_collidables(city_loader_config.collidables.on_ground_collidable_file, CATEGORY_GROUND,
                      MASK_GROUND);
