@@ -11,6 +11,7 @@
 
 class CityLoader {
 
+
     b2World& box2d_world;
     const ServerConfig& server_config;
     CityUtils city_utils;

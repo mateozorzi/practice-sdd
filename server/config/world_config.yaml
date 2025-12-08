@@ -17,6 +17,9 @@ world:
     object_rendering:
       bridge: "/var/nfs/world/object_rendering/bridges_liberty_city.json"
       decoration: "/var/nfs/world/object_rendering/decorations_liberty_city.json"
+    
+    npc:
+      npc_file: "/var/nfs/world/npcs/npcs_liberty_city.json"
 
 
   san_andreas:
@@ -31,6 +34,9 @@ world:
     object_rendering:
       bridge: "/var/nfs/world/object_rendering/bridges_san_andreas.json"
       decoration: "/var/nfs/world/object_rendering/decorations_san_andreas.json"
+    
+    npc:
+      npc_file: "/var/nfs/world/npcs/npcs_san_andreas.json"
 
 
   vice_city:
@@ -45,3 +51,6 @@ world:
     object_rendering:
       bridge: "/var/nfs/world/object_rendering/bridges_vice_city.json"
       decoration: "/var/nfs/world/object_rendering/decorations_vice_city.json"
+    
+    npc:
+      npc_file: "/var/nfs/world/npcs/npcs_vice_city.json"

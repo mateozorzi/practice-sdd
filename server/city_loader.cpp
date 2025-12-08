@@ -53,7 +53,11 @@ void CityLoader::load_npcs(const std::string& city_name) {
     npcs.clear();
 
     std::string normalized_city_name = city_utils.normalize_city_name(city_name);
-    std::string npc_file = "/var/nfs/world/npcs/npcs_" + normalized_city_name + ".json";
+
+    const CityLoaderConfig& city_loader_config =
+            city_utils.obtain_city_loader_config(normalized_city_name);
+
+    std::string npc_file = city_loader_config.npc_file;
 
     try {
         std::ifstream file(npc_file);

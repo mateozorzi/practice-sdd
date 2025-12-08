@@ -19,6 +19,7 @@
 
 class Car {
 
+
     uint32_t player_id;
     b2Body* box2d_body;
     const ServerConfig& server_config;
@@ -59,13 +60,12 @@ public:
 
     CarLayer get_layer() const;
 
-    // void upgrade_configuration(const UpgradeDTO& upgrade);
-
     void set_collision(bool colliding);
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
 
     void set_layer(CarLayer car_layer);
     void reset_car_velocity();
 };
+
 
 #endif

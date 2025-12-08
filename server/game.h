@@ -12,9 +12,7 @@
 #include "game_loop.h"
 #include "game_monitor.h"
 #include "server_config.h"
-
-
-constexpr std::string_view GAME = "GAME";
+#include "server_constants.h"
 
 
 class Game {

@@ -184,4 +184,10 @@ void ServerConfigLoader::load_city(const YAML::Node& node, CityLoaderConfig& cit
         city.objects.bridge_file = obj["bridge"].as<std::string>();
         city.objects.decoration_file = obj["decoration"].as<std::string>();
     }
+
+    if (node["npc"]) {
+
+        auto n = node["npc"];
+        city.npc_file = n["npc_file"].as<std::string>();
+    }
 }

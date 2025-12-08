@@ -11,10 +11,6 @@
 #include "../common/thread.h"
 
 #include "client_handler.h"
-#include "server_config.h"
-
-
-constexpr std::string_view ACCEPTOR = "ACCEPTOR";
 
 
 class Acceptor final: public Thread {
@@ -24,7 +20,7 @@ class Acceptor final: public Thread {
     std::list<std::unique_ptr<ClientHandler>> clients;
     Lobby& lobby;
     const ServerConfig& server_config;
-    uint32_t client_id = 0;
+    uint32_t client_id = FIRST_CLIENT_ID;
 
     void reap();
     void clear();

@@ -15,9 +15,7 @@
 
 #include "game.h"
 #include "server_config.h"
-
-
-constexpr std::string_view LOBBY = "LOBBY";
+#include "server_constants.h"
 
 
 using GameQueues = std::pair<Queue<GameCommand>&, Queue<GameUpdateDTO>&>;

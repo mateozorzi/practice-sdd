@@ -14,9 +14,6 @@
 #include "server_config.h"
 
 
-constexpr std::string_view CLIENT_HANDLER = "CLIENT HANDLER";
-
-
 class ClientHandler final: public Thread {
 
 
@@ -25,7 +22,7 @@ class ClientHandler final: public Thread {
     Lobby& lobby;
     const ServerConfig& server_config;
     const uint32_t player_id;
-    std::string username = "Player";
+    std::string username = std::string(DEFAULT_USERNAME);
     bool is_in_lobby = true;
     RaceCatalogueDTO selected_races;
 

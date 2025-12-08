@@ -42,6 +42,7 @@ target_sources(nfs_server
     server.h
     server_config.h
     server_config_loader.h
+    server_constants.h
     server_protocol.h
     world_creation_exception.h
     )

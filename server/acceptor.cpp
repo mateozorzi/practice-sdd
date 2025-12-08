@@ -18,9 +18,9 @@ void Acceptor::run() {
 
             Socket peer_socket = acceptor_socket.accept();
             reap();
-            client_id++;
             std::unique_ptr<ClientHandler> client = std::make_unique<ClientHandler>(
                     std::move(peer_socket), lobby, client_id, server_config);
+            client_id++;
             client->start();
             clients.push_back(std::move(client));
         } catch (const std::exception& e) {

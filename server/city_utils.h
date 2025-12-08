@@ -10,6 +10,7 @@
 #include "../common/checkpoint_dto.h"
 
 #include "server_config.h"
+#include "server_constants.h"
 
 
 enum class SensorType : uint8_t {
@@ -24,10 +25,8 @@ class CityUtils {
 
     const ServerConfig& server_config;
 
-    uint8_t current_on_bridge_id = 1;
-    uint8_t current_under_bridge_id = 1;
-
-    std::array<b2Vec2, 4> obtain_b2_vertices(const std::vector<std::vector<int>>& polygon) const;
+    std::array<b2Vec2, POLYGONS_SIZE> obtain_b2_vertices(
+            const std::vector<std::vector<int>>& polygon) const;
 
     float pixels_to_meters(float pixels) const;
 

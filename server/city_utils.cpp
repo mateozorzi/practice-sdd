@@ -13,20 +13,16 @@
 CityUtils::CityUtils(const ServerConfig& server_config): server_config(server_config) {}
 
 
-std::array<b2Vec2, 4> CityUtils::obtain_b2_vertices(
+std::array<b2Vec2, POLYGONS_SIZE> CityUtils::obtain_b2_vertices(
         const std::vector<std::vector<int>>& polygon) const {
 
-    if (polygon.size() != 4)
+    if (polygon.size() != POLYGONS_SIZE)
         throw WorldCreationException("Polygons must have exactly 4 vertices");
 
-    std::array<b2Vec2, 4> vertices{};
+    std::array<b2Vec2, POLYGONS_SIZE> vertices{};
 
-    for (size_t i = 0; i < 4; i++) {
-        if (polygon[i].size() < 2)
-            throw WorldCreationException("Invalid vertex format");
-
+    for (size_t i = 0; i < POLYGONS_SIZE; i++)
         vertices[i].Set(pixels_to_meters(polygon[i][0]), pixels_to_meters(polygon[i][1]));
-    }
 
     return vertices;
 }
@@ -81,9 +77,6 @@ std::vector<std::vector<std::vector<int>>> CityUtils::load_polygons_from_file(
 
     for (const auto& polygon: json_data) {
 
-        if (!polygon.is_array() || polygon.size() != 4)
-            throw WorldCreationException("Each polygon must have exactly 4 vertices");
-
         std::vector<std::vector<int>> polygon_vertices;
         polygon_vertices.reserve(polygon.size());
 
@@ -105,7 +98,7 @@ void CityUtils::add_collidable(b2World& box2d_world, const std::vector<std::vect
     auto vertices = obtain_b2_vertices(polygon);
 
     b2PolygonShape box2d_polygon_shape;
-    box2d_polygon_shape.Set(vertices.data(), 4);
+    box2d_polygon_shape.Set(vertices.data(), POLYGONS_SIZE);
 
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_staticBody;
@@ -126,7 +119,7 @@ void CityUtils::add_sensor(b2World& box2d_world, const std::vector<std::vector<i
     auto vertices = obtain_b2_vertices(polygon);
 
     b2PolygonShape box2d_polygon_shape;
-    box2d_polygon_shape.Set(vertices.data(), 4);
+    box2d_polygon_shape.Set(vertices.data(), POLYGONS_SIZE);
 
     b2BodyDef box2d_body_definition;
     box2d_body_definition.type = b2_staticBody;
@@ -135,15 +128,9 @@ void CityUtils::add_sensor(b2World& box2d_world, const std::vector<std::vector<i
     b2FixtureDef box2d_fixture_definition;
     box2d_fixture_definition.shape = &box2d_polygon_shape;
     box2d_fixture_definition.isSensor = true;
-    if (type == SensorType::ON_BRIDGE) {
 
-        box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(type);
-        current_on_bridge_id++;
-    } else {
+    box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(type);
 
-        box2d_fixture_definition.userData.pointer = static_cast<uintptr_t>(type);
-        current_under_bridge_id++;
-    }
     box2d_fixture_definition.filter.categoryBits = collision_category;
     box2d_fixture_definition.filter.maskBits = collision_mask;
 

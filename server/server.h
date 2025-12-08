@@ -8,13 +8,7 @@
 #include "game_loop.h"
 #include "lobby.h"
 #include "server_config.h"
-
-
-constexpr std::string_view SERVER = "SERVER";
-constexpr char SERVER_CMD_EXIT = 'q';
-constexpr std::string_view SERVER_STARTED = "SERVER STARTED";
-constexpr std::string_view SERVER_STOPPED = "SERVER STOPPED";
-constexpr std::string_view SERVER_CONFIG_FILEPATH = "/etc/nfs";
+#include "server_constants.h"
 
 
 class Server {

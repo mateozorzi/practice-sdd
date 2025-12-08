@@ -16,9 +16,7 @@
 
 #include "game_command.h"
 #include "server_config.h"
-
-
-constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
+#include "server_constants.h"
 
 
 class GameMonitor {

@@ -87,6 +87,7 @@ struct CityLoaderConfig {
     struct CollidableFiles collidables;
     struct SensorFiles sensors;
     struct ObjectRenderingFiles objects;
+    std::string npc_file;
 };
 
 struct WorldConfig {
@@ -150,4 +151,4 @@ struct ServerConfig {
     struct ServerSpecificConfig server;
 };
 
-#endif  // SERVER_CONFIG_H
+#endif

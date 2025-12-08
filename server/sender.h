@@ -6,10 +6,8 @@
 #include "../common/thread.h"
 
 #include "lobby.h"
+#include "server_constants.h"
 #include "server_protocol.h"
-
-
-constexpr std::string_view SENDER = "SENDER";
 
 
 class Sender final {

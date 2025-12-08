@@ -19,12 +19,7 @@
 #include "game_monitor.h"
 #include "player.h"
 #include "server_config.h"
-
-
-constexpr std::string_view GAME_LOOP = "GAME_LOOP";
-constexpr float GAME_STEP = 1.0f / 60.0f;
-constexpr int VELOCITY_ITERATIONS = 10;
-constexpr int POSITION_ITERATIONS = 6;
+#include "server_constants.h"
 
 
 enum class GamePhase {

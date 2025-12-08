@@ -19,9 +19,6 @@
 #include "server_config.h"
 
 
-constexpr std::string_view PLAYER = "PLAYER";
-
-
 class Player {
 
 

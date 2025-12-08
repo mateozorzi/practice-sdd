@@ -44,12 +44,19 @@ float CollisionListener::calculate_damage_two_cars_collision(const b2Body& body_
     b2Vec2 forward_a = body_a.GetWorldVector(b2Vec2(0.0f, 1.0f));
     b2Vec2 forward_b = body_b.GetWorldVector(b2Vec2(0.0f, 1.0f));
 
-    float angle_factor = (1.0f - b2Dot(forward_a, forward_b)) / 2.0f;
-    angle_factor = (angle_factor < 0.5f) ? 0.1f : (angle_factor < 0.7f) ? 0.3f : 1.0f;
+    float angle_factor = (1.0f - b2Dot(forward_a, forward_b)) / ANGLE_DOT_NORMALIZATION;
 
-    float speed_factor = std::clamp(relative_speed / 10.0f, 0.2f, 1.0f);
+    if (angle_factor < ANGLE_FACTOR_LOW_THRESHOLD)
+        angle_factor = ANGLE_FACTOR_LOW_VALUE;
+    else if (angle_factor < ANGLE_FACTOR_MID_THRESHOLD)
+        angle_factor = ANGLE_FACTOR_MID_VALUE;
+    else
+        angle_factor = ANGLE_FACTOR_HIGH_VALUE;
 
-    return 10.0f * angle_factor * speed_factor;
+    float speed_factor = std::clamp(relative_speed / RELATIVE_SPEED_NORMALIZATION, SPEED_FACTOR_MIN,
+                                    SPEED_FACTOR_MAX);
+
+    return BASE_DAMAGE * angle_factor * speed_factor;
 }
 
 
@@ -70,7 +77,7 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
         return;
 
     uintptr_t player_data = sensor_fixture->GetUserData().pointer;
-    auto sensor_type = static_cast<SensorType>(player_data & 0xFF);
+    auto sensor_type = static_cast<SensorType>(player_data & SENSOR_TYPE_MASK);
     auto player_ptr = find_player_by_body(*car_fixture->GetBody());
 
     if (!player_ptr)
@@ -84,7 +91,7 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
 
         if (sensor_type == SensorType::CHECKPOINT) {
 
-            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> 8);
+            uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> SENSOR_DATA_SHIFT);
             if (player.is_next_checkpoint(checkpoint_id))
                 player.trigger_checkpoint_collision();
         }
@@ -117,7 +124,8 @@ void CollisionListener::handle_two_car_collision(Player& player_a, Player& playe
     player_a.apply_collision_damage(static_cast<uint16_t>(damage));
     player_b.apply_collision_damage(static_cast<uint16_t>(damage));
 
-    float velocity_reduction = std::min(0.5f + damage / 100.0f, 0.9f);
+    float velocity_reduction =
+            std::min(BASE_VELOCITY_REDUCTION + damage / 100.0f, MAX_VELOCITY_REDUCTION);
     float scale = 1.0f - velocity_reduction;
 
     body_a.SetLinearVelocity(scale * body_a.GetLinearVelocity());
@@ -126,10 +134,11 @@ void CollisionListener::handle_two_car_collision(Player& player_a, Player& playe
 
 void CollisionListener::handle_static_collision(Player& player, b2Body& body, float speed) {
 
-    float damage = std::min(speed * 2.0f, 40.0f);
+    float damage =
+            std::min(speed * STATIC_COLLISION_DAMAGE_MULTIPLIER, STATIC_COLLISION_DAMAGE_MAX);
     player.apply_collision_damage(static_cast<uint16_t>(damage));
 
-    body.SetLinearVelocity(0.3f * body.GetLinearVelocity());
+    body.SetLinearVelocity(STATIC_COLLISION_VELOCITY_REDUCTION * body.GetLinearVelocity());
 }
 
 void CollisionListener::handle_collision(b2Contact& contact) {
