@@ -39,6 +39,7 @@ class Car {
     void detect_rotation();
     void detect_drifting();
 
+
 public:
     Car(const Car&) = delete;
     Car& operator=(const Car&) = delete;

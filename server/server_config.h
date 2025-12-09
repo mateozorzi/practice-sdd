@@ -1,6 +1,7 @@
 #ifndef SERVER_CONFIG_H
 #define SERVER_CONFIG_H
 
+
 #include <string>
 
 
@@ -8,14 +9,18 @@
 // PHYSICS CONFIGURATION STRUCTS
 // ============================================================================
 
+
 struct CollidableConfig {
+
 
     float density;
     float friction;
     float restitution;
 };
 
+
 struct CarConfig {
+
 
     std::string model;
     float width;
@@ -35,18 +40,24 @@ struct CarConfig {
     unsigned int health;
 };
 
+
 struct RaceStartPosition {
+
 
     float meters_x;
     float meters_y;
 };
 
+
 struct PositionsConfig {
+
 
     struct RaceStartPosition race_start;
 };
 
+
 struct PhysicsConfig {
+
 
     struct CollidableConfig block;
     struct PositionsConfig positions;
@@ -64,13 +75,17 @@ struct PhysicsConfig {
 // WORLD CONFIGURATION STRUCTS
 // ============================================================================
 
+
 struct CollidableFiles {
+
 
     std::string on_ground_collidable_file;
     std::string on_bridge_collidable_file;
 };
 
+
 struct SensorFiles {
+
 
     std::string on_bridge_sensor_file;
     std::string under_bridge_sensor_file;
@@ -82,7 +97,9 @@ struct ObjectRenderingFiles {
     std::string decoration_file;
 };
 
+
 struct CityLoaderConfig {
+
 
     struct CollidableFiles collidables;
     struct SensorFiles sensors;
@@ -90,7 +107,9 @@ struct CityLoaderConfig {
     std::string npc_file;
 };
 
+
 struct WorldConfig {
+
 
     unsigned int pixels_per_meter;
     std::string races_folder;
@@ -104,7 +123,9 @@ struct WorldConfig {
 // GAME CONFIGURATION STRUCTS
 // ============================================================================
 
+
 struct UpgradeConfig {
+
 
     float health_upgrade;
     float speed_upgrade;
@@ -112,7 +133,9 @@ struct UpgradeConfig {
     float handling_upgrade;
 };
 
+
 struct GameConfig {
+
 
     unsigned int game_fps;
     unsigned int wait_seconds_upgrade_shop;
@@ -125,7 +148,9 @@ struct GameConfig {
     struct UpgradeConfig upgrades;
 };
 
+
 struct ServerSpecificConfig {
+
 
     unsigned short server_port;
     unsigned int max_concurrent_games;
@@ -137,11 +162,14 @@ struct ServerSpecificConfig {
     unsigned int snapshot_queue_capacity;
 };
 
+
 // ============================================================================
 // ROOT CONFIGURATION STRUCT
 // ============================================================================
 
+
 struct ServerConfig {
+
 
     struct PhysicsConfig physics;
 
@@ -150,5 +178,6 @@ struct ServerConfig {
     struct GameConfig game;
     struct ServerSpecificConfig server;
 };
+
 
 #endif

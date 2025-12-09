@@ -20,6 +20,8 @@
 
 
 struct GameCommandDTO {
+
+
     ClientAction client_action;
     std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string, PlayerRaceStatsDTO,
                  BuyUpgradeDTO>

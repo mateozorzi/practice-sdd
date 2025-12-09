@@ -13,6 +13,7 @@
 int main() {
 
     try {
+
         ServerConfig server_config =
                 ServerConfigLoader().load_yaml(std::string(SERVER_CONFIG_FILEPATH));
 

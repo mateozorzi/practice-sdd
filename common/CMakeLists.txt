@@ -2,43 +2,47 @@ target_sources(nfs_common
     PRIVATE
     # .cpp files
     car_catalogue_dto.cpp
+    car_dto.cpp
     car_position_dto.cpp
+    checkpoint_dto.cpp
+    client_event_dto.cpp
     common_protocol.cpp
-    movement_dto.cpp
     liberror.cpp
+    movement_dto.cpp
     player_dto.cpp
+    race_dto.cpp
     resolver.cpp
     resolvererror.cpp
     socket.cpp
     world_snapshot_dto.cpp
-    race_dto.cpp
-    movement_dto.cpp
     PUBLIC
     # .h files
     car_catalogue_dto.h
+    car_dto.h
     car_position_dto.h
+    checkpoint_dto.h
+    client_event_dto.h
     common_protocol.h
+    constants.h
     game_command_dto.h
-    movement_dto.h
+    game_update_dto.h
+    isocket.h
+    leaderboard_dto.h
     liberror.h
+    lobbies_catalogue_dto.h
+    lobby_dto.h
+    movement_dto.h
+    npc_dto.h
+    phase.h
     player_dto.h
+    player_race_stats_dto.h
     queue.h
+    race_catalogue_dto.h
+    race_dto.h
     resolver.h
     resolvererror.h
     socket.h
     thread.h
-    movement_dto.h
-
-    lobby_dto.h
-    car_dto.h
+    upgrade_dto.h
     world_snapshot_dto.h
-    race_dto.h
-    checkpoint_dto.h
-    race_catalogue_dto.h
-    npc_dto.h
-
-    player_race_stats_dto.h
-    leaderboard_dto.h
-    game_update_dto.h
-    isocket.h
     )

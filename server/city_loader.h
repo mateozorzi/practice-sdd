@@ -27,6 +27,7 @@ class CityLoader {
                           uint16_t collision_category, uint16_t collision_mask);
     void load_npcs(const std::string& city_name);
 
+
 public:
     CityLoader(const CityLoader&) = delete;
     CityLoader& operator=(const CityLoader&) = delete;

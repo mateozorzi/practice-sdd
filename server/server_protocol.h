@@ -20,6 +20,7 @@
 
 class ServerProtocol final: public CommonProtocol {
 
+
     void add_car_position_to_buffer(const CarPositionDTO& car_position_dto);
     void add_player_to_buffer(const PlayerDTO& player);
     void add_checkpoint_to_buffer(const CheckpointDTO& checkpoint);

@@ -1,6 +1,7 @@
 #ifndef COLLISION_LISTENER_H
 #define COLLISION_LISTENER_H
 
+
 #include <cstdint>
 #include <optional>
 #include <unordered_map>
@@ -11,6 +12,7 @@
 
 
 class CollisionListener: public b2ContactListener {
+
 
     std::unordered_map<uint32_t, Player>& players;
 
@@ -25,6 +27,7 @@ class CollisionListener: public b2ContactListener {
                                   b2Body& body_b, float relative_speed);
     void handle_static_collision(Player& player, b2Body& body, float speed);
     void handle_collision(b2Contact& contact);
+
 
 public:
     CollisionListener(const CollisionListener&) = delete;

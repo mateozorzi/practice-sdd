@@ -15,6 +15,7 @@
 
 enum class SensorType : uint8_t {
 
+
     ON_BRIDGE,
     UNDER_BRIDGE,
     CHECKPOINT
@@ -23,12 +24,14 @@ enum class SensorType : uint8_t {
 
 class CityUtils {
 
+
     const ServerConfig& server_config;
 
     std::array<b2Vec2, POLYGONS_SIZE> obtain_b2_vertices(
             const std::vector<std::vector<int>>& polygon) const;
 
     float pixels_to_meters(float pixels) const;
+
 
 public:
     CityUtils(const CityUtils&) = delete;

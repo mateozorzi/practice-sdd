@@ -1,5 +1,5 @@
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef COMMON_PROTOCOL_H
+#define COMMON_PROTOCOL_H
 
 
 #include <string>
@@ -10,7 +10,9 @@
 #include "isocket.h"
 #include "socket.h"
 
+
 class CommonProtocol {
+
 
 protected:
     ISocket& socket;

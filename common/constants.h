@@ -1,11 +1,13 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+
 #include <cstdint>
 #include <string_view>
 
 
 enum class ClientAction : uint8_t {
+
 
     DISCONNECT = 0x0D,
     SEND_CAR_SELECTION = 0x01,
@@ -17,9 +19,12 @@ enum class ClientAction : uint8_t {
 
 };
 
+
 constexpr int MAX_UPGRADES_PER_RACE = 4;
 
+
 enum class GameLoopAction : uint8_t {
+
 
     DISCONNECT = 0xDD,
     SEND_UPDATE_POSITIONS = 0x10,
@@ -36,6 +41,7 @@ enum class GameLoopAction : uint8_t {
     SEND_UPGRADES_REMAINING = 0x21,
     SEND_UPGRADE_SHOP_TIME_REMAINING = 0x22,
     RACE_TIME = 0x23,
+
 };
 
 
@@ -53,7 +59,6 @@ constexpr uint16_t MASK_CAR_GROUND = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CAT
 constexpr uint16_t MASK_CAR_BRIDGE = CATEGORY_BRIDGE | CATEGORY_CAR_BRIDGE;
 constexpr uint16_t MASK_CAR_UNDER = CATEGORY_GROUND | CATEGORY_CAR_GROUND | CATEGORY_CAR_UNDER;
 constexpr uint16_t MASK_SENSOR = CATEGORY_CAR_GROUND | CATEGORY_CAR_BRIDGE | CATEGORY_CAR_UNDER;
-
 
 // CHECKPOINTS
 constexpr char HORIZONTAL = 'H';

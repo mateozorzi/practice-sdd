@@ -15,6 +15,7 @@
 
 struct Point {
 
+
     float x;
     float y;
 
@@ -42,6 +43,7 @@ class Npc {
     float pixels_to_meters(const float pixels) const;
     void update_angle();
     void advance_on_route();
+
 
 public:
     Npc(uint32_t npc_id, const std::vector<std::vector<int>>& polygon, float speed,

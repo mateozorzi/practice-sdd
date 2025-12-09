@@ -24,6 +24,7 @@
 
 enum class GamePhase {
 
+
     WAITING_CAR_SELECTION,
     UPGRADE_SHOP,
     COUNTDOWN,
@@ -34,6 +35,7 @@ enum class GamePhase {
 
 
 class GameLoop final: public Thread {
+
 
     std::unordered_map<ClientAction, std::function<void(const GameCommand&)>> command_handlers;
 
