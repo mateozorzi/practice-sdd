@@ -32,7 +32,7 @@ El proyecto consta de tres aplicaciones: **Editor**, **Servidor** y
 Para ejecutarlo:
 
 ``` bash
-sudo nfs_editor
+nfs_editor
 ```
 
 Permite:
