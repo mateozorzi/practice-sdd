@@ -34,7 +34,7 @@ struct CarConfig {
     float acceleration;
     float braking_factor;
     float max_speed;
-    float drift_factor;     // The lower = more drifting
+    float drift_factor;  // The lower = more drifting
     float turn_torque;
     float mass;
     unsigned int health;
