@@ -138,11 +138,11 @@ void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
     std::unordered_map<uint32_t, PlayerInfo> last_state = std::move(game_state.players);
     game_state.players.clear();
 
-    for (const auto& [playerDTO, carPos]: snapshot.get_car_positions()) {
+    for (const auto& [playerDTO, carPos]: snapshot.car_positions) {
         update_player(playerDTO, carPos, last_state);
     }
 
-    game_state.npcs = snapshot.get_npc_positions();
+    game_state.npcs = snapshot.npc_positions;
 }
 
 void Game::handle_waiting_events() { input_handler.handle_waiting(); }

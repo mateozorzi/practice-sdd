@@ -16,10 +16,13 @@ target_sources(nfs_common
     movement_dto.cpp
     npc_dto.cpp
     player_dto.cpp
+    player_race_stats_dto.cpp
+    race_catalogue_dto.cpp
     race_dto.cpp
     resolver.cpp
     resolvererror.cpp
     socket.cpp
+    upgrade_dto.cpp
     world_snapshot_dto.cpp
     PUBLIC
     # .h files

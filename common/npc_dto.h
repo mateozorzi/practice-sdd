@@ -13,6 +13,7 @@ struct NpcDTO {
     uint32_t y_position;
     uint32_t angle;
 
+
     explicit NpcDTO(uint32_t npc_id = 0, uint32_t x_position = 0, uint32_t y_position = 0,
                     uint32_t angle = 0);
 };

@@ -189,7 +189,7 @@ void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
     const WorldSnapshotDTO& world_snapshot = std::get<WorldSnapshotDTO>(snapshot.data);
     add_uint8_to_buffer(world_snapshot.size);
 
-    for (const auto& car_position: world_snapshot.get_car_positions()) {
+    for (const auto& car_position: world_snapshot.car_positions) {
 
         add_player_to_buffer(car_position.first);
         add_car_position_to_buffer(car_position.second);
@@ -197,7 +197,7 @@ void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
 
     add_uint8_to_buffer(world_snapshot.npc_size);
 
-    for (const auto& npc: world_snapshot.get_npc_positions()) {
+    for (const auto& npc: world_snapshot.npc_positions) {
 
         add_uint32_to_buffer(npc.npc_id);
         add_uint32_to_buffer(npc.x_position);
