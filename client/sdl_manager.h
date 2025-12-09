@@ -49,8 +49,6 @@ private:
     std::vector<SDL2pp::Rect> decorations_rects;
     int iteration_counter = 0;
     std::string map_name;
-    std::string decoration;
-    std::string bridges;
     LeaderboardInfo leaderboard_info;
     SDL2pp::Texture* waiting_room_background;
 
