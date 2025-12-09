@@ -309,7 +309,7 @@ void Creador::on_Done_clicked() {
         return;
     }
 
-    QString default_name = name_circuit + ".csv";
+    QString default_name = name_circuit;
 
     QString file_path = QFileDialog::getSaveFileName(
             this, "Save Race File", QDir::homePath() + "/" + default_name, "CSV Files (*.csv)");
