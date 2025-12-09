@@ -28,7 +28,6 @@ SDLManager::SDLManager():
         shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH),
         leaderboard_info(renderer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    // load_city(DEFAULT_CITY);
 
     int idx = std::rand() % WAITING_ROOMS.size();
     const std::string& selected = WAITING_ROOMS[idx];
