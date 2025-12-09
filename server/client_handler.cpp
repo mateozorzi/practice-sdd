@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../common/liberror.h"
-#include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_catalogue_dto.h"
 #include "../common/race_catalogue_dto.h"
 
 

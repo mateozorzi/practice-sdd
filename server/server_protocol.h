@@ -10,7 +10,7 @@
 #include "../common/game_command_dto.h"
 #include "../common/game_update_dto.h"
 #include "../common/leaderboard_dto.h"
-#include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_catalogue_dto.h"
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 #include "../common/race_catalogue_dto.h"

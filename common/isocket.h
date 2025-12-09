@@ -1,7 +1,10 @@
 #ifndef ISOCKET_H
 #define ISOCKET_H
 
+
 class ISocket {
+
+
 public:
     virtual ~ISocket() = default;
     virtual int sendsome(const void* data, unsigned int sz) = 0;
@@ -13,5 +16,6 @@ public:
     virtual bool is_stream_recv_closed() const = 0;
     virtual int close() = 0;
 };
+
 
 #endif

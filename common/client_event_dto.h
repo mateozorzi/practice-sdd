@@ -23,7 +23,7 @@ struct ClientActionDTO {
 
     ClientAction action;
 
-    explicit ClientActionDTO(ClientAction action = ClientAction::DISCONNECT);
+    explicit ClientActionDTO(const ClientAction action = ClientAction::DISCONNECT);
 };
 
 

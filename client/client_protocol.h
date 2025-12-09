@@ -14,7 +14,7 @@
 #include "../common/constants.h"
 #include "../common/game_update_dto.h"
 #include "../common/leaderboard_dto.h"
-#include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_catalogue_dto.h"
 #include "../common/lobby_dto.h"
 #include "../common/race_catalogue_dto.h"
 #include "../common/race_dto.h"

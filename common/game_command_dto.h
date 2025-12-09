@@ -27,19 +27,18 @@ struct GameCommandDTO {
                  BuyUpgradeDTO>
             command_data;
 
-    GameCommandDTO(): client_action(ClientAction::DISCONNECT), command_data(std::monostate{}) {}
 
-    explicit GameCommandDTO(ClientAction client_action):
-            client_action(client_action), command_data(std::monostate{}) {}
-
-    template <typename T>
-    GameCommandDTO(ClientAction client_action, T&& data):
-            client_action(client_action), command_data(std::forward<T>(data)) {}
+    explicit GameCommandDTO(
+            const ClientAction client_action = ClientAction::DISCONNECT,
+            const std::variant<std::monostate, MovementDTO, PlayerDTO, CarDTO, std::string,
+                               PlayerRaceStatsDTO, BuyUpgradeDTO>& command_data = std::monostate());
 
     template <typename T>
     std::optional<std::reference_wrapper<const T>> get_data() const {
+
         if (std::holds_alternative<T>(command_data))
             return std::cref(std::get<T>(command_data));
+
         return std::nullopt;
     }
 };

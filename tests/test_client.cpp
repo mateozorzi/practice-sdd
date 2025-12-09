@@ -215,7 +215,7 @@ TEST_F(ClientProtocolTest, SendCarSelection_WithMock) {
 
 TEST_F(ClientProtocolTest, ChangeUsername_WithMock) {
     std::string username = "Player1";
-    LobbyDTO lobby(LobbyAction::CHANGE_USERNAME, username);
+    LobbyDTO lobby(LobbyAction::CHANGE_USERNAME, 0, username);
 
     std::vector<uint8_t> captured_bytes;
 

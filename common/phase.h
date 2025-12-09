@@ -1,7 +1,10 @@
 #ifndef PHASE_H
 #define PHASE_H
 
+
 enum class Phase {
+
+
     WAITING_FOR_CAR_SELECTION = 0,
     UPGRADE = 1,
     COUNTDOWN = 2,
@@ -9,5 +12,6 @@ enum class Phase {
     LEADERBOARD = 4,
     GAME_FINISHED = 5,
 };
+
 
 #endif

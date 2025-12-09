@@ -7,8 +7,14 @@ target_sources(nfs_common
     checkpoint_dto.cpp
     client_event_dto.cpp
     common_protocol.cpp
+    game_command_dto.cpp
+    game_update_dto.cpp
+    leaderboard_dto.cpp
     liberror.cpp
+    lobby_catalogue_dto.cpp
+    lobby_dto.cpp
     movement_dto.cpp
+    npc_dto.cpp
     player_dto.cpp
     race_dto.cpp
     resolver.cpp
@@ -23,26 +29,27 @@ target_sources(nfs_common
     checkpoint_dto.h
     client_event_dto.h
     common_protocol.h
-    constants.h
     game_command_dto.h
     game_update_dto.h
-    isocket.h
     leaderboard_dto.h
     liberror.h
-    lobbies_catalogue_dto.h
+    lobby_catalogue_dto.h
     lobby_dto.h
     movement_dto.h
     npc_dto.h
-    phase.h
     player_dto.h
     player_race_stats_dto.h
-    queue.h
     race_catalogue_dto.h
     race_dto.h
     resolver.h
     resolvererror.h
     socket.h
-    thread.h
     upgrade_dto.h
     world_snapshot_dto.h
+
+    constants.h
+    isocket.h
+    phase.h
+    queue.h
+    thread.h
     )

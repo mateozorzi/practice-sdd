@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "../common/game_update_dto.h"
-#include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_catalogue_dto.h"
 #include "../common/race_catalogue_dto.h"
 
 #include "game.h"

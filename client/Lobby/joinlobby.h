@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include "../../common/lobbies_catalogue_dto.h"
+#include "../../common/lobby_catalogue_dto.h"
 
 namespace Ui {
 class JoinLobby;

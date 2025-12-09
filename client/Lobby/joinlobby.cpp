@@ -2,7 +2,7 @@
 
 #include <QMessageBox>
 
-#include "../../common/lobbies_catalogue_dto.h"
+#include "../../common/lobby_catalogue_dto.h"
 
 #include "ui_joinlobby.h"
 

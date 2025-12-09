@@ -16,7 +16,7 @@
 
 #include "../common/car_catalogue_dto.h"
 #include "../common/car_dto.h"
-#include "../common/lobbies_catalogue_dto.h"
+#include "../common/lobby_catalogue_dto.h"
 #include "../common/lobby_dto.h"
 #include "../common/player_dto.h"
 #include "Lobby/creategame.h"
@@ -282,7 +282,7 @@ void MenuInterface::lobby(PlayerDTO& player) {
     QObject::connect(&l, &Lobby::input_username, [&](const QString& name) {
         username = name.toStdString();
 
-        protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, username));
+        protocol.change_username(LobbyDTO(LobbyAction::CHANGE_USERNAME, client_id, username));
         client_id = protocol.receive_id();  // wait for server response
         player.username = username;
         player.id = client_id;

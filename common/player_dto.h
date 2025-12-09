@@ -19,10 +19,9 @@ struct PlayerDTO {
     uint16_t max_health;
     bool finish_race;
 
-    PlayerDTO(const std::string& username, const uint32_t id, const CarDTO& car, uint16_t health,
-              bool dead, uint16_t max_health, bool finish_race);
-    explicit PlayerDTO(const std::string& username);
-    PlayerDTO();
+    explicit PlayerDTO(const std::string& username = "", uint32_t id = 0,
+                       const CarDTO& car = CarDTO(), uint16_t health = 0, bool dead = false,
+                       uint16_t max_health = 0, bool finish_race = false);
 };
 
 
