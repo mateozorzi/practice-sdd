@@ -2,6 +2,7 @@
 
 #include <QBrush>
 #include <QDir>
+#include <QFileDialog>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsScene>
 #include <QList>
@@ -308,9 +309,17 @@ void Creador::on_Done_clicked() {
         return;
     }
 
+    QString default_name = name_circuit;
 
-    if (checkpoints.export_checkpoints(name_circuit, map, n_laps, this->mask, this)) {
-        // file create succesfully
+    QString file_path = QFileDialog::getSaveFileName(
+            this, "Save Race File", QDir::homePath() + "/" + default_name, "CSV Files (*.csv)");
+
+    if (file_path.isEmpty())
+        return;
+
+
+    if (checkpoints.export_checkpoints(file_path, map, n_laps, this->mask, this)) {
+
         if (name_circuit != race.name) {
             QString old_path = "/var/nfs/races/" + race.name + ".csv";
             QFile old_file(old_path);

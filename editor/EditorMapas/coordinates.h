@@ -31,7 +31,7 @@ public:
 
     bool enough_checkpoints();
 
-    bool export_checkpoints(const QString& name, const QString& map, const int n_laps,
+    bool export_checkpoints(const QString& file_path, const QString& map, const int n_laps,
                             const QString& mask, QWidget* window);
 
     QVector<Checkpoint> get_checkpoints();
