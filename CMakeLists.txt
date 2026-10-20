@@ -10,6 +10,9 @@ endif()
 
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# Export compile_commands.json for static analysis (SonarCloud)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(nfs_tp
     VERSION 1.0
     HOMEPAGE_URL "https://github.com/URL-HERE"
@@ -21,6 +24,7 @@ option(NFS_CLIENT "Enable / disable client program." ON)
 option(NFS_SERVER "Enable / disable server program." ON)
 option(NFS_EDITOR "Enable / disable editor program." ON)
 option(NFS_MAKE_WARNINGS_AS_ERRORS "Enable / disable warnings as errors." ON)
+option(NFS_COVERAGE "Enable / disable code coverage instrumentation." OFF)
 
 message(CMAKE_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}")
 
@@ -249,5 +253,103 @@ if(NFS_TESTS)
         gmock
         SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer
         nlohmann_json::nlohmann_json
+        yaml-cpp::yaml-cpp box2d
     )
+
+    # Let the tests find the repository files (configs, races, maps)
+    target_compile_definitions(nfs_tests PRIVATE NFS_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+
+    # Client and editor tests live in their own executable: the client defines classes with the
+    # same names as the server ones (Receiver, Sender), so they cannot be linked together.
+    find_package(Qt6 COMPONENTS Core Widgets Multimedia Test REQUIRED)
+
+    add_executable(nfs_client_tests)
+
+    # The Qt windows of the lobby and the editor need their .ui, .qrc and moc files
+    set_target_properties(nfs_client_tests PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
+
+    add_dependencies(nfs_client_tests nfs_common SDL2pp::SDL2pp)
+
+    target_sources(nfs_client_tests
+        PRIVATE
+        tests/client/test_client_threads.cpp
+        tests/client/test_editor_model.cpp
+        tests/client/test_game_logic.cpp
+        tests/client/test_lobby_windows.cpp
+        tests/client/test_menus.cpp
+        tests/client/test_editor_windows.cpp
+        tests/client/qt_test_utils.cpp
+        tests/client/test_sdl_client.cpp
+        client/animations.cpp
+        client/camera.cpp
+        client/client_protocol.cpp
+        client/game.cpp
+        client/game_phase.cpp
+        client/input_manager.cpp
+        client/leaderboard_info.cpp
+        client/resource_manager.cpp
+        client/sdl_manager.cpp
+        client/sounds.cpp
+        client/upgrade_shop.cpp
+        client/game_logic.cpp
+        client/receiver.cpp
+        client/sender.cpp
+        client/menu_connection.cpp
+        client/menu_interface.cpp
+        client/Lobby/connectioninfo.cpp
+        client/Lobby/creategame.cpp
+        client/Lobby/createlobby.cpp
+        client/Lobby/joinlobby.cpp
+        client/Lobby/lobby.cpp
+        client/Lobby/raceselector.cpp
+        client/Lobby/selectcars.cpp
+        client/Lobby/waitingroom.cpp
+        client/Lobby/images.qrc
+        server/server_protocol.cpp
+        editor/EditorMapas/checkpoint.cpp
+        editor/EditorMapas/coordinates.cpp
+        editor/EditorMapas/creador.cpp
+        editor/EditorMapas/editor.cpp
+        editor/EditorMapas/editormenu.cpp
+        editor/EditorMapas/messages.cpp
+        editor/EditorMapas/race.cpp
+        editor/EditorMapas/selectcircuit.cpp
+        editor/EditorMapas/resources.qrc
+        )
+
+    target_include_directories(nfs_client_tests
+        PUBLIC
+        .
+        editor/EditorMapas
+        ${gtest_SOURCE_DIR}/include
+        ${libSDL2pp_SOURCE_DIR}
+        )
+
+    set_project_warnings(nfs_client_tests ${NFS_MAKE_WARNINGS_AS_ERRORS} TRUE)
+
+    target_link_libraries(nfs_client_tests
+        nfs_common
+        GTest::gtest_main
+        gtest
+        SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer
+        nlohmann_json::nlohmann_json
+        Qt6::Core Qt6::Widgets Qt6::Multimedia Qt6::Test
+    )
+
+    # Let the tests find the repository files
+    target_compile_definitions(nfs_client_tests PRIVATE NFS_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+endif()
+
+
+# Coverage section
+# ----------------
+
+if(NFS_COVERAGE)
+    include(cmake/Coverage.cmake)
+
+    foreach(target nfs_common nfs_client nfs_server nfs_editor nfs_tests nfs_client_tests)
+        if(TARGET ${target})
+            enable_coverage(${target})
+        endif()
+    endforeach()
 endif()

@@ -358,8 +358,11 @@ void GameLoop::handle_game_finished_phase() {
 
     process_commands({}, 0);
 
-    if (elapsed_time >= game_finish_seconds)
+    if (elapsed_time >= game_finish_seconds) {
+
         GameLoop::stop();
+        players.clear();
+    }
 
     fixed_sleep(now);
 }
@@ -659,10 +662,8 @@ void GameLoop::stop() {
         _keep_running = false;
     }
 
-    try {
-
-        players.clear();
-    } catch (const std::exception&) {}
+    // players is not cleared here: stop() is called from other threads while the loop may
+    // still be iterating it. The loop clears it itself when the game finishes.
 }
 
 

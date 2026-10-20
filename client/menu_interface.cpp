@@ -30,7 +30,7 @@
 #include "client_constants.h"
 
 MenuInterface::MenuInterface(ClientProtocol& protocol, int argc = 0, char** argv = nullptr):
-        protocol(protocol), app(argc, argv) {}
+        protocol(protocol), argc(argc), argv(argv), app(this->argc, this->argv) {}
 
 
 bool MenuInterface::car_selection(PlayerDTO& player) {

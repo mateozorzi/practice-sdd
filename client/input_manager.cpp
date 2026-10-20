@@ -298,7 +298,8 @@ InputManager::~InputManager() {
 
     if (sender.is_alive()) {
 
-        sender.stop();
+        // Closing the queue (instead of stopping the sender) lets it send the pending events,
+        // the disconnection included, before it ends
         sender.close_queue();
         sender.join();
     }

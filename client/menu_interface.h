@@ -12,9 +12,12 @@
 class MenuInterface {
 private:
     ClientProtocol& protocol;
+    // QApplication keeps a reference to argc, so it must outlive app
+    int argc;
+    char** argv;
     QApplication app;
-    QMediaPlayer* musicPlayer;
-    QAudioOutput* audioOutput;
+    QMediaPlayer* musicPlayer = nullptr;
+    QAudioOutput* audioOutput = nullptr;
 
 public:
     MenuInterface(ClientProtocol& protocol, int argc, char** argv);

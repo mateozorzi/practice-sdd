@@ -18,6 +18,7 @@ target_sources(nfs_client
     animations.cpp
     upgrade_shop.cpp
     game.cpp
+    game_logic.cpp
     game_phase.cpp
 
     Lobby/lobby.cpp
@@ -50,6 +51,7 @@ target_sources(nfs_client
     animations.h
     upgrade_shop.h
     game.h
+    game_logic.h
     game_phase.h
     game_state.h
 

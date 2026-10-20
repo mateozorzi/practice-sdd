@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-commit-checks.sh",
+            "timeout": 300,
+            "onFailure": "block",
+            "statusMessage": "Running linters before commit..."
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-commit-tests.sh",
+            "timeout": 1500,
+            "onFailure": "block",
+            "statusMessage": "Running tests before commit..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/modified-file-checks.sh",
+            "timeout": 120,
+            "statusMessage": "Formatting and running cppcheck on the modified file..."
+          }
+        ]
+      }
+    ]
+  }
+}

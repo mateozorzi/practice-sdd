@@ -18,7 +18,7 @@ bool GamePhase::run() {
     while (loop) {
         handle_game_events();
 
-        if (!game.keep_running)
+        if (!game.is_running())
             break;
 
         if (!update_game_state()) {
@@ -26,7 +26,7 @@ bool GamePhase::run() {
             loop = false;
         }
 
-        if (!game.keep_running)
+        if (!game.is_running())
             break;
 
         show_game();

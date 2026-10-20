@@ -3,14 +3,46 @@ target_sources(nfs_tests
     # .cpp files
     test_client.cpp
     test_server.cpp
+    test_city_loader.cpp
+    test_city_utils.cpp
+    test_collision_listener.cpp
+    test_game_loop.cpp
+    test_game_monitor.cpp
+    test_lobby.cpp
+    test_player.cpp
+    test_race_loader.cpp
+    test_server_config_loader.cpp
+    test_server_integration.cpp
+    test_server_main.cpp
+    test_common.cpp
+    server_test_utils.cpp
     ../client/client_protocol.cpp
+    ../server/acceptor.cpp
+    ../server/car.cpp
+    ../server/city_loader.cpp
+    ../server/city_utils.cpp
+    ../server/client_handler.cpp
+    ../server/collision_listener.cpp
+    ../server/game.cpp
+    ../server/game_command.cpp
+    ../server/game_loop.cpp
+    ../server/game_monitor.cpp
+    ../server/lobby.cpp
+    ../server/npc.cpp
+    ../server/player.cpp
+    ../server/race_loader.cpp
+    ../server/receiver.cpp
+    ../server/sender.cpp
+    ../server/server.cpp
+    ../server/server_config_loader.cpp
     ../server/server_protocol.cpp
-    
+
 
     PUBLIC
     # .h files
     test_client.h
     test_server.h
     mock_socket.h
+    server_test_utils.h
     ../client/client_protocol.h
     )

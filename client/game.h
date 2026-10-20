@@ -4,9 +4,10 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 #include "client_protocol.h"
+#include "game_logic.h"
 #include "game_phase.h"
 #include "game_state.h"
 #include "input_manager.h"
@@ -14,17 +15,16 @@
 #include "sdl_manager.h"
 
 
-class Game {
+// Runs the game phases: reads the input, lets GameLogic apply the server updates and draws
+// the result with SDL.
+class Game: private GameView {
 
     ClientProtocol& protocol;
     SDLManager sdl;
     InputManager input_handler;
     Receiver receiver;
-    LocalInfo game_state;
+    GameLogic logic;
     std::unique_ptr<GamePhase> phase;
-    bool keep_running = true;
-    std::string current_city = "";
-    LeaderboardDTO leaderboard;
 
     friend class GamePhase;
     friend class WaitingForGamePhase;
@@ -35,13 +35,16 @@ class Game {
     friend class GameFinishedPhase;
     friend class WinnerPhase;
 
-    void reset_events();
+    // GameView
+    void set_sound_info(const std::vector<uint32_t>& ids) override;
+    void load_city(const std::string& city_name, const std::string& bridges_data,
+                   const std::string& decorations_data) override;
+    void open_shop() override;
+    void close_shop() override;
+    void open_leaderboard() override;
+    void close_leaderboard() override;
 
-    void detect_events_for_player(PlayerInfo& info, const PlayerDTO& dto,
-                                  const CarPositionDTO& car_pos);
-
-    void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
-
+    bool is_running() const;
 
     void handle_waiting_events();
     bool update_waiting();
@@ -68,10 +71,6 @@ class Game {
     void show_game_finished();
 
     void change_phase();
-
-    void update_player(const PlayerDTO& player, const CarPositionDTO& car,
-                       const std::unordered_map<uint32_t, PlayerInfo>& prev_state);
-    void check_for_last_updates();
 
 
 public:

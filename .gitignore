@@ -4,3 +4,6 @@ tags.*
 .vscode
 .idea
 nfs_valgrind_log
+.scannerwork/
+.tools/
+.claude/settings.local.json

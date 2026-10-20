@@ -2,15 +2,11 @@
 
 #include <iostream>
 #include <memory>
-#include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
 #include "../common/leaderboard_dto.h"
-#include "../common/queue.h"
-#include "../common/race_dto.h"
 
 #include "sender.h"
 
@@ -20,8 +16,7 @@ Game::Game(ClientProtocol& protocol, uint32_t id):
         sdl(SDLManager()),
         input_handler(sdl, this->protocol),
         receiver(this->protocol),
-        game_state{id, {}, {}, {}},
-        leaderboard(LeaderboardDTO()) {
+        logic(*this, receiver.get_car_positions_queue(), id) {
     phase = std::make_unique<WaitingForGamePhase>(*this, 0);
 }
 
@@ -32,7 +27,7 @@ bool Game::run() {
 
     try {
 
-        while (keep_running) {
+        while (logic.is_running()) {
 
             bool phase_changed = false;
             phase_changed = phase->run();
@@ -44,7 +39,7 @@ bool Game::run() {
 
     } catch (const std::exception& e) {
 
-        this->keep_running = false;
+        logic.stop();
     }
 
     bool server_connected = receiver.is_server_connected();
@@ -55,127 +50,30 @@ bool Game::run() {
 }
 
 
-void Game::reset_events() {
-    for (auto& [username, p]: game_state.players) {
+void Game::set_sound_info(const std::vector<uint32_t>& ids) { sdl.set_sound_info(ids); }
 
-        p.crashed = false;
-        p.isMoving = false;
-    }
-    game_state.player.crashed = false;
-    game_state.player.isMoving = false;
+void Game::load_city(const std::string& city_name, const std::string& bridges_data,
+                     const std::string& decorations_data) {
+    sdl.load_city(city_name, bridges_data, decorations_data);
 }
 
-void Game::detect_events_for_player(PlayerInfo& info, const PlayerDTO& dto,
-                                    const CarPositionDTO& car_pos) {
-    // Detectar movimiento
-    if (info.x != (int)car_pos.x_position || info.y != (int)car_pos.y_position ||
-        info.angle != (int)car_pos.angle) {
-        info.isMoving = true;
-    }
-
-    // Detectar muerte
-    if (dto.dead && !info.died) {
-        info.died = true;
-        return;
-    }
-
-    // Detectar choque (reduccion de vida)
-    if (dto.health < info.life && dto.health > 0) {
-        info.crashed = true;
-    }
+void Game::open_shop() {
+    if (!sdl.is_shop_open())
+        sdl.toggle_shop();
 }
 
-void Game::update_player(const PlayerDTO& player, const CarPositionDTO& car,
-                         const std::unordered_map<uint32_t, PlayerInfo>& last_state) {
-    if (player.id == game_state.id) {
-        PlayerInfo& info = game_state.player;
+void Game::close_shop() { sdl.close_shop(); }
 
-        detect_events_for_player(info, player, car);
+void Game::open_leaderboard() { sdl.open_leaderboard(); }
 
-        info.id = player.id;
-        info.x = car.x_position;
-        info.y = car.y_position;
-        info.angle = car.angle;
-        info.life = player.health;
-        info.max_life = player.max_health;
-        info.died = player.dead;
-        info.layer = car.layer;
-        info.checkpoint = car.next;
-        info.model = player.car.model;
-        info.finish_race = player.finish_race;
-        info.current_lap = car.current_lap;
-        info.race_lap = car.race_lap;
-        info.username = player.username;
-        return;
-    }
+void Game::close_leaderboard() { sdl.close_leaderboard(); }
 
-    PlayerInfo& info = game_state.players[player.id];
+bool Game::is_running() const { return logic.is_running(); }
 
-    auto last_it = last_state.find(player.id);
-    if (last_it != last_state.end()) {
-        info = last_it->second;
-        detect_events_for_player(info, player, car);
-    }
-
-    info.id = player.id;
-    info.model = player.car.model;
-    info.life = player.health;
-    info.max_life = player.max_health;
-    info.died = player.dead;
-    info.x = car.x_position;
-    info.y = car.y_position;
-    info.angle = car.angle;
-    info.layer = car.layer;
-    info.checkpoint = car.next;
-    info.finish_race = player.finish_race;
-    info.current_lap = car.current_lap;
-    info.race_lap = car.race_lap;
-    info.username = player.username;
-}
-
-void Game::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
-
-    std::unordered_map<uint32_t, PlayerInfo> last_state = std::move(game_state.players);
-    game_state.players.clear();
-
-    for (const auto& [playerDTO, carPos]: snapshot.car_positions) {
-        update_player(playerDTO, carPos, last_state);
-    }
-
-    game_state.npcs = snapshot.npc_positions;
-}
 
 void Game::handle_waiting_events() { input_handler.handle_waiting(); }
 
-bool Game::update_waiting() {
-
-    GameUpdateDTO dto;
-    reset_events();
-
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-
-    while (updates.try_pop(dto)) {
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
-            dto.gameloop_action == GameLoopAction::DISCONNECT) {
-
-            this->keep_running = false;
-            return true;
-        }
-        if (dto.gameloop_action == GameLoopAction::START_SHOP) {
-            std::vector<uint32_t> ids;
-            ids.push_back(game_state.id);
-            for (const auto& [id, player]: game_state.players) {
-                ids.push_back(id);
-            }
-            sdl.set_sound_info(ids);
-            game_state.phase = Phase::UPGRADE;
-            game_state.penalty_per_upgrade = std::get<uint8_t>(dto.data);
-            return false;
-        }
-    }
-    return true;
-}
+bool Game::update_waiting() { return logic.update_waiting(); }
 
 void Game::show_waiting() {
 
@@ -184,76 +82,15 @@ void Game::show_waiting() {
     sdl.show_screen();
 }
 
-void Game::handle_upgrade_events() { input_handler.handle_buy_events(game_state.player.time); }
-
-bool Game::update_upgrade() {
-
-    if (!sdl.is_shop_open())
-        sdl.toggle_shop();
-
-    GameUpdateDTO dto;
-    WorldSnapshotDTO last;
-    reset_events();
-    bool got_snapshot = false;
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (updates.try_pop(dto)) {
-
-        if (got_snapshot) {
-            update_game_state_from_snapshot(last);
-            got_snapshot = false;
-        }
-
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
-            dto.gameloop_action == GameLoopAction::DISCONNECT) {
-
-            this->keep_running = false;
-            return true;
-        }
-        if (dto.gameloop_action == GameLoopAction::START_COUNTDOWN) {
-
-            game_state.phase = Phase::COUNTDOWN;
-            if (got_snapshot)
-                update_game_state_from_snapshot(last);
-
-            sdl.close_shop();
-            return false;
-        } else if (dto.gameloop_action == GameLoopAction::SEND_RACE) {
-
-            if (std::holds_alternative<RaceDTO>(dto.data)) {
-
-                RaceDTO race = std::get<RaceDTO>(dto.data);
-                if (current_city != race.city) {
-
-                    current_city = race.city;
-                    sdl.load_city(race.city, race.bridges_data, race.decorations_data);
-                }
-                if (!sdl.is_shop_open())
-                    sdl.toggle_shop();
-            }
-        } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-
-            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                last = std::get<WorldSnapshotDTO>(dto.data);
-                got_snapshot = true;
-            }
-        } else if (dto.gameloop_action == GameLoopAction::SEND_UPGRADES_REMAINING) {
-            if (std::holds_alternative<uint8_t>(dto.data)) {
-                uint8_t upgrades_remaining = std::get<uint8_t>(dto.data);
-                game_state.player.upgrades_remaining = upgrades_remaining;
-            }
-        } else if (dto.gameloop_action == GameLoopAction::SEND_UPGRADE_SHOP_TIME_REMAINING) {
-            if (std::holds_alternative<uint8_t>(dto.data)) {
-                uint8_t time_remaining = std::get<uint8_t>(dto.data);
-                game_state.upgrade_shop_countdown = time_remaining;
-            }
-        }
-    }
-
-    return true;
+void Game::handle_upgrade_events() {
+    input_handler.handle_buy_events(logic.get_state().player.time);
 }
 
+bool Game::update_upgrade() { return logic.update_upgrade(); }
+
 void Game::show_upgrade() {
+
+    const LocalInfo& game_state = logic.get_state();
 
     sdl.clear_screen();
     sdl.render_shop(game_state.player.time, static_cast<int>(game_state.penalty_per_upgrade),
@@ -264,197 +101,43 @@ void Game::show_upgrade() {
 
 void Game::handle_countdown_events() { input_handler.handle_countdown(); }
 
-bool Game::update_countdown() {
+bool Game::update_countdown() { return logic.update_countdown(); }
 
-    GameUpdateDTO dto;
-    WorldSnapshotDTO last;
-    bool got_snapshot = false;
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-
-    while (updates.try_pop(dto)) {
-
-        if (got_snapshot) {
-            update_game_state_from_snapshot(last);
-            got_snapshot = false;
-        }
-
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
-            dto.gameloop_action == GameLoopAction::DISCONNECT) {
-
-            this->keep_running = false;
-            return true;
-        }
-        if (dto.gameloop_action == GameLoopAction::START_RACE) {
-            game_state.phase = Phase::IN_RACE;
-            return false;
-        }
-
-        if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                last = std::get<WorldSnapshotDTO>(dto.data);
-                got_snapshot = true;
-            }
-        } else if (dto.gameloop_action == GameLoopAction::COUNTDOWN_TIME) {
-            if (std::holds_alternative<uint8_t>(dto.data)) {
-                uint8_t seconds_left = std::get<uint8_t>(dto.data);
-                game_state.countdown_seconds = seconds_left;
-            }
-        }
-    }
-    return true;
-}
-
-void Game::show_countdown() { sdl.render_countdown(game_state); }
+void Game::show_countdown() { sdl.render_countdown(logic.get_state()); }
 
 
 void Game::handle_race_events() { input_handler.handle_movement(); }
 
+bool Game::update_race() { return logic.update_race(); }
 
-bool Game::update_race() {
-
-    GameUpdateDTO dto;
-    WorldSnapshotDTO last;
-    bool got_snapshot = false;
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-
-    while (updates.try_pop(dto)) {
-
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
-            dto.gameloop_action == GameLoopAction::DISCONNECT) {
-
-            this->keep_running = false;
-            return true;
-        }
-        if (dto.gameloop_action == GameLoopAction::LEADERBOARD) {
-
-            game_state.phase = Phase::LEADERBOARD;
-            if (got_snapshot)
-                update_game_state_from_snapshot(last);
-
-            game_state.player.time = 0;
-            return false;
-        } else if (dto.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
-
-            if (std::holds_alternative<WorldSnapshotDTO>(dto.data)) {
-                last = std::get<WorldSnapshotDTO>(dto.data);
-                got_snapshot = true;
-            }
-        } else if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
-
-            game_state.phase = Phase::GAME_FINISHED;
-            if (got_snapshot)
-                update_game_state_from_snapshot(last);
-
-            return false;
-        } else if (dto.gameloop_action == GameLoopAction::RACE_TIME) {
-            if (std::holds_alternative<uint32_t>(dto.data)) {
-                uint32_t elapsed_seconds = std::get<uint32_t>(dto.data);
-                game_state.player.time = static_cast<int>(elapsed_seconds);
-            }
-        }
-
-        if (game_state.phase != Phase::IN_RACE) {
-
-            if (got_snapshot)
-                update_game_state_from_snapshot(last);
-
-            return false;
-        }
-    }
-
-    if (got_snapshot)
-        update_game_state_from_snapshot(last);
-
-    return true;
-}
-
-void Game::show_race() { sdl.render(game_state); }
+void Game::show_race() { sdl.render(logic.get_state()); }
 
 void Game::handle_leaderboard_events() { input_handler.handle_leaderboard(); }
 
-bool Game::update_leaderboard() {
-
-    GameUpdateDTO dto;
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (updates.try_pop(dto)) {
-
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
-            dto.gameloop_action == GameLoopAction::DISCONNECT) {
-
-            this->keep_running = false;
-            sdl.close_leaderboard();
-            return true;
-        }
-        if (dto.gameloop_action == GameLoopAction::GAME_FINISHED) {
-
-            game_state.phase = Phase::GAME_FINISHED;
-            sdl.close_leaderboard();
-            return false;
-        } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
-
-            if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
-
-                LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
-                leaderboard = std::move(leaderboard_recv);
-                sdl.open_leaderboard();
-            }
-        } else if (dto.gameloop_action == GameLoopAction::START_SHOP) {
-
-            game_state.phase = Phase::UPGRADE;
-            return false;
-        }
-    }
-    return true;
-}
+bool Game::update_leaderboard() { return logic.update_leaderboard(); }
 
 void Game::show_leaderboard() {
 
     sdl.clear_screen();
-    sdl.render_leaderboard(leaderboard, "Leaderboard");
+    sdl.render_leaderboard(logic.get_leaderboard(), "Leaderboard");
     sdl.show_screen();
 }
 
 void Game::handle_game_finished_events() { input_handler.handle_game_finished(); }
 
-bool Game::update_game_finished() {
-
-    GameUpdateDTO dto;
-    Queue<GameUpdateDTO>& updates = receiver.get_car_positions_queue();
-    while (updates.try_pop(dto)) {
-
-        if (dto.gameloop_action == GameLoopAction::RETURN_TO_LOBBY ||
-            dto.gameloop_action == GameLoopAction::DISCONNECT) {
-
-            this->keep_running = false;
-            sdl.close_leaderboard();
-            return true;
-        } else if (dto.gameloop_action == GameLoopAction::SEND_LEADERBOARD) {
-
-            if (std::holds_alternative<LeaderboardDTO>(dto.data)) {
-
-                LeaderboardDTO leaderboard_recv = std::get<LeaderboardDTO>(dto.data);
-                leaderboard = std::move(leaderboard_recv);
-                sdl.open_leaderboard();
-            }
-        }
-    }
-    return true;
-}
+bool Game::update_game_finished() { return logic.update_game_finished(); }
 
 void Game::show_game_finished() {
 
     sdl.clear_screen();
-    sdl.render_leaderboard(leaderboard, "Final Leaderboard");
+    sdl.render_leaderboard(logic.get_leaderboard(), "Final Leaderboard");
     sdl.show_screen();
 }
 
 
 void Game::change_phase() {
 
-    switch (this->game_state.phase) {
+    switch (logic.get_state().phase) {
 
         case Phase::WAITING_FOR_CAR_SELECTION:
             phase = std::make_unique<WaitingForGamePhase>(*this, 0);
