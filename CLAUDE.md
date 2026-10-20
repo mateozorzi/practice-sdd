@@ -3,6 +3,8 @@
 Juego 2D de carreras (TP Taller de Programación) en C++20 con CMake, Box2D, Qt, SDL2 y YAML.
 - `server/`: lobby, partidas y física. `client/`: menús en Qt y juego en SDL2. `editor/EditorMapas/`: editor de circuitos (Qt). `common/`: código compartido.
 - El programa instalado lee la configuración de `/etc/nfs` y los assets de `/var/nfs`.
+- Creación de test que guien la implementacion
+
 
 ## Comandos
 - Compilar y testear: `make run-tests`
