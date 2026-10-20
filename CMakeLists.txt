@@ -248,7 +248,6 @@ if(NFS_TESTS)
     # Change this if you have to.
     target_link_libraries(nfs_tests
         nfs_common
-        GTest::gtest_main
         gtest
         gmock
         SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer
@@ -272,6 +271,7 @@ if(NFS_TESTS)
 
     target_sources(nfs_client_tests
         PRIVATE
+        tests/client/main.cpp
         tests/client/test_client_threads.cpp
         tests/client/test_editor_model.cpp
         tests/client/test_game_logic.cpp
@@ -329,7 +329,6 @@ if(NFS_TESTS)
 
     target_link_libraries(nfs_client_tests
         nfs_common
-        GTest::gtest_main
         gtest
         SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer
         nlohmann_json::nlohmann_json

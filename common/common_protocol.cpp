@@ -1,7 +1,10 @@
 #include "common_protocol.h"
 
+#include <cerrno>
 #include <cstring>
 #include <vector>
+
+#include "liberror.h"
 
 
 CommonProtocol::CommonProtocol(ISocket& socket): socket(socket) {}
@@ -47,8 +50,10 @@ void CommonProtocol::send_buffer() {
 
     if (!protocol_buffer.empty()) {
 
-        socket.sendall(protocol_buffer.data(), protocol_buffer.size());
+        const int sent = socket.sendall(protocol_buffer.data(), protocol_buffer.size());
         protocol_buffer.clear();
+        if (sent == 0)
+            throw LibError(EPIPE, "the connection was closed while sending: ");
     }
 }
 
@@ -56,7 +61,7 @@ void CommonProtocol::send_buffer() {
 uint8_t CommonProtocol::recv_uint8() {
 
     uint8_t value_to_recv = 0;
-    socket.recvall(&value_to_recv, sizeof(value_to_recv));
+    recv_exactly(&value_to_recv, sizeof(value_to_recv));
 
     return value_to_recv;
 }
@@ -64,7 +69,7 @@ uint8_t CommonProtocol::recv_uint8() {
 uint16_t CommonProtocol::recv_uint16() {
 
     uint16_t value_to_recv = 0;
-    socket.recvall(&value_to_recv, sizeof(value_to_recv));
+    recv_exactly(&value_to_recv, sizeof(value_to_recv));
 
     return ntohs(value_to_recv);
 }
@@ -72,7 +77,7 @@ uint16_t CommonProtocol::recv_uint16() {
 uint32_t CommonProtocol::recv_uint32() {
 
     uint32_t value_to_recv = 0;
-    socket.recvall(&value_to_recv, sizeof(value_to_recv));
+    recv_exactly(&value_to_recv, sizeof(value_to_recv));
 
     return ntohl(value_to_recv);
 }
@@ -81,13 +86,22 @@ std::string CommonProtocol::recv_string() {
 
     const uint32_t string_len = recv_uint32();
     std::vector<char> buf(string_len);
-    socket.recvall(buf.data(), string_len);
+    recv_exactly(buf.data(), string_len);
 
     return std::string(buf.begin(), buf.end());
 }
 
+void CommonProtocol::recv_exactly(void* data, const unsigned int size) {
+
+    if (size > 0 && socket.recvall(data, size) == 0)
+        throw LibError(EPIPE, "the connection was closed while receiving: ");
+}
+
 
 void CommonProtocol::stop() {
+
+    if (stopped.exchange(true))
+        return;
 
     socket.shutdown(SHUT_RDWR);
     socket.close();

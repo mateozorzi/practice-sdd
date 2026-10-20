@@ -3,9 +3,12 @@
 # Every project target is instrumented (not only the tests) so the files that
 # no test exercises still show up in the report, with 0% coverage.
 
+# -fprofile-update=atomic: the counters are shared by several threads; without
+# it they race and gcov reports negative hit counts.
+
 function(enable_coverage target_name)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(${target_name} PRIVATE --coverage -O0 -g)
+    target_compile_options(${target_name} PRIVATE --coverage -fprofile-update=atomic -O0 -g)
     target_link_options(${target_name} PRIVATE --coverage)
   else()
     message(WARNING "Coverage is not supported for compiler '${CMAKE_CXX_COMPILER_ID}'")

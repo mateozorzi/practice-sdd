@@ -1,6 +1,7 @@
 target_sources(nfs_tests
     PRIVATE
     # .cpp files
+    main.cpp
     test_client.cpp
     test_server.cpp
     test_city_loader.cpp

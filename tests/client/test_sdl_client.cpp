@@ -214,7 +214,9 @@ TEST_F(SdlTest, DrawsCrashesExplosionsAndTheEndOfTheRace) {
 TEST_F(SdlTest, InvalidCityDataIsIgnored) {
     SDLManager sdl;
 
+    testing::internal::CaptureStderr();
     sdl.load_city("Liberty City", "not json", "");
+    EXPECT_NE(testing::internal::GetCapturedStderr().find("Error parsing JSON"), std::string::npos);
 
     LocalInfo state{1, {}, player_at(1, 1000, 1000), {}};
     sdl.render(state);

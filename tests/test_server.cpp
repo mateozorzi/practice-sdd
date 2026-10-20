@@ -621,7 +621,9 @@ TEST_F(ServerProtocolTest, ReceiveLobbyInfo) {
             0x00, 0x00, 0x00, 0x06,        // race city size
             'M', 'o', 'n', 'a', 'c', 'o',  // race city "Monaco"
             0x00,                          // size checkpoints
-            0x02                           // laps
+            0x02,                          // laps
+            0x00, 0x00, 0x00, 0x00,        // bridges data size 0
+            0x00, 0x00, 0x00, 0x00         // decorations data size 0
     };
 
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);

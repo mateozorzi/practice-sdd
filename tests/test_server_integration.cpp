@@ -255,11 +255,7 @@ TEST_F(ServerIntegrationTest, LeavingTheLobbyClosesTheConnection) {
     EXPECT_ANY_THROW(client->protocol.receive_id());
 }
 
-// Disabled: fails intermittently because of a server bug. When a client leaves, its handler
-// runs ClientHandler::stop() twice and CommonProtocol::stop() shuts down and closes the same fd
-// number twice (Socket::close keeps `skt`). If the next client was accepted in between and got
-// that fd, its connection is closed. Enable it once the double close is fixed.
-TEST_F(ServerIntegrationTest, DISABLED_ServerKeepsAcceptingAfterAClientLeaves) {
+TEST_F(ServerIntegrationTest, ServerKeepsAcceptingAfterAClientLeaves) {
     {
         auto client = connect();
         ASSERT_EQ(client->change_username("first"), FIRST_CLIENT_ID);

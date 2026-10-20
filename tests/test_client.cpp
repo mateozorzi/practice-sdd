@@ -604,7 +604,8 @@ TEST_F(ClientProtocolTest, ReceiveUpdatePositions_WithMock) {
             0x00,                    // next checkpoint is_finish_line = false
             0x01,                    // layer = 1
             0x01,                    // current lap = 1
-            0x02                     // race lap = 2
+            0x02,                    // race lap = 2
+            0x00                     // npc size = 0
     };
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);
     size_t read_pos = 0;

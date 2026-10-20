@@ -2,6 +2,8 @@
 #include <chrono>
 #include <cstring>
 #include <stdexcept>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>
@@ -377,6 +379,9 @@ TEST(ThreadTest, ExceptionsInRunEndTheThread) {
     FlagThread thread;
     thread.throw_in_run = true;
 
+    // The tests' main silences std::cerr, so it is redirected here to check the messages
+    std::ostringstream errors;
+    std::streambuf* silenced = std::cerr.rdbuf(errors.rdbuf());
     thread.start();
     thread.join();
 
@@ -387,6 +392,10 @@ TEST(ThreadTest, ExceptionsInRunEndTheThread) {
     unknown.start();
     unknown.join();
     EXPECT_FALSE(unknown.is_alive());
+
+    std::cerr.rdbuf(silenced);
+    EXPECT_NE(errors.str().find("Unexpected exception: boom"), std::string::npos);
+    EXPECT_NE(errors.str().find("Unexpected exception: <unknown>"), std::string::npos);
 }
 
 TEST(UpgradeDTOTest, StoresTheIncreases) {

@@ -122,9 +122,7 @@ TEST_F(SenderTest, ClosingTheQueueEndsTheThread) {
     EXPECT_TRUE(wait_until_dead(sender));
 }
 
-// Disabled: client bug. Socket::sendall returns 0 on a broken pipe instead of throwing and
-// CommonProtocol::send_buffer ignores it, so the sender never notices the server is gone.
-TEST_F(SenderTest, DISABLED_SendingToAClosedConnectionEndsTheThread) {
+TEST_F(SenderTest, SendingToAClosedConnectionEndsTheThread) {
     server_socket.shutdown(SHUT_RDWR);
     server_socket.close();
 
@@ -217,9 +215,7 @@ TEST_F(ReceiverTest, ServerDisconnectionEndsTheThread) {
     EXPECT_FALSE(receiver.is_server_connected());
 }
 
-// Disabled: client bug. Socket::recvall returns 0 when the peer closes and CommonProtocol reads
-// it as a zero value, so the receiver loops forever queueing updates with action 0.
-TEST_F(ReceiverTest, DISABLED_LostConnectionEndsTheThread) {
+TEST_F(ReceiverTest, LostConnectionEndsTheThread) {
     server_socket.shutdown(SHUT_RDWR);
     server_socket.close();
 

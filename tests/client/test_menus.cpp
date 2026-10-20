@@ -150,22 +150,30 @@ protected:
 TEST(MenuConnectionTest, ReturnsAValidAddress) {
     use_offscreen_platform();
 
+    testing::internal::CaptureStdout();
     auto [ip, port] = run_connection_menu("127.0.0.1", "8080");
+    std::string output = testing::internal::GetCapturedStdout();
 
     EXPECT_EQ(ip, "127.0.0.1");
     EXPECT_EQ(port, "8080");
+    EXPECT_NE(output.find("Connecting to IP: 127.0.0.1 Port: 8080"), std::string::npos);
 }
 
 TEST(MenuConnectionTest, RejectsInvalidAddresses) {
     use_offscreen_platform();
     const std::pair<std::string, std::string> nothing("", "");
 
+    testing::internal::CaptureStdout();
     EXPECT_EQ(run_connection_menu("", "8080"), nothing);
     EXPECT_EQ(run_connection_menu("127.0.0.1", ""), nothing);
     EXPECT_EQ(run_connection_menu("127.0.0.1", "port"), nothing);
     EXPECT_EQ(run_connection_menu("127.0.0.1", "70000"), nothing);
     EXPECT_EQ(run_connection_menu("localhost", "8080"), nothing);
     EXPECT_EQ(run_connection_menu("127.0.0.300", "8080"), nothing);
+    std::string output = testing::internal::GetCapturedStdout();
+
+    EXPECT_NE(output.find("Invalid port number"), std::string::npos);
+    EXPECT_NE(output.find("Invalid IP address"), std::string::npos);
 }
 
 TEST(MenuConnectionTest, ExitReturnsNothing) {

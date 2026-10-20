@@ -2,6 +2,7 @@
 #define COMMON_PROTOCOL_H
 
 
+#include <atomic>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,8 @@ class CommonProtocol {
 protected:
     ISocket& socket;
     std::vector<uint8_t> protocol_buffer;
+    // Socket::close keeps the fd number: closing twice could close a socket opened in between
+    std::atomic<bool> stopped{false};
 
     void add_uint8_to_buffer(uint8_t value);
     void add_uint16_to_buffer(uint16_t value);
@@ -28,6 +31,9 @@ protected:
     uint16_t recv_uint16();
     uint32_t recv_uint32();
     std::string recv_string();
+
+    // Socket::sendall and Socket::recvall return 0 when the peer closed the connection
+    void recv_exactly(void* data, unsigned int size);
 
 
 public:
