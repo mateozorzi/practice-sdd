@@ -46,6 +46,7 @@ operations:
       - Seguir el ciclo rojo → verde → refactor; no marcar una tarea como hecha sin su test pasando
       - Compilar los tests con cmake --build build --target nfs_tests nfs_client_tests -j16
       - Si un hook (formato, cpplint, cppcheck, tests) falla, arreglar el problema; nunca saltear el hook
+      - Commits deben ser atómicos y reflejar cambios coherentes con los tests y la implementación
   archive:
     guidance:
       - Actualizar el estado del hito en openspec/specs/roadmap.md
