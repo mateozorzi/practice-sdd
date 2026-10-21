@@ -1,0 +1,52 @@
+schema: spec-driven
+
+# Constitution del proyecto: aplica a todos los artefactos y operaciones de OpenSpec.
+context: |
+  Escribir todos los artefactos en español.
+
+  Antes de crear o revisar cualquier artefacto, leer la constitution del proyecto:
+  - openspec/constitution/mission.md: misión, audiencia y principios no negociables
+  - openspec/constitution/tech-stack.md: stack (cerrado, sin dependencias nuevas), arquitectura y reglas de tests
+  - openspec/constitution/roadmap.md: hitos de la feature actual y su estado
+  - roadmap.md (raíz) y TODO.md: Background y criterios Given/When/Then de cada hito (fuente de verdad)
+
+  Principios no negociables (si un artefacto o cambio contradice uno, es un problema CRITICAL):
+  I. TDD obligatorio: primero los tests de aceptación (GoogleTest) y verificar que fallan; después la implementación.
+     Cada scenario Given/When/Then se mapea a un test con nombre (Suite.Test).
+  II. Tests deterministas: el tiempo avanza solo con pasos de física o ticks explícitos; el RNG se inyecta;
+     los valores salen del Background del hito, nunca de los defaults de server/config/*.yaml.
+  III. Gates entre hitos: no se arranca un hito si el anterior no tiene sus tests verdes, make run-tests sin
+     regresiones, hooks sin errores y /opsx:verify sin CRITICAL.
+
+  Restricciones de arquitectura:
+  - El servidor es autoritativo: los efectos se calculan en el servidor; el cliente solo dibuja y reproduce sonido.
+  - Nunca incluir headers del cliente y del servidor en la misma unidad de compilación; en los tests del cliente,
+    el servidor se usa vía RunningServer (tests/server_test_utils.h).
+  - Cada archivo de tests de red usa su propio rango de puertos.
+  - Sin cambios en editor/ para la feature de power-ups.
+
+rules:
+  proposal:
+    - Indicar qué hito de roadmap.md implementa el change
+    - Indicar explícitamente qué queda fuera de alcance
+  specs:
+    - Cada requirement tiene al menos un scenario Given/When/Then
+    - Los scenarios cubren todos los criterios de aceptación del hito en roadmap.md, usando los valores de su Background
+    - Cada scenario indica el test de GoogleTest que lo verifica (Suite.Test) y su archivo en tests/
+  design:
+    - Definir la API para avanzar el tiempo de forma explícita (pasos o ticks), sin reloj de pared
+    - Definir cómo se inyectan el RNG y la config de test (por ejemplo, helpers en tests/server_test_utils.*)
+  tasks:
+    - Las primeras tareas escriben los tests de aceptación y verifican que fallan; la implementación va después
+    - La última tarea es correr make run-tests en verde y chequear el gate del hito
+
+operations:
+  apply:
+    guidance:
+      - Seguir el ciclo rojo → verde → refactor; no marcar una tarea como hecha sin su test pasando
+      - Compilar los tests con cmake --build build --target nfs_tests nfs_client_tests -j16
+      - Si un hook (formato, cpplint, cppcheck, tests) falla, arreglar el problema; nunca saltear el hook
+  archive:
+    guidance:
+      - Actualizar el estado del hito en openspec/specs/roadmap.md
+      - Si cambia el protocolo o algo visible para el usuario, actualizar README.md y los manuales
