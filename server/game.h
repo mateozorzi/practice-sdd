@@ -40,7 +40,7 @@ public:
                                                                      const std::string& username);
     void remove_player(uint32_t player_id);
 
-    const std::string get_name() const;
+    const std::string& get_name() const;
     uint8_t get_max_players() const;
     uint8_t get_active_players() const;
     uint32_t get_next_player_id() const;

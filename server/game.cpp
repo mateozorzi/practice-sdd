@@ -38,7 +38,7 @@ void Game::remove_player(const uint32_t player_id) {
     game_monitor.remove_player(player_id);
 }
 
-const std::string Game::get_name() const { return name; }
+const std::string& Game::get_name() const { return name; }
 
 uint8_t Game::get_max_players() const { return max_players; }
 

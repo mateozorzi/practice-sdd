@@ -47,7 +47,7 @@ private:
     bool is_street(const QPoint& pos);
     Checkpoint calculate_checkpoint(const QPoint& pos);
     void import_checkpoints();
-    void draw_id_checkpoint(QRect& fig, const int id);
+    void draw_id_checkpoint(const QRect& fig, const int id);
     void draw_checkpoint(QRect& fig, const int id);
     void update_id(const int id);
 

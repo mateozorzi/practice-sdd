@@ -61,7 +61,7 @@ public:
     bool is_alive() const override { return _is_alive; }
 
     virtual void run() = 0;
-    virtual ~Thread() {}
+    ~Thread() override {}
 
     Thread(const Thread&) = delete;
     Thread& operator=(const Thread&) = delete;

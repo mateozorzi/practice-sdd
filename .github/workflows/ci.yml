@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build, tests y cobertura
+    runs-on: ubuntu-latest
+    # Mismo entorno que el de desarrollo (g++ 15, Qt 6.10); los runners traen Qt 6.4
+    container: ubuntu:26.04
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Instalar dependencias
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential cmake git pkg-config ca-certificates gcovr \
+            libopus-dev libopusfile-dev libxmp-dev libfluidsynth-dev libwavpack-dev libfreetype-dev \
+            qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-multimedia-dev \
+            libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
+
+      - uses: actions/checkout@v4
+
+      # SDL2, yaml-cpp, box2d, json y gtest los baja FetchContent
+      - name: Cache de dependencias de CMake
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+
+      - name: Compilar, correr tests y generar cobertura
+        run: make test EXTRA_COMPILE="-j$(nproc)"
+
+      - name: Subir reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/report/
+          if-no-files-found: ignore
+
+  lint:
+    name: Lint (pre-commit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar cppcheck y pre-commit
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+          pip install pre-commit
+
+      - name: Cache de pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Correr hooks
+        run: pre-commit run --all-files --show-diff-on-failure

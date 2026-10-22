@@ -137,7 +137,7 @@ Checkpoint Creador::calculate_checkpoint(const QPoint& pos) {
     }
 }
 
-void Creador::draw_id_checkpoint(QRect& fig, const int id) {
+void Creador::draw_id_checkpoint(const QRect& fig, const int id) {
     QGraphicsTextItem* text = scene->addText(QString::number(id));
 
     QFont font("Arial", 12, QFont::Bold);

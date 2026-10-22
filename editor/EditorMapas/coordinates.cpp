@@ -150,7 +150,7 @@ bool Coordinates::export_checkpoints(const QString& file_path, const QString& ma
     return true;
 }
 
-QVector<Checkpoint> Coordinates::get_checkpoints() { return checkpoints; }
+const QVector<Checkpoint>& Coordinates::get_checkpoints() const { return checkpoints; }
 
 bool Coordinates::is_empty() { return checkpoints.empty(); }
 

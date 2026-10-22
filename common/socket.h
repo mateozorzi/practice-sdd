@@ -178,6 +178,6 @@ public:
      * se llamara a `Socket::shutdown` y `Socket::close`
      * automáticamente.
      * */
-    ~Socket();
+    ~Socket() override;
 };
 #endif
