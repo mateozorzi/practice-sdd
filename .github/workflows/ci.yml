@@ -27,21 +27,22 @@ jobs:
             qt6-base-dev qt6-tools-dev qt6-l10n-tools qt6-multimedia-dev \
             libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # SDL2, yaml-cpp, box2d, json y gtest los baja FetchContent
       - name: Cache de dependencias de CMake
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: build/_deps
           key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
 
+      # La CMake 4 de Ubuntu 26.04 rechaza deps que piden cmake_minimum_required < 3.5 (yaml-cpp 0.8.0)
       - name: Compilar, correr tests y generar cobertura
-        run: make test EXTRA_COMPILE="-j$(nproc)"
+        run: make test EXTRA_GENERATE="-DCMAKE_POLICY_VERSION_MINIMUM=3.5" EXTRA_COMPILE="-j$(nproc)"
 
       - name: Subir reporte de cobertura
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: coverage-report
           path: build/report/
@@ -51,9 +52,9 @@ jobs:
     name: Lint (pre-commit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -64,7 +65,7 @@ jobs:
           pip install pre-commit
 
       - name: Cache de pre-commit
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
