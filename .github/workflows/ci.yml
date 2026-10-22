@@ -36,6 +36,14 @@ jobs:
           path: build/_deps
           key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
 
+      # Igual que install_assets() de installer.sh; sin esto se saltean los tests de SDL
+      - name: Instalar assets en /var/nfs
+        run: |
+          mkdir -p /var/nfs/assets /var/nfs/races /var/nfs/world
+          cp -r client/assets/* /var/nfs/assets/
+          cp -r server/races/* /var/nfs/races/
+          cp -r server/world/* /var/nfs/world/
+
       # La CMake 4 de Ubuntu 26.04 rechaza deps que piden cmake_minimum_required < 3.5 (yaml-cpp 0.8.0).
       # El backend PipeWire de SDL 2.30 no compila con los headers de PipeWire de 26.04 + GCC 15;
       # los tests corren sin audio real, así que se desactiva.
