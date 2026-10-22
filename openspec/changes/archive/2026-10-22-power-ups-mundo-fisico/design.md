@@ -44,6 +44,10 @@ class PowerUp {
 public:
     PowerUpType get_type() const; float get_x() const; float get_y() const;
     bool is_active() const; const b2Body* get_body() const;
+
+    void collect(double respawn_cooldown);  // inactivo y arranca el cooldown
+    bool advance(double elapsed_seconds);   // true cuando tiene que reaparecer
+    void respawn(PowerUpType new_type);     // activo con el tipo nuevo
 };
 ```
 El cuerpo es **`b2_kinematicBody`** con un fixture sensor cuadrado de lado `2 * POWER_UP_HALF_SIZE_PIXELS` (nueva
@@ -82,8 +86,10 @@ archivo; no hace falta tocarlo). No copiable: dueño de cuerpos de Box2D.
 - Real: `PowerUpTypeGenerator make_random_power_up_type_generator();` en `server/power_up.*`: captura un
   `std::mt19937` sembrado con `std::random_device` y una `std::uniform_int_distribution<int>(0, 2)` (uniforme sobre
   los 3 tipos). Lo usa el Hito 3 al construir el manager en el game loop; 2.5 lo llama 1000 veces.
-- Falso: `PowerUpTypeGenerator make_sequence_power_up_type_generator(std::vector<PowerUpType> sequence);` en
-  `tests/server_test_utils.*`: devuelve los tipos en orden y vuelve a empezar al terminarse. El Background usa
+- Falso: `std::function<PowerUpType()> make_sequence_power_up_type_generator(std::vector<PowerUpType> sequence);`
+  en `tests/server_test_utils.*`. Es el mismo tipo que `PowerUpTypeGenerator`, escrito así porque
+  `server_test_utils.h` también lo incluyen los tests del cliente y no puede incluir `server/power_up.h` (arrastra
+  `car.h`, que choca con el `Car` del cliente). Devuelve los tipos en orden y vuelve a empezar al terminarse. El Background usa
   `{Shield, Nitro, Repair, Nitro}`.
 - El tipo se sortea al crear y **al reaparecer** (no al recoger): así 2.13 ve Reparación, el tercero de la secuencia.
 
@@ -128,7 +134,8 @@ Se reutiliza `make_power_up_test_server_config()` (Compact con velocidad 10, ace
   `make_test_race(4, 1)` / `make_test_race(5, 1)`. Las posiciones esperadas salen de `race.checkpoints`.
 - `tests/test_collision_listener.cpp`: el fixture existente pasa a usar `make_power_up_test_server_config()` (el
   auto sigue siendo Compact; los tests de choque comparan contra la salud base, no contra números del YAML) y suma un
-  `PowerUpManager` + un segundo listener con el manager. Los casos de power-ups ubican autos y power-ups en
+  `PowerUpManager`; el único listener del fixture se construye con el manager (`CollisionListener{players,
+  power_ups}`), así que los tests existentes corren con un manager vacío. Los casos de power-ups ubican autos y power-ups en
   coordenadas propias del test (un “circuito” de 2 checkpoints armado en el test), no en las de una ciudad.
 - 2.7: el test pone `SetLinearDamping(0)` en el cuerpo del auto, para que cualquier cambio de velocidad venga del
   contacto, y compara la velocidad antes y después de cruzar el sensor.

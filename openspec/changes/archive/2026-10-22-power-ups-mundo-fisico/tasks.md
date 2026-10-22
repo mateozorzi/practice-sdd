@@ -43,7 +43,7 @@
 - [x] 5.1 Refactor final y hooks: formato, cpplint y cppcheck sin errores sobre los archivos tocados; verificar que
       ningún test nuevo lee valores de `server/config/*.yaml` (solo `make_power_up_test_server_config()` y el
       generador de secuencia) y que no hay cambios en `editor/`
-- [ ] 5.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 2: (a) los 13 tests de
+- [x] 5.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 2: (a) los 13 tests de
       2.1 – 2.13 existen y pasan, (b) `make run-tests` en verde, (c) hooks sin errores, (d) `/opsx:verify` sin CRITICAL
 
 ## Workflow follow-up
