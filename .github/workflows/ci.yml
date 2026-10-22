@@ -36,9 +36,14 @@ jobs:
           path: build/_deps
           key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
 
-      # La CMake 4 de Ubuntu 26.04 rechaza deps que piden cmake_minimum_required < 3.5 (yaml-cpp 0.8.0)
+      # La CMake 4 de Ubuntu 26.04 rechaza deps que piden cmake_minimum_required < 3.5 (yaml-cpp 0.8.0).
+      # El backend PipeWire de SDL 2.30 no compila con los headers de PipeWire de 26.04 + GCC 15;
+      # los tests corren sin audio real, así que se desactiva.
       - name: Compilar, correr tests y generar cobertura
-        run: make test EXTRA_GENERATE="-DCMAKE_POLICY_VERSION_MINIMUM=3.5" EXTRA_COMPILE="-j$(nproc)"
+        run: >
+          make test
+          EXTRA_GENERATE="-DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DSDL_PIPEWIRE=OFF"
+          EXTRA_COMPILE="-j$(nproc)"
 
       - name: Subir reporte de cobertura
         if: always()
