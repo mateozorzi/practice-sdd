@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -6,8 +7,10 @@
 #include <gtest/gtest.h>
 
 #include "../common/constants.h"
+#include "../common/power_up_type.h"
 #include "../server/city_utils.h"
 #include "../server/collision_listener.h"
+#include "../server/power_up.h"
 
 #include "server_test_utils.h"
 
@@ -15,10 +18,15 @@ namespace {
 
 class CollisionListenerTest: public ::testing::Test {
 protected:
-    ServerConfig config = make_test_server_config();
+    ServerConfig config = make_power_up_test_server_config();
     b2World world{b2Vec2(0.0f, 0.0f)};
     std::unordered_map<uint32_t, Player> players;
-    CollisionListener listener{players};
+    // Milestone 2 Background: fake generator sequence
+    PowerUpManager power_ups{
+            world, config,
+            make_sequence_power_up_type_generator({PowerUpType::Shield, PowerUpType::Nitro,
+                                                   PowerUpType::Repair, PowerUpType::Nitro})};
+    CollisionListener listener{players, power_ups};
     CityUtils city_utils{config};
 
     void SetUp() override { world.SetContactListener(&listener); }
@@ -41,8 +49,24 @@ protected:
     }
 
     void step(int times = 1) {
-        for (int i = 0; i < times; ++i)
+        for (int i = 0; i < times; ++i) {
             world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+            power_ups.advance(GAME_STEP);
+        }
+    }
+
+    // Loads a single power-up centered in (x, y) meters: the midpoint of two checkpoints there
+    const PowerUp& place_power_up(float x, float y) {
+        const auto px = static_cast<uint16_t>(x * config.world.pixels_per_meter);
+        const auto py = static_cast<uint16_t>(y * config.world.pixels_per_meter);
+        power_ups.load({CheckpointDTO(1, 'V', px, py), CheckpointDTO(2, 'V', px, py)});
+        if (power_ups.get_power_ups().empty())
+            throw std::runtime_error("no power-up was loaded");
+        return power_ups.get_power_ups().front();
+    }
+
+    static bool has_any_effect(const Player& player) {
+        return player.has_effect(PowerUpType::Nitro) || player.has_effect(PowerUpType::Shield);
     }
 };
 
@@ -190,4 +214,70 @@ TEST_F(CollisionListenerTest, NullContactsAreIgnored) {
     listener.PreSolve(nullptr, nullptr);
 
     SUCCEED();
+}
+
+TEST_F(CollisionListenerTest, CrossingAPowerUpKeepsVelocityAndHealth) {
+    const Player& player = add_player(1, 0.0f, 10.0f);
+    place_power_up(5.0f, 10.0f);
+    b2Body* body = player.get_car_body();
+    // Without damping, any change in velocity can only come from the contact
+    body->SetLinearDamping(0.0f);
+    body->SetLinearVelocity(b2Vec2(10.0f, 0.0f));
+
+    step(60);
+
+    EXPECT_GT(body->GetPosition().x, 6.0f);
+    EXPECT_FLOAT_EQ(body->GetLinearVelocity().x, 10.0f);
+    EXPECT_FLOAT_EQ(body->GetLinearVelocity().y, 0.0f);
+    EXPECT_EQ(player.get_health(), 100);
+}
+
+TEST_F(CollisionListenerTest, CarCollectsShieldPowerUp) {
+    const Player& player = add_player(1, 0.0f, 10.0f);
+    const PowerUp& power_up = place_power_up(5.0f, 10.0f);
+    ASSERT_EQ(power_up.get_type(), PowerUpType::Shield);
+
+    player.get_car_body()->SetLinearVelocity(b2Vec2(10.0f, 0.0f));
+    step(60);
+
+    EXPECT_TRUE(player.has_effect(PowerUpType::Shield));
+    EXPECT_FALSE(power_up.is_active());
+}
+
+TEST_F(CollisionListenerTest, InactivePowerUpGivesNoEffect) {
+    Player& first = add_player(1, 50.0f, 50.0f);
+    const PowerUp& power_up = place_power_up(5.0f, 10.0f);
+    ASSERT_TRUE(power_ups.try_collect(0, first));
+    const Player& second = add_player(2, 0.0f, 10.0f);
+
+    second.get_car_body()->SetLinearVelocity(b2Vec2(10.0f, 0.0f));
+    step(60);
+
+    EXPECT_FALSE(has_any_effect(second));
+    EXPECT_FALSE(power_up.is_active());
+}
+
+TEST_F(CollisionListenerTest, TwoCarsSameStepOnlyOneCollects) {
+    const PowerUp& power_up = place_power_up(5.0f, 10.0f);
+    // Both cars overlap the sensor (but not each other), so both contacts begin in the same step
+    const Player& first = add_player(1, 5.0f, 9.6f);
+    const Player& second = add_player(2, 5.0f, 10.4f);
+
+    step();
+
+    EXPECT_NE(first.has_effect(PowerUpType::Shield), second.has_effect(PowerUpType::Shield));
+    EXPECT_FALSE(power_up.is_active());
+}
+
+TEST_F(CollisionListenerTest, DeadCarDoesNotCollect) {
+    Player& player = add_player(1, 0.0f, 10.0f);
+    player.apply_collision_damage(100);
+    ASSERT_TRUE(player.is_dead());
+    const PowerUp& power_up = place_power_up(5.0f, 10.0f);
+
+    player.get_car_body()->SetLinearVelocity(b2Vec2(10.0f, 0.0f));
+    step(60);
+
+    EXPECT_TRUE(power_up.is_active());
+    EXPECT_FALSE(has_any_effect(player));
 }

@@ -10,6 +10,10 @@
 CollisionListener::CollisionListener(std::unordered_map<uint32_t, Player>& players):
         players(players) {}
 
+CollisionListener::CollisionListener(std::unordered_map<uint32_t, Player>& players,
+                                     PowerUpManager& power_ups):
+        players(players), power_ups(&power_ups) {}
+
 
 std::optional<std::reference_wrapper<Player>> CollisionListener::find_player_by_body(
         const b2Body& body) {
@@ -94,6 +98,15 @@ void CollisionListener::handle_sensor_contact(b2Contact& contact, const bool is_
             uint32_t checkpoint_id = static_cast<uint32_t>(player_data >> SENSOR_DATA_SHIFT);
             if (player.is_next_checkpoint(checkpoint_id))
                 player.trigger_checkpoint_collision();
+        }
+
+        // BeginContact runs once per contact during Step, so with two cars entering in the same
+        // step the second one finds the power-up already inactive
+        if (sensor_type == SensorType::POWER_UP && power_ups) {
+
+            auto power_up_index = static_cast<size_t>(player_data >> SENSOR_DATA_SHIFT);
+            power_ups->try_collect(power_up_index, player);
+            return;
         }
 
         if (current_layer != CarLayer::ON_GROUND)
