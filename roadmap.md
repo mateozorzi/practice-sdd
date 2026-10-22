@@ -18,7 +18,6 @@ Por eso:
 - El tiempo de los efectos avanza solo por llamadas explícitas del test (pasos de física o ticks del
   loop), nunca por reloj de pared. El nombre de la API se define en `design.md`.
 - El sorteo del tipo usa un RNG falso con una secuencia fija, salvo en el test que verifica que salen los 3 tipos.
-- La única excepción es el test 1.2, que lee el YAML real para detectar un cambio accidental de los defaults.
 
 ### Hito 1 — Configuración y modelo de efectos en el servidor (sin física ni red)
 Archivos esperados: `server/player.*`, `server/car.*`, config loader, `tests/test_player.cpp`,

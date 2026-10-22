@@ -54,7 +54,7 @@
 
 - [x] 7.1 Refactor sin cambiar comportamiento (nombres y duplicación en `Player`), con hooks de formato, cpplint y
       cppcheck sin errores; verificar que `PowerUpEffectsTest.*` sigue en verde
-- [ ] 7.2 Correr `make run-tests` en verde sin regresiones y chequear el gate del Hito 1: los 1.1 – 1.17 existen y
+- [x] 7.2 Correr `make run-tests` en verde sin regresiones y chequear el gate del Hito 1: los 1.1 – 1.17 existen y
       pasan, ningún test de power-ups lee los valores de `server/config/*.yaml`, hooks sin errores, sin cambios en
       `editor/`, y `/opsx:verify` sin CRITICAL
 

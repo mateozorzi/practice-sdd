@@ -49,5 +49,5 @@ operations:
       - Commits deben ser atómicos y reflejar cambios coherentes con los tests y la implementación
   archive:
     guidance:
-      - Actualizar el estado del hito en openspec/specs/roadmap.md
+      - Actualizar el estado del hito en openspec/constitution/roadmap.md
       - Si cambia el protocolo o algo visible para el usuario, actualizar README.md y los manuales
