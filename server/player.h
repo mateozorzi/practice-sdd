@@ -12,6 +12,7 @@
 #include "../common/movement_dto.h"
 #include "../common/player_dto.h"
 #include "../common/player_race_stats_dto.h"
+#include "../common/power_up_type.h"
 #include "../common/race_dto.h"
 #include "../common/upgrade_dto.h"
 
@@ -40,8 +41,11 @@ class Player {
     int n_penalty = 0;
     bool infinite_health = false;
     bool checkpoint_triggered = false;
+    double nitro_remaining = 0.0;   // seconds, active while > 0
+    double shield_remaining = 0.0;  // seconds, active while > 0
 
     bool update_next_checkpoint(const RaceDTO& race);
+    void clear_effects();
 
 
 public:
@@ -63,6 +67,8 @@ public:
     PlayerDTO get_info() const;
     PlayerRaceStatsDTO get_race_stats() const;
     uint16_t get_health() const;
+    float get_max_speed() const;
+    float get_acceleration() const;
 
     void handle_car_movement(const MovementDTO& movement_dto);
     void update_car_position(const RaceDTO& race, uint32_t elapsed_seconds,
@@ -89,6 +95,11 @@ public:
     bool is_dead() const;
 
     void apply_collision_damage(uint16_t damage);
+
+    void apply_power_up(PowerUpType type, const PowerUpConfig& power_up_config);
+    void advance_effects(double elapsed_seconds);
+    bool has_effect(PowerUpType type) const;
+    double get_effect_remaining(PowerUpType type) const;
 };
 
 

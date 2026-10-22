@@ -57,6 +57,10 @@ constexpr int VELOCITY_ITERATIONS = 10;
 constexpr int POSITION_ITERATIONS = 6;
 constexpr uint8_t INITIAL_RACE_INDEX = 0;
 
+// Player
+constexpr double EFFECT_TIME_EPSILON =
+        1e-6;  // seconds; absorbs rounding when time adds up per tick
+
 // Main
 constexpr uint8_t SUCCESS = 0;
 constexpr uint8_t ERROR = 1;

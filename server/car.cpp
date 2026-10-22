@@ -121,7 +121,7 @@ void Car::detect_linear_movement() {
 
     b2Vec2 forward_vector = box2d_body->GetWorldVector(b2Vec2(0.0f, 1.0f));
 
-    b2Vec2 force = box2d_body->GetMass() * car_config.acceleration * forward_vector;
+    b2Vec2 force = box2d_body->GetMass() * get_acceleration() * forward_vector;
 
     if (moving_up)
         box2d_body->ApplyForceToCenter(-force, true);
@@ -132,9 +132,11 @@ void Car::detect_linear_movement() {
     b2Vec2 velocity = box2d_body->GetLinearVelocity();
     float current_speed = velocity.Length();
 
-    if (current_speed > car_config.max_speed) {
+    float max_speed = get_max_speed();
 
-        float scale = car_config.max_speed / current_speed;
+    if (current_speed > max_speed) {
+
+        float scale = max_speed / current_speed;
         b2Vec2 limited_velocity(scale * velocity);
         box2d_body->SetLinearVelocity(limited_velocity);
     }
@@ -197,6 +199,10 @@ void Car::update_position() {
 
 uint16_t Car::get_max_health() const { return car_config.health; }
 
+float Car::get_max_speed() const { return car_config.max_speed * power_multiplier; }
+
+float Car::get_acceleration() const { return car_config.acceleration * power_multiplier; }
+
 
 CarPositionDTO Car::get_position_dto() const {
 
@@ -253,6 +259,9 @@ void Car::set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_co
         car_config.drift_factor = std::max(0.0f, car_config.drift_factor - 0.05f);
     }
 }
+
+
+void Car::set_power_multiplier(float multiplier) { power_multiplier = multiplier; }
 
 
 void Car::set_layer(CarLayer layer) {

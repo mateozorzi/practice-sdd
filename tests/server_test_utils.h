@@ -22,6 +22,13 @@ ServerConfig make_test_server_config();
 // Same as make_test_server_config, but with every wait set to zero so game phases advance fast
 ServerConfig make_fast_game_config();
 
+// Power-up values of the milestone Background, different on purpose from server/config defaults
+PowerUpConfig make_test_power_up_config();
+
+// make_test_server_config with the Background test car (Compact: max speed 10, acceleration 5,
+// health 100), upgrades (health 50, speed 3) and make_test_power_up_config()
+ServerConfig make_power_up_test_server_config();
+
 // Race in Liberty City with `checkpoints` checkpoints placed one after the other
 RaceDTO make_test_race(uint8_t checkpoints, uint8_t laps, const std::string& name = "test_race");
 

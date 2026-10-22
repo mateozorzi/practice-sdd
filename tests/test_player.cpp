@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "../common/constants.h"
+#include "../common/power_up_type.h"
 #include "../server/player.h"
 #include "../server/server_constants.h"
 
@@ -444,4 +445,196 @@ TEST_F(CarTest, PositionAngleIsNormalizedToDegrees) {
 
     car.get_body()->SetTransform(b2Vec2(1.0f, 2.0f), 2.0f * b2_pi - 0.001f);
     EXPECT_EQ(car.get_position_dto().angle, 0u);
+}
+
+
+// Power-up effects (Hito 1). Every value comes from the Background, never from server/config.
+
+class PowerUpEffectsTest: public ::testing::Test {
+protected:
+    // Declared before the player: the car keeps a reference to it
+    ServerConfig config = make_power_up_test_server_config();
+    PowerUpConfig power_ups = config.game.power_ups;
+    b2World world{b2Vec2(0.0f, 0.0f)};
+    Player player{PLAYER_ID, "mateo"};
+
+    void SetUp() override { player.create_car("Compact", config, world); }
+
+    void take(PowerUpType type) { player.apply_power_up(type, power_ups); }
+
+    bool has_no_effects() const {
+        return !player.has_effect(PowerUpType::Nitro) && !player.has_effect(PowerUpType::Shield);
+    }
+};
+
+
+TEST_F(PowerUpEffectsTest, NitroDoublesSpeedAndAcceleration) {
+    take(PowerUpType::Nitro);
+
+    EXPECT_TRUE(player.has_effect(PowerUpType::Nitro));
+    EXPECT_FLOAT_EQ(player.get_max_speed(), 20.0f);
+    EXPECT_FLOAT_EQ(player.get_acceleration(), 10.0f);
+}
+
+TEST_F(PowerUpEffectsTest, NitroAppliesOverSpeedUpgrade) {
+    player.set_upgrade(BuyUpgradeDTO{ButtonType::Speed}, config.game.upgrades);
+    ASSERT_FLOAT_EQ(player.get_max_speed(), 13.0f);
+
+    take(PowerUpType::Nitro);
+
+    EXPECT_FLOAT_EQ(player.get_max_speed(), 26.0f);
+}
+
+TEST_F(PowerUpEffectsTest, NitroExpiresAfterDurationRestoringValues) {
+    take(PowerUpType::Nitro);
+
+    player.advance_effects(1.9);
+    EXPECT_TRUE(player.has_effect(PowerUpType::Nitro));
+    EXPECT_FLOAT_EQ(player.get_max_speed(), 20.0f);
+
+    player.advance_effects(0.1);
+    EXPECT_FALSE(player.has_effect(PowerUpType::Nitro));
+    EXPECT_EQ(player.get_max_speed(), 10.0f);
+    EXPECT_EQ(player.get_acceleration(), 5.0f);
+}
+
+TEST_F(PowerUpEffectsTest, NitroRenewsDurationWithoutStacking) {
+    take(PowerUpType::Nitro);
+    player.advance_effects(1.0);
+
+    take(PowerUpType::Nitro);
+
+    EXPECT_NEAR(player.get_effect_remaining(PowerUpType::Nitro), 2.0, 1e-9);
+    EXPECT_FLOAT_EQ(player.get_max_speed(), 20.0f);
+}
+
+TEST_F(PowerUpEffectsTest, NitroAndShieldExpireIndependently) {
+    take(PowerUpType::Nitro);
+    take(PowerUpType::Shield);
+
+    player.advance_effects(2.0);
+    EXPECT_FALSE(player.has_effect(PowerUpType::Nitro));
+    EXPECT_TRUE(player.has_effect(PowerUpType::Shield));
+
+    player.advance_effects(2.0);
+    EXPECT_TRUE(has_no_effects());
+}
+
+TEST_F(PowerUpEffectsTest, RepairAddsHealth) {
+    player.apply_collision_damage(50);
+
+    take(PowerUpType::Repair);
+
+    EXPECT_EQ(player.get_health(), 80);
+    EXPECT_FALSE(player.has_effect(PowerUpType::Repair));
+}
+
+TEST_F(PowerUpEffectsTest, RepairCapsAtMaxHealth) {
+    player.apply_collision_damage(10);
+
+    take(PowerUpType::Repair);
+
+    EXPECT_EQ(player.get_health(), 100);
+}
+
+TEST_F(PowerUpEffectsTest, RepairCapsAtUpgradedMaxHealth) {
+    player.set_upgrade(BuyUpgradeDTO{ButtonType::Health}, config.game.upgrades);
+    player.apply_collision_damage(20);
+    ASSERT_EQ(player.get_health(), 130);
+
+    take(PowerUpType::Repair);
+
+    EXPECT_EQ(player.get_health(), 150);
+}
+
+TEST_F(PowerUpEffectsTest, ShieldIgnoresCollisionDamage) {
+    take(PowerUpType::Shield);
+
+    player.apply_collision_damage(20);
+
+    EXPECT_EQ(player.get_health(), 100);
+}
+
+TEST_F(PowerUpEffectsTest, ShieldExpiredTakesDamage) {
+    take(PowerUpType::Shield);
+    ASSERT_TRUE(player.has_effect(PowerUpType::Shield));
+
+    player.advance_effects(4.0);
+    player.apply_collision_damage(20);
+
+    EXPECT_EQ(player.get_health(), 80);
+}
+
+TEST_F(PowerUpEffectsTest, InfiniteHealthSurvivesShieldExpiry) {
+    player.activate_infinite_health();
+    take(PowerUpType::Shield);
+    ASSERT_TRUE(player.has_effect(PowerUpType::Shield));
+
+    player.advance_effects(4.0);
+    player.apply_collision_damage(20);
+
+    EXPECT_EQ(player.get_health(), 100);
+}
+
+TEST_F(PowerUpEffectsTest, InfiniteHealthSurvivesRepair) {
+    player.activate_infinite_health();
+    take(PowerUpType::Repair);
+
+    player.apply_collision_damage(20);
+
+    EXPECT_EQ(player.get_health(), 100);
+}
+
+TEST_F(PowerUpEffectsTest, DeadCarIgnoresPowerUps) {
+    player.apply_collision_damage(100);
+    ASSERT_TRUE(player.is_dead());
+
+    take(PowerUpType::Nitro);
+    take(PowerUpType::Repair);
+    take(PowerUpType::Shield);
+
+    EXPECT_TRUE(has_no_effects());
+    EXPECT_EQ(player.get_health(), 0);
+    EXPECT_EQ(player.get_max_speed(), 10.0f);
+}
+
+TEST_F(PowerUpEffectsTest, ShieldPreventsLethalDamage) {
+    take(PowerUpType::Nitro);
+    take(PowerUpType::Shield);
+
+    player.apply_collision_damage(100);
+
+    EXPECT_FALSE(player.is_dead());
+    EXPECT_EQ(player.get_health(), 100);
+    EXPECT_TRUE(player.has_effect(PowerUpType::Nitro));
+    EXPECT_TRUE(player.has_effect(PowerUpType::Shield));
+}
+
+TEST_F(PowerUpEffectsTest, DyingClearsEffects) {
+    take(PowerUpType::Shield);
+    player.advance_effects(3.0);
+    take(PowerUpType::Nitro);
+    player.advance_effects(1.0);
+    ASSERT_FALSE(player.has_effect(PowerUpType::Shield));
+    ASSERT_TRUE(player.has_effect(PowerUpType::Nitro));
+
+    player.apply_collision_damage(100);
+
+    EXPECT_TRUE(player.is_dead());
+    EXPECT_TRUE(has_no_effects());
+    EXPECT_EQ(player.get_max_speed(), 10.0f);
+    EXPECT_EQ(player.get_acceleration(), 5.0f);
+}
+
+TEST_F(PowerUpEffectsTest, StartRaceClearsEffects) {
+    take(PowerUpType::Nitro);
+    take(PowerUpType::Shield);
+    ASSERT_TRUE(player.has_effect(PowerUpType::Nitro));
+    ASSERT_TRUE(player.has_effect(PowerUpType::Shield));
+
+    player.start_race();
+
+    EXPECT_TRUE(has_no_effects());
+    EXPECT_EQ(player.get_max_speed(), 10.0f);
+    EXPECT_EQ(player.get_acceleration(), 5.0f);
 }

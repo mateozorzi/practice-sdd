@@ -58,6 +58,31 @@ ServerConfig make_fast_game_config() {
     return config;
 }
 
+PowerUpConfig make_test_power_up_config() {
+    PowerUpConfig power_ups;
+
+    power_ups.nitro_multiplier = 2.0f;
+    power_ups.nitro_duration = 2.0;
+    power_ups.repair_amount = 30;
+    power_ups.shield_duration = 4.0;
+    power_ups.respawn_cooldown = 10.0;
+
+    return power_ups;
+}
+
+ServerConfig make_power_up_test_server_config() {
+    ServerConfig config = make_test_server_config();
+
+    config.physics.compact.max_speed = 10.0f;
+    config.physics.compact.acceleration = 5.0f;
+    config.physics.compact.health = 100;
+    config.game.upgrades.health_upgrade = 50.0f;
+    config.game.upgrades.speed_upgrade = 3.0f;
+    config.game.power_ups = make_test_power_up_config();
+
+    return config;
+}
+
 RaceDTO make_test_race(uint8_t checkpoints, uint8_t laps, const std::string& name) {
     std::vector<CheckpointDTO> race_checkpoints;
     for (uint8_t id = 1; id <= checkpoints; ++id)

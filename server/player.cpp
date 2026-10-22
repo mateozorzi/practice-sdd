@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include <algorithm>
+
 #include "../common/checkpoint_dto.h"
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
@@ -9,6 +11,26 @@
 #include "../common/upgrade_dto.h"
 
 #include "server_config.h"
+#include "server_constants.h"
+
+
+namespace {
+
+// Consumes `elapsed_seconds` of an effect; returns true when it expires in this call
+bool advance_effect(double& remaining, double elapsed_seconds) {
+
+    if (remaining <= 0.0)
+        return false;
+
+    remaining -= elapsed_seconds;
+    if (remaining > EFFECT_TIME_EPSILON)
+        return false;
+
+    remaining = 0.0;
+    return true;
+}
+
+}  // namespace
 
 
 Player::Player(uint32_t player_id, const std::string& username):
@@ -81,6 +103,10 @@ PlayerRaceStatsDTO Player::get_race_stats() const {
 
 uint16_t Player::get_health() const { return health; }
 
+float Player::get_max_speed() const { return car ? car->get_max_speed() : 0.0f; }
+
+float Player::get_acceleration() const { return car ? car->get_acceleration() : 0.0f; }
+
 
 void Player::start_race() {
 
@@ -92,6 +118,7 @@ void Player::start_race() {
     dead = false;
     health = base_health;
     infinite_health = false;
+    clear_effects();
 }
 
 bool Player::is_in_race() const { return in_race; }
@@ -253,14 +280,71 @@ bool Player::is_in_game() const { return in_game; }
 
 void Player::apply_collision_damage(uint16_t damage) {
 
-    if (infinite_health)
+    if (infinite_health || has_effect(PowerUpType::Shield))
         return;
-    if (health > damage)
+    if (health > damage) {
         health -= damage;
-    else
+    } else {
         health = 0;
+        clear_effects();
+    }
 }
 
 uint8_t Player::get_upgrades_remaining() const {
     return static_cast<uint8_t>(MAX_UPGRADES_PER_RACE - n_penalty);
+}
+
+void Player::apply_power_up(PowerUpType type, const PowerUpConfig& power_up_config) {
+
+    if (!car || is_dead())
+        return;
+
+    switch (type) {
+
+        case PowerUpType::Nitro:
+            nitro_remaining = power_up_config.nitro_duration;
+            car->set_power_multiplier(power_up_config.nitro_multiplier);
+            break;
+        case PowerUpType::Shield:
+            shield_remaining = power_up_config.shield_duration;
+            break;
+        case PowerUpType::Repair: {
+            unsigned int repaired = health + power_up_config.repair_amount;
+            health = static_cast<uint16_t>(
+                    std::min(repaired, static_cast<unsigned int>(base_health)));
+            break;
+        }
+    }
+}
+
+void Player::advance_effects(double elapsed_seconds) {
+
+    if (advance_effect(nitro_remaining, elapsed_seconds))
+        car->set_power_multiplier(1.0f);
+
+    advance_effect(shield_remaining, elapsed_seconds);
+}
+
+bool Player::has_effect(PowerUpType type) const { return get_effect_remaining(type) > 0.0; }
+
+double Player::get_effect_remaining(PowerUpType type) const {
+
+    switch (type) {
+        case PowerUpType::Nitro:
+            return nitro_remaining;
+        case PowerUpType::Shield:
+            return shield_remaining;
+        case PowerUpType::Repair:
+            break;
+    }
+    return 0.0;
+}
+
+void Player::clear_effects() {
+
+    nitro_remaining = 0.0;
+    shield_remaining = 0.0;
+
+    if (car)
+        car->set_power_multiplier(1.0f);
 }

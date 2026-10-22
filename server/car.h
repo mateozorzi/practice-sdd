@@ -32,8 +32,9 @@ class Car {
     bool moving_right = false;
     bool is_colliding = false;
     CarLayer car_layer = CarLayer::ON_GROUND;
+    float power_multiplier = 1.0f;  // Nitro: scales max speed and acceleration, 1 when inactive
 
-    const CarConfig& find_car_config(const std::string& model, const PhysicsConfig& physics);
+    static const CarConfig& find_car_config(const std::string& model, const PhysicsConfig& physics);
 
     void detect_linear_movement();
     void detect_rotation();
@@ -53,6 +54,8 @@ public:
     void update_position();
 
     uint16_t get_max_health() const;
+    float get_max_speed() const;
+    float get_acceleration() const;
     CarPositionDTO get_position_dto() const;
 
     const CarDTO get_configuration() const;
@@ -63,6 +66,8 @@ public:
 
     void set_collision(bool colliding);
     void set_upgrade(const BuyUpgradeDTO& upgrade, const UpgradeConfig& game_config);
+
+    void set_power_multiplier(float multiplier);
 
     void set_layer(CarLayer car_layer);
     void reset_car_velocity();
