@@ -15,6 +15,7 @@ target_sources(nfs_server
     main.cpp
     npc.cpp
     player.cpp
+    power_up.cpp
     race_loader.cpp
     receiver.cpp
     sender.cpp
@@ -36,6 +37,7 @@ target_sources(nfs_server
     lobby.h
     npc.h
     player.h
+    power_up.h
     race_loader.h
     receiver.h
     sender.h

@@ -7,8 +7,10 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "../common/game_update_dto.h"
+#include "../common/power_up_type.h"
 #include "../common/queue.h"
 #include "../common/race_dto.h"
 #include "../server/server_config.h"
@@ -28,6 +30,11 @@ PowerUpConfig make_test_power_up_config();
 // make_test_server_config with the Background test car (Compact: max speed 10, acceleration 5,
 // health 100), upgrades (health 50, speed 3) and make_test_power_up_config()
 ServerConfig make_power_up_test_server_config();
+
+// Fake power-up type generator (same type as PowerUpTypeGenerator, spelled out so this header does
+// not include server/power_up.h): returns `sequence` in order, starting over when it runs out
+std::function<PowerUpType()> make_sequence_power_up_type_generator(
+        std::vector<PowerUpType> sequence);
 
 // Race in Liberty City with `checkpoints` checkpoints placed one after the other
 RaceDTO make_test_race(uint8_t checkpoints, uint8_t laps, const std::string& name = "test_race");

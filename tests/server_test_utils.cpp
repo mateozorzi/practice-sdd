@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include "../server/acceptor.h"
@@ -81,6 +82,15 @@ ServerConfig make_power_up_test_server_config() {
     config.game.power_ups = make_test_power_up_config();
 
     return config;
+}
+
+std::function<PowerUpType()> make_sequence_power_up_type_generator(
+        std::vector<PowerUpType> sequence) {
+    return [sequence = std::move(sequence), next = size_t{0}]() mutable {
+        PowerUpType type = sequence[next];
+        next = (next + 1) % sequence.size();
+        return type;
+    };
 }
 
 RaceDTO make_test_race(uint8_t checkpoints, uint8_t laps, const std::string& name) {

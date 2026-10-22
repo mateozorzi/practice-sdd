@@ -29,6 +29,9 @@ constexpr uint8_t SENSOR_TYPE_MASK = 0xFF;
 constexpr uint8_t SENSOR_DATA_SHIFT = 8;
 constexpr float MIN_COLLISION_SPEED = 1.0f;
 
+// PowerUp
+constexpr int POWER_UP_HALF_SIZE_PIXELS = 15;
+
 constexpr float ANGLE_DOT_NORMALIZATION = 2.0f;
 constexpr float ANGLE_FACTOR_LOW_THRESHOLD = 0.5f;
 constexpr float ANGLE_FACTOR_MID_THRESHOLD = 0.7f;

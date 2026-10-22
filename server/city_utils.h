@@ -18,7 +18,8 @@ enum class SensorType : uint8_t {
 
     ON_BRIDGE,
     UNDER_BRIDGE,
-    CHECKPOINT
+    CHECKPOINT,
+    POWER_UP
 };
 
 

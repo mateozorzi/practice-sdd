@@ -11,6 +11,7 @@ target_sources(nfs_tests
     test_game_monitor.cpp
     test_lobby.cpp
     test_player.cpp
+    test_power_up.cpp
     test_race_loader.cpp
     test_server_config_loader.cpp
     test_server_integration.cpp
@@ -31,6 +32,7 @@ target_sources(nfs_tests
     ../server/lobby.cpp
     ../server/npc.cpp
     ../server/player.cpp
+    ../server/power_up.cpp
     ../server/race_loader.cpp
     ../server/receiver.cpp
     ../server/sender.cpp
