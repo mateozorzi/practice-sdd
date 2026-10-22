@@ -134,6 +134,17 @@ struct UpgradeConfig {
 };
 
 
+struct PowerUpConfig {
+
+
+    float nitro_multiplier;
+    double nitro_duration;  // seconds
+    unsigned int repair_amount;
+    double shield_duration;   // seconds
+    double respawn_cooldown;  // seconds
+};
+
+
 struct GameConfig {
 
 
@@ -146,6 +157,7 @@ struct GameConfig {
     unsigned int penalty_per_upgrade;
 
     struct UpgradeConfig upgrades;
+    struct PowerUpConfig power_ups;
 };
 
 

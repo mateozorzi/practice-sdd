@@ -2,6 +2,41 @@
 
 #include <stdexcept>
 
+namespace {
+
+// Reads `power_ups.<key>` and checks it is not negative
+double load_power_up_value(const YAML::Node& power_ups, const std::string& key) {
+
+    if (!power_ups[key])
+        throw std::runtime_error("Missing 'power_ups." + key + "' in game configuration file");
+
+    double value = power_ups[key].as<double>();
+    if (value < 0)
+        throw std::runtime_error("Invalid 'power_ups." + key + "': must be >= 0");
+
+    return value;
+}
+
+// Reads the required `power_ups` node of `game`
+void load_power_ups(const YAML::Node& game, PowerUpConfig& power_ups) {
+
+    if (!game["power_ups"])
+        throw std::runtime_error("Missing 'power_ups' node in game configuration file");
+
+    YAML::Node node = game["power_ups"];
+
+    power_ups.nitro_multiplier = static_cast<float>(load_power_up_value(node, "nitro_multiplier"));
+    if (power_ups.nitro_multiplier <= 0.0f)
+        throw std::runtime_error("Invalid 'power_ups.nitro_multiplier': must be > 0");
+
+    power_ups.nitro_duration = load_power_up_value(node, "nitro_duration");
+    power_ups.repair_amount = static_cast<unsigned int>(load_power_up_value(node, "repair_amount"));
+    power_ups.shield_duration = load_power_up_value(node, "shield_duration");
+    power_ups.respawn_cooldown = load_power_up_value(node, "respawn_cooldown");
+}
+
+}  // namespace
+
 ServerConfig ServerConfigLoader::load_yaml(const std::string& base_path) {
     try {
 
@@ -59,6 +94,8 @@ void ServerConfigLoader::load_game_config(const YAML::Node& config, ServerConfig
                 upgrades["acceleration_upgrade"].as<float>();
         server_config.game.upgrades.handling_upgrade = upgrades["handling_upgrade"].as<float>();
     }
+
+    load_power_ups(game, server_config.game.power_ups);
 
     if (config["server"]) {
 

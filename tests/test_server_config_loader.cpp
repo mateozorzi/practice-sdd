@@ -11,7 +11,7 @@
 
 namespace {
 
-const char* MINIMAL_GAME = R"(game:
+const char* GAME_WITHOUT_POWER_UPS = R"(game:
   game_fps: 30
   wait_seconds_upgrade_shop: 1
   wait_seconds_countdown: 2
@@ -20,6 +20,18 @@ const char* MINIMAL_GAME = R"(game:
   wait_seconds_game_finished: 5
   penalty_per_upgrade: 6
 )";
+
+// Power-up values of the Hito 1 Background, nested under `game:`
+const char* BACKGROUND_POWER_UPS = R"(  power_ups:
+    nitro_multiplier: 2.0
+    nitro_duration: 2
+    repair_amount: 30
+    shield_duration: 4
+    respawn_cooldown: 10
+)";
+
+// Smallest valid game configuration: the required `power_ups` section is included
+std::string minimal_game() { return std::string(GAME_WITHOUT_POWER_UPS) + BACKGROUND_POWER_UPS; }
 
 const char* MINIMAL_PHYSICS = "physics:\n  collidable:\n    density: 2.0\n"
                               "    friction: 0.5\n    restitution: 0.25\n";
@@ -47,6 +59,17 @@ protected:
 
     void write_file(const std::string& name, const std::string& content) {
         std::ofstream(config_dir / name) << content;
+    }
+
+    // Message of the error thrown while loading the config written in config_dir
+    std::string load_error() {
+        try {
+            ServerConfigLoader().load_yaml(config_dir.string());
+        } catch (const std::runtime_error& error) {
+            return error.what();
+        }
+        ADD_FAILURE() << "expected the configuration loading to fail";
+        return "";
     }
 
     void write_config(const std::string& game, const std::string& physics,
@@ -113,7 +136,7 @@ TEST_F(ServerConfigLoaderTest, LoadsWorldPaths) {
 }
 
 TEST_F(ServerConfigLoaderTest, OptionalSectionsCanBeOmitted) {
-    write_config(MINIMAL_GAME, MINIMAL_PHYSICS, MINIMAL_WORLD);
+    write_config(minimal_game(), MINIMAL_PHYSICS, MINIMAL_WORLD);
 
     ServerConfig config = ServerConfigLoader().load_yaml(config_dir.string());
 
@@ -138,21 +161,56 @@ TEST_F(ServerConfigLoaderTest, MissingGameRootNodeThrows) {
 }
 
 TEST_F(ServerConfigLoaderTest, MissingPhysicsRootNodeThrows) {
-    write_config(MINIMAL_GAME, "something_else: {}\n", MINIMAL_WORLD);
+    write_config(minimal_game(), "something_else: {}\n", MINIMAL_WORLD);
 
     EXPECT_THROW(ServerConfigLoader().load_yaml(config_dir.string()), std::runtime_error);
 }
 
 TEST_F(ServerConfigLoaderTest, MissingWorldRootNodeThrows) {
-    write_config(MINIMAL_GAME, MINIMAL_PHYSICS, "something_else: {}\n");
+    write_config(minimal_game(), MINIMAL_PHYSICS, "something_else: {}\n");
 
     EXPECT_THROW(ServerConfigLoader().load_yaml(config_dir.string()), std::runtime_error);
 }
 
 TEST_F(ServerConfigLoaderTest, InvalidValueTypeThrows) {
-    std::string game = MINIMAL_GAME;
+    std::string game = minimal_game();
     game.replace(game.find("30"), 2, "fast");
     write_config(game, MINIMAL_PHYSICS, MINIMAL_WORLD);
 
     EXPECT_THROW(ServerConfigLoader().load_yaml(config_dir.string()), std::runtime_error);
+}
+
+TEST_F(ServerConfigLoaderTest, LoadsPowerUpsSection) {
+    write_config(minimal_game(), MINIMAL_PHYSICS, MINIMAL_WORLD);
+
+    ServerConfig config = ServerConfigLoader().load_yaml(config_dir.string());
+
+    EXPECT_FLOAT_EQ(config.game.power_ups.nitro_multiplier, 2.0f);
+    EXPECT_DOUBLE_EQ(config.game.power_ups.nitro_duration, 2.0);
+    EXPECT_EQ(config.game.power_ups.repair_amount, 30u);
+    EXPECT_DOUBLE_EQ(config.game.power_ups.shield_duration, 4.0);
+    EXPECT_DOUBLE_EQ(config.game.power_ups.respawn_cooldown, 10.0);
+}
+
+TEST_F(ServerConfigLoaderTest, MissingPowerUpValueThrows) {
+    std::string power_ups = BACKGROUND_POWER_UPS;
+    power_ups.erase(power_ups.find("    shield_duration"),
+                    std::string("    shield_duration: 4\n").size());
+    write_config(std::string(GAME_WITHOUT_POWER_UPS) + power_ups, MINIMAL_PHYSICS, MINIMAL_WORLD);
+
+    EXPECT_NE(load_error().find("shield_duration"), std::string::npos);
+}
+
+TEST_F(ServerConfigLoaderTest, NegativePowerUpValueThrows) {
+    std::string power_ups = BACKGROUND_POWER_UPS;
+    power_ups.replace(power_ups.find("repair_amount: 30"), 17, "repair_amount: -30");
+    write_config(std::string(GAME_WITHOUT_POWER_UPS) + power_ups, MINIMAL_PHYSICS, MINIMAL_WORLD);
+
+    EXPECT_NE(load_error().find("repair_amount"), std::string::npos);
+}
+
+TEST_F(ServerConfigLoaderTest, MissingPowerUpsSectionThrows) {
+    write_config(GAME_WITHOUT_POWER_UPS, MINIMAL_PHYSICS, MINIMAL_WORLD);
+
+    EXPECT_NE(load_error().find("power_ups"), std::string::npos);
 }
