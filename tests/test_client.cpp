@@ -599,7 +599,9 @@ TEST_F(ClientProtocolTest, ReceiveUpdatePositions_WithMock) {
             0x01,                    // layer = 1
             0x01,                    // current lap = 1
             0x02,                    // race lap = 2
-            0x00                     // npc size = 0
+            0x00,                    // npc size = 0
+            0x00,                    // power-up size = 0
+            0x00                     // effect size = 0
     };
     auto mock_stream = std::make_shared<std::vector<uint8_t>>(mock_data);
     size_t read_pos = 0;
@@ -641,6 +643,9 @@ TEST_F(ClientProtocolTest, ReceiveUpdatePositions_WithMock) {
     EXPECT_EQ(world_snapshot.car_positions[0].second.layer, CarLayer::ON_BRIDGE);
     EXPECT_EQ(world_snapshot.car_positions[0].second.current_lap, 1);
     EXPECT_EQ(world_snapshot.car_positions[0].second.race_lap, 2);
+    EXPECT_TRUE(world_snapshot.npc_positions.empty());
+    EXPECT_TRUE(world_snapshot.power_ups.empty());
+    EXPECT_TRUE(world_snapshot.effects.empty());
 }
 
 TEST_F(ClientProtocolTest, ReceiveLeaderBoard_WithMock) {

@@ -186,7 +186,9 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
                            SIZE_UINT8_T +                                 // is_finish_line
                            SIZE_UINT8_T +                                 // layer
                            SIZE_UINT8_T + SIZE_UINT8_T +  // current lap and race_lap
-                           SIZE_UINT8_T;                  // NPC size (0)
+                           SIZE_UINT8_T +                 // NPC size (0)
+                           SIZE_UINT8_T +                 // power-up size (0)
+                           SIZE_UINT8_T;                  // effect size (0)
     EXPECT_EQ(captured_bytes.size(), expected_size);
 
     // verify_data
@@ -315,6 +317,11 @@ TEST_F(ServerProtocolTest, SendWorldSnapshot) {
     // race lap byte
     EXPECT_EQ(captured_bytes[offset], car_position1.race_lap);
     offset += 1;
+
+    // NPC, power-up and effect sizes
+    EXPECT_EQ(captured_bytes[offset], 0);
+    EXPECT_EQ(captured_bytes[offset + 1], 0);
+    EXPECT_EQ(captured_bytes[offset + 2], 0);
 }
 
 

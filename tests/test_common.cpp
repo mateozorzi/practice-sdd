@@ -1,23 +1,30 @@
 #include <atomic>
 #include <chrono>
 #include <cstring>
+#include <deque>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
 #include <utility>
+#include <variant>
 
 #include <gtest/gtest.h>
 #include <sys/socket.h>
 
+#include "../client/client_protocol.h"
+#include "../common/isocket.h"
 #include "../common/liberror.h"
+#include "../common/power_up_dto.h"
 #include "../common/queue.h"
 #include "../common/resolver.h"
 #include "../common/resolvererror.h"
 #include "../common/socket.h"
 #include "../common/thread.h"
 #include "../common/upgrade_dto.h"
+#include "../common/world_snapshot_dto.h"
+#include "../server/server_protocol.h"
 
 namespace {
 
@@ -48,6 +55,50 @@ class UnknownExceptionThread: public Thread {
 public:
     void run() override { throw 42; }
 };
+
+// In-memory socket: what is sent can be received back, so a protocol round trip needs no network
+class LoopbackSocket: public ISocket {
+    std::deque<uint8_t> bytes;
+
+public:
+    int sendsome(const void* data, unsigned int sz) override { return sendall(data, sz); }
+    int recvsome(void* data, unsigned int sz) override { return recvall(data, sz); }
+
+    int sendall(const void* data, unsigned int sz) override {
+        const auto* begin = static_cast<const uint8_t*>(data);
+        bytes.insert(bytes.end(), begin, begin + sz);
+        return static_cast<int>(sz);
+    }
+
+    int recvall(void* data, unsigned int sz) override {
+        if (bytes.size() < sz)
+            return 0;
+        auto* out = static_cast<uint8_t*>(data);
+        for (unsigned int i = 0; i < sz; ++i) {
+            out[i] = bytes.front();
+            bytes.pop_front();
+        }
+        return static_cast<int>(sz);
+    }
+
+    void shutdown(int) override {}
+    bool is_stream_send_closed() const override { return false; }
+    bool is_stream_recv_closed() const override { return false; }
+    int close() override { return 0; }
+};
+
+// Sends the snapshot with the server protocol and reads it back with the client one
+WorldSnapshotDTO round_trip(const WorldSnapshotDTO& snapshot) {
+    LoopbackSocket socket;
+    ServerProtocol server(socket);
+    ClientProtocol client(socket);
+
+    server.send_game_update(GameUpdateDTO(GameLoopAction::SEND_UPDATE_POSITIONS, snapshot));
+    GameUpdateDTO received = client.receive_update();
+
+    EXPECT_EQ(received.gameloop_action, GameLoopAction::SEND_UPDATE_POSITIONS);
+    return std::get<WorldSnapshotDTO>(received.data);
+}
 
 }  // namespace
 
@@ -408,4 +459,35 @@ TEST(UpgradeDTOTest, StoresTheIncreases) {
     EXPECT_EQ(upgrade.speed_increase, 2);
     EXPECT_EQ(upgrade.acceleration_increase, 3);
     EXPECT_EQ(upgrade.health_increase, 400);
+}
+
+
+// Power-ups in the snapshot (values from the game loop milestone Background)
+
+TEST(PowerUpProtocolTest, PowerUpDTORoundTrip) {
+    const PowerUpDTO power_up(1, PowerUpType::Nitro, 100, 200, true);
+    WorldSnapshotDTO snapshot;
+    snapshot.add_power_up(power_up);
+
+    WorldSnapshotDTO received = round_trip(snapshot);
+
+    ASSERT_EQ(received.power_ups.size(), 1u);
+    EXPECT_EQ(received.power_ups[0], power_up);
+}
+
+TEST(PowerUpProtocolTest, SnapshotEffectRoundTrip) {
+    const PowerUpEffectDTO effect(1, PowerUpType::Shield, 2500);
+    WorldSnapshotDTO snapshot;
+    snapshot.add_car_position(PlayerDTO("player1", 1, CarDTO("Compact"), 100, false, 100, false),
+                              CarPositionDTO(1, 100, 200));
+    snapshot.add_effect(effect);
+
+    WorldSnapshotDTO received = round_trip(snapshot);
+
+    ASSERT_EQ(received.car_positions.size(), 1u);
+    EXPECT_EQ(received.car_positions[0].first.id, 1u);
+    ASSERT_EQ(received.effects.size(), 1u);
+    EXPECT_EQ(received.effects[0], effect);
+    EXPECT_EQ(received.effects[0].type, PowerUpType::Shield);
+    EXPECT_EQ(received.effects[0].remaining_ms, 2500u);
 }

@@ -17,6 +17,7 @@ target_sources(nfs_common
     npc_dto.cpp
     player_dto.cpp
     player_race_stats_dto.cpp
+    power_up_dto.cpp
     race_catalogue_dto.cpp
     race_dto.cpp
     resolver.cpp
@@ -42,6 +43,8 @@ target_sources(nfs_common
     npc_dto.h
     player_dto.h
     player_race_stats_dto.h
+    power_up_dto.h
+    power_up_type.h
     race_catalogue_dto.h
     race_dto.h
     resolver.h

@@ -18,3 +18,7 @@ void WorldSnapshotDTO::add_npc_position(const NpcDTO& npc_position) {
     npc_positions.push_back(npc_position);
     npc_size++;
 }
+
+void WorldSnapshotDTO::add_power_up(const PowerUpDTO& power_up) { power_ups.push_back(power_up); }
+
+void WorldSnapshotDTO::add_effect(const PowerUpEffectDTO& effect) { effects.push_back(effect); }

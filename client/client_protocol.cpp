@@ -11,6 +11,7 @@
 #include "../common/game_update_dto.h"
 #include "../common/lobby_dto.h"
 #include "../common/npc_dto.h"
+#include "../common/power_up_dto.h"
 #include "../common/race_catalogue_dto.h"
 #include "../common/race_dto.h"
 #include "../common/upgrade_dto.h"
@@ -211,6 +212,25 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
         uint32_t y_position = recv_uint32();
         uint32_t angle = recv_uint32();
         world_snapshot.add_npc_position(NpcDTO(npc_id, x_position, y_position, angle));
+    }
+
+    // Unknown power-up types are not rejected here: the render decides what to draw
+    const uint8_t power_up_size = recv_uint8();
+    for (uint8_t i = 0; i < power_up_size; ++i) {
+        uint8_t id = recv_uint8();
+        auto type = static_cast<PowerUpType>(recv_uint8());
+        uint32_t x_position = recv_uint32();
+        uint32_t y_position = recv_uint32();
+        bool active = static_cast<bool>(recv_uint8());
+        world_snapshot.add_power_up(PowerUpDTO(id, type, x_position, y_position, active));
+    }
+
+    const uint8_t effect_size = recv_uint8();
+    for (uint8_t i = 0; i < effect_size; ++i) {
+        uint32_t player_id = recv_uint32();
+        auto type = static_cast<PowerUpType>(recv_uint8());
+        uint32_t remaining_ms = recv_uint32();
+        world_snapshot.add_effect(PowerUpEffectDTO(player_id, type, remaining_ms));
     }
 
     return world_snapshot;
