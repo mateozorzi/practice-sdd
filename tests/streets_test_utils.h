@@ -24,4 +24,8 @@ StreetMap make_two_streets_map();
 // y = 260 (x 110..260), outside the crossing.
 StreetMap make_test_crossing_map();
 
+// Bridge over the water in (100..160, 100..160): only the top road of the crossing, with its
+// ON_BRIDGE sensor (40..220, 110..150) and rails. No UNDER_BRIDGE sensor and no bottom road.
+StreetMap make_water_bridge_map();
+
 #endif

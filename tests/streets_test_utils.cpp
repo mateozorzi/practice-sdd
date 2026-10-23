@@ -61,3 +61,15 @@ StreetMap make_test_crossing_map() {
 
     return StreetMap{make_grid(segments), std::move(bridges)};
 }
+
+StreetMap make_water_bridge_map() {
+    std::vector<Segment> segments;
+    for (int y = 110; y <= 150; y += TEST_CELL_SIZE) segments.push_back({0, y, 260, y});
+
+    BridgeLayout bridges;
+    bridges.bridges = {{100, 160, 100, 160}};
+    bridges.on_bridge_sensors = {{40, 220, 110, 150}};
+    bridges.on_bridge_walls = {{100, 160, 100, 100}, {100, 160, 160, 160}};
+
+    return StreetMap{make_grid(segments), std::move(bridges)};
+}

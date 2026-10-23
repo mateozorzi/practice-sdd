@@ -20,13 +20,15 @@ StreetPoint center_of(const CheckpointDTO& checkpoint) {
     return {static_cast<float>(checkpoint.x), static_cast<float>(checkpoint.y)};
 }
 
-// Middle of the street path between the checkpoints, or (P + Q) / 2 when there is no grid or no
-// path
-StreetPoint spawn_point(const CheckpointDTO& p, const CheckpointDTO& q, const StreetMap* streets) {
+// Middle of the street path between the checkpoints, moved along it so it never crosses the edge
+// of a bridge, with the layer of the path there. (P + Q) / 2 on the ground when there is no grid
+// or no path.
+PathSpot spawn_point(const CheckpointDTO& p, const CheckpointDTO& q, const StreetMap* streets) {
 
     const StreetPoint from = center_of(p);
     const StreetPoint to = center_of(q);
-    const StreetPoint straight_midpoint{(from.x + to.x) / 2.0f, (from.y + to.y) / 2.0f};
+    const PathSpot straight_midpoint{{(from.x + to.x) / 2.0f, (from.y + to.y) / 2.0f},
+                                     CarLayer::ON_GROUND};
 
     if (!streets)
         return straight_midpoint;
@@ -39,7 +41,16 @@ StreetPoint spawn_point(const CheckpointDTO& p, const CheckpointDTO& q, const St
         return straight_midpoint;
     }
 
-    return path_midpoint(streets->grid, *path);
+    const std::optional<PathSpot> spot =
+            place_on_path(*streets, *path, static_cast<float>(POWER_UP_HALF_SIZE_PIXELS));
+    if (!spot) {
+        std::cerr << "[" << POWER_UPS << "] Stretch " << static_cast<int>(p.id) << " -> "
+                  << static_cast<int>(q.id) << " crosses a bridge edge, keeping the path midpoint"
+                  << std::endl;
+        return {path_midpoint(streets->grid, *path), CarLayer::ON_GROUND};
+    }
+
+    return *spot;
 }
 
 }  // namespace
@@ -53,8 +64,9 @@ PowerUpTypeGenerator make_random_power_up_type_generator() {
 }
 
 
-PowerUp::PowerUp(const PowerUpType type, const float x, const float y, b2Body* body):
-        type(type), x(x), y(y), body(body) {}
+PowerUp::PowerUp(const PowerUpType type, const float x, const float y, b2Body* body,
+                 const CarLayer layer):
+        type(type), x(x), y(y), body(body), layer(layer) {}
 
 PowerUpType PowerUp::get_type() const { return type; }
 
@@ -63,6 +75,8 @@ float PowerUp::get_x() const { return x; }
 float PowerUp::get_y() const { return y; }
 
 bool PowerUp::is_active() const { return active; }
+
+CarLayer PowerUp::get_layer() const { return layer; }
 
 const b2Body* PowerUp::get_body() const { return body; }
 
@@ -136,10 +150,10 @@ void PowerUpManager::load(const std::vector<CheckpointDTO>& checkpoints, const S
 
     for (size_t first = 0; first + 1 < checkpoints.size(); first += 2) {
 
-        const StreetPoint spawn = spawn_point(checkpoints[first], checkpoints[first + 1], streets);
+        const PathSpot spawn = spawn_point(checkpoints[first], checkpoints[first + 1], streets);
 
-        b2Body* body = create_sensor(spawn.x, spawn.y, power_ups.size());
-        power_ups.emplace_back(type_generator(), spawn.x, spawn.y, body);
+        b2Body* body = create_sensor(spawn.point.x, spawn.point.y, power_ups.size());
+        power_ups.emplace_back(type_generator(), spawn.point.x, spawn.point.y, body, spawn.layer);
     }
 }
 
@@ -150,6 +164,11 @@ bool PowerUpManager::try_collect(const size_t index, Player& player) {
 
     PowerUp& power_up = power_ups[index];
     if (!power_up.is_active() || player.is_dead())
+        return false;
+
+    // On a bridge only a car on the same layer reaches it; on the ground, any car
+    if (power_up.get_layer() != CarLayer::ON_GROUND &&
+        player.get_car_layer() != power_up.get_layer())
         return false;
 
     const PowerUpConfig& power_up_config = server_config.game.power_ups;

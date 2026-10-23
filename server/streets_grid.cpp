@@ -182,6 +182,46 @@ int read_int(const nlohmann::json& json, const std::string& key) {
     return json[key].get<int>();
 }
 
+// True if the square of half side `half_size` centered in `point` is entirely inside a bridge
+// (edges included), false if it is entirely outside all of them (touching an edge counts as
+// outside), nullopt if it crosses the edge of one
+std::optional<bool> inside_a_bridge(const std::vector<StreetRect>& bridges, const StreetPoint point,
+                                    const float half_size) {
+
+    bool inside = false;
+    for (const StreetRect& bridge: bridges) {
+
+        const bool contained =
+                point.x - half_size >= bridge.min_x && point.x + half_size <= bridge.max_x &&
+                point.y - half_size >= bridge.min_y && point.y + half_size <= bridge.max_y;
+        const bool apart =
+                point.x + half_size <= bridge.min_x || point.x - half_size >= bridge.max_x ||
+                point.y + half_size <= bridge.min_y || point.y - half_size >= bridge.max_y;
+        if (!contained && !apart)
+            return std::nullopt;
+
+        inside = inside || contained;
+    }
+
+    return inside;
+}
+
+// Layer of the step of the path whose cell contains the point at `distance` along it
+CarLayer path_layer_at(const StreetsGrid& grid, const std::vector<PathStep>& path,
+                       const float distance, const StreetPoint point) {
+
+    const auto segment =
+            std::min(static_cast<size_t>(distance / static_cast<float>(grid.get_cell_size())),
+                     path.size() - 1);
+    const std::optional<StreetCell> cell = grid.cell_at(point);
+
+    if (cell && segment + 1 < path.size() && path[segment + 1].col == cell->col &&
+        path[segment + 1].row == cell->row)
+        return path[segment + 1].layer;
+
+    return path[segment].layer;
+}
+
 }  // namespace
 
 
@@ -408,21 +448,67 @@ std::optional<std::vector<PathStep>> find_street_path(const StreetMap& street_ma
 }
 
 StreetPoint path_midpoint(const StreetsGrid& grid, const std::vector<PathStep>& path) {
+    return path_point_at(grid, path, path_length(grid, path) / 2.0f);
+}
+
+float path_length(const StreetsGrid& grid, const std::vector<PathStep>& path) {
+
+    if (path.empty())
+        return 0.0f;
+
+    // Neighbor cells: every segment between two consecutive centers is one cell long
+    return static_cast<float>(path.size() - 1) * static_cast<float>(grid.get_cell_size());
+}
+
+StreetPoint path_point_at(const StreetsGrid& grid, const std::vector<PathStep>& path,
+                          const float distance) {
 
     if (path.empty())
         return {0.0f, 0.0f};
 
-    // Neighbor cells: every segment between two consecutive centers is one cell long
     const auto cell_size = static_cast<float>(grid.get_cell_size());
-    const float half_length = static_cast<float>(path.size() - 1) * cell_size / 2.0f;
-    const auto segment = static_cast<size_t>(half_length / cell_size);
+    const float clamped = std::clamp(distance, 0.0f, path_length(grid, path));
+    const auto segment = static_cast<size_t>(clamped / cell_size);
 
     const StreetPoint from = grid.cell_center(path[segment].col, path[segment].row);
     if (segment + 1 >= path.size())
         return from;
 
     const StreetPoint to = grid.cell_center(path[segment + 1].col, path[segment + 1].row);
-    const float fraction = (half_length - static_cast<float>(segment) * cell_size) / cell_size;
+    const float fraction = (clamped - static_cast<float>(segment) * cell_size) / cell_size;
 
     return {from.x + (to.x - from.x) * fraction, from.y + (to.y - from.y) * fraction};
+}
+
+std::optional<PathSpot> place_on_path(const StreetMap& street_map,
+                                      const std::vector<PathStep>& path, const float half_size) {
+
+    if (path.empty())
+        return std::nullopt;
+
+    const float length = path_length(street_map.grid, path);
+    const float middle = length / 2.0f;
+    const auto max_offset = static_cast<int>(std::ceil(length));
+
+    // 1 px steps away from the middle, ahead (towards Q) before back on a tie
+    for (int offset = 0; offset <= max_offset; ++offset) {
+        for (const int direction: {1, -1}) {
+
+            const float distance = middle + static_cast<float>(direction * offset);
+            if (distance < 0.0f || distance > length || (offset == 0 && direction == -1))
+                continue;
+
+            const StreetPoint point = path_point_at(street_map.grid, path, distance);
+            const std::optional<bool> inside =
+                    inside_a_bridge(street_map.bridges.bridges, point, half_size);
+            if (!inside)
+                continue;
+
+            const CarLayer layer = *inside ? path_layer_at(street_map.grid, path, distance, point) :
+                                             CarLayer::ON_GROUND;
+            return PathSpot{point, layer};
+        }
+    }
+
+    return std::nullopt;
 }

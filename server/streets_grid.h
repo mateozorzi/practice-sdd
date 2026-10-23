@@ -101,5 +101,24 @@ std::optional<std::vector<PathStep>> find_street_path(const StreetMap& street_ma
 // Point of the path (through the cell centers) that leaves half of its length on each side
 StreetPoint path_midpoint(const StreetsGrid& grid, const std::vector<PathStep>& path);
 
+// Length in pixels of the polyline through the cell centers of the path
+float path_length(const StreetsGrid& grid, const std::vector<PathStep>& path);
+
+// Point of the polyline at `distance` pixels from its start, clamped to [0, length]
+StreetPoint path_point_at(const StreetsGrid& grid, const std::vector<PathStep>& path,
+                          float distance);
+
+struct PathSpot {
+    StreetPoint point;
+    CarLayer layer;
+};
+
+// Place of a power-up on the path: the midpoint, or the point closest to it (along the path) where
+// its square of half side `half_size` is entirely inside or entirely outside each bridge. The layer
+// is the one of the path inside a bridge and ON_GROUND outside. Nullopt if no point of the path
+// fits.
+std::optional<PathSpot> place_on_path(const StreetMap& street_map,
+                                      const std::vector<PathStep>& path, float half_size);
+
 
 #endif

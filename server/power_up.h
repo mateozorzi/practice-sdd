@@ -9,6 +9,7 @@
 
 #include <box2d/box2d.h>
 
+#include "../common/car_position_dto.h"
 #include "../common/checkpoint_dto.h"
 #include "../common/power_up_type.h"
 
@@ -37,15 +38,17 @@ class PowerUp {
     uint32_t collected_by = 0;       // id of the player that collected it, 0 since it appeared
     double respawn_remaining = 0.0;  // seconds
     b2Body* body;
+    CarLayer layer;  // only a car on the same layer collects it, any car if ON_GROUND
 
 
 public:
-    PowerUp(PowerUpType type, float x, float y, b2Body* body);
+    PowerUp(PowerUpType type, float x, float y, b2Body* body, CarLayer layer = CarLayer::ON_GROUND);
 
     PowerUpType get_type() const;
     float get_x() const;
     float get_y() const;
     bool is_active() const;
+    CarLayer get_layer() const;
     uint32_t get_collected_by() const;
     const b2Body* get_body() const;
     b2Body* get_body();
@@ -80,7 +83,8 @@ public:
     // Replaces the current power-ups with one in the middle of each odd stretch (1->2, 3->4, ...):
     // the middle of the street path when there is a grid, (P + Q) / 2 otherwise
     void load(const std::vector<CheckpointDTO>& checkpoints, const StreetMap* streets = nullptr);
-    // Applies the power-up to the player if it is active and the player is alive
+    // Applies the power-up to the player if it is active, the player is alive and on its layer (any
+    // layer for a power-up on the ground)
     bool try_collect(size_t index, Player& player);
     // Explicit time step: counts down the respawn cooldowns (no wall clock)
     void advance(double elapsed_seconds);

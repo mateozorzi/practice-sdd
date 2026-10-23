@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <sstream>
@@ -64,6 +65,31 @@ protected:
         EXPECT_FLOAT_EQ(power_up.get_y(), y) << "power-up " << index;
     }
 };
+
+// Milestone 6: the crossing of the milestone 5 Background, power-ups with the milestone 2 values
+class BridgePowerUpTest: public StreetPowerUpTest {
+protected:
+    void expect_power_up_layer(const size_t index, const CarLayer layer) const {
+        ASSERT_GT(power_ups.get_power_ups().size(), index);
+        EXPECT_EQ(power_ups.get_power_ups()[index].get_layer(), layer) << "power-up " << index;
+    }
+};
+
+// Square of a power-up against a bridge: entirely inside (edges included), entirely outside
+// (touching an edge counts as outside), or crossing an edge
+enum class BridgeOverlap { INSIDE, OUTSIDE, CROSSING };
+
+BridgeOverlap overlap_with(const StreetRect& bridge, const float x, const float y) {
+    const auto half = static_cast<float>(POWER_UP_HALF_SIZE_PIXELS);
+    if (x - half >= bridge.min_x && x + half <= bridge.max_x && y - half >= bridge.min_y &&
+        y + half <= bridge.max_y)
+        return BridgeOverlap::INSIDE;
+    if (x + half <= bridge.min_x || x - half >= bridge.max_x || y + half <= bridge.min_y ||
+        y - half >= bridge.max_y)
+        return BridgeOverlap::OUTSIDE;
+    return BridgeOverlap::CROSSING;
+}
+
 
 }  // namespace
 
@@ -238,6 +264,142 @@ TEST(RealRacesPowerUpTest, AllPowerUpsLandOnStreets) {
             EXPECT_TRUE(cell.has_value() && street_map.grid.is_street(cell->col, cell->row))
                     << race.name << ": power-up at (" << power_up.get_x() << ", "
                     << power_up.get_y() << ") is not on a street cell";
+        }
+    }
+}
+
+
+TEST_F(BridgePowerUpTest, OverTheBridgeIsOnBridge) {
+    const StreetMap crossing = make_test_crossing_map();
+
+    power_ups.load(checkpoints_at({{0, 130}, {260, 130}}), &crossing);
+
+    expect_power_up_at(0, 130.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::ON_BRIDGE);
+}
+
+TEST_F(BridgePowerUpTest, UnderTheBridgeIsUnderBridge) {
+    const StreetMap crossing = make_test_crossing_map();
+
+    power_ups.load(checkpoints_at({{130, 0}, {130, 260}}), &crossing);
+
+    expect_power_up_at(0, 130.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::UNDER_BRIDGE);
+}
+
+TEST_F(BridgePowerUpTest, WaterBridgeIsOnBridge) {
+    const StreetMap water_bridge = make_water_bridge_map();
+
+    power_ups.load(checkpoints_at({{0, 130}, {260, 130}}), &water_bridge);
+
+    expect_power_up_at(0, 130.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::ON_BRIDGE);
+}
+
+TEST_F(BridgePowerUpTest, OutsideTheBridgeIsOnGround) {
+    const StreetMap crossing = make_test_crossing_map();
+
+    // (70, 130) is on the ramp: inside the ON_BRIDGE sensor, its square outside the bridge
+    power_ups.load(checkpoints_at({{0, 130}, {140, 130}}), &crossing);
+
+    expect_power_up_at(0, 70.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::ON_GROUND);
+}
+
+TEST_F(BridgePowerUpTest, WithoutGridIsOnGround) {
+    power_ups.load(make_test_race(4, 1).checkpoints);
+
+    ASSERT_EQ(power_ups.get_power_ups().size(), 2u);
+    expect_power_up_layer(0, CarLayer::ON_GROUND);
+    expect_power_up_layer(1, CarLayer::ON_GROUND);
+}
+
+TEST_F(BridgePowerUpTest, CrossingTheEdgeMovesInside) {
+    const StreetMap crossing = make_test_crossing_map();
+
+    // Path midpoint (105, 130): entirely inside 10 px ahead, entirely outside 20 px back
+    power_ups.load(checkpoints_at({{0, 130}, {210, 130}}), &crossing);
+
+    expect_power_up_at(0, 115.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::ON_BRIDGE);
+}
+
+TEST_F(BridgePowerUpTest, CrossingTheEdgeMovesOutside) {
+    const StreetMap crossing = make_test_crossing_map();
+
+    // Path midpoint (95, 130): entirely outside 10 px back, entirely inside 20 px ahead
+    power_ups.load(checkpoints_at({{0, 130}, {190, 130}}), &crossing);
+
+    expect_power_up_at(0, 85.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::ON_GROUND);
+}
+
+TEST_F(BridgePowerUpTest, RespawnKeepsPositionAndLayer) {
+    const StreetMap crossing = make_test_crossing_map();
+    power_ups.load(checkpoints_at({{130, 0}, {130, 260}}), &crossing);
+    ASSERT_NO_FATAL_FAILURE(expect_power_up_layer(0, CarLayer::UNDER_BRIDGE));
+    player.set_car_layer(CarLayer::UNDER_BRIDGE);
+    ASSERT_TRUE(power_ups.try_collect(0, player));
+
+    step(600);  // 10 s
+
+    const PowerUp& respawned = power_ups.get_power_ups()[0];
+    EXPECT_TRUE(respawned.is_active());
+    expect_power_up_at(0, 130.0f, 130.0f);
+    EXPECT_EQ(respawned.get_layer(), CarLayer::UNDER_BRIDGE);
+}
+
+// Same fixed races and world files as AllPowerUpsLandOnStreets
+TEST(RealRacesPowerUpTest, BridgePowerUpsHaveThePathLayer) {
+    ServerConfig config = make_power_up_test_server_config();
+    config.world.races_folder = source_path("tests/data/races/");
+    const std::vector<RaceDTO> races = RaceLoader(config).load_races();
+    ASSERT_EQ(races.size(), 6u);
+    CityUtils city_utils(config);
+
+    for (const RaceDTO& race: races) {
+        const CityLoaderConfig& city =
+                city_utils.obtain_city_loader_config(city_utils.normalize_city_name(race.city));
+        const StreetMap street_map = load_street_map(city, city_utils);
+
+        b2World world{b2Vec2(0.0f, 0.0f)};
+        PowerUpManager power_ups{world, config,
+                                 make_sequence_power_up_type_generator(BACKGROUND_SEQUENCE)};
+        power_ups.load(race.checkpoints, &street_map);
+
+        for (size_t index = 0; index < power_ups.get_power_ups().size(); ++index) {
+            const PowerUp& power_up = power_ups.get_power_ups()[index];
+            const CheckpointDTO& p = race.checkpoints[2 * index];
+            const CheckpointDTO& q = race.checkpoints[2 * index + 1];
+            std::ostringstream where;
+            where << race.name << ": stretch " << static_cast<int>(p.id) << " -> "
+                  << static_cast<int>(q.id) << ", power-up at (" << power_up.get_x() << ", "
+                  << power_up.get_y() << ")";
+
+            bool inside_a_bridge = false;
+            for (const StreetRect& bridge: street_map.bridges.bridges) {
+                const BridgeOverlap overlap =
+                        overlap_with(bridge, power_up.get_x(), power_up.get_y());
+                EXPECT_NE(overlap, BridgeOverlap::CROSSING) << where.str() << " crosses a bridge";
+                inside_a_bridge = inside_a_bridge || overlap == BridgeOverlap::INSIDE;
+            }
+
+            if (!inside_a_bridge) {
+                EXPECT_EQ(power_up.get_layer(), CarLayer::ON_GROUND) << where.str();
+                continue;
+            }
+
+            const auto path =
+                    find_street_path(street_map, {static_cast<float>(p.x), static_cast<float>(p.y)},
+                                     {static_cast<float>(q.x), static_cast<float>(q.y)});
+            ASSERT_TRUE(path.has_value()) << where.str();
+            const auto cell = street_map.grid.cell_at({power_up.get_x(), power_up.get_y()});
+            ASSERT_TRUE(cell.has_value()) << where.str();
+            const auto step = std::find_if(path->begin(), path->end(), [&](const PathStep& s) {
+                return s.col == cell->col && s.row == cell->row;
+            });
+            ASSERT_NE(step, path->end()) << where.str() << " is not on the path";
+            EXPECT_EQ(power_up.get_layer(), step->layer) << where.str();
         }
     }
 }

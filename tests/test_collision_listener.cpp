@@ -13,6 +13,7 @@
 #include "../server/power_up.h"
 
 #include "server_test_utils.h"
+#include "streets_test_utils.h"
 
 namespace {
 
@@ -28,6 +29,7 @@ protected:
                                                    PowerUpType::Repair, PowerUpType::Nitro})};
     CollisionListener listener{players, power_ups};
     CityUtils city_utils{config};
+    const StreetMap crossing = make_test_crossing_map();
 
     void SetUp() override { world.SetContactListener(&listener); }
 
@@ -63,6 +65,38 @@ protected:
         if (power_ups.get_power_ups().empty())
             throw std::runtime_error("no power-up was loaded");
         return power_ups.get_power_ups().front();
+    }
+
+    // Milestone 6: loads the power-up of the stretch P -> Q (pixels) of the crossing of the
+    // milestone 5 Background, so it gets the layer of the path
+    const PowerUp& place_bridge_power_up(uint16_t px, uint16_t py, uint16_t qx, uint16_t qy) {
+        power_ups.load({CheckpointDTO(1, 'V', px, py), CheckpointDTO(2, 'V', qx, qy)}, &crossing);
+        if (power_ups.get_power_ups().empty())
+            throw std::runtime_error("no power-up was loaded");
+        return power_ups.get_power_ups().front();
+    }
+
+    float meters(float pixels) const {
+        return pixels / static_cast<float>(config.world.pixels_per_meter);
+    }
+
+    // Car at (x, y) pixels with the given layer, moving at (vx, vy) meters per second
+    Player& add_moving_player(uint32_t id, float x, float y, CarLayer layer, float vx, float vy) {
+        Player& player = add_player(id, meters(x), meters(y));
+        player.set_car_layer(layer);
+        player.get_car_body()->SetLinearVelocity(b2Vec2(vx, vy));
+        return player;
+    }
+
+    // Box2D sensor over a box in pixels
+    void add_bridge_sensor(const StreetRect& box, SensorType type) {
+        const auto min_x = static_cast<int>(box.min_x);
+        const auto max_x = static_cast<int>(box.max_x);
+        const auto min_y = static_cast<int>(box.min_y);
+        const auto max_y = static_cast<int>(box.max_y);
+        city_utils.add_sensor(world,
+                              {{min_x, min_y}, {max_x, min_y}, {max_x, max_y}, {min_x, max_y}},
+                              type, CATEGORY_SENSOR, MASK_SENSOR);
     }
 
     static bool has_any_effect(const Player& player) {
@@ -280,4 +314,88 @@ TEST_F(CollisionListenerTest, DeadCarDoesNotCollect) {
 
     EXPECT_TRUE(power_up.is_active());
     EXPECT_FALSE(has_any_effect(player));
+}
+
+
+// Power-ups by layer on the bridges (scenarios 6.6 - 6.10). The cars of 6.6 - 6.9 keep the layer
+// the test sets, because there are no bridge sensors in the world.
+
+TEST_F(CollisionListenerTest, UnderBridgeCarSkipsOnBridgePowerUp) {
+    const PowerUp& power_up = place_bridge_power_up(0, 130, 260, 130);
+    ASSERT_EQ(power_up.get_layer(), CarLayer::ON_BRIDGE);
+    const Player& player = add_moving_player(1, 130, 70, CarLayer::UNDER_BRIDGE, 0.0f, 5.0f);
+
+    step(60);
+
+    ASSERT_GT(player.get_car_body()->GetPosition().y, meters(160));
+    EXPECT_TRUE(power_up.is_active());
+    EXPECT_FALSE(has_any_effect(player));
+    EXPECT_EQ(player.get_health(), 100);
+}
+
+TEST_F(CollisionListenerTest, OnBridgeCarCollectsOnBridgePowerUp) {
+    const PowerUp& power_up = place_bridge_power_up(0, 130, 260, 130);
+    ASSERT_EQ(power_up.get_layer(), CarLayer::ON_BRIDGE);
+    ASSERT_EQ(power_up.get_type(), PowerUpType::Shield);
+    const Player& player = add_moving_player(1, 70, 130, CarLayer::ON_BRIDGE, 5.0f, 0.0f);
+
+    step(60);
+
+    EXPECT_TRUE(player.has_effect(PowerUpType::Shield));
+    EXPECT_FALSE(power_up.is_active());
+}
+
+TEST_F(CollisionListenerTest, UnderBridgePowerUpOnlyForUnderBridgeCars) {
+    const PowerUp& power_up = place_bridge_power_up(130, 0, 130, 260);
+    ASSERT_EQ(power_up.get_layer(), CarLayer::UNDER_BRIDGE);
+    const Player& on_bridge = add_moving_player(1, 70, 130, CarLayer::ON_BRIDGE, 5.0f, 0.0f);
+
+    step(60);
+
+    ASSERT_GT(on_bridge.get_car_body()->GetPosition().x, meters(160));
+    EXPECT_TRUE(power_up.is_active());
+    EXPECT_FALSE(has_any_effect(on_bridge));
+
+    const Player& under_bridge = add_moving_player(2, 130, 70, CarLayer::UNDER_BRIDGE, 0.0f, 5.0f);
+
+    step(60);
+
+    EXPECT_TRUE(under_bridge.has_effect(PowerUpType::Shield));
+    EXPECT_FALSE(power_up.is_active());
+}
+
+TEST_F(CollisionListenerTest, OnGroundPowerUpForAnyLayer) {
+    const PowerUp& power_up = place_power_up(5.0f, 10.0f);
+    ASSERT_EQ(power_up.get_layer(), CarLayer::ON_GROUND);
+    Player& player = add_player(1, 0.0f, 10.0f);
+    player.set_car_layer(CarLayer::ON_BRIDGE);  // for example, on the ramp of a bridge
+
+    player.get_car_body()->SetLinearVelocity(b2Vec2(10.0f, 0.0f));
+    step(60);
+
+    EXPECT_TRUE(player.has_effect(PowerUpType::Shield));
+    EXPECT_FALSE(power_up.is_active());
+}
+
+TEST_F(CollisionListenerTest, RealSensorsOnlyTheCarOnTopCollects) {
+    add_bridge_sensor(crossing.bridges.on_bridge_sensors.front(), SensorType::ON_BRIDGE);
+    add_bridge_sensor(crossing.bridges.under_bridge_sensors.front(), SensorType::UNDER_BRIDGE);
+    const PowerUp& power_up = place_bridge_power_up(0, 130, 260, 130);
+    ASSERT_EQ(power_up.get_layer(), CarLayer::ON_BRIDGE);
+    // Both start on the ground, outside the sensors; the second one waits on the top road
+    const Player& below = add_moving_player(1, 130, 0, CarLayer::ON_GROUND, 0.0f, 10.0f);
+    const Player& above = add_moving_player(2, 0, 130, CarLayer::ON_GROUND, 0.0f, 0.0f);
+
+    step(90);
+
+    ASSERT_GT(below.get_car_body()->GetPosition().y, meters(260));
+    EXPECT_TRUE(power_up.is_active());
+    EXPECT_FALSE(has_any_effect(below));
+
+    above.get_car_body()->SetLinearVelocity(b2Vec2(10.0f, 0.0f));
+    step(90);
+
+    ASSERT_GT(above.get_car_body()->GetPosition().x, meters(260));
+    EXPECT_TRUE(above.has_effect(PowerUpType::Shield));
+    EXPECT_FALSE(power_up.is_active());
 }
