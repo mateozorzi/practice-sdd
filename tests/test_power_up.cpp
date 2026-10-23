@@ -154,9 +154,15 @@ TEST(PowerUpTypeGeneratorTest, RandomGeneratorYieldsAllThreeTypes) {
 TEST_F(StreetPowerUpTest, StraightStreetKeepsMidpoint) {
     const StreetMap street = make_straight_street_map();
 
+    // On a straight street the path midpoint is (P + Q) / 2, so the empty log is what tells the
+    // path apart from the fallback
+    std::ostringstream errors;
+    std::streambuf* silenced = std::cerr.rdbuf(errors.rdbuf());
     power_ups.load(checkpoints_at({{0, 0}, {200, 0}}), &street);
+    std::cerr.rdbuf(silenced);
 
     expect_power_up_at(0, 100.0f, 0.0f);
+    EXPECT_TRUE(errors.str().empty()) << errors.str();
 }
 
 TEST_F(StreetPowerUpTest, LShapedStreetUsesPathMidpoint) {

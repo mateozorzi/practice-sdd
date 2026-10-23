@@ -62,6 +62,7 @@ public:
     int get_cell_size() const; int get_width() const; int get_height() const;
     bool is_street(int col, int row) const;                     // false fuera de la grilla
     StreetPoint cell_center(int col, int row) const;
+    std::optional<StreetCell> cell_at(StreetPoint point) const;              // nullopt fuera (5.11)
     std::optional<StreetCell> nearest_street_cell(StreetPoint point) const;  // 5.9
 };
 StreetsGrid load_streets_grid(const std::string& path);         // WorldCreationException
