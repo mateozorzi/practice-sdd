@@ -30,6 +30,9 @@ public:
     bool eventFilter(QObject* obj, QEvent* event) override;
     ~Creador();
 
+protected:
+    void showEvent(QShowEvent* event) override;
+
 private:
     Ui::Creador* ui;
     QGraphicsScene* scene;
@@ -40,6 +43,7 @@ private:
     Messages m;
     QImage mask_circuit;
     Race race;
+    bool shown = false;
 
     void add_checkpoint(QMouseEvent* event);
     void delete_checkpoint(QMouseEvent* event);
@@ -53,6 +57,7 @@ private:
     void draw_id_checkpoint(const QRect& fig, const int id);
     void draw_checkpoint(QRect& fig, const int id);
     void update_id(const int id);
+    void center_on_first_checkpoint();
 
 signals:
     void close_w();

@@ -338,6 +338,24 @@ TEST_F(EditorWindowsTest, CreatorOpensAnExistingRace) {
     EXPECT_EQ(creador.findChild<QLineEdit*>("name_circuit")->text(), "park day");
 }
 
+TEST_F(EditorWindowsTest, OpenedRaceIsCenteredOnTheFirstCheckpoint) {
+    // Checkpoint 1 is not the first one of the vector: it is found by id
+    QVector<Checkpoint> checkpoints = {
+            Checkpoint(2, 'H', QPoint(1000, 1000), QRect(967, 993, 66, 15)),
+            Checkpoint(1, 'H', QPoint(2300, 2300), QRect(2267, 2293, 66, 15))};
+    Race race(0, "far race", "Liberty City", LIBERTY_MAP, LIBERTY_MASK, 2, checkpoints, 3);
+    QTemporaryDir races_dir;
+    Creador creador(race, races_dir.path());
+
+    creador.showMaximized();
+    QApplication::processEvents();
+
+    auto* view = creador.findChild<QGraphicsView*>("labelmap");
+    QPointF shown_center = view->mapToScene(view->viewport()->rect().center());
+    EXPECT_NEAR(shown_center.x(), 2300, 2);
+    EXPECT_NEAR(shown_center.y(), 2300, 2);
+}
+
 
 class SelectCircuitTest: public EditorWindowsTest {
 protected:

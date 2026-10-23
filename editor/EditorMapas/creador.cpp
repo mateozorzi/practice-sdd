@@ -277,6 +277,23 @@ bool Creador::eventFilter(QObject* obj, QEvent* event) {
 }
 
 
+void Creador::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+    if (!shown) {
+        // only when first shown: the view has no size before
+        shown = true;
+        center_on_first_checkpoint();
+    }
+}
+
+void Creador::center_on_first_checkpoint() {
+    const QVector<Checkpoint>& v_checkpoints = checkpoints.get_checkpoints();
+    auto first = std::find_if(v_checkpoints.begin(), v_checkpoints.end(),
+                              [](const Checkpoint& c) { return c.id == 1; });
+    if (first != v_checkpoints.end())
+        ui->labelmap->centerOn(QRectF(first->rect).center());
+}
+
 Creador::~Creador() {
     qDeleteAll(scene->items());
     delete scene;
