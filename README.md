@@ -38,7 +38,19 @@ nfs_editor
 Permite:
 
 -   Crear circuitos nuevos
--   Editar circuitos existentes
+-   Editar circuitos existentes: el mapa se abre centrado en el
+    checkpoint 1 de la carrera
+
+Al apretar "Done" la carrera se guarda, sin preguntar dónde, en
+`/var/nfs/races/<nombre de la carrera>.csv`, la carpeta que lee el
+servidor instalado. Si ya existe una carrera con ese nombre, el editor
+pregunta antes de pisarla; si no se confirma, la guarda como
+`<nombre>_1.csv` (o el primer número libre). El servidor carga las
+carreras al arrancar, así que para jugar una carrera nueva hay que
+reiniciar `nfs_server`.
+
+Para versionar una carrera en el repositorio (y que `installer.sh` la
+instale), hay que copiarla a mano a `server/races/`.
 
 ------------------------------------------------------------------------
 
