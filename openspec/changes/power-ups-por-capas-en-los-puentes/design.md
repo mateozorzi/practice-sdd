@@ -67,8 +67,8 @@ std::optional<PathSpot> place_on_path(const StreetMap& map, const std::vector<Pa
   todos los puentes, `ON_GROUND` aunque el camino tenga otra capa (rampa, 6.4).
 - **Sin posición válida** en todo el camino (tramo muy corto metido en un borde): `nullopt`. `load` deja el punto
   medio con `ON_GROUND` y escribe en `std::cerr`
-  `[POWER_UPS] Stretch <p> -> <q> crosses a bridge edge, keeping the path midpoint`. 6.15 detecta si pasa en datos
-  reales.
+  `[POWER_UPS] Stretch <p> -> <q> crosses a bridge edge, keeping the path midpoint`
+  (`BridgePowerUpTest.NoPlaceOffTheEdgeKeepsMidpointAndReports`). 6.15 detecta si pasa en datos reales.
 
 Paso de 1 px: con largos de unos cientos a pocos miles de px son a lo sumo unos miles de evaluaciones por tramo, cada
 una contra los ~20 puentes de una ciudad; despreciable al lado del BFS. Alternativa descartada: calcular
@@ -126,8 +126,9 @@ las pasadas es fijo en `render_players`.
   los dos sensores del cruce con `CityUtils::add_sensor` y no fija capas.
 - **Carrera del loop (6.13)**: `make_bridge_test_race()` en `tests/server_test_utils.*`: Liberty City, 4
   checkpoints, el tramo 1 → 2 sobre el camino de arriba del puente 0 (rectángulo (1584..1679, 2648..2791); su sensor
-  `ON_BRIDGE` (1592..1671, 2630..2809) es largo en y, así que el camino de arriba es vertical). Los checkpoints
-  exactos se eligen al implementar y el test chequea, antes del `THEN`, que el power-up cae dentro del rectángulo.
+  `ON_BRIDGE` (1592..1671, 2630..2809) es largo en y, así que el camino de arriba es vertical). Checkpoints sobre la
+  calle vertical x = 1632, en y ∈ {2480, 2960, 3020, 3080} (orientación `H`, 66 × 15): el punto medio del tramo 1 → 2
+  cae en y = 2720, dentro del puente. El test chequea, antes del `THEN`, que el power-up cae dentro del rectángulo.
 - **6.15**: `RaceLoader` sobre `tests/data/races/` y las rutas de `make_test_server_config()` (solo rutas de
   `server/world/`, excepción ya documentada en el Hito 5). Para cada power-up recalcula el camino del tramo y toma la
   capa del paso cuya celda es `cell_at(posición)`.

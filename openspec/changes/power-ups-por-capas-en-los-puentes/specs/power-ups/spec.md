@@ -73,6 +73,13 @@ valores.
 - **THEN** el cliente obtiene un power-up idéntico, capa `ON_BRIDGE` incluida
 - Test: `PowerUpProtocolTest.PowerUpDTOLayerRoundTrip` (`tests/test_common.cpp`)
 
+#### Scenario: Una capa desconocida se lee como suelo (soporte de 6.12)
+- **GIVEN** un snapshot con un power-up {id 1, Nitro, (130, 130), activo} cuya capa tiene un valor que el cliente no
+  conoce (7)
+- **WHEN** el servidor lo serializa y el cliente lo deserializa
+- **THEN** el cliente obtiene ese power-up con capa `ON_GROUND`, así se dibuja debajo de los puentes
+- Test: `PowerUpProtocolTest.UnknownLayerIsReadAsOnGround` (`tests/test_common.cpp`)
+
 ## ADDED Requirements
 
 ### Requirement: El power-up toma la capa del camino dentro de un puente
@@ -124,7 +131,9 @@ los checkpoints (respaldo (P + Q) / 2), el power-up MUST ser `ON_GROUND`.
 ### Requirement: El power-up nunca cruza el borde de un puente
 Si en el punto medio del camino el cuadrado del power-up (medio lado 15 px) queda cruzando el borde del rectángulo de
 un puente, el power-up SHALL correrse por el camino hasta la posición más cercana (en distancia recorrida por el
-camino) donde su cuadrado queda entero dentro o entero fuera de todo puente, y MUST tomar la capa de esa posición.
+camino) donde su cuadrado queda entero dentro o entero fuera de todo puente, y MUST tomar la capa de esa posición. Si
+ningún punto del camino cumple, MUST quedar en el punto medio del camino con capa `ON_GROUND` y el servidor informa
+el tramo.
 
 #### Scenario: Se corre hacia adentro del puente (6.5)
 - **GIVEN** el cruce de test del Hito 5 y los checkpoints 1 y 2 en P = (0, 130) y Q = (210, 130): el punto medio
@@ -141,6 +150,13 @@ camino) donde su cuadrado queda entero dentro o entero fuera de todo puente, y M
 - **WHEN** se cargan los power-ups con ese cruce
 - **THEN** el primer power-up está en (85, 130) y su capa es `ON_GROUND`
 - Test: `BridgePowerUpTest.CrossingTheEdgeMovesOutside` (`tests/test_power_up.cpp`)
+
+#### Scenario: Ningún punto del camino sale del borde (soporte de 6.5)
+- **GIVEN** el cruce de test del Hito 5 y los checkpoints 1 y 2 los dos en (100, 130), sobre el borde x = 100: el
+  camino es una sola celda y el cuadrado del power-up (85..115) cruza el borde en cualquier punto del camino
+- **WHEN** se cargan los power-ups con ese cruce
+- **THEN** el primer power-up queda en (100, 130) con capa `ON_GROUND` y el servidor informa el tramo `1 -> 2`
+- Test: `BridgePowerUpTest.NoPlaceOffTheEdgeKeepsMidpointAndReports` (`tests/test_power_up.cpp`)
 
 ### Requirement: Un power-up de puente lo recoge solo un auto de su capa
 Un power-up `ON_BRIDGE` o `UNDER_BRIDGE` MUST NOT darle efectos a un auto de otra capa que entra a su sensor: SHALL

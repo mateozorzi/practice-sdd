@@ -334,6 +334,20 @@ TEST_F(BridgePowerUpTest, CrossingTheEdgeMovesOutside) {
     expect_power_up_layer(0, CarLayer::ON_GROUND);
 }
 
+TEST_F(BridgePowerUpTest, NoPlaceOffTheEdgeKeepsMidpointAndReports) {
+    const StreetMap crossing = make_test_crossing_map();
+
+    // A one-cell path on the edge x = 100: no point of it leaves the square off the edge
+    std::ostringstream errors;
+    std::streambuf* silenced = std::cerr.rdbuf(errors.rdbuf());
+    power_ups.load(checkpoints_at({{100, 130}, {100, 130}}), &crossing);
+    std::cerr.rdbuf(silenced);
+
+    expect_power_up_at(0, 100.0f, 130.0f);
+    expect_power_up_layer(0, CarLayer::ON_GROUND);
+    EXPECT_NE(errors.str().find("1 -> 2 crosses a bridge edge"), std::string::npos) << errors.str();
+}
+
 TEST_F(BridgePowerUpTest, RespawnKeepsPositionAndLayer) {
     const StreetMap crossing = make_test_crossing_map();
     power_ups.load(checkpoints_at({{130, 0}, {130, 260}}), &crossing);

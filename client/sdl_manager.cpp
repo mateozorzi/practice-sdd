@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -13,7 +14,6 @@
 #include "client_constants.h"
 #include "game_state.h"
 #include "leaderboard_info.h"
-#include "power_up_view.h"
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),

@@ -495,6 +495,19 @@ TEST(PowerUpProtocolTest, PowerUpDTOLayerRoundTrip) {
     EXPECT_EQ(received.power_ups[0].layer, CarLayer::ON_BRIDGE);
 }
 
+TEST(PowerUpProtocolTest, UnknownLayerIsReadAsOnGround) {
+    const PowerUpDTO power_up(1, PowerUpType::Nitro, 130, 130, true, 0, static_cast<CarLayer>(7));
+    WorldSnapshotDTO snapshot;
+    snapshot.add_power_up(power_up);
+
+    WorldSnapshotDTO received = round_trip(snapshot);
+
+    ASSERT_EQ(received.power_ups.size(), 1u);
+    EXPECT_EQ(received.power_ups[0].layer, CarLayer::ON_GROUND);
+    EXPECT_EQ(received.power_ups[0].id, 1);
+    EXPECT_EQ(received.power_ups[0].x_position, 130u);
+}
+
 TEST(PowerUpProtocolTest, SnapshotEffectRoundTrip) {
     const PowerUpEffectDTO effect(1, PowerUpType::Shield, 2500);
     WorldSnapshotDTO snapshot;

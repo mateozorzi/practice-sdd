@@ -67,7 +67,7 @@
 - [x] 6.1 Refactor final y hooks: formato, cpplint y cppcheck sin errores sobre los archivos tocados; verificar que
       ningún test nuevo lee valores de juego de `server/config/*.yaml` (6.13 y 6.15 solo usan rutas de
       `server/world/`) y que `git status editor/` no muestra cambios
-- [ ] 6.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 6: (a) los tests de
+- [x] 6.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 6: (a) los tests de
       6.1 – 6.15 existen y pasan, (b) `make run-tests` en verde, (c) hooks sin errores, (d) `/opsx:verify` sin
       CRITICAL
 
