@@ -135,12 +135,12 @@ void SDLManager::render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, do
 }
 
 // The power-up PNGs are transparent: they are copied as they are, with no background
-void SDLManager::render_power_ups(const LocalInfo& game_state, const SDL2pp::Rect& view_rect,
-                                  double scale_x, double scale_y) {
+void SDLManager::render_power_ups(const LocalInfo& game_state, const PowerUpDrawPass pass,
+                                  const SDL2pp::Rect& view_rect, double scale_x, double scale_y) {
     // Size in the world of a power-up drawn POWER_UP_RENDER_SIZE wide, to know if it is on screen
     const int world_size = static_cast<int>(POWER_UP_RENDER_SIZE / scale_x);
 
-    for (const auto& power_up: power_ups_to_draw(game_state)) {
+    for (const auto& power_up: power_ups_to_draw(game_state, pass)) {
 
         SDL2pp::Rect world_rect(power_up.x - world_size / 2, power_up.y - world_size / 2,
                                 world_size, world_size);
@@ -279,8 +279,8 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
         }
     }
 
-    // Los power-ups quedan debajo de los autos
-    render_power_ups(game_state, view_rect, scale_x, scale_y);
+    // Los power-ups quedan debajo de los autos; los de abajo y los del suelo, debajo de los puentes
+    render_power_ups(game_state, PowerUpDrawPass::BELOW_BRIDGES, view_rect, scale_x, scale_y);
 
     // Renderizar autos desde el suelo
     if (my_car.layer != CarLayer::ON_BRIDGE) {
@@ -307,6 +307,9 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
     }
 
     render_bridges(view_rect, scale_x, scale_y, map);
+
+    // Los power-ups sobre un puente, encima del puente y debajo de los autos de arriba
+    render_power_ups(game_state, PowerUpDrawPass::ABOVE_BRIDGES, view_rect, scale_x, scale_y);
 
     // Renderizar jugadores sobre puentes
     if (my_car.layer == CarLayer::ON_BRIDGE) {

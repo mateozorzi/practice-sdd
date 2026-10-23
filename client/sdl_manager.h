@@ -18,6 +18,7 @@
 #include "client_constants.h"
 #include "game_state.h"
 #include "leaderboard_info.h"
+#include "power_up_view.h"
 #include "resource_manager.h"
 #include "sounds.h"
 #include "upgrade_shop.h"
@@ -66,8 +67,8 @@ private:
                        SDL2pp::Texture& cars_texture);
     void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
                     double scale_y, SDL2pp::Texture& cars_texture);
-    void render_power_ups(const LocalInfo& game_state, const SDL2pp::Rect& view_rect,
-                          double scale_x, double scale_y);
+    void render_power_ups(const LocalInfo& game_state, PowerUpDrawPass pass,
+                          const SDL2pp::Rect& view_rect, double scale_x, double scale_y);
     void render_hud_health(int health, int max_health);
     void render_hud_effects(const LocalInfo& game_state);
     void render_hud_minimap(int player_x, int player_y, const CheckpointDTO& next_checkpoint);

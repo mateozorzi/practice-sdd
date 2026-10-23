@@ -43,8 +43,20 @@ std::vector<PowerUpSprite> power_ups_to_draw(const LocalInfo& state) {
             continue;
 
         sprites.push_back(PowerUpSprite{power_up.id, *sprite, static_cast<int>(power_up.x_position),
-                                        static_cast<int>(power_up.y_position),
-                                        POWER_UP_RENDER_SIZE});
+                                        static_cast<int>(power_up.y_position), POWER_UP_RENDER_SIZE,
+                                        power_up.layer});
+    }
+    return sprites;
+}
+
+std::vector<PowerUpSprite> power_ups_to_draw(const LocalInfo& state, const PowerUpDrawPass pass) {
+
+    std::vector<PowerUpSprite> sprites;
+    for (const auto& sprite: power_ups_to_draw(state)) {
+
+        const bool above = sprite.layer == CarLayer::ON_BRIDGE;
+        if (above == (pass == PowerUpDrawPass::ABOVE_BRIDGES))
+            sprites.push_back(sprite);
     }
     return sprites;
 }

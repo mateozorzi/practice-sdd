@@ -109,13 +109,14 @@ LocalInfo power_up_state() {
     return state;
 }
 
-std::vector<uint8_t> drawn_ids(const LocalInfo& state) {
-    const std::vector<PowerUpSprite> sprites = power_ups_to_draw(state);
+std::vector<uint8_t> ids_of(const std::vector<PowerUpSprite>& sprites) {
     std::vector<uint8_t> ids(sprites.size());
     std::transform(sprites.begin(), sprites.end(), ids.begin(),
                    [](const PowerUpSprite& sprite) { return sprite.id; });
     return ids;
 }
+
+std::vector<uint8_t> drawn_ids(const LocalInfo& state) { return ids_of(power_ups_to_draw(state)); }
 
 bool intersect(const EffectBadge& a, const EffectBadge& b) {
     return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -525,14 +526,14 @@ namespace {
 // the installed assets, so just that part is skipped without them
 class PowerUpRenderTest: public ::testing::Test {
 protected:
-    void render(LocalInfo& state) {
+    void render(LocalInfo& state, const std::string& bridges_data = bridges("liberty_city")) {
         if (!std::filesystem::exists(ASSETS_FOLDER))
             GTEST_SKIP() << "the client assets are not installed in " << ASSETS_FOLDER;
         setenv("SDL_VIDEODRIVER", "offscreen", 1);
         setenv("SDL_AUDIODRIVER", "dummy", 1);
 
         SDLManager sdl;
-        sdl.load_city("Liberty City", bridges("liberty_city"), decorations("liberty_city"));
+        sdl.load_city("Liberty City", bridges_data, decorations("liberty_city"));
         for (int frame = 0; frame < 3; ++frame) sdl.render(state);
     }
 };
@@ -570,6 +571,21 @@ TEST_F(PowerUpRenderTest, UnknownTypeIsIgnored) {
 
     EXPECT_EQ(drawn_ids(state), (std::vector<uint8_t>{1, 2, 3}));
     EXPECT_NO_THROW(render(state));
+}
+
+TEST_F(PowerUpRenderTest, OnBridgePowerUpIsDrawnAboveTheBridge) {
+    // Milestone 6 Background: a bridge in (100..160, 100..160) and a power-up on each layer
+    LocalInfo state{1, {}, player_at(1, 130, 130), {}};
+    state.power_ups = {
+            PowerUpDTO(1, PowerUpType::Nitro, 130, 130, true, 0, CarLayer::ON_BRIDGE),
+            PowerUpDTO(2, PowerUpType::Shield, 130, 130, true, 0, CarLayer::UNDER_BRIDGE)};
+    const std::string bridge = "[[[100, 100], [160, 100], [100, 160], [160, 160]]]";
+
+    EXPECT_EQ(ids_of(power_ups_to_draw(state, PowerUpDrawPass::BELOW_BRIDGES)),
+              (std::vector<uint8_t>{2}));
+    EXPECT_EQ(ids_of(power_ups_to_draw(state, PowerUpDrawPass::ABOVE_BRIDGES)),
+              (std::vector<uint8_t>{1}));
+    EXPECT_NO_THROW(render(state, bridge));
 }
 
 TEST(PowerUpHudTest, NitroBadgeShowsCeiledSeconds) {

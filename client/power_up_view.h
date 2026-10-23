@@ -21,7 +21,11 @@ struct PowerUpSprite {
     int x;
     int y;
     int size;
+    CarLayer layer;
 };
+
+// The power-ups on a bridge are drawn after the bridges, the rest before them
+enum class PowerUpDrawPass { BELOW_BRIDGES, ABOVE_BRIDGES };
 
 // Badge of an effect of the own player: the power-up sprite and the seconds left, in screen pixels
 struct EffectBadge {
@@ -39,6 +43,8 @@ std::optional<std::string> power_up_sprite(PowerUpType type);
 
 // Active power-ups with a known type
 std::vector<PowerUpSprite> power_ups_to_draw(const LocalInfo& state);
+// The ones of `power_ups_to_draw` drawn in that pass: ON_BRIDGE above, the rest below
+std::vector<PowerUpSprite> power_ups_to_draw(const LocalInfo& state, PowerUpDrawPass pass);
 
 // One badge per own effect with duration (Nitro or Shield), side by side
 std::vector<EffectBadge> effect_badges(const LocalInfo& state);
