@@ -2,13 +2,15 @@
 
 
 PowerUpDTO::PowerUpDTO(const uint8_t id, const PowerUpType type, const uint32_t x_position,
-                       const uint32_t y_position, const bool active, const uint32_t collected_by):
+                       const uint32_t y_position, const bool active, const uint32_t collected_by,
+                       const CarLayer layer):
         id(id),
         type(type),
         x_position(x_position),
         y_position(y_position),
         active(active),
-        collected_by(collected_by) {}
+        collected_by(collected_by),
+        layer(layer) {}
 
 
 PowerUpEffectDTO::PowerUpEffectDTO(const uint32_t player_id, const PowerUpType type,

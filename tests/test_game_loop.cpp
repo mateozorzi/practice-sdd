@@ -9,6 +9,7 @@
 
 #include "../server/game.h"
 #include "../server/game_loop.h"
+#include "../server/server_constants.h"
 
 #include "server_test_utils.h"
 
@@ -572,6 +573,22 @@ TEST_F(GameLoopPowerUpTest, SnapshotHasTwoActiveNitroPowerUps) {
         EXPECT_TRUE(power_up.active);
         EXPECT_EQ(power_up.type, PowerUpType::Nitro);
     }
+}
+
+TEST_F(GameLoopPowerUpTest, SnapshotHasTheBridgeLayer) {
+    races = RaceCatalogueDTO{{make_bridge_test_race()}};
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Nitro));
+
+    tick();
+
+    ASSERT_FALSE(snapshot.power_ups.empty());
+    const PowerUpDTO& power_up = snapshot.power_ups[0];
+    // Bridge 0 of Liberty City: (1584..1679, 2648..2791), with the 15 px half side inside
+    ASSERT_GE(power_up.x_position, 1584u + POWER_UP_HALF_SIZE_PIXELS);
+    ASSERT_LE(power_up.x_position, 1679u - POWER_UP_HALF_SIZE_PIXELS);
+    ASSERT_GE(power_up.y_position, 2648u + POWER_UP_HALF_SIZE_PIXELS);
+    ASSERT_LE(power_up.y_position, 2791u - POWER_UP_HALF_SIZE_PIXELS);
+    EXPECT_EQ(power_up.layer, CarLayer::ON_BRIDGE);
 }
 
 TEST_F(GameLoopPowerUpTest, CollectedPowerUpShowsInactiveAndNitroEffect) {

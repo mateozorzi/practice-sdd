@@ -215,6 +215,7 @@ void ServerProtocol::send_world_snapshot(const GameUpdateDTO& snapshot) {
         add_uint32_to_buffer(power_up.y_position);
         add_uint8_to_buffer(static_cast<uint8_t>(power_up.active));
         add_uint32_to_buffer(power_up.collected_by);
+        add_uint8_to_buffer(static_cast<uint8_t>(power_up.layer));
     }
 
     add_uint8_to_buffer(static_cast<uint8_t>(world_snapshot.effects.size()));

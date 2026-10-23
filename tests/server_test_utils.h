@@ -43,6 +43,10 @@ std::function<PowerUpType()> make_sequence_power_up_type_generator(
 // Race in Liberty City with `checkpoints` checkpoints placed one after the other
 RaceDTO make_test_race(uint8_t checkpoints, uint8_t laps, const std::string& name = "test_race");
 
+// Race in Liberty City with 4 checkpoints on a vertical street: the stretch 1 -> 2 crosses bridge 0
+// (1584..1679, 2648..2791) along its top road, with the middle of the path inside the bridge
+RaceDTO make_bridge_test_race(const std::string& name = "bridge_test_race");
+
 // Pops updates until one matches `predicate`. Returns nullopt on timeout or closed queue.
 std::optional<GameUpdateDTO> wait_for_update(
         Queue<GameUpdateDTO>& queue, const std::function<bool(const GameUpdateDTO&)>& predicate,

@@ -115,6 +115,15 @@ RaceDTO make_test_race(uint8_t checkpoints, uint8_t laps, const std::string& nam
     return RaceDTO(name, "Liberty City", race_checkpoints, laps);
 }
 
+RaceDTO make_bridge_test_race(const std::string& name) {
+    std::vector<CheckpointDTO> race_checkpoints;
+    uint8_t id = 1;
+    for (uint16_t y: {2480, 2960, 3020, 3080})
+        race_checkpoints.emplace_back(id++, 'H', 1632, y, 66, 15);
+
+    return RaceDTO(name, "Liberty City", race_checkpoints, 1);
+}
+
 std::optional<GameUpdateDTO> wait_for_update(
         Queue<GameUpdateDTO>& queue, const std::function<bool(const GameUpdateDTO&)>& predicate,
         std::chrono::milliseconds timeout) {

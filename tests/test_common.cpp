@@ -478,6 +478,21 @@ TEST(PowerUpProtocolTest, PowerUpDTORoundTrip) {
     EXPECT_EQ(received.power_ups[0].collected_by, 0u);
     EXPECT_EQ(received.power_ups[1], collected);
     EXPECT_EQ(received.power_ups[1].collected_by, 1u);
+    EXPECT_EQ(received.power_ups[0].layer, CarLayer::ON_GROUND);
+    EXPECT_EQ(received.power_ups[1].layer, CarLayer::ON_GROUND);
+}
+
+TEST(PowerUpProtocolTest, PowerUpDTOLayerRoundTrip) {
+    // Milestone 6 Background: example DTO on the bridge
+    const PowerUpDTO power_up(1, PowerUpType::Nitro, 130, 130, true, 0, CarLayer::ON_BRIDGE);
+    WorldSnapshotDTO snapshot;
+    snapshot.add_power_up(power_up);
+
+    WorldSnapshotDTO received = round_trip(snapshot);
+
+    ASSERT_EQ(received.power_ups.size(), 1u);
+    EXPECT_EQ(received.power_ups[0], power_up);
+    EXPECT_EQ(received.power_ups[0].layer, CarLayer::ON_BRIDGE);
 }
 
 TEST(PowerUpProtocolTest, SnapshotEffectRoundTrip) {

@@ -223,8 +223,12 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
         uint32_t y_position = recv_uint32();
         bool active = static_cast<bool>(recv_uint8());
         uint32_t collected_by = recv_uint32();
-        world_snapshot.add_power_up(
-                PowerUpDTO(id, type, x_position, y_position, active, collected_by));
+        // An unknown layer is drawn below the bridges, like a power-up on the ground
+        uint8_t layer = recv_uint8();
+        if (layer > static_cast<uint8_t>(CarLayer::UNDER_BRIDGE))
+            layer = static_cast<uint8_t>(CarLayer::ON_GROUND);
+        world_snapshot.add_power_up(PowerUpDTO(id, type, x_position, y_position, active,
+                                               collected_by, static_cast<CarLayer>(layer)));
     }
 
     const uint8_t effect_size = recv_uint8();

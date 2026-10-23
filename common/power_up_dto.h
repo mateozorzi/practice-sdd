@@ -4,6 +4,7 @@
 
 #include <cstdint>
 
+#include "car_position_dto.h"
 #include "power_up_type.h"
 
 
@@ -16,11 +17,12 @@ struct PowerUpDTO {
     uint32_t y_position;
     bool active;
     uint32_t collected_by;  // id of the player that collected it, 0 if nobody did since it appeared
+    CarLayer layer;         // only a car on the same layer collects it, any car if ON_GROUND
 
 
     explicit PowerUpDTO(uint8_t id = 0, PowerUpType type = PowerUpType::Nitro,
                         uint32_t x_position = 0, uint32_t y_position = 0, bool active = false,
-                        uint32_t collected_by = 0);
+                        uint32_t collected_by = 0, CarLayer layer = CarLayer::ON_GROUND);
 
     bool operator==(const PowerUpDTO& other) const = default;
 };
