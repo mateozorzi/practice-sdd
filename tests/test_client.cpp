@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,14 @@
 using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
+
+
+// Big-endian uint32_t stored in bytes[first .. first + 3]
+static uint32_t read_uint32(const std::vector<uint8_t>& bytes, size_t first) {
+    return std::accumulate(bytes.begin() + static_cast<std::ptrdiff_t>(first),
+                           bytes.begin() + static_cast<std::ptrdiff_t>(first + 4), uint32_t{0},
+                           [](uint32_t value, uint8_t byte) { return (value << 8) | byte; });
+}
 
 
 void ClientProtocolTest::SetUp() {
@@ -124,18 +133,12 @@ TEST_F(ClientProtocolTest, SendCreateLobby_WithMock) {
     EXPECT_EQ(action, static_cast<uint8_t>(LobbyAction::CREATE_LOBBY));
 
     // test lobby id, form bytes 1 to 4
-    uint32_t lobby_id = 0;
-    for (size_t i = 1; i <= 4; ++i) {
-        lobby_id = (lobby_id << 8) | captured_bytes[i];
-    }
+    uint32_t lobby_id = read_uint32(captured_bytes, 1);
     EXPECT_EQ(lobby_id, 1);
 
     // test size lobby name
     // size name is also uint32_t, bytes 5 to 8
-    uint32_t name_size = 0;
-    for (size_t i = 5; i <= 8; ++i) {
-        name_size = (name_size << 8) | captured_bytes[i];
-    }
+    uint32_t name_size = read_uint32(captured_bytes, 5);
     EXPECT_EQ(name_size, lobby.lobby_name.size());
 
     // test lobby name, byte 9 to 9 + name_size -1 (17)
@@ -203,10 +206,7 @@ TEST_F(ClientProtocolTest, SendCarSelection_WithMock) {
 
     // check car model sent
     // size of string is bytes 1 to 4
-    uint32_t model_size = 0;
-    for (size_t i = 1; i <= 4; ++i) {
-        model_size = (model_size << 8) | captured_bytes[i];
-    }
+    uint32_t model_size = read_uint32(captured_bytes, 1);
     EXPECT_EQ(model_size, car.model.size());
     // string bytes from byte 5 to end
     std::string model_sent(captured_bytes.begin() + 5, captured_bytes.end());
@@ -239,17 +239,11 @@ TEST_F(ClientProtocolTest, ChangeUsername_WithMock) {
     EXPECT_EQ(action, static_cast<uint8_t>(LobbyAction::CHANGE_USERNAME));
 
     // id should be zero, byte 1 to 4
-    uint32_t lobby_id = 0;
-    for (size_t i = 1; i <= 4; ++i) {
-        lobby_id = (lobby_id << 8) | captured_bytes[i];
-    }
+    uint32_t lobby_id = read_uint32(captured_bytes, 1);
     EXPECT_EQ(lobby_id, 0);
 
     // check size of username sent, byte 5 to 8
-    uint32_t name_size = 0;
-    for (size_t i = 5; i <= 8; ++i) {
-        name_size = (name_size << 8) | captured_bytes[i];
-    }
+    uint32_t name_size = read_uint32(captured_bytes, 5);
     EXPECT_EQ(name_size, username.size());
 
     // check username sent, from byte 9 to 9 + name_size -1
