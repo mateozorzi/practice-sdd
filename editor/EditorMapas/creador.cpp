@@ -2,7 +2,6 @@
 
 #include <QBrush>
 #include <QDir>
-#include <QFileDialog>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsScene>
 #include <QList>
@@ -21,11 +20,13 @@
 #include "messages.h"
 #include "ui_creador.h"
 
-Creador::Creador(const QString& path, const QString& path_mask, QWidget* parent):
+Creador::Creador(const QString& path, const QString& path_mask, const QString& races_folder,
+                 QWidget* parent):
         QMainWindow(parent),
         ui(new Ui::Creador),
         map(path),
         mask(path_mask),
+        races_folder_path(races_folder),
         checkpoints(Coordinates()),
         m(Messages()),
         race(Race()) {
@@ -44,11 +45,12 @@ Creador::Creador(const QString& path, const QString& path_mask, QWidget* parent)
     ui->labelmap->installEventFilter(this);
 }
 
-Creador::Creador(const Race& r, QWidget* parent):
+Creador::Creador(const Race& r, const QString& races_folder, QWidget* parent):
         QMainWindow(parent),
         ui(new Ui::Creador),
         map(r.map),
         mask(r.mask),
+        races_folder_path(races_folder),
         checkpoints(r.checkpoints),
         m(Messages()),
         race(r) {
@@ -70,6 +72,8 @@ Creador::Creador(const Race& r, QWidget* parent):
 
     import_checkpoints();
 }
+
+const QString& Creador::races_folder() const { return races_folder_path; }
 
 void Creador::import_checkpoints() {
     // draw checkpoints on the map
@@ -309,20 +313,11 @@ void Creador::on_Done_clicked() {
         return;
     }
 
-    QString default_name = name_circuit;
+    if (checkpoints.export_checkpoints(races_folder_path, name_circuit, map, n_laps, this->mask,
+                                       this)) {
 
-    QString file_path = QFileDialog::getSaveFileName(
-            this, "Save Race File", QDir::homePath() + "/" + default_name, "CSV Files (*.csv)");
-
-    if (file_path.isEmpty())
-        return;
-
-
-    if (checkpoints.export_checkpoints(file_path, map, n_laps, this->mask, this)) {
-
-        if (name_circuit != race.name) {
-            QString old_path = "/var/nfs/races/" + race.name + ".csv";
-            QFile old_file(old_path);
+        if (!race.name.isEmpty() && name_circuit != race.name) {
+            QFile old_file(QDir(races_folder_path).filePath(race.name + ".csv"));
             if (old_file.exists()) {
                 old_file.remove();
             }

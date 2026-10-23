@@ -1,6 +1,7 @@
 #include "editor.h"
 
 #include "creador.h"
+#include "races_folder.h"
 #include "ui_editor.h"
 
 Editor::Editor(QWidget* parent): QMainWindow(parent), ui(new Ui::Editor) { ui->setupUi(this); }
@@ -13,7 +14,7 @@ void Editor::on_mapa1_clicked() {
     QString mask = ":/mask/imagenes/001 - B_STREETS - Liberty City.png";
     // liberty city map
     this->hide();
-    Creador* c = new Creador(mapa, mask);
+    Creador* c = new Creador(mapa, mask, RACES_FOLDER);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // signal to know when the editor has close
@@ -32,7 +33,7 @@ void Editor::on_mapa2_clicked() {
     QString mask = ":/mask/imagenes/002 - B_STREETS - San Andreas.png";
     // san andreas amp
     this->hide();
-    Creador* c = new Creador(mapa, mask);
+    Creador* c = new Creador(mapa, mask, RACES_FOLDER);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // signal to know when the editor has close
@@ -51,7 +52,7 @@ void Editor::on_mapa3_clicked() {
     QString mask = ":/mask/imagenes/003 - B_STREETS - Vice City.png";
     // vice city map
     this->hide();
-    Creador* c = new Creador(mapa, mask);
+    Creador* c = new Creador(mapa, mask, RACES_FOLDER);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // signal to know when the editor has close

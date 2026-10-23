@@ -23,8 +23,8 @@
 #include "qt_test_utils.h"
 #include "selectcircuit.h"
 
-// Unit tests of the map editor windows. Saving a race is not tested: it writes into the
-// installation folder (/var/nfs/races), so the save dialog is always cancelled.
+// Unit tests of the map editor windows. The windows get a temporary races folder, so saving a
+// race never writes into the installation folder (/var/nfs/races).
 
 namespace {
 
@@ -65,6 +65,17 @@ std::vector<QPoint> street_points(size_t amount) {
     return points;
 }
 
+QStringList race_files(const QTemporaryDir& races_dir) {
+    return QDir(races_dir.path()).entryList(QDir::Files);
+}
+
+QStringList read_lines(const QString& path) {
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return {};
+    return QTextStream(&file).readAll().split('\n', Qt::SkipEmptyParts);
+}
+
 QPoint non_street_point() {
     QImage mask(LIBERTY_MASK);
     for (int y = 0; y < mask.height(); y += 7)
@@ -81,7 +92,8 @@ protected:
 
 class CreadorTest: public EditorWindowsTest {
 protected:
-    Creador creador{LIBERTY_MAP, LIBERTY_MASK};
+    QTemporaryDir races_dir;
+    Creador creador{LIBERTY_MAP, LIBERTY_MASK, races_dir.path()};
 
     void SetUp() override { creador.showMaximized(); }
 
@@ -96,6 +108,13 @@ protected:
     }
 
     int checkpoints_shown() { return creador.findChild<QLCDNumber*>("n_checkpoints")->intValue(); }
+
+    // Fills a valid race: the given checkpoints, 2 laps and the name "my circuit"
+    void fill_valid_race(const std::vector<QPoint>& points) {
+        for (const QPoint& point: points) click_map(point);
+        creador.findChild<QSpinBox*>("n_laps")->setValue(2);
+        creador.findChild<QLineEdit*>("name_circuit")->setText("my circuit");
+    }
 };
 
 }  // namespace
@@ -138,6 +157,26 @@ TEST_F(EditorWindowsTest, MenuOpensTheRaceListAndComesBack) {
     click(*races, "pushButton");
     process_deletions();
     EXPECT_TRUE(menu.isVisible());
+}
+
+TEST_F(EditorWindowsTest, InstalledEditorUsesTheServerRacesFolder) {
+    Editor editor;
+    editor.show();
+    click(editor, "mapa1");
+    Creador* creador = visible_window<Creador>();
+    ASSERT_NE(creador, nullptr);
+    EXPECT_EQ(creador->races_folder(), "/var/nfs/races");
+    click(*creador, "Exit");
+    process_deletions();
+
+    EditorMenu menu;
+    menu.show();
+    click(menu, "pushButton");
+    SelectCircuit* races = visible_window<SelectCircuit>();
+    ASSERT_NE(races, nullptr);
+    EXPECT_EQ(races->races_folder(), "/var/nfs/races");
+    click(*races, "pushButton");
+    process_deletions();
 }
 
 TEST_F(EditorWindowsTest, EditorOpensTheCreatorOfEachCity) {
@@ -230,14 +269,60 @@ TEST_F(CreadorTest, DoneValidatesTheRace) {
     creador.findChild<QSpinBox*>("n_laps")->setValue(2);
     creador.findChild<QLineEdit*>("name_circuit")->setText("abc");
     click(creador, "Done");  // short name
-    creador.findChild<QLineEdit*>("name_circuit")->setText("my circuit");
-    click(creador, "Done");  // valid: the save dialog is cancelled
 
     ASSERT_EQ(modals.messages.size(), 3);
     EXPECT_TRUE(modals.messages[0].startsWith("Not enough checkpoints"));
     EXPECT_EQ(modals.messages[1], "Minimum number of laps is 1.");
     EXPECT_TRUE(modals.messages[2].startsWith("Fill the name of the circuit"));
     EXPECT_TRUE(creador.isVisible());
+    EXPECT_TRUE(race_files(races_dir).isEmpty());
+}
+
+TEST_F(CreadorTest, DoneSavesTheRaceInTheRacesFolder) {
+    std::vector<QPoint> points = street_points(5);
+    ASSERT_EQ(points.size(), 5u);
+    fill_valid_race(points);
+
+    click(creador, "Done");
+
+    // ModalCloser rejects any other dialog, so the file is only written if no dialog was shown
+    QStringList lines = read_lines(races_dir.filePath("my circuit.csv"));
+    ASSERT_EQ(lines.size(), 9);
+    EXPECT_EQ(lines[0], LIBERTY_MAP + "," + LIBERTY_MASK);
+    EXPECT_EQ(lines[1], "City,n_laps");
+    EXPECT_EQ(lines[2], "Liberty City,2");
+    EXPECT_EQ(lines[3], "id, orientation, xCenter, yCenter, width, height");
+    for (int i = 0; i < 5; ++i) {
+        QStringList row = lines[4 + i].split(',');
+        ASSERT_EQ(row.size(), 6) << lines[4 + i].toStdString();
+        EXPECT_EQ(row[0].toInt(), i + 1);
+        EXPECT_TRUE(row[1] == "H" || row[1] == "V" || row[1] == "I") << row[1].toStdString();
+        int width = row[4].toInt();
+        int height = row[5].toInt();
+        QRect checkpoint(row[2].toInt() - width / 2, row[3].toInt() - height / 2, width, height);
+        EXPECT_TRUE(checkpoint.adjusted(-1, -1, 1, 1).contains(points[i]))
+                << "checkpoint " << i + 1 << " is not where it was clicked";
+    }
+    EXPECT_EQ(modals.messages, QStringList{"Congratulations! Creation complete"});
+    EXPECT_FALSE(creador.isVisible());
+}
+
+TEST_F(CreadorTest, ExistingRaceIsNotOverwritten) {
+    {
+        QFile existing(races_dir.filePath("my circuit.csv"));
+        ASSERT_TRUE(existing.open(QIODevice::WriteOnly | QIODevice::Text));
+        existing.write("existing race\n");
+    }
+    fill_valid_race(street_points(5));
+
+    click(creador, "Done");  // ModalCloser answers "No" to overwriting
+
+    ASSERT_FALSE(modals.messages.isEmpty());
+    EXPECT_TRUE(modals.messages[0].startsWith("Already exists a race with this name"));
+    EXPECT_EQ(read_lines(races_dir.filePath("my circuit.csv")), QStringList{"existing race"});
+    QStringList new_race = read_lines(races_dir.filePath("my circuit_1.csv"));
+    ASSERT_EQ(new_race.size(), 9);
+    EXPECT_EQ(new_race[2], "Liberty City,2");
 }
 
 TEST_F(EditorWindowsTest, CreatorOpensAnExistingRace) {
@@ -246,7 +331,7 @@ TEST_F(EditorWindowsTest, CreatorOpensAnExistingRace) {
             Checkpoint(2, 'V', QPoint(300, 100), QRect(295, 90, 10, 20))};
     Race race(0, "park day", "Liberty City", LIBERTY_MAP, LIBERTY_MASK, 2, checkpoints, 3);
 
-    Creador creador(race);
+    Creador creador(race, QTemporaryDir().path());
 
     EXPECT_EQ(creador.findChild<QLCDNumber*>("n_checkpoints")->intValue(), 2);
     EXPECT_EQ(creador.findChild<QSpinBox*>("n_laps")->value(), 3);
@@ -314,4 +399,36 @@ TEST_F(SelectCircuitTest, ExitEmitsClose) {
 
     EXPECT_TRUE(closed);
     EXPECT_EQ(window.findChild<QTableWidget*>("tableRaces")->rowCount(), 0);
+}
+
+TEST_F(SelectCircuitTest, RenamedRaceReplacesItsFile) {
+    write_race("first.csv", {"1,H,100,100,66,15", "2,V,300,100,15,66", "3,H,500,100,66,15",
+                             "4,V,700,100,15,66", "5,H,900,100,66,15"});
+    SelectCircuit window(races_dir.path());
+    window.show();
+    auto* table = window.findChild<QTableWidget*>("tableRaces");
+    qobject_cast<QPushButton*>(table->cellWidget(0, 4))->click();
+    Creador* creador = visible_window<Creador>();
+    ASSERT_NE(creador, nullptr);
+
+    creador->findChild<QLineEdit*>("name_circuit")->setText("second race");
+    click(*creador, "Done");
+    process_deletions();
+
+    EXPECT_EQ(QDir(races_dir.path()).entryList(QDir::Files), QStringList{"second race.csv"});
+    EXPECT_TRUE(window.isVisible());
+    ASSERT_EQ(table->rowCount(), 1);
+    EXPECT_EQ(table->item(0, 0)->text(), "second race");
+}
+
+TEST_F(SelectCircuitTest, DeleteRemovesTheRaceFromItsFolder) {
+    write_race("first.csv", {"1,H,100,100,66,15", "2,V,300,100,15,66"});
+    SelectCircuit window(races_dir.path());
+    auto* table = window.findChild<QTableWidget*>("tableRaces");
+
+    qobject_cast<QPushButton*>(table->cellWidget(0, 5))->click();
+    process_deletions();
+
+    EXPECT_FALSE(QFile::exists(races_dir.filePath("first.csv")));
+    EXPECT_EQ(table->rowCount(), 0);
 }

@@ -15,6 +15,7 @@ class SelectCircuit: public QMainWindow {
 public:
     explicit SelectCircuit(const QString& path, QWidget* parent = nullptr);
     ~SelectCircuit();
+    const QString& races_folder() const;
 
 signals:
     void close_select_race();

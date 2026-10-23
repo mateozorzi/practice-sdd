@@ -9,8 +9,8 @@
 #include "coordinates.h"
 #include "race.h"
 
-// Unit tests of the map editor model. Coordinates::export_checkpoints is not tested: it
-// writes into the installation folder (/var/nfs/races).
+// Unit tests of the map editor model. Coordinates::export_checkpoints is tested through the
+// creator windows (test_editor_windows.cpp), which save into a temporary races folder.
 
 namespace {
 

@@ -15,7 +15,7 @@ private:
 
     bool is_a_checkpoint(const Checkpoint& point);
 
-    QString get_map_name(const QString& map);
+    static QString get_map_name(const QString& map);
 
 
 public:
@@ -31,8 +31,9 @@ public:
 
     bool enough_checkpoints();
 
-    bool export_checkpoints(const QString& file_path, const QString& map, const int n_laps,
-                            const QString& mask, QWidget* window);
+    bool export_checkpoints(const QString& races_folder, const QString& race_name,
+                            const QString& map, const int n_laps, const QString& mask,
+                            QWidget* window);
 
     const QVector<Checkpoint>& get_checkpoints() const;
 

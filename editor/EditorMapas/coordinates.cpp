@@ -86,18 +86,17 @@ QString Coordinates::get_map_name(const QString& map) {
     return city;
 }
 
-bool Coordinates::export_checkpoints(const QString& file_path, const QString& map, const int n_laps,
-                                     const QString& mask, QWidget* window) {
-    QString path = "/var/nfs/races";
-    QDir dir(path);
+bool Coordinates::export_checkpoints(const QString& races_folder, const QString& race_name,
+                                     const QString& map, const int n_laps, const QString& mask,
+                                     QWidget* window) {
+    QDir dir(races_folder);
 
     if (!dir.exists() && !dir.mkpath(".")) {
         return false;
     }
 
 
-    QString race_name = file_path + ".csv";
-    QString path_race = dir.filePath(race_name);
+    QString path_race = dir.filePath(race_name + ".csv");
 
 
     if (QFile::exists(path_race)) {
@@ -111,8 +110,7 @@ bool Coordinates::export_checkpoints(const QString& file_path, const QString& ma
             // new race name (+ "_i")
             int id = 1;
             while (QFile::exists(path_race)) {
-                race_name = file_path + "_" + QString::number(id) + ".csv";
-                path_race = dir.filePath(race_name);
+                path_race = dir.filePath(race_name + "_" + QString::number(id) + ".csv");
                 id++;
             }
         }

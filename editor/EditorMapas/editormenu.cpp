@@ -4,6 +4,7 @@
 #include <QDir>
 
 #include "editor.h"
+#include "races_folder.h"
 #include "selectcircuit.h"
 #include "ui_editormenu.h"
 
@@ -35,8 +36,7 @@ void EditorMenu::on_pushButton_clicked() {
     // edit a already existing race
     this->hide();
 
-    QString races_path = "/var/nfs/races";
-    SelectCircuit* c = new SelectCircuit(races_path);
+    SelectCircuit* c = new SelectCircuit(RACES_FOLDER);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     // signal to know when the editor has close

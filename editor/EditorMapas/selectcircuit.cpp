@@ -143,6 +143,8 @@ void SelectCircuit::read_info_races(const QStringList& races_names) {
 
 SelectCircuit::~SelectCircuit() { delete ui; }
 
+const QString& SelectCircuit::races_folder() const { return path_races; }
+
 void SelectCircuit::on_pushButton_clicked() {
     emit close_select_race();
     this->close();
@@ -150,8 +152,7 @@ void SelectCircuit::on_pushButton_clicked() {
 
 void SelectCircuit::delete_race(const QString& race_name) {
 
-    QString path = "/var/nfs/races/" + race_name + ".csv";
-    QFile file(path);
+    QFile file(QDir(path_races).filePath(race_name + ".csv"));
     if (file.exists()) {
         file.remove();
         races.clear();
@@ -161,7 +162,7 @@ void SelectCircuit::delete_race(const QString& race_name) {
 
 void SelectCircuit::select_race(const Race& race) {
     this->hide();
-    Creador* c = new Creador(race);
+    Creador* c = new Creador(race, path_races);
     c->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(c, &Creador::close_w, this, [this]() {

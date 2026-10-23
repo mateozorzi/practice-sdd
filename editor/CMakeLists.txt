@@ -31,5 +31,6 @@ target_sources(nfs_editor
     EditorMapas/Constants.h
     EditorMapas/selectcircuit.h
     EditorMapas/race.h
+    EditorMapas/races_folder.h
     EditorMapas/editormenu.h
 )

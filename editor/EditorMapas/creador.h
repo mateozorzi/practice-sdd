@@ -21,8 +21,10 @@ class Creador: public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit Creador(const QString& path, const QString& path_mask, QWidget* parent = nullptr);
-    explicit Creador(const Race& r, QWidget* parent = nullptr);
+    Creador(const QString& path, const QString& path_mask, const QString& races_folder,
+            QWidget* parent = nullptr);
+    Creador(const Race& r, const QString& races_folder, QWidget* parent = nullptr);
+    const QString& races_folder() const;
     void set_background(const QString& path);
     void handle_checkpoints(QMouseEvent* event);
     bool eventFilter(QObject* obj, QEvent* event) override;
@@ -33,6 +35,7 @@ private:
     QGraphicsScene* scene;
     QString map;
     QString mask;
+    QString races_folder_path;
     Coordinates checkpoints;
     Messages m;
     QImage mask_circuit;
