@@ -116,6 +116,13 @@ Máximo de 4 mejoras por carrera, persistentes para toda la partida.
 -   Colisiones con edificios o autos restan vida.
 -   Si un jugador pierde toda la vida, queda descalificado de esa
     carrera.
+-   En la pista aparecen power-ups, uno entre cada par de checkpoints
+    (1→2, 3→4, …). El primer auto que pasa por uno recibe su efecto:
+    -   Nitro: más velocidad máxima y aceleración por unos segundos.
+    -   Reparación: recupera vida, sin superar la vida máxima.
+    -   Escudo: los choques no restan vida por unos segundos.
+-   Un power-up recogido desaparece para todos y vuelve a aparecer en el
+    mismo lugar, con un tipo al azar, después de un tiempo.
 
 Al finalizar:
 
@@ -144,6 +151,9 @@ Es posible ajustar:
 
 -   Atributos de los autos (model, speed, acceleration, handling)
 -   Valores de mejoras
+-   Power-ups (multiplicador y duración del nitro, vida que repara la
+    reparación, duración del escudo y tiempo de reaparición), en la
+    sección `power_ups:` de `game_config.yaml`
 -   Parámetros del servidor (FPS, rendimiento)
 -   Aspectos visuales (tamaño de sprites, etc.)
 
