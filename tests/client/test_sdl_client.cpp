@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -16,6 +17,7 @@
 #include "../../client/client_protocol.h"
 #include "../../client/game.h"
 #include "../../client/input_manager.h"
+#include "../../client/power_up_view.h"
 #include "../../client/sdl_manager.h"
 #include "../../common/socket.h"
 #include "../../server/server_protocol.h"
@@ -96,6 +98,28 @@ protected:
         setenv("SDL_AUDIODRIVER", "dummy", 1);
     }
 };
+
+// Snapshot of the render and sound milestone Background: the own player (id 1) next to the
+// power-ups 1 Nitro, 2 Repair and 3 Shield, all active
+LocalInfo power_up_state() {
+    LocalInfo state{1, {}, player_at(1, 200, 100), {}};
+    state.power_ups = {PowerUpDTO(1, PowerUpType::Nitro, 100, 100, true),
+                       PowerUpDTO(2, PowerUpType::Repair, 200, 100, true),
+                       PowerUpDTO(3, PowerUpType::Shield, 300, 100, true)};
+    return state;
+}
+
+std::vector<uint8_t> drawn_ids(const LocalInfo& state) {
+    const std::vector<PowerUpSprite> sprites = power_ups_to_draw(state);
+    std::vector<uint8_t> ids(sprites.size());
+    std::transform(sprites.begin(), sprites.end(), ids.begin(),
+                   [](const PowerUpSprite& sprite) { return sprite.id; });
+    return ids;
+}
+
+bool intersect(const EffectBadge& a, const EffectBadge& b) {
+    return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+}
 
 // Client protocol connected to a server protocol through a localhost socket
 class ConnectedSdlTest: public SdlTest {
@@ -490,4 +514,92 @@ TEST_F(ConnectedSdlTest, ServerDisconnectionEndsTheGame) {
     server_thread.join();
 
     EXPECT_FALSE(server_connected);
+}
+
+
+// Power-ups on the track and effect badges in the HUD (render and sound milestone)
+
+namespace {
+
+// Renders the power-ups in a real city, offscreen
+class PowerUpRenderTest: public SdlTest {
+protected:
+    void render(LocalInfo& state) {
+        SDLManager sdl;
+        sdl.load_city("Liberty City", bridges("liberty_city"), decorations("liberty_city"));
+        for (int frame = 0; frame < 3; ++frame) sdl.render(state);
+    }
+};
+
+}  // namespace
+
+
+TEST_F(PowerUpRenderTest, DrawsTheThreePowerUps) {
+    LocalInfo state = power_up_state();
+
+    std::vector<PowerUpSprite> sprites = power_ups_to_draw(state);
+
+    ASSERT_EQ(sprites.size(), 3u);
+    EXPECT_EQ(sprites[0].id, 1);
+    EXPECT_EQ(sprites[0].sprite, NITRO_SPRITE_PATH);
+    EXPECT_EQ(sprites[1].id, 2);
+    EXPECT_EQ(sprites[1].sprite, LIFE_SPRITE_PATH);
+    EXPECT_EQ(sprites[2].id, 3);
+    EXPECT_EQ(sprites[2].sprite, SHIELD_SPRITE_PATH);
+    for (const auto& sprite: sprites) EXPECT_EQ(sprite.size, CAR_RENDER_SIZE);
+    EXPECT_NO_THROW(render(state));
+}
+
+TEST_F(PowerUpRenderTest, InactivePowerUpIsNotDrawn) {
+    LocalInfo state = power_up_state();
+    state.power_ups[1].active = false;
+
+    EXPECT_EQ(drawn_ids(state), (std::vector<uint8_t>{1, 3}));
+    EXPECT_NO_THROW(render(state));
+}
+
+TEST_F(PowerUpRenderTest, UnknownTypeIsIgnored) {
+    LocalInfo state = power_up_state();
+    state.power_ups.emplace_back(4, static_cast<PowerUpType>(99), 150, 100, true);
+
+    EXPECT_EQ(drawn_ids(state), (std::vector<uint8_t>{1, 2, 3}));
+    EXPECT_NO_THROW(render(state));
+}
+
+TEST(PowerUpHudTest, NitroBadgeShowsCeiledSeconds) {
+    LocalInfo state = power_up_state();
+    state.effects = {PowerUpEffectDTO(1, PowerUpType::Nitro, 2400)};
+
+    std::vector<EffectBadge> badges = effect_badges(state);
+
+    ASSERT_EQ(badges.size(), 1u);
+    EXPECT_EQ(badges[0].type, PowerUpType::Nitro);
+    EXPECT_EQ(badges[0].sprite, NITRO_SPRITE_PATH);
+    EXPECT_EQ(badges[0].text, "3s");
+}
+
+TEST(PowerUpHudTest, TwoBadgesSideBySide) {
+    LocalInfo state = power_up_state();
+    state.effects = {PowerUpEffectDTO(1, PowerUpType::Nitro, 1000),
+                     PowerUpEffectDTO(1, PowerUpType::Shield, 4000)};
+
+    std::vector<EffectBadge> badges = effect_badges(state);
+
+    ASSERT_EQ(badges.size(), 2u);
+    EXPECT_EQ(badges[0].sprite, NITRO_SPRITE_PATH);
+    EXPECT_EQ(badges[0].text, "1s");
+    EXPECT_EQ(badges[1].sprite, SHIELD_SPRITE_PATH);
+    EXPECT_EQ(badges[1].text, "4s");
+    EXPECT_GT(badges[0].w, 0);
+    EXPECT_GT(badges[0].h, 0);
+    EXPECT_FALSE(intersect(badges[0], badges[1]));
+}
+
+TEST(PowerUpAssetsTest, SpritesAreInstalled) {
+    if (!std::filesystem::exists(ASSETS_FOLDER))
+        GTEST_SKIP() << "the client assets are not installed in " << ASSETS_FOLDER;
+
+    EXPECT_TRUE(std::filesystem::exists("/var/nfs/assets/sprites/nitro.png"));
+    EXPECT_TRUE(std::filesystem::exists("/var/nfs/assets/sprites/life.png"));
+    EXPECT_TRUE(std::filesystem::exists("/var/nfs/assets/sprites/shield.png"));
 }

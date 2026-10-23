@@ -54,19 +54,22 @@ private:
 
     std::vector<SDL2pp::Rect> loadRects(const nlohmann::json& data);
 
-    nlohmann::json parse_file_data(const std::string& json_data);
+    static nlohmann::json parse_file_data(const std::string& json_data);
 
     void update_camera(int player_x, int player_y);
     SDL2pp::Rect get_view_rect_with_shake();
 
-    SDL2pp::Rect get_car_sprite_rect(const std::string& model) const;
+    static SDL2pp::Rect get_car_sprite_rect(const std::string& model);
 
     void render_player(const CarPositionDTO& player, const std::string& model, bool is_moving,
                        const SDL2pp::Rect& view_rect, double scale_x, double scale_y,
                        SDL2pp::Texture& cars_texture);
     void render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, double scale_x,
                     double scale_y, SDL2pp::Texture& cars_texture);
+    void render_power_ups(const LocalInfo& game_state, const SDL2pp::Rect& view_rect,
+                          double scale_x, double scale_y);
     void render_hud_health(int health, int max_health);
+    void render_hud_effects(const LocalInfo& game_state);
     void render_hud_minimap(int player_x, int player_y, const CheckpointDTO& next_checkpoint);
     void render_layer(const std::vector<SDL2pp::Rect>& rects, const SDL2pp::Rect& view_rect,
                       double scale_x, double scale_y, SDL2pp::Texture& map_texture);
@@ -76,8 +79,8 @@ private:
                             SDL2pp::Texture& map_texture);
     void render_checkpoints(const CheckpointDTO& checkpoint, const SDL2pp::Rect& view_rect,
                             double scale_x, double scale_y);
-    double calculate_angle_to_checkpoint(const CarPositionDTO& player,
-                                         const CheckpointDTO& checkpoint);
+    static double calculate_angle_to_checkpoint(const CarPositionDTO& player,
+                                                const CheckpointDTO& checkpoint);
     void render_hint(const CarPositionDTO& player, const SDL2pp::Rect& view_rect, double scale_x,
                      double scale_y, SDL2pp::Texture& arrow_texture);
 

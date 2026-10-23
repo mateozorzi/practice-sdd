@@ -13,6 +13,7 @@
 #include "client_constants.h"
 #include "game_state.h"
 #include "leaderboard_info.h"
+#include "power_up_view.h"
 
 SDLManager::SDLManager():
         sdl(SDL_INIT_VIDEO),
@@ -94,7 +95,7 @@ SDL2pp::Rect SDLManager::get_view_rect_with_shake() {
     return view_rect;
 }
 
-SDL2pp::Rect SDLManager::get_car_sprite_rect(const std::string& model) const {
+SDL2pp::Rect SDLManager::get_car_sprite_rect(const std::string& model) {
     auto it = CAR_SPRITES.find(model);
     if (it != CAR_SPRITES.end()) {
         return it->second;
@@ -131,6 +132,46 @@ void SDLManager::render_npc(const NpcDTO& npc, const SDL2pp::Rect& view_rect, do
                                CAR_RENDER_SIZE, CAR_RENDER_SIZE),
                   static_cast<double>(npc.angle + NPC_ANGLE_OFFSET), SDL2pp::NullOpt,
                   SDL_FLIP_NONE);
+}
+
+// The power-up PNGs are transparent: they are copied as they are, with no background
+void SDLManager::render_power_ups(const LocalInfo& game_state, const SDL2pp::Rect& view_rect,
+                                  double scale_x, double scale_y) {
+    // Size in the world of a power-up drawn POWER_UP_RENDER_SIZE wide, to know if it is on screen
+    const int world_size = static_cast<int>(POWER_UP_RENDER_SIZE / scale_x);
+
+    for (const auto& power_up: power_ups_to_draw(game_state)) {
+
+        SDL2pp::Rect world_rect(power_up.x - world_size / 2, power_up.y - world_size / 2,
+                                world_size, world_size);
+        if (!camera.on_screen(world_rect))
+            continue;
+
+        const int screen_x = static_cast<int>((power_up.x - view_rect.x) * scale_x);
+        const int screen_y = static_cast<int>((power_up.y - view_rect.y) * scale_y);
+        renderer.Copy(resources.get_texture(power_up.sprite), SDL2pp::NullOpt,
+                      SDL2pp::Rect(screen_x - power_up.size / 2, screen_y - power_up.size / 2,
+                                   power_up.size, power_up.size));
+    }
+}
+
+void SDLManager::render_hud_effects(const LocalInfo& game_state) {
+    const SDL2pp::Color text_color(COLOR_WHITE_R, COLOR_WHITE_G, COLOR_WHITE_B, COLOR_WHITE_A);
+
+    for (const auto& badge: effect_badges(game_state)) {
+
+        renderer.Copy(resources.get_texture(badge.sprite), SDL2pp::NullOpt,
+                      SDL2pp::Rect(badge.x, badge.y, POWER_UP_RENDER_SIZE, POWER_UP_RENDER_SIZE));
+
+        // The seconds go next to the sprite, scaled down if they do not fit in the badge
+        SDL2pp::Texture& text =
+                resources.get_text(badge.text, FONT_PATH, EFFECT_BADGE_FONT_SIZE, text_color);
+        const int text_w = std::min(text.GetWidth(), EFFECT_BADGE_TEXT_WIDTH);
+        const int text_h = text.GetHeight() * text_w / std::max(text.GetWidth(), 1);
+        renderer.Copy(text, SDL2pp::NullOpt,
+                      SDL2pp::Rect(badge.x + POWER_UP_RENDER_SIZE, badge.y + (badge.h - text_h) / 2,
+                                   text_w, text_h));
+    }
 }
 
 void SDLManager::render_hud_health(const int health, const int max_health) {
@@ -237,6 +278,9 @@ void SDLManager::render_players(double scale_x, double scale_y, const SDL2pp::Re
             render_npc(npc, view_rect, scale_x, scale_y, cars_texture);
         }
     }
+
+    // Los power-ups quedan debajo de los autos
+    render_power_ups(game_state, view_rect, scale_x, scale_y);
 
     // Renderizar autos desde el suelo
     if (my_car.layer != CarLayer::ON_BRIDGE) {
@@ -387,6 +431,7 @@ void SDLManager::render(LocalInfo& game_state) {
                    arrow_texture);
 
     render_hud_health(game_state.player.life, game_state.player.max_life);
+    render_hud_effects(game_state);
     animations.render_explosions(iteration_counter);
     animations.clean_explosions(iteration_counter);
     render_hud_minimap(pos_x, pos_y, my_player.checkpoint);
