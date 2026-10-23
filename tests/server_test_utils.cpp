@@ -84,6 +84,19 @@ ServerConfig make_power_up_test_server_config() {
     return config;
 }
 
+ServerConfig make_fast_power_up_game_config() {
+    ServerConfig config = make_fast_game_config();
+
+    config.game.timeout_seconds_race = 60;
+    config.game.power_ups.nitro_multiplier = 2.0f;
+    config.game.power_ups.nitro_duration = 1.0;
+    config.game.power_ups.repair_amount = 30;
+    config.game.power_ups.shield_duration = 1.0;
+    config.game.power_ups.respawn_cooldown = 2.0;
+
+    return config;
+}
+
 std::function<PowerUpType()> make_sequence_power_up_type_generator(
         std::vector<PowerUpType> sequence) {
     return [sequence = std::move(sequence), next = size_t{0}]() mutable {

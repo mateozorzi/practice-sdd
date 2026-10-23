@@ -129,6 +129,7 @@ void Player::finish_race() {
     infinite_health = true;
     id_next_checkpoint = 1;
     n_lap = 1;
+    clear_effects();
     car->reset_car_velocity();
 }
 

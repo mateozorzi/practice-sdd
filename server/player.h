@@ -45,7 +45,6 @@ class Player {
     double shield_remaining = 0.0;  // seconds, active while > 0
 
     bool update_next_checkpoint(const RaceDTO& race);
-    void clear_effects();
 
 
 public:
@@ -98,6 +97,8 @@ public:
 
     void apply_power_up(PowerUpType type, const PowerUpConfig& power_up_config);
     void advance_effects(double elapsed_seconds);
+    // Removes every active effect; speed and acceleration go back to their values without nitro
+    void clear_effects();
     bool has_effect(PowerUpType type) const;
     double get_effect_remaining(PowerUpType type) const;
 };

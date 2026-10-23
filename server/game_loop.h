@@ -18,6 +18,7 @@
 #include "collision_listener.h"
 #include "game_monitor.h"
 #include "player.h"
+#include "power_up.h"
 #include "server_config.h"
 #include "server_constants.h"
 
@@ -43,6 +44,7 @@ class GameLoop final: public Thread {
     const uint8_t max_players;
     GamePhase current_phase = GamePhase::WAITING_CAR_SELECTION;
     const std::chrono::milliseconds game_iteration_duration;
+    const double tick_seconds;  // game time of one tick: effects and cooldowns advance with it
 
     std::optional<std::chrono::steady_clock::time_point> phase_start = std::nullopt;
     std::optional<std::chrono::steady_clock::time_point> race_start_time = std::nullopt;
@@ -58,6 +60,7 @@ class GameLoop final: public Thread {
     b2World box2d_world = b2Vec2(0.0f, 0.0f);
     CityLoader city_loader;
     std::unordered_map<uint32_t, Player> players;
+    PowerUpManager power_ups;  // after the world (destroyed first) and before the listener
     CollisionListener collision_listener;
     const RaceCatalogueDTO& selected_races;
     std::vector<LeaderboardDTO> leaderboards;
@@ -88,6 +91,8 @@ class GameLoop final: public Thread {
     void handle_game_finished_phase();
 
     void update_positions(const RaceDTO& race, uint32_t elapsed_seconds);
+    void advance_power_ups();
+    void add_power_ups_to_snapshot(WorldSnapshotDTO& world_snapshot) const;
     void set_race(const RaceDTO& race);
     void finish_race(uint32_t timeout_time);
     LeaderboardDTO create_final_leaderboard();
@@ -113,9 +118,12 @@ public:
 
     explicit GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                       uint8_t max_players, const ServerConfig& server_config,
-                      const RaceCatalogueDTO& selected_races);
+                      const RaceCatalogueDTO& selected_races,
+                      PowerUpTypeGenerator type_generator = make_random_power_up_type_generator());
 
     void run() override;
+    // One iteration of the loop without sleeping: tests call it to advance time explicitly
+    void tick();
     void stop() override;
 
     void remove_player(uint32_t player_id);

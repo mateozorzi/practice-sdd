@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <chrono>
+#include <functional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -77,6 +78,155 @@ protected:
         if (running)
             stop_loop();
     }
+};
+
+// GameLoop driven tick by tick from the test thread (the loop thread is never started), with
+// the values of the game loop milestone Background
+class GameLoopPowerUpTest: public ::testing::Test {
+protected:
+    static constexpr uint32_t PLAYER_ID = 1;
+    static constexpr int MAX_TICKS = 2000;
+    static constexpr int SHIELD_TICKS = 200;  // shield_duration 1 s at game_fps 200
+    static constexpr int PINNED_TICKS = 10;   // ticks without moving to consider the car stopped
+
+    ServerConfig config = make_fast_power_up_game_config();
+    RaceCatalogueDTO races{{make_test_race(4, 1, "first"), make_test_race(4, 1, "second")}};
+    Queue<GameCommand> commands{1000};
+    GameMonitor monitor{config};
+    std::unique_ptr<GameLoop> loop;
+    Queue<GameUpdateDTO>* updates = nullptr;
+    WorldSnapshotDTO snapshot;
+    int races_started = 0;
+
+    // Loop with one player that already chose its car, until the first race starts
+    void start_race(PowerUpType type) {
+        loop = std::make_unique<GameLoop>(monitor, commands, 1, config, races,
+                                          make_sequence_power_up_type_generator({type}));
+        updates = &monitor.register_player(PLAYER_ID);
+        loop->add_player(PLAYER_ID, "player1");
+        select_car(commands, PLAYER_ID);
+
+        ASSERT_TRUE(tick_until([this] { return races_started == 1; }, MAX_TICKS));
+    }
+
+    // Advances the loop `n` ticks, keeping the last snapshot the player got
+    void tick(int n = 1) {
+        for (int i = 0; i < n; ++i) {
+            loop->tick();
+            GameUpdateDTO update;
+            while (updates->try_pop(update)) {
+                if (update.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS)
+                    snapshot = std::get<WorldSnapshotDTO>(update.data);
+                else if (update.gameloop_action == GameLoopAction::START_RACE)
+                    races_started++;
+            }
+        }
+    }
+
+    bool tick_until(const std::function<bool()>& condition, int max_ticks) {
+        for (int i = 0; i < max_ticks; ++i) {
+            tick();
+            if (condition())
+                return true;
+        }
+        return false;
+    }
+
+    void press(Direction direction, bool pressed) {
+        send(commands, PLAYER_ID, ClientAction::SEND_CAR_MOVEMENT, MovementDTO(direction, pressed));
+    }
+
+    bool collected(size_t index) const {
+        return snapshot.power_ups.size() > index && !snapshot.power_ups[index].active;
+    }
+
+    const PowerUpEffectDTO* effect(PowerUpType type) const {
+        auto it =
+                std::find_if(snapshot.effects.begin(), snapshot.effects.end(),
+                             [type](const PowerUpEffectDTO& candidate) {
+                                 return candidate.player_id == PLAYER_ID && candidate.type == type;
+                             });
+        return it == snapshot.effects.end() ? nullptr : &(*it);
+    }
+
+    bool has_effects() const {
+        return std::any_of(
+                snapshot.effects.begin(), snapshot.effects.end(),
+                [](const PowerUpEffectDTO& effect) { return effect.player_id == PLAYER_ID; });
+    }
+
+    uint16_t health() const { return snapshot.car_positions.at(0).first.health; }
+    uint32_t car_x() const { return snapshot.car_positions.at(0).second.x_position; }
+
+    // Ticks until the car does not move for PINNED_TICKS ticks. Returns the ticks advanced.
+    int tick_until_pinned() {
+        int ticks = 0;
+        int still = 0;
+        uint32_t previous_x = car_x();
+        while (still < PINNED_TICKS && ticks < MAX_TICKS) {
+            tick();
+            ticks++;
+            still = car_x() == previous_x ? still + 1 : 0;
+            previous_x = car_x();
+        }
+        return ticks;
+    }
+
+    // Accelerates over the first power-up and stops before the second one (its sensor starts at
+    // x 1930). Returns false if the first power-up is not collected.
+    bool collect_first_power_up() {
+        press(Direction::UP, true);
+        if (!tick_until([this] { return collected(0); }, MAX_TICKS))
+            return false;
+        press(Direction::UP, false);
+        press(Direction::DOWN, true);
+        braking = true;
+        return true;
+    }
+
+    // Ticks while braking after collect_first_power_up: releases the brake once the car stops
+    // going forward, so it does not reach the second power-up nor reverse far away
+    void tick_braking(int n) {
+        for (int i = 0; i < n; ++i) {
+            uint32_t previous_x = car_x();
+            tick();
+            if (braking && car_x() < previous_x) {
+                press(Direction::DOWN, false);
+                braking = false;
+            }
+        }
+    }
+
+    // 3.7 maneuver (design D7, double crash). The second power-up lies between the first one and
+    // the wall at x 1968, so the car crashes once with a renewed shield (not measured), waits
+    // pinned to the wall until the shield expires and crashes again. Returns the health before
+    // and after the second crash.
+    void crash_after_shield_expires(uint16_t& before, uint16_t& after) {
+        press(Direction::UP, true);
+        ASSERT_TRUE(tick_until([this] { return collected(1); }, MAX_TICKS));
+        int since_renewal = tick_until_pinned();
+        ASSERT_LT(since_renewal, SHIELD_TICKS) << "the car did not reach the wall at x 1968";
+
+        tick(SHIELD_TICKS - since_renewal);
+        ASSERT_EQ(effect(PowerUpType::Shield), nullptr) << "the shield should have expired";
+        before = health();
+        const uint32_t wall_x = car_x();
+
+        press(Direction::UP, false);
+        press(Direction::DOWN, true);
+        tick(30);
+        press(Direction::DOWN, false);
+        press(Direction::UP, true);
+        ASSERT_TRUE(tick_until([this, wall_x] { return car_x() >= wall_x; }, MAX_TICKS))
+                << "the car did not crash again";
+        tick_until_pinned();
+        ASSERT_TRUE(collected(1)) << "the second power-up came back before the second crash";
+        ASSERT_EQ(effect(PowerUpType::Shield), nullptr);
+        after = health();
+    }
+
+private:
+    bool braking = false;
 };
 
 class GameTest: public ::testing::Test {
@@ -406,4 +556,79 @@ TEST_F(GameTest, StopClosesTheQueues) {
     game.stop();
 
     EXPECT_THROW(commands.push(GameCommand()), ClosedQueue);
+}
+
+
+// Power-ups in the game loop (scenarios 3.3 - 3.7)
+
+TEST_F(GameLoopPowerUpTest, SnapshotHasTwoActiveNitroPowerUps) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Nitro));
+
+    tick();
+
+    ASSERT_EQ(snapshot.power_ups.size(), 2u);
+    for (const auto& power_up: snapshot.power_ups) {
+        EXPECT_TRUE(power_up.active);
+        EXPECT_EQ(power_up.type, PowerUpType::Nitro);
+    }
+}
+
+TEST_F(GameLoopPowerUpTest, CollectedPowerUpShowsInactiveAndNitroEffect) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Nitro));
+
+    ASSERT_TRUE(collect_first_power_up());
+
+    EXPECT_FALSE(snapshot.power_ups[0].active);
+    const PowerUpEffectDTO* nitro = effect(PowerUpType::Nitro);
+    ASSERT_NE(nitro, nullptr);
+    EXPECT_EQ(nitro->remaining_ms, 1000u);
+}
+
+TEST_F(GameLoopPowerUpTest, NitroExpiresAtTick200) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Nitro));
+    ASSERT_TRUE(collect_first_power_up());
+
+    tick_braking(199);
+    ASSERT_FALSE(collected(1)) << "the car reached the second power-up";
+    EXPECT_NE(effect(PowerUpType::Nitro), nullptr);
+
+    tick_braking(1);
+    EXPECT_FALSE(has_effects());
+}
+
+TEST_F(GameLoopPowerUpTest, NextRaceStartsWithActivePowerUpsAndNoEffects) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Nitro));
+    ASSERT_TRUE(collect_first_power_up());
+    ASSERT_NE(effect(PowerUpType::Nitro), nullptr);
+
+    send(commands, PLAYER_ID, ClientAction::CHEAT_WIN_RACE);
+    ASSERT_TRUE(tick_until([this] { return races_started == 2; }, MAX_TICKS));
+    tick();
+
+    ASSERT_EQ(snapshot.power_ups.size(), 2u);
+    EXPECT_TRUE(snapshot.power_ups[0].active);
+    EXPECT_TRUE(snapshot.power_ups[1].active);
+    EXPECT_FALSE(has_effects());
+}
+
+TEST_F(GameLoopPowerUpTest, InfiniteHealthSurvivesShieldExpiryInLoop) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Shield));
+    send(commands, PLAYER_ID, ClientAction::CHEAT_INFINITE_HEALTH);
+
+    uint16_t before = 0;
+    uint16_t after = 0;
+    ASSERT_NO_FATAL_FAILURE(crash_after_shield_expires(before, after));
+
+    EXPECT_EQ(after, before);
+}
+
+// Control of 3.7: the same crash without the cheat does damage
+TEST_F(GameLoopPowerUpTest, CrashIntoWallWithoutCheatTakesDamage) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Shield));
+
+    uint16_t before = 0;
+    uint16_t after = 0;
+    ASSERT_NO_FATAL_FAILURE(crash_after_shield_expires(before, after));
+
+    EXPECT_LT(after, before);
 }

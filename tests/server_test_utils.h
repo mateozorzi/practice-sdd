@@ -31,6 +31,10 @@ PowerUpConfig make_test_power_up_config();
 // health 100), upgrades (health 50, speed 3) and make_test_power_up_config()
 ServerConfig make_power_up_test_server_config();
 
+// make_fast_game_config with the power-up values of the game loop milestone Background (short
+// durations so the loop ends fast) and a race timeout that does not come from server/config
+ServerConfig make_fast_power_up_game_config();
+
 // Fake power-up type generator (same type as PowerUpTypeGenerator, spelled out so this header does
 // not include server/power_up.h): returns `sequence` in order, starting over when it runs out
 std::function<PowerUpType()> make_sequence_power_up_type_generator(

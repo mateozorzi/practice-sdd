@@ -2,8 +2,10 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -13,14 +15,16 @@
 #include "../common/constants.h"
 #include "../common/game_update_dto.h"
 #include "../common/leaderboard_dto.h"
+#include "../common/power_up_dto.h"
 
 
 GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
                    const uint8_t max_players, const ServerConfig& server_config,
-                   const RaceCatalogueDTO& selected_races):
+                   const RaceCatalogueDTO& selected_races, PowerUpTypeGenerator type_generator):
         server_config(server_config),
         max_players(max_players),
         game_iteration_duration(1000 / server_config.game.game_fps),
+        tick_seconds(1.0 / server_config.game.game_fps),
         upgrade_shop_seconds(server_config.game.wait_seconds_upgrade_shop),
         countdown_seconds(server_config.game.wait_seconds_countdown),
         race_timeout_seconds(server_config.game.timeout_seconds_race),
@@ -29,7 +33,8 @@ GameLoop::GameLoop(GameMonitor& game_monitor, Queue<GameCommand>& command_queue,
         game_monitor(game_monitor),
         command_queue(command_queue),
         city_loader(box2d_world, server_config),
-        collision_listener(players),
+        power_ups(box2d_world, server_config, std::move(type_generator)),
+        collision_listener(players, power_ups),
         selected_races(selected_races) {
 
     box2d_world.SetContactListener(&collision_listener);
@@ -190,8 +195,6 @@ void GameLoop::transition_to(const GamePhase& next_phase) {
 
 void GameLoop::handle_waiting_car_selection_phase() {
 
-    const std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
     process_commands({ClientAction::SEND_CAR_SELECTION}, 0);
 
     if (all_player_in_game() && players.size() == max_players) {
@@ -204,8 +207,6 @@ void GameLoop::handle_waiting_car_selection_phase() {
 
         set_race(selected_races.races[current_race_index]);
     }
-
-    fixed_sleep(now);
 }
 
 void GameLoop::handle_upgrade_shop_phase() {
@@ -227,8 +228,6 @@ void GameLoop::handle_upgrade_shop_phase() {
         GameUpdateDTO game_update(GameLoopAction::START_COUNTDOWN, std::monostate{});
         game_monitor.broadcast(game_update);
     }
-
-    fixed_sleep(now);
 }
 
 
@@ -251,8 +250,6 @@ void GameLoop::handle_countdown_phase() {
         GameUpdateDTO game_update(GameLoopAction::START_RACE, std::monostate{});
         game_monitor.broadcast(game_update);
     }
-
-    fixed_sleep(now);
 }
 
 void GameLoop::send_race_time(const uint32_t elapsed_seconds) {
@@ -275,13 +272,21 @@ void GameLoop::handle_in_race_phase() {
 
     check_alive_players();
 
-    update_positions(selected_races.races[current_race_index], elapsed_seconds);
+    // Effects and cooldowns advance before the step, so the snapshot of the tick in which a
+    // power-up is collected (during the step) shows its full duration
+    advance_power_ups();
 
     box2d_world.Step(GAME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+
+    update_positions(selected_races.races[current_race_index], elapsed_seconds);
 
     send_race_time(static_cast<uint32_t>(elapsed_seconds));
 
     if (elapsed >= race_timeout_seconds || !player_in_race()) {
+
+        // The race is over also for the players that did not finish it (timeout)
+        power_ups.clear();
+        for (auto& [player_id, player]: players) player.clear_effects();
 
         if (cheat_game_winner_activated) {
 
@@ -309,8 +314,6 @@ void GameLoop::handle_in_race_phase() {
             game_monitor.broadcast(l);
         }
     }
-
-    fixed_sleep(now);
 }
 
 void GameLoop::handle_leaderboard_phase() {
@@ -347,7 +350,6 @@ void GameLoop::handle_leaderboard_phase() {
             game_monitor.broadcast(l);
         }
     }
-    fixed_sleep(now);
 }
 
 
@@ -363,8 +365,6 @@ void GameLoop::handle_game_finished_phase() {
         GameLoop::stop();
         players.clear();
     }
-
-    fixed_sleep(now);
 }
 
 
@@ -427,9 +427,44 @@ void GameLoop::update_positions(const RaceDTO& race, uint32_t elapsed_seconds) {
     for (const auto& npc: city_loader.get_npcs())
         world_snapshot.add_npc_position(npc.get_position());
 
+    add_power_ups_to_snapshot(world_snapshot);
+
     GameUpdateDTO update(GameLoopAction::SEND_UPDATE_POSITIONS, world_snapshot);
 
     game_monitor.broadcast(update);
+}
+
+void GameLoop::advance_power_ups() {
+
+    for (auto& [player_id, player]: players) player.advance_effects(tick_seconds);
+
+    power_ups.advance(tick_seconds);
+}
+
+void GameLoop::add_power_ups_to_snapshot(WorldSnapshotDTO& world_snapshot) const {
+
+    const std::vector<PowerUp>& race_power_ups = power_ups.get_power_ups();
+    for (size_t i = 0; i < race_power_ups.size(); ++i) {
+
+        const PowerUp& power_up = race_power_ups[i];
+        world_snapshot.add_power_up(PowerUpDTO(static_cast<uint8_t>(i + 1), power_up.get_type(),
+                                               static_cast<uint32_t>(power_up.get_x()),
+                                               static_cast<uint32_t>(power_up.get_y()),
+                                               power_up.is_active()));
+    }
+
+    for (const auto& [player_id, player]: players) {
+
+        for (PowerUpType type: {PowerUpType::Nitro, PowerUpType::Shield}) {
+
+            if (!player.has_effect(type))
+                continue;
+
+            auto remaining_ms =
+                    static_cast<uint32_t>(std::lround(player.get_effect_remaining(type) * 1000.0));
+            world_snapshot.add_effect(PowerUpEffectDTO(player_id, type, remaining_ms));
+        }
+    }
 }
 
 void GameLoop::send_race(const RaceDTO& race) {
@@ -494,6 +529,7 @@ void GameLoop::set_race(const RaceDTO& race) {
     send_race(race);
 
     map_configuration(race.city, race.checkpoints);
+    power_ups.load(race.checkpoints);
 
     for (auto& [player_id, player]: players) {
 
@@ -615,36 +651,45 @@ LeaderboardDTO GameLoop::create_leaderboard() {
 }
 
 
+void GameLoop::tick() {
+
+    if (!phase_start.has_value())
+        phase_start = std::chrono::steady_clock::now();
+
+    switch (current_phase) {
+
+        case (GamePhase::WAITING_CAR_SELECTION):
+            handle_waiting_car_selection_phase();
+            break;
+        case (GamePhase::UPGRADE_SHOP):
+            handle_upgrade_shop_phase();
+            break;
+        case (GamePhase::COUNTDOWN):
+            handle_countdown_phase();
+            break;
+        case (GamePhase::IN_RACE):
+            handle_in_race_phase();
+            break;
+        case (GamePhase::LEADERBOARD):
+            handle_leaderboard_phase();
+            break;
+        case (GamePhase::GAME_FINISHED):
+            handle_game_finished_phase();
+            break;
+    }
+}
+
+
 void GameLoop::run() {
 
     try {
 
         while (should_keep_running()) {
 
-            if (!phase_start.has_value())
-                phase_start = std::chrono::steady_clock::now();
-
-            switch (current_phase) {
-
-                case (GamePhase::WAITING_CAR_SELECTION):
-                    handle_waiting_car_selection_phase();
-                    break;
-                case (GamePhase::UPGRADE_SHOP):
-                    handle_upgrade_shop_phase();
-                    break;
-                case (GamePhase::COUNTDOWN):
-                    handle_countdown_phase();
-                    break;
-                case (GamePhase::IN_RACE):
-                    handle_in_race_phase();
-                    break;
-                case (GamePhase::LEADERBOARD):
-                    handle_leaderboard_phase();
-                    break;
-                case (GamePhase::GAME_FINISHED):
-                    handle_game_finished_phase();
-                    break;
-            }
+            const std::chrono::steady_clock::time_point iteration_start =
+                    std::chrono::steady_clock::now();
+            tick();
+            fixed_sleep(iteration_start);
         }
     } catch (const ClosedQueue&) {}
 }

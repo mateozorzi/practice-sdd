@@ -638,3 +638,30 @@ TEST_F(PowerUpEffectsTest, StartRaceClearsEffects) {
     EXPECT_EQ(player.get_max_speed(), 10.0f);
     EXPECT_EQ(player.get_acceleration(), 5.0f);
 }
+
+TEST_F(PowerUpEffectsTest, FinishRaceClearsEffects) {
+    player.start_race();
+    take(PowerUpType::Nitro);
+    take(PowerUpType::Shield);
+    ASSERT_FALSE(has_no_effects());
+
+    player.finish_race();
+
+    EXPECT_TRUE(has_no_effects());
+    EXPECT_EQ(player.get_max_speed(), 10.0f);
+    EXPECT_EQ(player.get_acceleration(), 5.0f);
+}
+
+// The game loop calls it on every player when the race ends, also for the ones that did not
+// finish (race timeout)
+TEST_F(PowerUpEffectsTest, ClearEffectsRemovesEffectsAndRestoresValues) {
+    take(PowerUpType::Nitro);
+    take(PowerUpType::Shield);
+    ASSERT_FALSE(has_no_effects());
+
+    player.clear_effects();
+
+    EXPECT_TRUE(has_no_effects());
+    EXPECT_EQ(player.get_max_speed(), 10.0f);
+    EXPECT_EQ(player.get_acceleration(), 5.0f);
+}
