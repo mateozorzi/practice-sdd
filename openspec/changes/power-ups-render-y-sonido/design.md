@@ -141,7 +141,8 @@ verifica que los tres archivos existen en `/var/nfs/assets/sprites`, y se saltea
 ## Risks / Trade-offs
 
 - [Los tests de render se saltean si no están instalados los assets] → los de 4.3 – 4.10 no necesitan SDL (capa
-  pura y `GameLogic`), así que lo esencial corre igual; en la máquina de desarrollo los assets están instalados.
+  pura y `GameLogic`), y en 4.1, 4.2 y 4.11 las aserciones sobre `power_ups_to_draw` corren siempre: solo el render
+  del frame se saltea sin assets. En la máquina de desarrollo y en CI los assets están instalados.
 - [Cambio de protocolo: cliente y servidor viejos no se entienden] → se distribuyen juntos (igual que en el Hito 3);
   se actualizan los tests de bytes y la documentación del protocolo al archivar.
 - [Recolección, reaparición y nueva recolección dentro de una misma tanda coalescida] → el cooldown (segundos) es

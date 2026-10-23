@@ -54,7 +54,10 @@ sabe qué efecto tiene ni cuánto le queda, y no escucha nada al recogerlos. Est
 - **Cliente**: `client/client_protocol.cpp` (deserialización), `client/game_state.h` (power-ups y efectos propios en
   el estado local), `client/game_logic.*` (actualización del estado y detección de la recolección propia),
   `client/game.*` (sonido), `client/sdl_manager.*` y `client/client_constants.h` (sprites y HUD), y un módulo nuevo de
-  presentación sin SDL para los power-ups y los carteles (`client/CMakeLists.txt`).
+  presentación sin SDL para los power-ups y los carteles (`client/CMakeLists.txt`). Además, tres funciones
+  auxiliares existentes de `SDLManager` (`parse_file_data`, `get_car_sprite_rect`,
+  `calculate_angle_to_checkpoint`) pasan a ser `static`, porque cppcheck lo exige al commitear `sdl_manager.*`;
+  no cambia el comportamiento.
 - **Tests**: `tests/client/test_sdl_client.cpp`, `tests/client/test_game_logic.cpp`; se actualizan
   `tests/test_common.cpp`, `tests/test_game_loop.cpp`, `tests/test_server.cpp` y `tests/test_client.cpp` por el
   formato nuevo del snapshot.
