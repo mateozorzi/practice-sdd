@@ -521,10 +521,16 @@ TEST_F(ConnectedSdlTest, ServerDisconnectionEndsTheGame) {
 
 namespace {
 
-// Renders the power-ups in a real city, offscreen
-class PowerUpRenderTest: public SdlTest {
+// The draw lists are checked always; only rendering the frame in a real city, offscreen, needs
+// the installed assets, so just that part is skipped without them
+class PowerUpRenderTest: public ::testing::Test {
 protected:
     void render(LocalInfo& state) {
+        if (!std::filesystem::exists(ASSETS_FOLDER))
+            GTEST_SKIP() << "the client assets are not installed in " << ASSETS_FOLDER;
+        setenv("SDL_VIDEODRIVER", "offscreen", 1);
+        setenv("SDL_AUDIODRIVER", "dummy", 1);
+
         SDLManager sdl;
         sdl.load_city("Liberty City", bridges("liberty_city"), decorations("liberty_city"));
         for (int frame = 0; frame < 3; ++frame) sdl.render(state);

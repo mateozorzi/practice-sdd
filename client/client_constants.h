@@ -39,7 +39,6 @@ constexpr int CAR_RENDER_OFFSET = 50;  // CAR_RENDER_SIZE / 2
 
 // Power-up rendering: square, as wide as a drawn car
 constexpr int POWER_UP_RENDER_SIZE = CAR_RENDER_SIZE;
-constexpr int POWER_UP_RENDER_OFFSET = POWER_UP_RENDER_SIZE / 2;
 
 // Effect badges in the HUD: the power-up sprite and its seconds, in a row above the health bar
 constexpr int EFFECT_BADGE_TEXT_WIDTH = 80;
