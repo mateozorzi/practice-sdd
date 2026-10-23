@@ -79,7 +79,7 @@
 - [x] 7.1 Refactor final y hooks: formato, cpplint y cppcheck sin errores sobre los archivos tocados; verificar que
       ningún test nuevo del cliente lee config del servidor (todo sale del snapshot del Background) y que
       `git diff --stat HEAD -- editor/` está vacío
-- [ ] 7.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 4: (a) los 12 tests de
+- [x] 7.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 4: (a) los 12 tests de
       4.1 – 4.12 (más 3.1, 3.4 y `RespawnedPowerUpHasNoCollector`) existen y pasan, (b) `make run-tests` en verde,
       (c) hooks sin errores, (d) `/opsx:verify` sin CRITICAL
 

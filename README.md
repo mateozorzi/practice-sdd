@@ -123,6 +123,10 @@ Máximo de 4 mejoras por carrera, persistentes para toda la partida.
     -   Escudo: los choques no restan vida por unos segundos.
 -   Un power-up recogido desaparece para todos y vuelve a aparecer en el
     mismo lugar, con un tipo al azar, después de un tiempo.
+-   Al recoger un power-up suena el mismo sonido que las mejoras.
+-   Mientras dura un Nitro o un Escudo, sobre la barra de vida aparece un
+    cartel con el ícono del power-up y los segundos que le quedan (por
+    ejemplo `3 SEG`). Con los dos activos se muestran ambos carteles.
 
 Al finalizar:
 
