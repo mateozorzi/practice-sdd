@@ -117,7 +117,9 @@ Máximo de 4 mejoras por carrera, persistentes para toda la partida.
 -   Si un jugador pierde toda la vida, queda descalificado de esa
     carrera.
 -   En la pista aparecen power-ups, uno entre cada par de checkpoints
-    (1→2, 3→4, …). El primer auto que pasa por uno recibe su efecto:
+    (1→2, 3→4, …), sobre la calle: a mitad del camino que haría un auto
+    entre los dos checkpoints, cruzando los puentes por arriba o por
+    debajo. El primer auto que pasa por uno recibe su efecto:
     -   Nitro: más velocidad máxima y aceleración por unos segundos.
     -   Reparación: recupera vida, sin superar la vida máxima.
     -   Escudo: los choques no restan vida por unos segundos.
@@ -158,6 +160,11 @@ Es posible ajustar:
 -   Power-ups (multiplicador y duración del nitro, vida que repara la
     reparación, duración del escudo y tiempo de reaparición), en la
     sección `power_ups:` de `game_config.yaml`
+-   Grillas de calles de cada ciudad (`streets:` en `world_config.yaml`),
+    donde se ubican los power-ups. Se generan desde las máscaras de
+    `server/tools/streets/masks/` con `make streets` y se instalan en
+    `/var/nfs/world/streets/`; sin grilla, cada power-up va al punto medio
+    en línea recta entre sus dos checkpoints
 -   Parámetros del servidor (FPS, rendimiento)
 -   Aspectos visuales (tamaño de sprites, etc.)
 

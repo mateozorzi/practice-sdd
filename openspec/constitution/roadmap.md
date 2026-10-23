@@ -19,7 +19,7 @@ Cada hito es un change de OpenSpec (`/opsx:explore` → `/opsx:propose` → `/op
 | 2 | Power-ups en el mundo físico (sensores Box2D, spawn, reaparición) | `server/power_up.*`, `collision_listener` | 2.1 – 2.13 | Completo |
 | 3 | Game loop y protocolo (DTOs, snapshots) | `server/game_loop.*`, protocolos, `common/` | 3.1 – 3.8 | Completo |
 | 4 | Render y sonido en el cliente (sprites, HUD, sonido) | `client/sdl_manager.*`, `client/game.*` | 4.1 – 4.12 | Completo |
-| 5 | Power-ups sobre la calle (grilla de calles y camino por capas entre checkpoints) | `server/power_up.*`, `server/streets_grid.*` (nuevo), `server/tools/streets/`, `server/world/streets/` | 5.1 – 5.13 | Pendiente |
+| 5 | Power-ups sobre la calle (grilla de calles y camino por capas entre checkpoints) | `server/power_up.*`, `server/streets_grid.*` (nuevo), `server/tools/streets/`, `server/world/streets/` | 5.1 – 5.13 | Completo |
 | 6 | Power-ups por capas en los puentes (recolección por capa, borde del puente, render) | `server/power_up.*`, `collision_listener`, `common/power_up_dto.*`, protocolos, `client/sdl_manager.*` | 6.1 – 6.15 | Pendiente |
 
 ## Gate para avanzar de hito
