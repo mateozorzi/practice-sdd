@@ -91,7 +91,7 @@ Módulo nuevo **sin SDL** (solo `game_state.h` y `client_constants.h`), compilad
   con sprite conocido, con `size = POWER_UP_RENDER_SIZE` (cuadrado) (4.1, 4.2, 4.11).
 - `std::vector<EffectBadge> effect_badges(const LocalInfo&)` → por cada efecto propio Nitro o Escudo:
   `{type, sprite, text, x, y, w, h}`, con `text = ceil(remaining_ms / 1000) + "s"` en aritmética entera
-  (`(ms + 999) / 1000`, 2400 → `3s`), en una fila sobre la barra de salud, cada cartel desplazado
+  (`(ms + 999) / 1000`) seguido de `" SEG"`, 2400 → `3 SEG`, en una fila sobre la barra de salud, cada cartel desplazado
   `EFFECT_BADGE_WIDTH + EFFECT_BADGE_SPACING` del anterior (4.3, 4.4). Orden estable: el del snapshot. El sprite
   del cartel también es cuadrado de `POWER_UP_RENDER_SIZE`, para que haya una sola medida de sprite.
 
@@ -111,6 +111,11 @@ textos ni rectángulos; leer píxeles del renderer offscreen — frágil y lento
   en pantalla el sprite del auto Compact (celda de 50 px en la hoja, `CAR_SPRITE_SIZE`, dibujada a 100 px), en
   forma cuadrada (100 × 100). Se define en función de `CAR_RENDER_SIZE` para que siga al tamaño de los autos. El
   power-up se centra en su posición con un offset de `size / 2`, como `render_player`.
+- **Formato del texto:** la fuente del juego (`NFS_by_JLTV.ttf`) dibuja la `s` como una `S` estilizada que se
+  confunde con un dígito (en la prueba manual `3s` se leía como `30` / `35`), y la otra fuente instalada
+  (`UrbanHaze.ttf`) no dibuja el `2`. Por eso el texto es el número, un espacio y `SEG` en mayúsculas, que con
+  esa fuente se lee bien. `EFFECT_BADGE_TEXT_WIDTH` es 180: `N SEG` mide unos 168 px a `EFFECT_BADGE_FONT_SIZE`
+  (48), así que entra sin comprimirse (con 80 px el texto se achicaba y empeoraba la lectura).
 - **Sin fondo:** los PNG de los power-ups ya tienen transparencia; se copian tal cual con `renderer.Copy` (blending
   alfa de la textura), sin rectángulo ni color detrás, tanto en la pista como en el HUD.
 - `render_power_ups(view_rect, scale_x, scale_y, state)`: dentro de `render_players`, después de los NPCs y antes de

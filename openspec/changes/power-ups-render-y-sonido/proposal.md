@@ -12,7 +12,7 @@ sabe qué efecto tiene ni cuánto le queda, y no escucha nada al recogerlos. Est
 - **Power-ups en la pista**: el cliente dibuja cada power-up activo del snapshot con su sprite (`nitro.png`,
   `life.png`, `shield.png`); los inactivos no se dibujan y los de tipo desconocido se ignoran sin crashear.
 - **Carteles de efecto en el HUD**: por cada efecto con duración del jugador propio (Nitro, Escudo) se muestra un
-  cartel con el sprite del power-up y los segundos restantes redondeados hacia arriba (`3s`). Con dos efectos, los
+  cartel con el sprite del power-up y los segundos restantes redondeados hacia arriba (`3 SEG`). Con dos efectos, los
   dos carteles van uno al lado del otro sin superponerse. El tiempo sale del snapshot: al expirar el cartel
   desaparece y al renovar vuelve a la duración completa. La Reparación no muestra cartel y los efectos de otros
   jugadores no se muestran.
@@ -35,6 +35,8 @@ sabe qué efecto tiene ni cuánto le queda, y no escucha nada al recogerlos. Est
   registrar quién recogió cada power-up.
 - Cambios en `editor/`, en el formato de los circuitos y en los valores de `server/config/*.yaml`.
 - Compatibilidad con clientes o servidores de versiones anteriores del protocolo.
+- Ubicar los power-ups siempre sobre la calle (hoy el punto medio en línea recta entre checkpoints puede caer sobre
+  un edificio): modifica el requirement 2.3 del Hito 2 en el servidor y se trata en un change aparte.
 
 ## Capabilities
 

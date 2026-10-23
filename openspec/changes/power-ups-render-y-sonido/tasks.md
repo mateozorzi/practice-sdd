@@ -61,12 +61,25 @@
       (design D5); verificar que pasan
       4.1, 4.2, 4.11 completos (render sin errores) y que todos los `SdlTest.*` y `ConnectedSdlTest.*` siguen en verde
 
-## 6. Gate del Hito 4
+## 6. Formato legible del cartel (prueba manual)
 
-- [x] 6.1 Refactor final y hooks: formato, cpplint y cppcheck sin errores sobre los archivos tocados; verificar que
+- [x] 6.1 Actualizar `PowerUpHudTest.NitroBadgeShowsCeiledSeconds` (4.3, `3 SEG`), `PowerUpHudTest.TwoBadgesSideBySide`
+      (4.4, `1 SEG` y `4 SEG`) y `PowerUpGameLogicTest.RenewedEffectShowsFullDuration` (4.6, `3 SEG`) y verificar con
+      `./build/nfs_client_tests --gtest_filter='PowerUpHudTest.*:PowerUpGameLogicTest.RenewedEffectShowsFullDuration'`
+      que fallan
+- [x] 6.2 Cambiar el texto del cartel a `N SEG` en `client/power_up_view.cpp` y `EFFECT_BADGE_TEXT_WIDTH` a 180 en
+      `client/client_constants.h` (design D4, D5); verificar que pasan 4.3, 4.4 y 4.6 y que `PowerUp*` y
+      `GameLogicTest.*` siguen en verde
+- [x] 6.3 Actualizar el formato de ejemplo de `3s` a `3 SEG` en `roadmap.md` (criterios 4.3, 4.4 y 4.6) y en `TODO.md`
+      (regla "Indicador en el HUD"); verificar con `grep -n "3s\|1s\|4s" roadmap.md TODO.md` que no quedan
+      referencias al formato viejo
+
+## 7. Gate del Hito 4
+
+- [x] 7.1 Refactor final y hooks: formato, cpplint y cppcheck sin errores sobre los archivos tocados; verificar que
       ningún test nuevo del cliente lee config del servidor (todo sale del snapshot del Background) y que
       `git diff --stat HEAD -- editor/` está vacío
-- [x] 6.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 4: (a) los 12 tests de
+- [ ] 7.2 Correr `make run-tests` en verde, sin regresiones, y chequear el gate del Hito 4: (a) los 12 tests de
       4.1 – 4.12 (más 3.1, 3.4 y `RespawnedPowerUpHasNoCollector`) existen y pasan, (b) `make run-tests` en verde,
       (c) hooks sin errores, (d) `/opsx:verify` sin CRITICAL
 
@@ -76,4 +89,9 @@
 - Al archivar: documentar `collected_by` en el formato del snapshot y los power-ups / carteles en README y manuales,
   porque cambian el protocolo y lo que ve el jugador.
 - Prueba manual (DoD): correr una carrera, ver los power-ups en la pista, los carteles de Nitro y Escudo con la
-  cuenta regresiva y escuchar el sonido al recogerlos; ajustar medidas de los carteles si hace falta.
+  cuenta regresiva (`3 SEG`, `2 SEG`, `1 SEG`) y escuchar el sonido al recogerlos.
+- Change nuevo sugerido, `power-ups-spawn-sobre-calle` (modifica el requirement 2.3 del Hito 2): un script genera una
+  vez `server/world/streets/streets_<ciudad>.json` (grilla de celdas transitables) desde las máscaras
+  `editor/EditorMapas/imagenes/00X - B_STREETS - <ciudad>.png`; el servidor la carga como los collidables (se
+  instala en `/var/nfs/world`) y ubica cada power-up en el punto medio del camino por la calle (BFS) entre los dos
+  checkpoints del tramo. Hoy 23 de las 108 posiciones de las carreras de `server/races/` caen fuera de la calle.

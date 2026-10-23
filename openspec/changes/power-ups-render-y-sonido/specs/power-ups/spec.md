@@ -72,19 +72,19 @@ seguir renderizando el resto del frame sin fallar.
 
 ### Requirement: El HUD muestra un cartel por efecto propio con duración
 Mientras el jugador propio tenga un efecto con duración activo (Nitro o Escudo), su HUD SHALL mostrar un cartel por
-efecto con el sprite del power-up y los segundos restantes del snapshot redondeados hacia arriba (por ejemplo `3s`).
+efecto con el sprite del power-up y los segundos restantes del snapshot redondeados hacia arriba (por ejemplo `3 SEG`).
 Con dos efectos, los carteles MUST mostrarse uno al lado del otro sin superponerse.
 
 #### Scenario: Cartel de nitro con segundos redondeados hacia arriba (4.3)
 - **GIVEN** el jugador propio id 1 con el efecto Nitro y 2.4 s (2400 ms) restantes en el snapshot
 - **WHEN** se renderiza el HUD
-- **THEN** se muestra un único cartel con el sprite `nitro.png` y el texto `3s`
+- **THEN** se muestra un único cartel con el sprite `nitro.png` y el texto `3 SEG`
 - Test: `PowerUpHudTest.NitroBadgeShowsCeiledSeconds` (`tests/client/test_sdl_client.cpp`)
 
 #### Scenario: Dos carteles uno al lado del otro (4.4)
 - **GIVEN** el jugador propio id 1 con Nitro (1.0 s restante) y Escudo (4.0 s restantes)
 - **WHEN** se renderiza el HUD
-- **THEN** se muestran dos carteles, Nitro con `1s` y Escudo con `4s`, y sus rectángulos en pantalla no se
+- **THEN** se muestran dos carteles, Nitro con `1 SEG` y Escudo con `4 SEG`, y sus rectángulos en pantalla no se
   intersecan
 - Test: `PowerUpHudTest.TwoBadgesSideBySide` (`tests/client/test_sdl_client.cpp`)
 
@@ -102,7 +102,7 @@ cartel MUST mostrar ese tiempo.
 #### Scenario: El efecto se renueva (4.6)
 - **GIVEN** la carrera en curso y un snapshot con el jugador 1 con Nitro en 0.5 s
 - **WHEN** llega un snapshot siguiente con el jugador 1 con Nitro en 3.0 s
-- **THEN** el cartel de Nitro muestra `3s`
+- **THEN** el cartel de Nitro muestra `3 SEG`
 - Test: `PowerUpGameLogicTest.RenewedEffectShowsFullDuration` (`tests/client/test_game_logic.cpp`)
 
 ### Requirement: La Reparación y los efectos ajenos no muestran cartel
