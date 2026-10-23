@@ -86,8 +86,9 @@ class GameLoopPowerUpTest: public ::testing::Test {
 protected:
     static constexpr uint32_t PLAYER_ID = 1;
     static constexpr int MAX_TICKS = 2000;
-    static constexpr int SHIELD_TICKS = 200;  // shield_duration 1 s at game_fps 200
-    static constexpr int PINNED_TICKS = 10;   // ticks without moving to consider the car stopped
+    static constexpr int SHIELD_TICKS = 200;   // shield_duration 1 s at game_fps 200
+    static constexpr int RESPAWN_TICKS = 400;  // respawn_cooldown 2 s at game_fps 200
+    static constexpr int PINNED_TICKS = 10;    // ticks without moving to consider the car stopped
 
     ServerConfig config = make_fast_power_up_game_config();
     RaceCatalogueDTO races{{make_test_race(4, 1, "first"), make_test_race(4, 1, "second")}};
@@ -579,9 +580,22 @@ TEST_F(GameLoopPowerUpTest, CollectedPowerUpShowsInactiveAndNitroEffect) {
     ASSERT_TRUE(collect_first_power_up());
 
     EXPECT_FALSE(snapshot.power_ups[0].active);
+    EXPECT_EQ(snapshot.power_ups[0].collected_by, PLAYER_ID);
     const PowerUpEffectDTO* nitro = effect(PowerUpType::Nitro);
     ASSERT_NE(nitro, nullptr);
     EXPECT_EQ(nitro->remaining_ms, 1000u);
+}
+
+TEST_F(GameLoopPowerUpTest, RespawnedPowerUpHasNoCollector) {
+    ASSERT_NO_FATAL_FAILURE(start_race(PowerUpType::Nitro));
+    ASSERT_TRUE(collect_first_power_up());
+    ASSERT_EQ(snapshot.power_ups[0].collected_by, PLAYER_ID);
+
+    tick_braking(RESPAWN_TICKS);
+
+    ASSERT_FALSE(collected(1)) << "the car reached the second power-up";
+    EXPECT_TRUE(snapshot.power_ups[0].active);
+    EXPECT_EQ(snapshot.power_ups[0].collected_by, 0u);
 }
 
 TEST_F(GameLoopPowerUpTest, NitroExpiresAtTick200) {

@@ -466,13 +466,18 @@ TEST(UpgradeDTOTest, StoresTheIncreases) {
 
 TEST(PowerUpProtocolTest, PowerUpDTORoundTrip) {
     const PowerUpDTO power_up(1, PowerUpType::Nitro, 100, 200, true);
+    const PowerUpDTO collected(2, PowerUpType::Shield, 300, 200, false, 1);
     WorldSnapshotDTO snapshot;
     snapshot.add_power_up(power_up);
+    snapshot.add_power_up(collected);
 
     WorldSnapshotDTO received = round_trip(snapshot);
 
-    ASSERT_EQ(received.power_ups.size(), 1u);
+    ASSERT_EQ(received.power_ups.size(), 2u);
     EXPECT_EQ(received.power_ups[0], power_up);
+    EXPECT_EQ(received.power_ups[0].collected_by, 0u);
+    EXPECT_EQ(received.power_ups[1], collected);
+    EXPECT_EQ(received.power_ups[1].collected_by, 1u);
 }
 
 TEST(PowerUpProtocolTest, SnapshotEffectRoundTrip) {

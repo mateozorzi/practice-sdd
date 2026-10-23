@@ -3,6 +3,7 @@
 
 
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <vector>
 
@@ -32,6 +33,7 @@ class PowerUp {
     float x;  // pixels, center of the sensor
     float y;
     bool active = true;
+    uint32_t collected_by = 0;       // id of the player that collected it, 0 since it appeared
     double respawn_remaining = 0.0;  // seconds
     b2Body* body;
 
@@ -43,10 +45,11 @@ public:
     float get_x() const;
     float get_y() const;
     bool is_active() const;
+    uint32_t get_collected_by() const;
     const b2Body* get_body() const;
     b2Body* get_body();
 
-    void collect(double respawn_cooldown);
+    void collect(double respawn_cooldown, uint32_t player_id);
     // Counts down the respawn cooldown. Returns true when the power-up has to reappear.
     bool advance(double elapsed_seconds);
     void respawn(PowerUpType new_type);

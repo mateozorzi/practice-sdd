@@ -222,7 +222,9 @@ WorldSnapshotDTO ClientProtocol::receive_update_positions() {
         uint32_t x_position = recv_uint32();
         uint32_t y_position = recv_uint32();
         bool active = static_cast<bool>(recv_uint8());
-        world_snapshot.add_power_up(PowerUpDTO(id, type, x_position, y_position, active));
+        uint32_t collected_by = recv_uint32();
+        world_snapshot.add_power_up(
+                PowerUpDTO(id, type, x_position, y_position, active, collected_by));
     }
 
     const uint8_t effect_size = recv_uint8();

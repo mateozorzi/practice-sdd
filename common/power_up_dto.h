@@ -15,10 +15,12 @@ struct PowerUpDTO {
     uint32_t x_position;  // pixels, center of the power-up
     uint32_t y_position;
     bool active;
+    uint32_t collected_by;  // id of the player that collected it, 0 if nobody did since it appeared
 
 
     explicit PowerUpDTO(uint8_t id = 0, PowerUpType type = PowerUpType::Nitro,
-                        uint32_t x_position = 0, uint32_t y_position = 0, bool active = false);
+                        uint32_t x_position = 0, uint32_t y_position = 0, bool active = false,
+                        uint32_t collected_by = 0);
 
     bool operator==(const PowerUpDTO& other) const = default;
 };

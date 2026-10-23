@@ -450,7 +450,7 @@ void GameLoop::add_power_ups_to_snapshot(WorldSnapshotDTO& world_snapshot) const
         world_snapshot.add_power_up(PowerUpDTO(static_cast<uint8_t>(i + 1), power_up.get_type(),
                                                static_cast<uint32_t>(power_up.get_x()),
                                                static_cast<uint32_t>(power_up.get_y()),
-                                               power_up.is_active()));
+                                               power_up.is_active(), power_up.get_collected_by()));
     }
 
     for (const auto& [player_id, player]: players) {

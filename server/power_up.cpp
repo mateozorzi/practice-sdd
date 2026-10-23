@@ -34,8 +34,11 @@ const b2Body* PowerUp::get_body() const { return body; }
 
 b2Body* PowerUp::get_body() { return body; }
 
-void PowerUp::collect(const double respawn_cooldown) {
+uint32_t PowerUp::get_collected_by() const { return collected_by; }
+
+void PowerUp::collect(const double respawn_cooldown, const uint32_t player_id) {
     active = false;
+    collected_by = player_id;
     respawn_remaining = respawn_cooldown;
 }
 
@@ -51,6 +54,7 @@ bool PowerUp::advance(const double elapsed_seconds) {
 void PowerUp::respawn(const PowerUpType new_type) {
     type = new_type;
     active = true;
+    collected_by = 0;
     respawn_remaining = 0.0;
 }
 
@@ -118,7 +122,7 @@ bool PowerUpManager::try_collect(const size_t index, Player& player) {
         return false;
 
     const PowerUpConfig& power_up_config = server_config.game.power_ups;
-    power_up.collect(power_up_config.respawn_cooldown);
+    power_up.collect(power_up_config.respawn_cooldown, player.get_id());
     player.apply_power_up(power_up.get_type(), power_up_config);
 
     return true;
