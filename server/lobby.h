@@ -28,13 +28,17 @@ class Lobby {
     std::unordered_map<uint32_t, std::unique_ptr<Game>> games;
     const ServerConfig& server_config;
     std::vector<RaceDTO> races;
+    PowerUpTypeGeneratorFactory power_up_generators;
 
 
 public:
     Lobby(const Lobby&) = delete;
     Lobby& operator=(const Lobby&) = delete;
 
-    explicit Lobby(const ServerConfig& server_config);
+    // `power_up_generators` creates the power-up type generator of each new game
+    explicit Lobby(
+            const ServerConfig& server_config,
+            PowerUpTypeGeneratorFactory power_up_generators = make_random_power_up_type_generator);
 
     std::optional<GameQueues> create_new_game(uint32_t player_id, const std::string& username,
                                               uint8_t max_players, const std::string& name,

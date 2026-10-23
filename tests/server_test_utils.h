@@ -55,12 +55,14 @@ std::optional<GameUpdateDTO> wait_for_action(
 
 // Acceptor and lobby listening on localhost:`port` until destroyed. It hides the server headers
 // so tests can also include the client ones (both declare a global `Car`).
+// `power_up_generators` creates the power-up type generator of each game (empty: the real one).
 class RunningServer {
     struct Impl;
     std::unique_ptr<Impl> impl;
 
 public:
-    RunningServer(const std::string& port, const ServerConfig& config);
+    RunningServer(const std::string& port, const ServerConfig& config,
+                  std::function<std::function<PowerUpType()>()> power_up_generators = {});
     ~RunningServer();
 };
 

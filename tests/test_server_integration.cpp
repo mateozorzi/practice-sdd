@@ -1,5 +1,6 @@
 #include <atomic>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -74,6 +75,14 @@ struct TestClient {
     }
 };
 
+// Selects `race`, creates a game and consumes the car catalogue
+void host_game(TestClient& host, const RaceDTO& race, uint8_t max_players,
+               const std::string& name = "game") {
+    host.protocol.send_races_selection({race});
+    ASSERT_EQ(host.create_game(max_players, name).action, LobbyAction::CREATE_OR_JOIN_SUCCESS);
+    ASSERT_EQ(host.protocol.receive_car_catalogue().cars.size(), 7u);
+}
+
 class ServerIntegrationTest: public ::testing::Test {
 protected:
     ServerConfig config = make_fast_game_config();
@@ -85,10 +94,24 @@ protected:
 
     // Selects the test race and creates a game, consuming the car catalogue
     void host_game(TestClient& host, uint8_t max_players, const std::string& name = "game") {
-        host.protocol.send_races_selection({race});
-        ASSERT_EQ(host.create_game(max_players, name).action, LobbyAction::CREATE_OR_JOIN_SUCCESS);
-        ASSERT_EQ(host.protocol.receive_car_catalogue().cars.size(), 7u);
+        ::host_game(host, race, max_players, name);
     }
+};
+
+// Real server with the game loop milestone Background (scenario 3.8): its own config, a fake
+// generator that always gives Nitro and a race with 2 power-ups
+class ServerIntegrationPowerUpTest: public ::testing::Test {
+protected:
+    static constexpr int MAX_UPDATES = 4000;
+
+    ServerConfig config = make_fast_power_up_game_config();
+    std::string port = std::to_string(next_port++);
+    RunningServer server{port, config, [] {
+                             return make_sequence_power_up_type_generator({PowerUpType::Nitro});
+                         }};
+    RaceDTO race = make_test_race(4, 1, "power_up_race");
+
+    std::unique_ptr<TestClient> connect() { return std::make_unique<TestClient>(port); }
 };
 
 }  // namespace
@@ -263,4 +286,53 @@ TEST_F(ServerIntegrationTest, ServerKeepsAcceptingAfterAClientLeaves) {
 
     auto client = connect();
     EXPECT_EQ(client->change_username("second"), FIRST_CLIENT_ID + 1);
+}
+
+
+TEST_F(ServerIntegrationPowerUpTest, ClientReceivesCollectedPowerUpInSnapshot) {
+    auto client = connect();
+    const uint32_t player_id = client->change_username("racer");
+    host_game(*client, race, 1);
+    client->protocol.send_car_selection(CarDTO("Compact"));
+    client->receive_until(GameLoopAction::START_RACE);
+
+    client->protocol.send_event(MovementDTO(Direction::UP, true));
+
+    // Reads snapshots until the power-up shows up inactive or the race ends
+    std::optional<WorldSnapshotDTO> collected;
+    bool race_ended = false;
+    GameUpdateDTO update = client->protocol.receive_update();
+    for (int i = 0; i < MAX_UPDATES && !collected; ++i) {
+        if (update.gameloop_action == GameLoopAction::LEADERBOARD ||
+            update.gameloop_action == GameLoopAction::GAME_FINISHED ||
+            update.gameloop_action == GameLoopAction::RETURN_TO_LOBBY) {
+            race_ended = true;
+            break;
+        }
+        if (update.gameloop_action == GameLoopAction::SEND_UPDATE_POSITIONS) {
+            const auto& snapshot = std::get<WorldSnapshotDTO>(update.data);
+            if (!snapshot.power_ups.empty() && !snapshot.power_ups[0].active) {
+                collected = snapshot;
+                break;
+            }
+        }
+        update = client->protocol.receive_update();
+    }
+
+    // Back to the lobby before checking, so the client can leave cleanly even if the test fails
+    if (race_ended) {
+        if (update.gameloop_action == GameLoopAction::RETURN_TO_LOBBY)
+            client->protocol.send_client_action(ClientAction::DISCONNECT);
+        else
+            client->return_to_lobby();
+    } else {
+        client->protocol.send_client_action(ClientAction::DISCONNECT);
+        client->receive_until(GameLoopAction::RETURN_TO_LOBBY);
+    }
+
+    ASSERT_TRUE(collected.has_value()) << "the client never got the power-up inactive";
+    ASSERT_EQ(collected->effects.size(), 1u);
+    EXPECT_EQ(collected->effects[0].player_id, player_id);
+    EXPECT_EQ(collected->effects[0].type, PowerUpType::Nitro);
+    EXPECT_GT(collected->effects[0].remaining_ms, 0u);
 }

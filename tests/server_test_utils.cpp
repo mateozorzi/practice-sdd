@@ -150,12 +150,16 @@ struct RunningServer::Impl {
     Lobby lobby;
     Acceptor acceptor;
 
-    Impl(const std::string& port, const ServerConfig& config):
-            lobby(config), acceptor(port, lobby, config) {}
+    Impl(const std::string& port, const ServerConfig& config,
+         std::function<std::function<PowerUpType()>()> power_up_generators):
+            lobby(config, power_up_generators ? std::move(power_up_generators) :
+                                                make_random_power_up_type_generator),
+            acceptor(port, lobby, config) {}
 };
 
-RunningServer::RunningServer(const std::string& port, const ServerConfig& config):
-        impl(std::make_unique<Impl>(port, config)) {
+RunningServer::RunningServer(const std::string& port, const ServerConfig& config,
+                             std::function<std::function<PowerUpType()>()> power_up_generators):
+        impl(std::make_unique<Impl>(port, config, std::move(power_up_generators))) {
     impl->acceptor.start();
 }
 

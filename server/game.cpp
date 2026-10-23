@@ -5,13 +5,14 @@
 
 
 Game::Game(const uint8_t max_players, const ServerConfig& config, std::string name,
-           const RaceCatalogueDTO& selected_races):
+           const RaceCatalogueDTO& selected_races, PowerUpTypeGenerator type_generator):
         max_players(max_players),
         config(config),
         name(std::move(name)),
         command_queue(static_cast<size_t>(config.server.command_queue_capacity)),
         game_monitor(config),
-        game_loop(game_monitor, command_queue, max_players, config, selected_races) {}
+        game_loop(game_monitor, command_queue, max_players, config, selected_races,
+                  std::move(type_generator)) {}
 
 
 bool Game::is_full() const { return game_loop.is_full(); }

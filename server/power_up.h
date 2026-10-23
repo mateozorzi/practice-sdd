@@ -18,6 +18,8 @@ class Player;
 
 // Draws the type of a power-up every time it appears. Injected so tests can use a fixed sequence.
 using PowerUpTypeGenerator = std::function<PowerUpType()>;
+// Creates the generator of each game
+using PowerUpTypeGeneratorFactory = std::function<PowerUpTypeGenerator()>;
 
 // Uniform over Nitro, Repair and Shield
 PowerUpTypeGenerator make_random_power_up_type_generator();

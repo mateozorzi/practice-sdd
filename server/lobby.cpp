@@ -10,8 +10,10 @@
 #include "race_loader.h"
 
 
-Lobby::Lobby(const ServerConfig& server_config):
-        server_config(server_config), races(RaceLoader(server_config).load_races()) {}
+Lobby::Lobby(const ServerConfig& server_config, PowerUpTypeGeneratorFactory power_up_generators):
+        server_config(server_config),
+        races(RaceLoader(server_config).load_races()),
+        power_up_generators(std::move(power_up_generators)) {}
 
 
 std::optional<GameQueues> Lobby::create_new_game(const uint32_t player_id,
@@ -26,7 +28,8 @@ std::optional<GameQueues> Lobby::create_new_game(const uint32_t player_id,
 
     uint32_t game_id = player_id;
 
-    auto game = std::make_unique<Game>(max_players, server_config, name, selected_races);
+    auto game = std::make_unique<Game>(max_players, server_config, name, selected_races,
+                                       power_up_generators());
 
     auto queues = game->add_player(player_id, username);
     games.emplace(game_id, std::move(game));

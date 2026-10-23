@@ -31,7 +31,8 @@ public:
     Game& operator=(const Game&) = delete;
 
     explicit Game(uint8_t max_players, const ServerConfig& config, std::string name,
-                  const RaceCatalogueDTO& selected_races);
+                  const RaceCatalogueDTO& selected_races,
+                  PowerUpTypeGenerator type_generator = make_random_power_up_type_generator());
 
     bool is_full() const;
     bool is_empty() const;
