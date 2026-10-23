@@ -41,7 +41,7 @@ constexpr int CAR_RENDER_OFFSET = 50;  // CAR_RENDER_SIZE / 2
 constexpr int POWER_UP_RENDER_SIZE = CAR_RENDER_SIZE;
 
 // Effect badges in the HUD: the power-up sprite and its seconds, in a row above the health bar
-constexpr int EFFECT_BADGE_TEXT_WIDTH = 80;
+constexpr int EFFECT_BADGE_TEXT_WIDTH = 180;  // fits "N SEG" at EFFECT_BADGE_FONT_SIZE
 constexpr int EFFECT_BADGE_WIDTH = POWER_UP_RENDER_SIZE + EFFECT_BADGE_TEXT_WIDTH;
 constexpr int EFFECT_BADGE_HEIGHT = POWER_UP_RENDER_SIZE;
 constexpr int EFFECT_BADGE_SPACING = 20;

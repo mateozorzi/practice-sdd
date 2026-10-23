@@ -10,9 +10,10 @@ namespace {
 
 constexpr uint32_t MS_PER_SECOND = 1000;
 
-// Seconds left rounded up, so the badge shows "1s" until the effect expires
+// Seconds left rounded up, so the badge shows "1 SEG" until the effect expires. The game font
+// draws a lowercase "s" like a digit ("3s" reads as "35"), hence the separate "SEG".
 std::string seconds_left(uint32_t remaining_ms) {
-    return std::to_string((remaining_ms + MS_PER_SECOND - 1) / MS_PER_SECOND) + "s";
+    return std::to_string((remaining_ms + MS_PER_SECOND - 1) / MS_PER_SECOND) + " SEG";
 }
 
 }  // namespace

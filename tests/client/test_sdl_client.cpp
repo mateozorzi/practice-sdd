@@ -581,7 +581,7 @@ TEST(PowerUpHudTest, NitroBadgeShowsCeiledSeconds) {
     ASSERT_EQ(badges.size(), 1u);
     EXPECT_EQ(badges[0].type, PowerUpType::Nitro);
     EXPECT_EQ(badges[0].sprite, NITRO_SPRITE_PATH);
-    EXPECT_EQ(badges[0].text, "3s");
+    EXPECT_EQ(badges[0].text, "3 SEG");
 }
 
 TEST(PowerUpHudTest, TwoBadgesSideBySide) {
@@ -593,9 +593,9 @@ TEST(PowerUpHudTest, TwoBadgesSideBySide) {
 
     ASSERT_EQ(badges.size(), 2u);
     EXPECT_EQ(badges[0].sprite, NITRO_SPRITE_PATH);
-    EXPECT_EQ(badges[0].text, "1s");
+    EXPECT_EQ(badges[0].text, "1 SEG");
     EXPECT_EQ(badges[1].sprite, SHIELD_SPRITE_PATH);
-    EXPECT_EQ(badges[1].text, "4s");
+    EXPECT_EQ(badges[1].text, "4 SEG");
     EXPECT_GT(badges[0].w, 0);
     EXPECT_GT(badges[0].h, 0);
     EXPECT_FALSE(intersect(badges[0], badges[1]));

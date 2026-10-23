@@ -74,7 +74,7 @@ power_ups:
       que las mejoras (`sfx_upgrade.wav`, vía `Sounds::play_upgrade_sound`).
 - [ ] **Indicador en el HUD:** mientras el jugador tenga un efecto con duración activo (Nitro o Escudo),
       su pantalla muestra un cartel por efecto con el sprite del power-up (`nitro.png`, `shield.png`)
-      y los segundos restantes (redondeados hacia arriba, ej. `3s`). El tiempo restante lo manda el
+      y los segundos restantes (redondeados hacia arriba, ej. `3 SEG`). El tiempo restante lo manda el
       servidor en el snapshot; el cliente no lleva su propio timer. Al expirar, el cartel desaparece;
       al renovar el efecto, el contador vuelve a la duración completa. Con dos efectos activos se
       muestran los dos carteles, uno al lado del otro. La Reparación es instantánea, así que no muestra cartel.

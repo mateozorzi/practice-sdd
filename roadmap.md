@@ -148,10 +148,10 @@ sonido: fake que cuenta las llamadas a play_upgrade_sound
 |------|---------------------|
 | 4.1  | Dado el snapshot del Background, cuando se renderiza, entonces se dibujan los 3 sprites sin errores |
 | 4.2  | Dado el power-up 2 inactivo, cuando se renderiza, entonces se dibujan solo los power-ups 1 y 3 |
-| 4.3  | Dado el jugador 1 con Nitro y 2.4 s restantes, cuando se renderiza el HUD, entonces se muestra el cartel con el sprite de nitro y el texto `3s` |
-| 4.4  | Dado el jugador 1 con Nitro (1.0 s) y Escudo (4.0 s), cuando se renderiza el HUD, entonces se muestran los dos carteles (`1s` y `4s`) sin superponerse |
+| 4.3  | Dado el jugador 1 con Nitro y 2.4 s restantes, cuando se renderiza el HUD, entonces se muestra el cartel con el sprite de nitro y el texto `3 SEG` |
+| 4.4  | Dado el jugador 1 con Nitro (1.0 s) y Escudo (4.0 s), cuando se renderiza el HUD, entonces se muestran los dos carteles (`1 SEG` y `4 SEG`) sin superponerse |
 | 4.5  | Dado un snapshot con Nitro en 1.0 s y el siguiente sin efectos, cuando se renderiza el segundo, entonces no hay cartel |
-| 4.6  | Dado un snapshot con Nitro en 0.5 s y el siguiente con Nitro en 3.0 s, cuando se renderiza el segundo, entonces el cartel muestra `3s` |
+| 4.6  | Dado un snapshot con Nitro en 0.5 s y el siguiente con Nitro en 3.0 s, cuando se renderiza el segundo, entonces el cartel muestra `3 SEG` |
 | 4.7  | Dado que el jugador 1 recoge el power-up de Reparación, cuando se renderiza el HUD, entonces no hay cartel |
 | 4.8  | Dado el jugador 2 con Escudo (4.0 s) y el jugador 1 sin efectos, cuando se renderiza el HUD, entonces no hay carteles |
 | 4.9  | Dado que el jugador 1 recoge el power-up 1, cuando llega el snapshot, entonces el contador de sonido vale 1 (y sigue en 1 con los snapshots siguientes) |

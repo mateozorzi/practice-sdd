@@ -434,7 +434,7 @@ TEST_F(PowerUpGameLogicTest, RenewedEffectShowsFullDuration) {
 
     ASSERT_EQ(badges().size(), 1u);
     EXPECT_EQ(badges()[0].type, PowerUpType::Nitro);
-    EXPECT_EQ(badges()[0].text, "3s");
+    EXPECT_EQ(badges()[0].text, "3 SEG");
 }
 
 TEST_F(PowerUpGameLogicTest, RepairShowsNoBadge) {
