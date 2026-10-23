@@ -1,5 +1,7 @@
 #include "game_logic.h"
 
+#include <algorithm>
+#include <iterator>
 #include <unordered_map>
 #include <utility>
 #include <variant>
@@ -91,6 +93,25 @@ void GameLogic::update_player(const PlayerDTO& player, const CarPositionDTO& car
     info.username = player.username;
 }
 
+bool GameLogic::collected_by_me(const PowerUpDTO& power_up) const {
+    return !power_up.active && power_up.collected_by == game_state.id;
+}
+
+// Plays the sound once per pickup: a power-up stays collected by the player until it respawns
+void GameLogic::detect_own_power_up_pickups(const std::vector<PowerUpDTO>& power_ups) {
+    for (const auto& power_up: power_ups) {
+
+        if (!collected_by_me(power_up))
+            continue;
+
+        auto previous = std::find_if(
+                game_state.power_ups.begin(), game_state.power_ups.end(),
+                [&power_up](const PowerUpDTO& candidate) { return candidate.id == power_up.id; });
+        if (previous == game_state.power_ups.end() || !collected_by_me(*previous))
+            view.play_power_up_sound();
+    }
+}
+
 void GameLogic::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot) {
 
     std::unordered_map<uint32_t, PlayerInfo> last_state = std::move(game_state.players);
@@ -101,6 +122,16 @@ void GameLogic::update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot
     }
 
     game_state.npcs = snapshot.npc_positions;
+
+    detect_own_power_up_pickups(snapshot.power_ups);
+    game_state.power_ups = snapshot.power_ups;
+
+    // Only the effects of the own player are shown
+    game_state.effects.clear();
+    std::copy_if(snapshot.effects.begin(), snapshot.effects.end(),
+                 std::back_inserter(game_state.effects), [this](const PowerUpEffectDTO& effect) {
+                     return effect.player_id == game_state.id;
+                 });
 }
 
 

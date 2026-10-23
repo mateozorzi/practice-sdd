@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "../../client/game_logic.h"
+#include "../../client/power_up_view.h"
 
 // Unit tests of the client game logic: the server updates are pushed into the queue the
 // receiver would fill, and a fake view records what the logic asks the screen to do.
@@ -21,6 +22,7 @@ public:
     int shop_closed = 0;
     int leaderboard_opened = 0;
     int leaderboard_closed = 0;
+    int power_up_sounds = 0;
 
     void set_sound_info(const std::vector<uint32_t>& ids) override { sound_ids = ids; }
     void load_city(const std::string& city_name, const std::string&, const std::string&) override {
@@ -30,6 +32,7 @@ public:
     void close_shop() override { shop_closed++; }
     void open_leaderboard() override { leaderboard_opened++; }
     void close_leaderboard() override { leaderboard_closed++; }
+    void play_power_up_sound() override { power_up_sounds++; }
 };
 
 std::pair<PlayerDTO, CarPositionDTO> car(uint32_t id, uint32_t x, uint32_t y, uint16_t health,
@@ -361,4 +364,119 @@ TEST_F(GameLogicTest, ReturningToTheLobbyClosesTheLeaderboard) {
     EXPECT_TRUE(logic.update_game_finished());
 
     EXPECT_EQ(view.leaderboard_closed, 1);
+}
+
+
+// Power-ups (values from the render and sound milestone Background)
+
+namespace {
+
+// Power-ups of the Background: 1 Nitro, 2 Repair and 3 Shield, all active
+std::vector<PowerUpDTO> background_power_ups() {
+    return {PowerUpDTO(1, PowerUpType::Nitro, 100, 100, true),
+            PowerUpDTO(2, PowerUpType::Repair, 200, 100, true),
+            PowerUpDTO(3, PowerUpType::Shield, 300, 100, true)};
+}
+
+// Background power-ups with `id` inactive and collected by `collector`
+std::vector<PowerUpDTO> collected_power_ups(uint8_t id, uint32_t collector) {
+    std::vector<PowerUpDTO> power_ups = background_power_ups();
+    for (auto& power_up: power_ups) {
+        if (power_up.id == id) {
+            power_up.active = false;
+            power_up.collected_by = collector;
+        }
+    }
+    return power_ups;
+}
+
+GameUpdateDTO power_up_snapshot(const std::vector<PowerUpDTO>& power_ups,
+                                const std::vector<PowerUpEffectDTO>& effects = {}) {
+    WorldSnapshotDTO world({car(MY_ID, 100, 300, 100), car(OTHER_ID, 300, 300, 100)});
+    for (const auto& power_up: power_ups) world.add_power_up(power_up);
+    for (const auto& effect: effects) world.add_effect(effect);
+    return GameUpdateDTO(GameLoopAction::SEND_UPDATE_POSITIONS, world);
+}
+
+class PowerUpGameLogicTest: public GameLogicTest {
+protected:
+    void SetUp() override { ASSERT_NO_FATAL_FAILURE(go_to_race()); }
+
+    // Pushes the snapshot and lets the race logic apply it
+    void receive(const GameUpdateDTO& update) {
+        push(update);
+        ASSERT_TRUE(logic.update_race());
+    }
+
+    std::vector<EffectBadge> badges() { return effect_badges(state()); }
+};
+
+}  // namespace
+
+
+TEST_F(PowerUpGameLogicTest, ExpiredEffectRemovesBadge) {
+    receive(power_up_snapshot(background_power_ups(),
+                              {PowerUpEffectDTO(MY_ID, PowerUpType::Nitro, 1000)}));
+    ASSERT_EQ(badges().size(), 1u);
+
+    receive(power_up_snapshot(background_power_ups()));
+
+    EXPECT_TRUE(state().effects.empty());
+    EXPECT_TRUE(badges().empty());
+}
+
+TEST_F(PowerUpGameLogicTest, RenewedEffectShowsFullDuration) {
+    receive(power_up_snapshot(background_power_ups(),
+                              {PowerUpEffectDTO(MY_ID, PowerUpType::Nitro, 500)}));
+
+    receive(power_up_snapshot(background_power_ups(),
+                              {PowerUpEffectDTO(MY_ID, PowerUpType::Nitro, 3000)}));
+
+    ASSERT_EQ(badges().size(), 1u);
+    EXPECT_EQ(badges()[0].type, PowerUpType::Nitro);
+    EXPECT_EQ(badges()[0].text, "3s");
+}
+
+TEST_F(PowerUpGameLogicTest, RepairShowsNoBadge) {
+    receive(power_up_snapshot(background_power_ups()));
+
+    receive(power_up_snapshot(collected_power_ups(2, MY_ID)));
+
+    ASSERT_EQ(state().power_ups.size(), 3u);
+    EXPECT_FALSE(state().power_ups[1].active);
+    EXPECT_TRUE(badges().empty());
+}
+
+TEST_F(PowerUpGameLogicTest, OtherPlayersEffectsAreNotShown) {
+    receive(power_up_snapshot(background_power_ups(),
+                              {PowerUpEffectDTO(OTHER_ID, PowerUpType::Shield, 4000)}));
+
+    ASSERT_EQ(state().power_ups.size(), 3u);
+    EXPECT_TRUE(state().effects.empty());
+    EXPECT_TRUE(badges().empty());
+}
+
+TEST_F(PowerUpGameLogicTest, OwnPickupPlaysUpgradeSoundOnce) {
+    receive(power_up_snapshot(background_power_ups()));
+
+    receive(power_up_snapshot(collected_power_ups(1, MY_ID),
+                              {PowerUpEffectDTO(MY_ID, PowerUpType::Nitro, 1000)}));
+    EXPECT_EQ(view.power_up_sounds, 1);
+
+    receive(power_up_snapshot(collected_power_ups(1, MY_ID),
+                              {PowerUpEffectDTO(MY_ID, PowerUpType::Nitro, 900)}));
+    receive(power_up_snapshot(collected_power_ups(1, MY_ID),
+                              {PowerUpEffectDTO(MY_ID, PowerUpType::Nitro, 800)}));
+    EXPECT_EQ(view.power_up_sounds, 1);
+}
+
+TEST_F(PowerUpGameLogicTest, OtherPlayerPickupPlaysNoSound) {
+    receive(power_up_snapshot(background_power_ups()));
+
+    receive(power_up_snapshot(collected_power_ups(1, OTHER_ID),
+                              {PowerUpEffectDTO(OTHER_ID, PowerUpType::Nitro, 1000)}));
+
+    ASSERT_EQ(state().power_ups.size(), 3u);
+    EXPECT_FALSE(state().power_ups[0].active);
+    EXPECT_EQ(view.power_up_sounds, 0);
 }

@@ -29,6 +29,9 @@ public:
     virtual void open_leaderboard() = 0;
     virtual void close_leaderboard() = 0;
 
+    // The own player collected a power-up
+    virtual void play_power_up_sound() = 0;
+
     virtual ~GameView() = default;
 };
 
@@ -51,6 +54,9 @@ class GameLogic {
 
     void update_player(const PlayerDTO& player, const CarPositionDTO& car,
                        const std::unordered_map<uint32_t, PlayerInfo>& prev_state);
+
+    bool collected_by_me(const PowerUpDTO& power_up) const;
+    void detect_own_power_up_pickups(const std::vector<PowerUpDTO>& power_ups);
 
     void update_game_state_from_snapshot(const WorldSnapshotDTO& snapshot);
 

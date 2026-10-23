@@ -5,8 +5,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../common/car_position_dto.h"
+#include "../common/checkpoint_dto.h"
 #include "../common/npc_dto.h"
 #include "../common/phase.h"
+#include "../common/power_up_dto.h"
 
 
 struct PlayerInfo {
@@ -42,6 +45,8 @@ struct LocalInfo {
     uint8_t countdown_seconds = 0;
     uint8_t upgrade_shop_countdown = 0;
     uint8_t penalty_per_upgrade = 0;
+    std::vector<PowerUpDTO> power_ups{};
+    std::vector<PowerUpEffectDTO> effects{};  // only the effects of the own player
 };
 
 

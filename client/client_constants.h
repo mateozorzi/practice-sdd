@@ -36,6 +36,19 @@ constexpr int HEALTH_BAR_Y = SCREEN_HEIGHT - HEALTH_BAR_HEIGHT - HEALTH_BAR_X;
 constexpr int CAR_SPRITE_SIZE = 50;
 constexpr int CAR_RENDER_SIZE = 100;
 constexpr int CAR_RENDER_OFFSET = 50;  // CAR_RENDER_SIZE / 2
+
+// Power-up rendering: square, as wide as a drawn car
+constexpr int POWER_UP_RENDER_SIZE = CAR_RENDER_SIZE;
+constexpr int POWER_UP_RENDER_OFFSET = POWER_UP_RENDER_SIZE / 2;
+
+// Effect badges in the HUD: the power-up sprite and its seconds, in a row above the health bar
+constexpr int EFFECT_BADGE_TEXT_WIDTH = 80;
+constexpr int EFFECT_BADGE_WIDTH = POWER_UP_RENDER_SIZE + EFFECT_BADGE_TEXT_WIDTH;
+constexpr int EFFECT_BADGE_HEIGHT = POWER_UP_RENDER_SIZE;
+constexpr int EFFECT_BADGE_SPACING = 20;
+constexpr int EFFECT_BADGE_X = HEALTH_BAR_X;
+constexpr int EFFECT_BADGE_Y = HEALTH_BAR_Y - EFFECT_BADGE_SPACING - EFFECT_BADGE_HEIGHT;
+constexpr int EFFECT_BADGE_FONT_SIZE = 48;
 constexpr int DEFAULT_SPRITE_X = 128;
 constexpr int DEFAULT_SPRITE_Y = 32;
 constexpr int DEFAULT_SPRITE_W = 32;
@@ -107,6 +120,9 @@ constexpr int TEXT_COUNTDOWN_SIZE = 32;
 constexpr const char* FONT_PATH = "/var/nfs/assets/fonts/NFS_by_JLTV.ttf";
 constexpr const char* CARS_SPRITE_PATH = "/var/nfs/assets/sprites/cars-no-background.png";
 constexpr const char* ARROW_SPRITE_PATH = "/var/nfs/assets/sprites/arrow.png";
+constexpr const char* NITRO_SPRITE_PATH = "/var/nfs/assets/sprites/nitro.png";
+constexpr const char* LIFE_SPRITE_PATH = "/var/nfs/assets/sprites/life.png";
+constexpr const char* SHIELD_SPRITE_PATH = "/var/nfs/assets/sprites/shield.png";
 constexpr const char* MAP_BACKGROUND_PREFIX =
         "/var/nfs/assets/sprites/Game Boy _ GBC - Grand Theft Auto - Backgrounds - ";
 constexpr const char* MAP_BACKGROUND_SUFFIX = ".png";

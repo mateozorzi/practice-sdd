@@ -43,6 +43,7 @@ class Game: private GameView {
     void close_shop() override;
     void open_leaderboard() override;
     void close_leaderboard() override;
+    void play_power_up_sound() override;
 
     bool is_running() const;
 

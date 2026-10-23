@@ -68,6 +68,8 @@ void Game::open_leaderboard() { sdl.open_leaderboard(); }
 
 void Game::close_leaderboard() { sdl.close_leaderboard(); }
 
+void Game::play_power_up_sound() { sdl.play_upgrade_sound(); }
+
 bool Game::is_running() const { return logic.is_running(); }
 
 

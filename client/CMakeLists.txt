@@ -19,6 +19,7 @@ target_sources(nfs_client
     upgrade_shop.cpp
     game.cpp
     game_logic.cpp
+    power_up_view.cpp
     game_phase.cpp
 
     Lobby/lobby.cpp

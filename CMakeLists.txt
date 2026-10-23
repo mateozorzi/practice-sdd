@@ -292,6 +292,7 @@ if(NFS_TESTS)
         client/sounds.cpp
         client/upgrade_shop.cpp
         client/game_logic.cpp
+        client/power_up_view.cpp
         client/receiver.cpp
         client/sender.cpp
         client/menu_connection.cpp
