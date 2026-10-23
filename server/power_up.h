@@ -16,6 +16,7 @@
 
 
 class Player;
+struct StreetMap;
 
 // Draws the type of a power-up every time it appears. Injected so tests can use a fixed sequence.
 using PowerUpTypeGenerator = std::function<PowerUpType()>;
@@ -76,8 +77,9 @@ public:
                    PowerUpTypeGenerator type_generator);
     ~PowerUpManager();
 
-    // Replaces the current power-ups with one in the middle of each odd stretch (1->2, 3->4, ...)
-    void load(const std::vector<CheckpointDTO>& checkpoints);
+    // Replaces the current power-ups with one in the middle of each odd stretch (1->2, 3->4, ...):
+    // the middle of the street path when there is a grid, (P + Q) / 2 otherwise
+    void load(const std::vector<CheckpointDTO>& checkpoints, const StreetMap* streets = nullptr);
     // Applies the power-up to the player if it is active and the player is alive
     bool try_collect(size_t index, Player& player);
     // Explicit time step: counts down the respawn cooldowns (no wall clock)

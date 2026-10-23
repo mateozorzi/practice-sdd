@@ -26,6 +26,7 @@ void redirect_city(CityLoaderConfig& city) {
     redirect_to_repo(city.objects.bridge_file);
     redirect_to_repo(city.objects.decoration_file);
     redirect_to_repo(city.npc_file);
+    redirect_to_repo(city.streets_file);
 }
 
 }  // namespace

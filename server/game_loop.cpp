@@ -529,7 +529,7 @@ void GameLoop::set_race(const RaceDTO& race) {
     send_race(race);
 
     map_configuration(race.city, race.checkpoints);
-    power_ups.load(race.checkpoints);
+    power_ups.load(race.checkpoints, city_loader.get_street_map());
 
     for (auto& [player_id, player]: players) {
 

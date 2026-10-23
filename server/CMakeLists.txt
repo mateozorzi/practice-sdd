@@ -22,6 +22,7 @@ target_sources(nfs_server
     server.cpp
     server_config_loader.cpp
     server_protocol.cpp
+    streets_grid.cpp
     PUBLIC
     # .h files
     acceptor.h
@@ -46,5 +47,6 @@ target_sources(nfs_server
     server_config_loader.h
     server_constants.h
     server_protocol.h
+    streets_grid.h
     world_creation_exception.h
     )

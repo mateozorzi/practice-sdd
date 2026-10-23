@@ -21,6 +21,8 @@ world:
     npc:
       npc_file: "/var/nfs/world/npcs/npcs_liberty_city.json"
 
+    streets: "/var/nfs/world/streets/streets_liberty_city.json"
+
 
   san_andreas:
     collidables:
@@ -38,6 +40,8 @@ world:
     npc:
       npc_file: "/var/nfs/world/npcs/npcs_san_andreas.json"
 
+    streets: "/var/nfs/world/streets/streets_san_andreas.json"
+
 
   vice_city:
     collidables:
@@ -54,3 +58,5 @@ world:
     
     npc:
       npc_file: "/var/nfs/world/npcs/npcs_vice_city.json"
+
+    streets: "/var/nfs/world/streets/streets_vice_city.json"

@@ -1,6 +1,8 @@
 #include "power_up.h"
 
 #include <cstdint>
+#include <iostream>
+#include <optional>
 #include <random>
 #include <utility>
 
@@ -9,6 +11,38 @@
 #include "city_utils.h"
 #include "player.h"
 #include "server_constants.h"
+#include "streets_grid.h"
+
+
+namespace {
+
+StreetPoint center_of(const CheckpointDTO& checkpoint) {
+    return {static_cast<float>(checkpoint.x), static_cast<float>(checkpoint.y)};
+}
+
+// Middle of the street path between the checkpoints, or (P + Q) / 2 when there is no grid or no
+// path
+StreetPoint spawn_point(const CheckpointDTO& p, const CheckpointDTO& q, const StreetMap* streets) {
+
+    const StreetPoint from = center_of(p);
+    const StreetPoint to = center_of(q);
+    const StreetPoint straight_midpoint{(from.x + to.x) / 2.0f, (from.y + to.y) / 2.0f};
+
+    if (!streets)
+        return straight_midpoint;
+
+    const std::optional<std::vector<PathStep>> path = find_street_path(*streets, from, to);
+    if (!path) {
+        std::cerr << "[" << POWER_UPS << "] Stretch " << static_cast<int>(p.id) << " -> "
+                  << static_cast<int>(q.id) << " has no street path, using the straight midpoint"
+                  << std::endl;
+        return straight_midpoint;
+    }
+
+    return path_midpoint(streets->grid, *path);
+}
+
+}  // namespace
 
 
 PowerUpTypeGenerator make_random_power_up_type_generator() {
@@ -96,19 +130,16 @@ b2Body* PowerUpManager::create_sensor(const float x, const float y, const size_t
     return box2d_body;
 }
 
-void PowerUpManager::load(const std::vector<CheckpointDTO>& checkpoints) {
+void PowerUpManager::load(const std::vector<CheckpointDTO>& checkpoints, const StreetMap* streets) {
 
     clear();
 
     for (size_t first = 0; first + 1 < checkpoints.size(); first += 2) {
 
-        const CheckpointDTO& p = checkpoints[first];
-        const CheckpointDTO& q = checkpoints[first + 1];
-        const float x = (static_cast<float>(p.x) + static_cast<float>(q.x)) / 2.0f;
-        const float y = (static_cast<float>(p.y) + static_cast<float>(q.y)) / 2.0f;
+        const StreetPoint spawn = spawn_point(checkpoints[first], checkpoints[first + 1], streets);
 
-        b2Body* body = create_sensor(x, y, power_ups.size());
-        power_ups.emplace_back(type_generator(), x, y, body);
+        b2Body* body = create_sensor(spawn.x, spawn.y, power_ups.size());
+        power_ups.emplace_back(type_generator(), spawn.x, spawn.y, body);
     }
 }
 

@@ -16,8 +16,10 @@ target_sources(nfs_tests
     test_server_config_loader.cpp
     test_server_integration.cpp
     test_server_main.cpp
+    test_streets_grid.cpp
     test_common.cpp
     server_test_utils.cpp
+    streets_test_utils.cpp
     ../client/client_protocol.cpp
     ../server/acceptor.cpp
     ../server/car.cpp
@@ -39,6 +41,7 @@ target_sources(nfs_tests
     ../server/server.cpp
     ../server/server_config_loader.cpp
     ../server/server_protocol.cpp
+    ../server/streets_grid.cpp
 
 
     PUBLIC
@@ -47,5 +50,6 @@ target_sources(nfs_tests
     test_server.h
     mock_socket.h
     server_test_utils.h
+    streets_test_utils.h
     ../client/client_protocol.h
     )

@@ -9,6 +9,7 @@
 
 #include "../server/city_loader.h"
 #include "../server/npc.h"
+#include "../server/streets_grid.h"
 #include "../server/world_creation_exception.h"
 
 #include "server_test_utils.h"
@@ -228,4 +229,28 @@ TEST_F(CityLoaderTest, UnknownCityThrows) {
     CityLoader loader(world, config);
 
     EXPECT_THROW(loader.load_city("Gotham", {}), std::runtime_error);
+}
+
+TEST_F(CityLoaderTest, LoadsTheStreetMapOfTheCity) {
+    CityLoader city_loader(world, config);
+    EXPECT_EQ(city_loader.get_street_map(), nullptr);
+
+    city_loader.load_city("Liberty City", {});
+
+    const StreetMap* street_map = city_loader.get_street_map();
+    ASSERT_NE(street_map, nullptr);
+    EXPECT_GT(street_map->grid.get_width(), 0);
+    EXPECT_FALSE(street_map->bridges.bridges.empty());
+}
+
+TEST_F(CityLoaderTest, MissingStreetGridLoadsNoStreetMap) {
+    config.world.liberty_city.streets_file = "";
+    config.world.san_andreas.streets_file = "/does/not/exist.json";
+    CityLoader city_loader(world, config);
+
+    city_loader.load_city("Liberty City", {});
+    EXPECT_EQ(city_loader.get_street_map(), nullptr);
+
+    EXPECT_NO_THROW(city_loader.load_city("San Andreas", {}));
+    EXPECT_EQ(city_loader.get_street_map(), nullptr);
 }

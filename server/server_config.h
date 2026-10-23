@@ -105,6 +105,7 @@ struct CityLoaderConfig {
     struct SensorFiles sensors;
     struct ObjectRenderingFiles objects;
     std::string npc_file;
+    std::string streets_file;  // street grid of the city, empty: no grid
 };
 
 

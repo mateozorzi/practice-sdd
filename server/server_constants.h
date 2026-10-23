@@ -11,6 +11,7 @@ constexpr std::string_view LOBBY = "LOBBY";
 constexpr std::string_view GAME = "GAME";
 constexpr std::string_view GAME_LOOP = "GAME_LOOP";
 constexpr std::string_view GAME_MONITOR = "GAME_MONITOR";
+constexpr std::string_view POWER_UPS = "POWER_UPS";
 constexpr std::string_view SERVER = "SERVER";
 constexpr std::string_view SERVER_MAIN = "SERVER_MAIN";
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 
 #include <nlohmann/json.hpp>
 
@@ -131,10 +132,36 @@ void CityLoader::load_city(const std::string& city_name,
 
     load_npcs(city_name);
 
+    street_map = load_street_map_once(normalized_city_name, city_loader_config);
+
     load_checkpoints(checkpoints, CATEGORY_SENSOR, MASK_SENSOR);
 
     city_loaded = true;
 }
+
+const StreetMap* CityLoader::load_street_map_once(const std::string& normalized_city_name,
+                                                  const CityLoaderConfig& city_loader_config) {
+
+    auto [entry, inserted] = street_maps.try_emplace(normalized_city_name);
+
+    // A missing or broken grid is logged once and the race goes on: the power-ups fall back to
+    // the straight midpoint
+    if (inserted && !city_loader_config.streets_file.empty()) {
+
+        try {
+
+            entry->second.emplace(load_street_map(city_loader_config, city_utils));
+        } catch (const std::exception& e) {
+
+            std::cerr << "[" << POWER_UPS << "] No street grid for " << normalized_city_name << ": "
+                      << e.what() << std::endl;
+        }
+    }
+
+    return entry->second ? &*entry->second : nullptr;
+}
+
+const StreetMap* CityLoader::get_street_map() const { return street_map; }
 
 std::vector<Npc>& CityLoader::get_npcs() { return npcs; }
 

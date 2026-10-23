@@ -227,4 +227,8 @@ void ServerConfigLoader::load_city(const YAML::Node& node, CityLoaderConfig& cit
         auto n = node["npc"];
         city.npc_file = n["npc_file"].as<std::string>();
     }
+
+    // Optional: without a street grid the power-ups go to the straight midpoint
+    if (node["streets"])
+        city.streets_file = node["streets"].as<std::string>();
 }
