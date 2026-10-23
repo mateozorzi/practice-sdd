@@ -39,7 +39,8 @@ std::string source_path(const std::string& relative_path) {
 ServerConfig make_test_server_config() {
     ServerConfig config = ServerConfigLoader().load_yaml(source_path("server/config"));
 
-    redirect_to_repo(config.world.races_folder);
+    // Fixed copy of the races, so adding or editing a game race does not change the tests
+    config.world.races_folder = source_path("tests/data/races/");
     redirect_city(config.world.liberty_city);
     redirect_city(config.world.san_andreas);
     redirect_city(config.world.vice_city);

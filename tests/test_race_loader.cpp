@@ -46,7 +46,11 @@ protected:
 }  // namespace
 
 
-TEST_F(RaceLoaderTest, LoadsEveryRaceInTheRepository) {
+TEST(ServerTestUtilsTest, RacesComeFromTheFixedCopy) {
+    EXPECT_EQ(make_test_server_config().world.races_folder, source_path("tests/data/races/"));
+}
+
+TEST_F(RaceLoaderTest, LoadsTheFixedTestRaces) {
     std::vector<RaceDTO> races = RaceLoader(config).load_races();
 
     ASSERT_EQ(races.size(), 6u);
@@ -54,6 +58,38 @@ TEST_F(RaceLoaderTest, LoadsEveryRaceInTheRepository) {
                             "ocean_bridge_cruise", "ocean_dream", "park_day"})
         EXPECT_NE(find_race(races, name), nullptr) << "missing race " << name;
 
+    for (const auto& race: races) {
+        EXPECT_GT(race.laps, 0) << race.name;
+        EXPECT_GE(race.size_checkpoints, 2) << race.name;
+        EXPECT_EQ(race.size_checkpoints, race.checkpoints.size()) << race.name;
+    }
+}
+
+TEST_F(RaceLoaderTest, EveryGameRaceIsValid) {
+    const std::string game_races = source_path("server/races/");
+
+    // Each race is loaded alone first, so a race that cannot be loaded is named
+    size_t race_files = 0;
+    config.world.races_folder = races_dir.string();
+    for (const auto& entry: std::filesystem::directory_iterator(game_races)) {
+        if (!entry.is_regular_file() || entry.path().extension() != ".csv")
+            continue;
+        ++race_files;
+        std::filesystem::path copy = races_dir / entry.path().filename();
+        std::filesystem::copy_file(entry.path(), copy);
+        try {
+            RaceLoader(config).load_races();
+        } catch (const std::exception& error) {
+            ADD_FAILURE() << entry.path().stem() << " cannot be loaded: " << error.what();
+        }
+        std::filesystem::remove(copy);
+    }
+
+    config.world.races_folder = game_races;
+    std::vector<RaceDTO> races;
+    ASSERT_NO_THROW(races = RaceLoader(config).load_races());
+
+    ASSERT_EQ(races.size(), race_files);
     for (const auto& race: races) {
         EXPECT_GT(race.laps, 0) << race.name;
         EXPECT_GE(race.size_checkpoints, 2) << race.name;

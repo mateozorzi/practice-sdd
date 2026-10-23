@@ -23,7 +23,7 @@ protected:
 }  // namespace
 
 
-TEST_F(LobbyTest, ListsTheRacesInTheRepository) {
+TEST_F(LobbyTest, ListsTheFixedTestRaces) {
     RaceCatalogueDTO catalogue = lobby.list_races();
 
     EXPECT_EQ(catalogue.size, 6);
