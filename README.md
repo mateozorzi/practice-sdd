@@ -123,6 +123,10 @@ Máximo de 4 mejoras por carrera, persistentes para toda la partida.
     -   Nitro: más velocidad máxima y aceleración por unos segundos.
     -   Reparación: recupera vida, sin superar la vida máxima.
     -   Escudo: los choques no restan vida por unos segundos.
+-   Sobre un puente, un power-up está arriba o abajo, según el camino
+    que pasa por ahí, y solo lo agarra un auto que va por ese mismo
+    nivel. Los de arriba se dibujan encima del puente. Un power-up
+    nunca queda cruzando el borde de un puente.
 -   Un power-up recogido desaparece para todos y vuelve a aparecer en el
     mismo lugar, con un tipo al azar, después de un tiempo.
 -   Al recoger un power-up suena el mismo sonido que las mejoras.
