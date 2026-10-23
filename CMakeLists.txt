@@ -204,6 +204,25 @@ if(NFS_EDITOR)
 endif()
 
 
+# Street grids generator
+# ----------------------
+# Builds server/world/streets/streets_<city>.json from the B_STREETS masks. It runs once, outside
+# the game (`make streets`), so it is not part of `all` and the server does not depend on Qt.
+
+if(NFS_EDITOR OR NFS_CLIENT)
+    find_package(Qt6 COMPONENTS Gui REQUIRED)
+
+    add_executable(nfs_streets_generator EXCLUDE_FROM_ALL
+        server/tools/streets/generate_streets_grid.cpp
+        server/tools/streets/streets_grid_generator.cpp
+    )
+
+    set_project_warnings(nfs_streets_generator ${NFS_MAKE_WARNINGS_AS_ERRORS} FALSE)
+
+    target_link_libraries(nfs_streets_generator nlohmann_json::nlohmann_json Qt6::Gui)
+endif()
+
+
 # Testing section
 # ---------------
 
@@ -280,6 +299,7 @@ if(NFS_TESTS)
         tests/client/test_editor_windows.cpp
         tests/client/qt_test_utils.cpp
         tests/client/test_sdl_client.cpp
+        tests/client/test_streets_generator.cpp
         client/animations.cpp
         client/camera.cpp
         client/client_protocol.cpp
@@ -307,6 +327,7 @@ if(NFS_TESTS)
         client/Lobby/waitingroom.cpp
         client/Lobby/images.qrc
         server/server_protocol.cpp
+        server/tools/streets/streets_grid_generator.cpp
         editor/EditorMapas/checkpoint.cpp
         editor/EditorMapas/coordinates.cpp
         editor/EditorMapas/creador.cpp

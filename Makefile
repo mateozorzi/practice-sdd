@@ -1,4 +1,4 @@
-.PHONY: all test clean editor client common server build coverage gcovr
+.PHONY: all test clean editor client common server build coverage gcovr streets
 
 COVERAGE_DIR := build
 GCOVR_DIR := build/tools
@@ -31,6 +31,20 @@ coverage: gcovr
 	$(GCOVR) --root . --object-directory $(COVERAGE_DIR) \
 		--filter 'client/' --filter 'server/' --filter 'common/' --filter 'editor/' \
 		--print-summary --html-details $(COVERAGE_DIR)/report/index.html
+
+# Regenera las grillas de calles de server/world/streets/ desde las máscaras de server/tools/streets/
+STREETS_CELL_SIZE := 16
+STREETS_CITIES := liberty_city san_andreas vice_city
+
+streets:
+	mkdir -p build/
+	cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug $(EXTRA_GENERATE)
+	cmake --build build/ --target nfs_streets_generator
+	mkdir -p server/world/streets
+	for city in $(STREETS_CITIES); do \
+		./build/nfs_streets_generator server/tools/streets/masks/streets_mask_$$city.png \
+			server/world/streets/streets_$$city.json $(STREETS_CELL_SIZE) || exit 1; \
+	done
 
 all: clean run-tests
 
