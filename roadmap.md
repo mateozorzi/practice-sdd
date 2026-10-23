@@ -159,8 +159,100 @@ sonido: fake que cuenta las llamadas a play_upgrade_sound
 | 4.11 | Dado un snapshot con un power-up de tipo desconocido (ej. 99), cuando se renderiza, entonces se ignora sin crashear |
 | 4.12 | Los sprites `nitro.png`, `life.png`, `shield.png` se instalan en `/var/nfs` |
 
+### Hito 5 — Power-ups sobre la calle
+Modifica el criterio 2.3: el power-up ya no va en (P + Q) / 2 sino en el punto medio del **camino por la calle**
+entre los dos checkpoints del tramo. El camino respeta los puentes igual que los autos: si entra a un puente por
+arriba lo cruza por arriba y no puede bajar por la baranda; si pasa por debajo, sigue por debajo y no puede doblar
+hacia la calle de arriba. Para eso el BFS recorre estados `(celda, capa)` y reproduce la máquina de estados de
+`CollisionListener` con los sensores `ON_BRIDGE` / `UNDER_BRIDGE` de la ciudad. Este hito no cambia quién agarra un
+power-up, ni el protocolo, ni el cliente.
+
+Archivos esperados: `server/streets_grid.*` (nuevo: carga de la grilla y camino), `server/power_up.*`,
+`server/race_loader.*` / config loader (ruta de la grilla en `world_config.yaml`), `server/tools/streets/`
+(copia de las máscaras `B_STREETS` y el generador de la grilla), `server/world/streets/streets_<ciudad>.json`
+(generado y versionado; se instala en `/var/nfs/world/streets/` con el resto de `server/world/`),
+`tests/test_streets_grid.cpp`, `tests/test_power_up.cpp`.
+
+Las máscaras se **copian** de `editor/EditorMapas/imagenes/` a `server/tools/streets/` (sin cambios en `editor/`).
+El generador corre una vez, fuera del juego, y no forma parte del servidor: el servidor solo lee el JSON. El stack es
+cerrado, así que el generador se escribe con lo que ya hay (por ejemplo C++ con `QImage` de Qt); el `design.md` lo
+define.
+
+**Background** (los tests arman una grilla y un cruce propios; no leen `server/world/streets/`, salvo 5.11)
+
+Las carreras de 5.11 y 6.15 son una copia fija en `tests/data/races/`: las carreras que se creen o editen después
+(el editor escribe en `/var/nfs/races`) no cambian el resultado de los tests.
+```yaml
+grilla_de_test:            # armada en el test, celdas de 10 px
+  calle_recta: horizontal, de (0, 0) a (200, 0)
+  calle_en_L: de (0, 0) a (200, 0) y de (200, 0) a (200, 200); (P + Q) / 2 = (100, 100) queda fuera de la calle
+cruce_de_test:             # rectángulo de puente en (100..160, 100..160)
+  camino_de_arriba: horizontal, con sensor ON_BRIDGE (40..220, 110..150) y barandas en y = 100 y y = 160
+  camino_de_abajo: vertical, con sensor UNDER_BRIDGE (110..150, 40..220)
+  rodeo: una calle que une el camino de arriba con el de abajo por fuera del cruce
+power_ups: mismos valores que el Hito 2
+rng_falso: el del Hito 2
+```
+
+| #    | Given / When / Then |
+|------|---------------------|
+| 5.1  | Dado un JSON temporal de grilla escrito por el test, cuando se carga, entonces la grilla tiene el tamaño de celda y las celdas transitables del archivo |
+| 5.2  | Dado un JSON de grilla mal formado o con dimensiones que no coinciden con los datos, cuando se carga, entonces falla con un error claro |
+| 5.3  | Dado un `PowerUpManager` sin grilla de calles, cuando se cargan los power-ups, entonces el primero sigue en (P + Q) / 2 (el criterio 2.3 y los tests del Hito 2 no cambian) |
+| 5.4  | Dada la calle recta y P, Q sobre ella, cuando se cargan los power-ups, entonces el power-up está en (P + Q) / 2 |
+| 5.5  | Dada la calle en L con P = (0, 0) y Q = (200, 200), cuando se cargan los power-ups, entonces el power-up está sobre la calle, en el punto que deja la mitad del largo del camino de cada lado: (200, 0) |
+| 5.6  | Dado el cruce y P, Q a los dos lados del camino de arriba, cuando se calcula el camino, entonces sigue derecho por arriba, nunca entra al camino de abajo y su capa dentro del rectángulo del puente es `ON_BRIDGE` |
+| 5.7  | Dado el cruce y P, Q a los dos lados del camino de abajo, cuando se calcula el camino, entonces atraviesa las barandas por debajo y su capa dentro del rectángulo del puente es `UNDER_BRIDGE` |
+| 5.8  | Dado el cruce con P en el camino de arriba y Q en el de abajo, cuando se calcula el camino, entonces no dobla dentro del cruce: va por el rodeo |
+| 5.9  | Dado P en una celda que no es calle, cuando se calcula el camino, entonces arranca desde la celda de calle más cercana a P |
+| 5.10 | Dados P y Q sin camino entre ellos, cuando se cargan los power-ups, entonces el power-up queda en (P + Q) / 2 y se informa el tramo |
+| 5.11 | Dadas las carreras fijas de `tests/data/races/` (copia de las de `server/races/` al crear el hito) y las grillas de `server/world/streets/`, cuando se cargan los power-ups, entonces todos quedan sobre una celda de calle y ningún tramo cae en el caso 5.10 |
+| 5.12 | Dada una carrera nueva como las que crea el editor (checkpoints arbitrarios, incluso con tramos sin camino), cuando se carga, entonces no falla: cada power-up queda en el camino o, si no lo hay, en (P + Q) / 2 |
+| 5.13 | Los archivos `streets_<ciudad>.json` de las 3 ciudades se instalan en `/var/nfs/world/streets/` y `world_config.yaml` apunta a ellos |
+
+### Hito 6 — Power-ups por capas en los puentes
+Un power-up que queda dentro del rectángulo de un puente toma la capa del camino del Hito 5 en ese punto. Si la carrera
+pasa por arriba, el power-up está arriba; si pasa por debajo, está abajo. En un puente sobre el agua solo hay camino
+por arriba, así que queda arriba. Nunca queda cruzando el borde del puente. Lo agarra solo un auto de su misma capa.
+Deja sin efecto la exclusión del Hito 2 "power-ups sobre puentes: sin lógica por capa".
+
+Archivos esperados: `server/power_up.*`, `server/collision_listener.*`, `common/power_up_dto.*`,
+`server/server_protocol.*`, `client/client_protocol.*`, `client/sdl_manager.*`, `client/power_up_view.*`,
+`tests/test_power_up.cpp`, `tests/test_collision_listener.cpp`, `tests/test_common.cpp`,
+`tests/client/test_sdl_client.cpp`.
+
+**Background**
+```yaml
+cruce_de_test: el del Hito 5 (rectángulo de puente en (100..160, 100..160))
+puente_sobre_agua: rectángulo de puente con sensor ON_BRIDGE y sin sensor UNDER_BRIDGE
+power_up: medio lado 15 px (POWER_UP_HALF_SIZE_PIXELS)
+power_ups: mismos valores que el Hito 2
+autos: dos autos de test vivos (ids 1 y 2), salud 100; la capa la fija el escenario
+capas_del_power_up: ON_GROUND (fuera de todo puente), ON_BRIDGE, UNDER_BRIDGE
+cliente: snapshot armado en el test con un rectángulo de puente en (100..160, 100..160), SDL offscreen
+dto_de_ejemplo: power-up {id 1, Nitro, (130, 130), activo, ON_BRIDGE}
+```
+
+| #    | Given / When / Then |
+|------|---------------------|
+| 6.1  | Dado el cruce y un tramo por el camino de arriba cuyo punto medio cae dentro del puente, cuando se cargan los power-ups, entonces el power-up es `ON_BRIDGE` |
+| 6.2  | Dado el cruce y un tramo por el camino de abajo cuyo punto medio cae dentro del puente, cuando se cargan los power-ups, entonces el power-up es `UNDER_BRIDGE` |
+| 6.3  | Dado el puente sobre el agua y un tramo que lo cruza, cuando se cargan los power-ups, entonces el power-up es `ON_BRIDGE` |
+| 6.4  | Dado un tramo cuyo punto medio queda fuera de todo puente, cuando se cargan los power-ups, entonces el power-up es `ON_GROUND` |
+| 6.5  | Dado un tramo cuyo punto medio deja el cuadrado del power-up cruzando el borde del puente, cuando se cargan los power-ups, entonces se corre por el camino hasta la posición más cercana donde queda entero dentro o entero fuera, y su capa es la de esa posición |
+| 6.6  | Dado un power-up `ON_BRIDGE`, cuando entra al sensor un auto `UNDER_BRIDGE`, entonces el power-up sigue activo y el auto no tiene efectos |
+| 6.7  | Dado un power-up `ON_BRIDGE`, cuando entra al sensor un auto `ON_BRIDGE`, entonces lo recoge |
+| 6.8  | Dado un power-up `UNDER_BRIDGE`, cuando entra al sensor un auto `ON_BRIDGE`, entonces sigue activo; cuando entra un auto `UNDER_BRIDGE`, entonces lo recoge |
+| 6.9  | Dado un power-up `ON_GROUND`, cuando entra al sensor un auto con cualquier capa (por ejemplo `ON_BRIDGE` en la rampa), entonces lo recoge |
+| 6.10 | Dado el cruce con sensores reales y un power-up `ON_BRIDGE`, cuando el auto 1 pasa por debajo con pasos de física y el auto 2 después por arriba, entonces lo recoge el auto 2 |
+| 6.11 | Dado un power-up `UNDER_BRIDGE` recogido, cuando reaparece, entonces conserva su posición y su capa |
+| 6.12 | Dado el DTO de ejemplo, cuando se serializa y deserializa, entonces es idéntico, capa incluida |
+| 6.13 | Dado un power-up `ON_BRIDGE` en la carrera, cuando el loop avanza un tick, entonces el snapshot lo trae con capa `ON_BRIDGE` |
+| 6.14 | Dado un snapshot con un power-up `ON_BRIDGE` y otro `UNDER_BRIDGE` dentro del puente, cuando se renderiza, entonces el `ON_BRIDGE` se dibuja después del puente y el `UNDER_BRIDGE` antes |
+| 6.15 | Dadas las carreras fijas de `tests/data/races/`, cuando se cargan los power-ups, entonces ninguno cruza el borde de un puente y cada uno dentro de un puente tiene la capa del camino en ese punto |
+
 ### Criterios globales (Definition of Done de la feature)
-- [ ] Todos los tests de los 4 hitos pasan; ningún test existente se rompe.
+- [ ] Todos los tests de los 6 hitos pasan; ningún test existente se rompe.
 - [ ] Ningún test de power-ups depende de los valores de `server/config/*.yaml`.
 - [ ] Cobertura (`make test`) de los archivos nuevos/modificados del servidor ≥ la actual.
 - [ ] Sin cambios en `editor/`.

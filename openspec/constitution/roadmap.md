@@ -19,6 +19,8 @@ Cada hito es un change de OpenSpec (`/opsx:explore` → `/opsx:propose` → `/op
 | 2 | Power-ups en el mundo físico (sensores Box2D, spawn, reaparición) | `server/power_up.*`, `collision_listener` | 2.1 – 2.13 | Completo |
 | 3 | Game loop y protocolo (DTOs, snapshots) | `server/game_loop.*`, protocolos, `common/` | 3.1 – 3.8 | Completo |
 | 4 | Render y sonido en el cliente (sprites, HUD, sonido) | `client/sdl_manager.*`, `client/game.*` | 4.1 – 4.12 | Completo |
+| 5 | Power-ups sobre la calle (grilla de calles y camino por capas entre checkpoints) | `server/power_up.*`, `server/streets_grid.*` (nuevo), `server/tools/streets/`, `server/world/streets/` | 5.1 – 5.13 | Pendiente |
+| 6 | Power-ups por capas en los puentes (recolección por capa, borde del puente, render) | `server/power_up.*`, `collision_listener`, `common/power_up_dto.*`, protocolos, `client/sdl_manager.*` | 6.1 – 6.15 | Pendiente |
 
 ## Gate para avanzar de hito
 Ver el principio III de [`mission.md`](mission.md):
@@ -28,7 +30,7 @@ Ver el principio III de [`mission.md`](mission.md):
 - (d) `/opsx:verify` sin CRITICAL.
 
 ## Definition of Done de la feature
-- [ ] Todos los tests de los 4 hitos pasan; ningún test existente se rompe.
+- [ ] Todos los tests de los 6 hitos pasan; ningún test existente se rompe.
 - [ ] Ningún test de power-ups depende de los valores de `server/config/*.yaml`.
 - [ ] La cobertura (`make test`) de los archivos nuevos o modificados del servidor es ≥ la actual.
 - [ ] Sin cambios en `editor/`.
@@ -36,4 +38,7 @@ Ver el principio III de [`mission.md`](mission.md):
 - [ ] Prueba manual.
 
 ## Aclaraciones
+- **Hitos 5 y 6:** surgieron durante el Hito 4 (ver el follow-up de
+  `openspec/changes/archive/2026-10-23-power-ups-render-y-sonido/tasks.md`). El 5 modifica el criterio 2.3 (ubicación) y
+  el 6 deja sin efecto la exclusión "power-ups sobre puentes sin lógica por capa" del Hito 2.
 - **Prueba manual del DoD:**: Usuario prueba una carrera a medida que se completan hitos, que tengan algo que probar.

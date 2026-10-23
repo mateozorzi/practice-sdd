@@ -54,8 +54,13 @@ power_ups:
 ```
 
 ### Reglas
-- [ ] **Ubicación:** los spawn points se calculan en el punto medio entre checkpoints consecutivos,
-      no se cargan desde el mapa. Solo hay uno cada dos checkpoints (tramos 1→2, 3→4, …).
+- [ ] **Ubicación:** los spawn points se calculan entre checkpoints consecutivos, no se cargan desde el mapa.
+      Solo hay uno cada dos checkpoints (tramos 1→2, 3→4, …). Van en el punto medio del camino por la calle entre
+      los dos checkpoints (grilla generada desde las máscaras `B_STREETS`). El camino cruza los puentes como un auto:
+      por arriba o por debajo, sin doblar dentro de un cruce (Hito 5).
+- [ ] **Capas:** un power-up dentro de un puente toma la capa del camino en ese punto (arriba o abajo) y solo lo
+      recoge un auto de esa capa; fuera de los puentes lo recoge cualquiera. Nunca queda cruzando el borde de un
+      puente, y el cliente lo dibuja encima o debajo del puente según su capa (Hito 6).
 - [ ] **Tipo aleatorio:** el tipo de cada power-up se sortea de forma uniforme entre Nitro, Reparación
       y Escudo, cada vez que aparece (al inicio de la carrera y en cada reaparición).
       El generador aleatorio es inyectable para que los tests sean deterministas.
