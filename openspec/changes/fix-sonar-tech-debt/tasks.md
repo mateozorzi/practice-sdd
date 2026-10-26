@@ -7,8 +7,8 @@
 
 ## 2. cpp:S5404 – `wait()` con predicado en `common/queue.h`
 
-- [ ] 2.1 Reemplazar los dos `while` + `wait()` de la plantilla `Queue<T>` por la sobrecarga con predicado según D1 (push sin `closed`; pop con `!q.empty() || closed` y `throw ClosedQueue()` si queda vacía); verificar que pasan `QueueTest.*` en `tests/test_common.cpp`
-- [ ] 2.2 Aplicar el mismo cambio a la especialización `Queue<void*>`; verificar `QueueTest.PointerSpecializationBehavesTheSame` y `make run-tests` en verde, y commitear
+- [x] 2.1 Reemplazar los dos `while` + `wait()` de la plantilla `Queue<T>` por la sobrecarga con predicado según D1 (push sin `closed`; pop con `!q.empty() || closed` y `throw ClosedQueue()` si queda vacía); verificar que pasan `QueueTest.*` en `tests/test_common.cpp`
+- [x] 2.2 Aplicar el mismo cambio a la especialización `Queue<void*>`; verificar `QueueTest.PointerSpecializationBehavesTheSame` y `make run-tests` en verde, y commitear
 
 ## 3. cpp:S1048 – destructores que no propagan excepciones
 

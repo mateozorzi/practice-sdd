@@ -86,9 +86,7 @@ public:
             throw ClosedQueue();
         }
 
-        while (q.size() == this->max_size) {
-            is_not_full.wait(lck);
-        }
+        is_not_full.wait(lck, [this] { return q.size() < this->max_size; });
 
         if (q.empty()) {
             is_not_empty.notify_all();
@@ -101,11 +99,10 @@ public:
     T pop() {
         std::unique_lock<std::mutex> lck(mtx);
 
-        while (q.empty()) {
-            if (closed) {
-                throw ClosedQueue();
-            }
-            is_not_empty.wait(lck);
+        is_not_empty.wait(lck, [this] { return !q.empty() || closed; });
+
+        if (q.empty()) {
+            throw ClosedQueue();
         }
 
         if (q.size() == this->max_size) {
@@ -196,9 +193,7 @@ public:
             throw ClosedQueue();
         }
 
-        while (q.size() == this->max_size) {
-            is_not_full.wait(lck);
-        }
+        is_not_full.wait(lck, [this] { return q.size() < this->max_size; });
 
         if (q.empty()) {
             is_not_empty.notify_all();
@@ -210,11 +205,10 @@ public:
     void* pop() {
         std::unique_lock<std::mutex> lck(mtx);
 
-        while (q.empty()) {
-            if (closed) {
-                throw ClosedQueue();
-            }
-            is_not_empty.wait(lck);
+        is_not_empty.wait(lck, [this] { return !q.empty() || closed; });
+
+        if (q.empty()) {
+            throw ClosedQueue();
         }
 
         if (q.size() == this->max_size) {
