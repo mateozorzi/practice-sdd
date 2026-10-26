@@ -35,17 +35,14 @@ void JoinLobby::fill_table(const LobbyCatalogueDTO& lobbies) {
     for (int i = 0; i < lobbies.size; ++i) {
         const auto& lobby = lobbies.lobbies[i];
 
-        QTableWidgetItem* items[] = {new QTableWidgetItem(QString::number(lobby.lobby_id)),
-                                     new QTableWidgetItem(QString::fromStdString(lobby.lobby_name)),
-                                     new QTableWidgetItem(QString::number(lobby.active_players)),
-                                     new QTableWidgetItem(QString::number(lobby.max_players))};
-
-        for (auto* item: items) {
-            item->setTextAlignment(Qt::AlignCenter);
-        }
+        const QString texts[] = {
+                QString::number(lobby.lobby_id), QString::fromStdString(lobby.lobby_name),
+                QString::number(lobby.active_players), QString::number(lobby.max_players)};
 
         for (int col = 0; col < 4; ++col) {
-            ui->lobbytable->setItem(i, col, items[col]);
+            auto* item = new QTableWidgetItem(texts[col]);
+            item->setTextAlignment(Qt::AlignCenter);
+            ui->lobbytable->setItem(i, col, item);
         }
 
         // Botón de Join

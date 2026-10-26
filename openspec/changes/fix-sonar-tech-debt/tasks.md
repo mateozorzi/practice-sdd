@@ -29,7 +29,7 @@
 
 ## 6. cpp:S5502 – un `new` por sentencia en `joinlobby.cpp`
 
-- [ ] 6.1 Reemplazar el arreglo de 4 `new QTableWidgetItem` en `client/Lobby/joinlobby.cpp` por un loop que crea cada ítem en su propia sentencia según D6; verificar `tests/client/test_lobby_windows.cpp` y `tests/client/test_menus.cpp` (tabla `lobbytable` y botón Join) en verde y commitear
+- [x] 6.1 Reemplazar el arreglo de 4 `new QTableWidgetItem` en `client/Lobby/joinlobby.cpp` por un loop que crea cada ítem en su propia sentencia según D6; verificar `tests/client/test_lobby_windows.cpp` y `tests/client/test_menus.cpp` (tabla `lobbytable` y botón Join) en verde y commitear
 
 ## 7. Verificación integral
 
