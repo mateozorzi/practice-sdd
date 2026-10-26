@@ -18,7 +18,7 @@
 
 ## 4. cpp:S5018 y cpp:S998 – `noexcept` en los move y renombrar `Thread::main()`
 
-- [ ] 4.1 Agregar `noexcept` a la declaración y la definición de los move constructor y move assignment de `Socket` (`common/socket.{h,cpp}`) y `Resolver` (`common/resolver.{h,cpp}`) según D3; verificar `SocketTest.*` en verde y commitear
+- [x] 4.1 Agregar `noexcept` a la declaración y la definición de los move constructor y move assignment de `Socket` (`common/socket.{h,cpp}`) y `Resolver` (`common/resolver.{h,cpp}`) según D3; verificar `SocketTest.*` en verde y commitear
 - [ ] 4.2 Renombrar `Thread::main()` a `thread_main()`, moverlo a `private` y actualizar `start()` según D4; verificar que `grep -rn "Thread::main\|::main()" common server client` no encuentra nada, `ThreadTest.*` y `make run-tests` en verde, y commitear
 
 ## 5. cpp:S5020 – `<random>` en el cliente

@@ -83,7 +83,7 @@ Resolver::Resolver(const char* hostname, const char* servname, bool is_passive) 
     this->_next = this->result;
 }
 
-Resolver::Resolver(Resolver&& other) {
+Resolver::Resolver(Resolver&& other) noexcept {
     /* Nos copiamos del otro resolver... */
     this->result = other.result;
     this->_next = other._next;
@@ -102,7 +102,7 @@ Resolver::Resolver(Resolver&& other) {
     other._next = nullptr;
 }
 
-Resolver& Resolver::operator=(Resolver&& other) {
+Resolver& Resolver::operator=(Resolver&& other) noexcept {
     /* Si el usuario hace algo como tratar de moverse
      * a si mismo (`resolver = resolver;`) simplemente no hacemos
      * nada.

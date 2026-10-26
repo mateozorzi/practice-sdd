@@ -55,8 +55,8 @@ public:
     /*
      * Hacemos que el `Resolver` sea movible.
      * */
-    Resolver(Resolver&&);
-    Resolver& operator=(Resolver&&);
+    Resolver(Resolver&&) noexcept;
+    Resolver& operator=(Resolver&&) noexcept;
 
     /* Retorna si hay o no una dirección siguiente para testear.
      * Si la hay, se deberá llamar a `Resolver::next()` para obtenerla.

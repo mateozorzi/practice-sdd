@@ -98,8 +98,8 @@ public:
     /*
      * Hacemos que el `Socket` sea movible.
      * */
-    Socket(Socket&&);
-    Socket& operator=(Socket&&);
+    Socket(Socket&&) noexcept;
+    Socket& operator=(Socket&&) noexcept;
 
     /* `Socket::sendsome` lee hasta `sz` bytes del buffer y los envía. La función
      * puede enviar menos bytes sin embargo.

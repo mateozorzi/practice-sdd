@@ -195,7 +195,7 @@ Socket::Socket(const char* servname) {
                    (servname ? servname : ""));
 }
 
-Socket::Socket(Socket&& other) {
+Socket::Socket(Socket&& other) noexcept {
     /* Nos copiamos del otro socket... */
     this->skt = other.skt;
     this->closed = other.closed;
@@ -217,7 +217,7 @@ Socket::Socket(Socket&& other) {
     other.stream_status = STREAM_BOTH_CLOSED;
 }
 
-Socket& Socket::operator=(Socket&& other) {
+Socket& Socket::operator=(Socket&& other) noexcept {
     /* Si el usuario hace algo como tratar de moverse
      * a si mismo (`skt = skt;`) simplemente no hacemos
      * nada.
