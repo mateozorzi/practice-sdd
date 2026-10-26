@@ -30,7 +30,9 @@ coverage: gcovr
 	mkdir -p $(COVERAGE_DIR)/report
 	$(GCOVR) --root . --object-directory $(COVERAGE_DIR) \
 		--filter 'client/' --filter 'server/' --filter 'common/' --filter 'editor/' \
-		--print-summary --html-details $(COVERAGE_DIR)/report/index.html
+		--exclude-throw-branches --exclude-unreachable-branches \
+		--print-summary --html-details $(COVERAGE_DIR)/report/index.html \
+		--sonarqube $(COVERAGE_DIR)/coverage.xml
 
 # Regenera las grillas de calles de server/world/streets/ desde las máscaras de server/tools/streets/
 STREETS_CELL_SIZE := 16
