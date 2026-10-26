@@ -11,6 +11,7 @@
 #include <thread>
 
 #include <SDL2/SDL.h>
+#include <SDL_mixer.h>
 #include <gtest/gtest.h>
 
 #include "../../client/animations.h"
@@ -323,6 +324,13 @@ TEST_F(SdlTest, PlaysTheSounds) {
     sdl.play_upgrade_sound();
     sdl.play_finished_race_sound();
     sdl.stop_background_music();
+}
+
+// Music and effects play at 30 % of the mixer volume, so the presentation is not too loud
+TEST_F(SdlTest, GameAudioIsTurnedDown) {
+    SDLManager sdl;
+
+    EXPECT_EQ(Mix_MasterVolume(-1), MIX_MAX_VOLUME * 30 / 100);
 }
 
 

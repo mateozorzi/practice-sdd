@@ -259,7 +259,7 @@ void MenuInterface::set_music(QObject* parent) {
             QUrl::fromLocalFile("/var/nfs/assets/music/Need for Speed II SE Soundtrack - Main Menu "
                                 "and Showcase Theme I - RonTaboga.mp3"));
 
-    audioOutput->setVolume(MUSIC_VOLUME);  // Volumen entre 0 y 100
+    audioOutput->setVolume(MUSIC_VOLUME);  // Volumen entre 0 y 1
 
     musicPlayer->setLoops(QMediaPlayer::Infinite);
     musicPlayer->play();

@@ -174,6 +174,9 @@ constexpr const char* SHOP_SECONDS_TEXT = " seconds";
 
 
 // Music Volume
-constexpr float MUSIC_VOLUME = 0.15f;  // Volume between 0 and 100
+constexpr float MUSIC_VOLUME = 0.05f;  // Volume of the menus music, between 0 and 1
+
+// Percentage of the mixer volume for all the game music and effects
+constexpr int GAME_VOLUME_PERCENT = 30;
 
 #endif

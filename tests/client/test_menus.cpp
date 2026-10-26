@@ -1,3 +1,4 @@
+#include <QAudioOutput>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
@@ -316,6 +317,17 @@ TEST_F(MenuInterfaceTest, JoinsAGameAfterADenial) {
     EXPECT_EQ(modals.messages, QStringList{"Denied join to lobby, refresh and try again."});
     server_thread.join();
     EXPECT_EQ(join_requests, (std::vector<uint32_t>{9, 9}));
+}
+
+TEST_F(MenuInterfaceTest, MenuMusicIsQuiet) {
+    MenuInterface menu(client, menu_argc, menu_argv);
+    QObject window;
+
+    menu.set_music(&window);
+
+    const auto* output = window.findChild<QAudioOutput*>();
+    ASSERT_NE(output, nullptr);
+    EXPECT_FLOAT_EQ(output->volume(), 0.05f);
 }
 
 TEST_F(MenuInterfaceTest, ClosingTheMenusGoesBack) {

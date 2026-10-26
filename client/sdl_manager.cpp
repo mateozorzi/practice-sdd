@@ -30,6 +30,7 @@ SDLManager::SDLManager():
         shop(renderer, mixer, resources, sounds, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH),
         leaderboard_info(renderer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Mix_MasterVolume(MIX_MAX_VOLUME * GAME_VOLUME_PERCENT / 100);
 
     std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<size_t> dis(0, WAITING_ROOMS.size() - 1);
