@@ -1,6 +1,7 @@
 #ifndef ANIMATIONS_H
 #define ANIMATIONS_H
 #include <optional>
+#include <random>
 #include <unordered_map>
 
 #include <SDL2pp/SDL2pp.hh>
@@ -33,6 +34,7 @@ private:
     };
 
     std::optional<CameraShakeAnimation> camera_shake;
+    std::mt19937 rng{std::random_device{}()};
 
 public:
     Animations(SDL2pp::Renderer& renderer, Camera& camera, ResourceManager& resources);

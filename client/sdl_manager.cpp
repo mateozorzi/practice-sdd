@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -30,8 +31,9 @@ SDLManager::SDLManager():
         leaderboard_info(renderer, resources, SCREEN_WIDTH, SCREEN_HEIGHT, FONT_PATH) {
     renderer.SetLogicalSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    int idx = std::rand() % WAITING_ROOMS.size();
-    const std::string& selected = WAITING_ROOMS[idx];
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<size_t> dis(0, WAITING_ROOMS.size() - 1);
+    const std::string& selected = WAITING_ROOMS[dis(gen)];
 
     waiting_room_background = &resources.get_texture(selected);
 }

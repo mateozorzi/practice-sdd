@@ -23,9 +23,9 @@
 
 ## 5. cpp:S5020 – `<random>` en el cliente
 
-- [ ] 5.1 Agregar `AnimationsTest.CameraShakeStaysWithinItsMagnitude` en `tests/client/test_sdl_client.cpp` según D5 (sin temblor activo devuelve `(0, 0)`; con temblor activo, en muchas muestras, `dx` y `dy` quedan en `[-3, 3]`); verificar que **pasa con el código actual** (`std::rand()`), porque fija el comportamiento existente
-- [ ] 5.2 Reemplazar `std::rand()` en `Animations::get_camera_shake()` por un miembro `std::mt19937` y `std::uniform_int_distribution` según D5; verificar que `AnimationsTest.CameraShakeStaysWithinItsMagnitude` sigue en verde
-- [ ] 5.3 Reemplazar `std::rand()` en el constructor de `SDLManager` (elección de la sala de espera) según D5; verificar que `grep -rn "std::rand\|srand" client server common editor` no encuentra nada, los tests de `SDLManager` en `tests/client/test_sdl_client.cpp` y `make run-tests` en verde, y commitear
+- [x] 5.1 Agregar `AnimationsTest.CameraShakeStaysWithinItsMagnitude` en `tests/client/test_sdl_client.cpp` según D5 (sin temblor activo devuelve `(0, 0)`; con temblor activo, en muchas muestras, `dx` y `dy` quedan en `[-3, 3]`); verificar que **pasa con el código actual** (`std::rand()`), porque fija el comportamiento existente
+- [x] 5.2 Reemplazar `std::rand()` en `Animations::get_camera_shake()` por un miembro `std::mt19937` y `std::uniform_int_distribution` según D5; verificar que `AnimationsTest.CameraShakeStaysWithinItsMagnitude` sigue en verde
+- [x] 5.3 Reemplazar `std::rand()` en el constructor de `SDLManager` (elección de la sala de espera) según D5; verificar que `grep -rn "std::rand\|srand" client server common editor` no encuentra nada, los tests de `SDLManager` en `tests/client/test_sdl_client.cpp` y `make run-tests` en verde, y commitear
 
 ## 6. cpp:S5502 – un `new` por sentencia en `joinlobby.cpp`
 

@@ -90,8 +90,9 @@ SDL2pp::Point Animations::get_camera_shake() {
     }
 
     int magnitude = 3;
-    int dx = (std::rand() % (2 * magnitude + 1)) - magnitude;
-    int dy = (std::rand() % (2 * magnitude + 1)) - magnitude;
+    std::uniform_int_distribution<int> offset(-magnitude, magnitude);
+    int dx = offset(rng);
+    int dy = offset(rng);
 
     return SDL2pp::Point(dx, dy);
 }

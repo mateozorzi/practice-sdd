@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -12,6 +13,7 @@
 #include <SDL2/SDL.h>
 #include <gtest/gtest.h>
 
+#include "../../client/animations.h"
 #include "../../client/camera.h"
 #include "../../client/client_constants.h"
 #include "../../client/client_protocol.h"
@@ -169,6 +171,33 @@ TEST(CameraTest, KnowsWhatIsOnScreen) {
 
     EXPECT_TRUE(camera.on_screen(SDL2pp::Rect(1000, 1000, 10, 10)));
     EXPECT_FALSE(camera.on_screen(SDL2pp::Rect(3000, 3000, 10, 10)));
+}
+
+
+// Animations
+
+TEST(AnimationsTest, CameraShakeStaysWithinItsMagnitude) {
+    setenv("SDL_VIDEODRIVER", "offscreen", 1);
+    SDL2pp::SDL sdl(SDL_INIT_VIDEO);
+    SDL2pp::Window window("test", 0, 0, 100, 100, 0);
+    SDL2pp::Renderer renderer(window, -1, SDL_RENDERER_SOFTWARE);
+    Camera camera(500, 300, 5000, 5000);
+    ResourceManager resources(renderer);
+    Animations animations(renderer, camera, resources);
+
+    EXPECT_EQ(animations.get_camera_shake(), SDL2pp::Point(0, 0));
+
+    animations.start_camera_shake(0);
+    std::set<int> offsets;
+    for (int sample = 0; sample < 500; ++sample) {
+        const SDL2pp::Point shake = animations.get_camera_shake();
+        EXPECT_GE(shake.x, -3);
+        EXPECT_LE(shake.x, 3);
+        EXPECT_GE(shake.y, -3);
+        EXPECT_LE(shake.y, 3);
+        offsets.insert(shake.x);
+    }
+    EXPECT_GT(offsets.size(), 1u);
 }
 
 
