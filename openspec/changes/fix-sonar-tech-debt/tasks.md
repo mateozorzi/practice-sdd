@@ -34,7 +34,7 @@
 ## 7. Verificación integral
 
 - [x] 7.1 Correr `make run-tests` en verde sin regresiones respecto de la línea base de 1.1, y los hooks (formato, cpplint, cppcheck) sin errores
-- [x] 7.2 Correr `make test` y verificar que se generan `build/coverage.xml` y `build/report/index.html`, con cobertura total no menor que la del análisis post-SDD (90,2 % en Sonar; comparar el resumen de gcovr antes y después)
+- [ ] 7.2 Correr `make test` y verificar que se generan `build/coverage.xml` y `build/report/index.html`, con cobertura total no menor que la del análisis post-SDD (90,2 % en Sonar; comparar el resumen de gcovr antes y después)
 - [x] 7.3 Correr `/opsx:verify` sobre el change y verificar que no hay issues CRITICAL
 
 ## 8. Tercer informe de Sonar y comparación de los tres análisis
@@ -43,7 +43,7 @@
 - [x] 8.2 Generar `doc/sonar/Resumen_SonarCloud_practice-sdd_postRemediacion.pdf` con datos de la API de SonarCloud, con la misma estructura que `Resumen_SonarCloud_practice-sdd_postSDD.pdf` (resumen ejecutivo, métricas, ratings, Quality Gate, issues por regla, recomendaciones); verificar que el PDF abre y que sus números coinciden con la API
 - [x] 8.3 Generar `doc/sonar/Comparacion_SonarCloud_practice-sdd_pre_post_remediacion.pdf` comparando pre-SDD (`8ae6d5d`), post-SDD (`54b529f`) y post-remediación: ratings, Quality Gate, issues por regla, métricas generales y balance de issues arregladas e introducidas en cada tramo; verificar que el PDF abre y que las columnas pre y post-SDD coinciden con los informes existentes
 - [x] 8.4 Verificar con `git status` que los tres PDFs existentes de `doc/sonar/` siguen sin cambios y commitear solo los dos PDFs nuevos
-- [ ] 8.5 Correr `make run-tests` en verde por última vez y chequear el cierre: todos los tests pasan, hooks sin errores, `/opsx:verify` sin CRITICAL y el tercer análisis con 0 issues de las seis reglas
+- [x] 8.5 Correr `make run-tests` en verde por última vez y chequear el cierre: todos los tests pasan, hooks sin errores, `/opsx:verify` sin CRITICAL y el tercer análisis con 0 issues de las seis reglas
 
 ## Workflow follow-up
 
