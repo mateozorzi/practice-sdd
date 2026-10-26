@@ -19,6 +19,18 @@ class Thread: public Runnable {
 private:
     std::thread thread;
 
+    void thread_main() {
+        try {
+            this->run();
+        } catch (const std::exception& err) {
+            std::cerr << "Unexpected exception: " << err.what() << "\n";
+        } catch (...) {
+            std::cerr << "Unexpected exception: <unknown>\n";
+        }
+
+        _is_alive = false;
+    }
+
 
 protected:
     // Subclasses that inherit from Thread will have access to these
@@ -34,22 +46,10 @@ public:
     void start() override {
         _is_alive = true;
         _keep_running = true;
-        thread = std::thread(&Thread::main, this);
+        thread = std::thread(&Thread::thread_main, this);
     }
 
     void join() override { thread.join(); }
-
-    void main() {
-        try {
-            this->run();
-        } catch (const std::exception& err) {
-            std::cerr << "Unexpected exception: " << err.what() << "\n";
-        } catch (...) {
-            std::cerr << "Unexpected exception: <unknown>\n";
-        }
-
-        _is_alive = false;
-    }
 
     // Note: it is up to the subclass to make something meaningful to
     // really stop the thread. The Thread::run() may be blocked and/or
