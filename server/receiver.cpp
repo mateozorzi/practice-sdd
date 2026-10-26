@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "../common/destructor_log.h"
 #include "../common/liberror.h"
 
 
@@ -52,13 +53,12 @@ void Receiver::stop() {
 
 
 Receiver::~Receiver() {
-
-    std::cerr << "[" << RECEIVER << "] Stopping." << std::endl;
+    log_stopping(RECEIVER);
     try {
-
         Receiver::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << RECEIVER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(RECEIVER, e.what());
+    } catch (...) {
+        log_destructor_error(RECEIVER, "<unknown>");
     }
 }

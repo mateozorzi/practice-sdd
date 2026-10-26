@@ -5,6 +5,7 @@
 #include <sstream>
 #include <utility>
 
+#include "../common/destructor_log.h"
 #include "../common/race_catalogue_dto.h"
 
 #include "race_loader.h"
@@ -141,13 +142,12 @@ void Lobby::stop() {
 
 
 Lobby::~Lobby() {
-
-    std::cerr << "[" << LOBBY << "] Stopping." << std::endl;
+    log_stopping(LOBBY);
     try {
-
         Lobby::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << LOBBY << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();
+        log_destructor_error(LOBBY, e.what());
+    } catch (...) {
+        log_destructor_error(LOBBY, "<unknown>");
     }
 }

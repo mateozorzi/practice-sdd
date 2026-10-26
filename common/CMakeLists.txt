@@ -54,6 +54,7 @@ target_sources(nfs_common
     world_snapshot_dto.h
 
     constants.h
+    destructor_log.h
     isocket.h
     phase.h
     queue.h

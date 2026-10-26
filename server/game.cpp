@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "../common/constants.h"
+#include "../common/destructor_log.h"
 #include "../common/race_catalogue_dto.h"
 
 
@@ -64,13 +65,12 @@ void Game::stop() {
 }
 
 Game::~Game() {
-
-    std::cerr << "[" << GAME << "] Stopping." << std::endl;
+    log_stopping(GAME);
     try {
-
         Game::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << GAME << "] " << EXCEPTION_IN_DESTRUCTOR << e.what();
+        log_destructor_error(GAME, e.what());
+    } catch (...) {
+        log_destructor_error(GAME, "<unknown>");
     }
 }

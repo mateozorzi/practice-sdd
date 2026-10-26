@@ -3,6 +3,7 @@
 #include <iostream>
 #include <variant>
 
+#include "../common/destructor_log.h"
 #include "../common/game_update_dto.h"
 #include "../common/liberror.h"
 #include "../common/race_dto.h"
@@ -54,14 +55,11 @@ void Receiver::stop() {
 
 
 Receiver::~Receiver() {
-
     try {
-
         Receiver::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "["
-                  << "RECEIVER"
-                  << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error("RECEIVER", e.what());
+    } catch (...) {
+        log_destructor_error("RECEIVER", "<unknown>");
     }
 }

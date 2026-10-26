@@ -60,12 +60,17 @@ Eso es un cambio de comportamiento (fuera de alcance, ver proposal).
 Sonar marca el `std::cerr << ...` que está **dentro** del `catch`. Un `catch (...)` agregado al mismo `try` no lo
 cubre, porque un handler no atrapa lo que lanza otro handler del mismo `try`. Por eso:
 
-- Header nuevo `common/destructor_log.h` con
-  `inline void log_destructor_error(std::string_view component, std::string_view what) noexcept`, que escribe en
-  `std::cerr` el mismo mensaje que hoy (`"[" << component << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << what`)
-  dentro de su propio `try { ... } catch (...) {}`. Se lista en `common/CMakeLists.txt`, junto a `thread.h`.
+- Header nuevo `common/destructor_log.h` con dos funciones `inline ... noexcept`, cada una con su `std::cerr`
+  dentro de su propio `try { ... } catch (...) {}`:
+  - `log_stopping(std::string_view component)`: el `"[" << component << "] Stopping."` que hoy escriben los 9
+    destructores del servidor antes del `try`.
+  - `log_destructor_error(std::string_view component, std::string_view what)`: el mismo mensaje de error que hoy
+    (`"[" << component << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << what`).
+
+  Se lista en `common/CMakeLists.txt`, junto a `thread.h`.
 - Cada destructor queda:
   ```cpp
+  log_stopping(X_NAME);  // solo los del servidor, como hoy
   try {
       X::stop();  // lo que haga hoy: stop/join/close
   } catch (const std::exception& e) {
@@ -74,8 +79,8 @@ cubre, porque un handler no atrapa lo que lanza otro handler del mismo `try`. Po
       log_destructor_error(X_NAME, "<unknown>");
   }
   ```
-- `~Lobby` también escribe "Stopping." antes del `try`. Ese log pasa adentro del `try` para que una excepción del
-  stream también quede atrapada.
+- El "Stopping." **no** pasa adentro del `try`: si el stream lanzara ahí, se saltearía el `stop()`. Con
+  `log_stopping` `noexcept` el log no puede escapar del destructor y el `stop()` corre siempre.
 - Se mantiene el texto actual de cada destructor. Hoy algunos ponen `": "` antes del `what()` y `Lobby`/`Game` no.
   Se unifica con `": "`, que es lo que usan 8 de los 10 (solo cambia la salida de `std::cerr`, que ningún test lee).
 

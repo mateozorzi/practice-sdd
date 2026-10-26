@@ -1,5 +1,6 @@
 #include "sender.h"
 
+#include "../common/destructor_log.h"
 #include "../common/game_update_dto.h"
 #include "../common/liberror.h"
 
@@ -53,13 +54,12 @@ void Sender::stop() {
 
 
 Sender::~Sender() {
-
-    std::cerr << "[" << SENDER << "] Stopping." << std::endl;
+    log_stopping(SENDER);
     try {
-
         Sender::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << SENDER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(SENDER, e.what());
+    } catch (...) {
+        log_destructor_error(SENDER, "<unknown>");
     }
 }

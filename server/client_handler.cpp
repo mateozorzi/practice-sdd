@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+#include "../common/destructor_log.h"
 #include "../common/liberror.h"
 #include "../common/lobby_catalogue_dto.h"
 #include "../common/race_catalogue_dto.h"
@@ -232,13 +233,12 @@ void ClientHandler::stop() {
 
 
 ClientHandler::~ClientHandler() {
-
-    std::cerr << "[" << CLIENT_HANDLER << "] Stopping." << std::endl;
+    log_stopping(CLIENT_HANDLER);
     try {
-
         ClientHandler::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << CLIENT_HANDLER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(CLIENT_HANDLER, e.what());
+    } catch (...) {
+        log_destructor_error(CLIENT_HANDLER, "<unknown>");
     }
 }

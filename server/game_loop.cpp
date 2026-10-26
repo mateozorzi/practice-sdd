@@ -13,6 +13,7 @@
 #include "../common/checkpoint_dto.h"
 #include "../common/client_event_dto.h"
 #include "../common/constants.h"
+#include "../common/destructor_log.h"
 #include "../common/game_update_dto.h"
 #include "../common/leaderboard_dto.h"
 #include "../common/power_up_dto.h"
@@ -713,13 +714,12 @@ void GameLoop::stop() {
 
 
 GameLoop::~GameLoop() {
-
-    std::cerr << "[" << GAME_LOOP << "] Stopping." << std::endl;
+    log_stopping(GAME_LOOP);
     try {
-
         GameLoop::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << GAME_LOOP << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(GAME_LOOP, e.what());
+    } catch (...) {
+        log_destructor_error(GAME_LOOP, "<unknown>");
     }
 }

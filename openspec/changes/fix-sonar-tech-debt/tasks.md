@@ -12,9 +12,9 @@
 
 ## 3. cpp:S1048 – destructores que no propagan excepciones
 
-- [ ] 3.1 Crear `common/destructor_log.h` con `log_destructor_error(component, what) noexcept` según D2 y agregarlo a `common/CMakeLists.txt`; verificar que `nfs_common` compila sin warnings
-- [ ] 3.2 Pasar los destructores de `server/lobby.cpp` (con el "Stopping." adentro del `try`), `game.cpp`, `client_handler.cpp`, `game_loop.cpp` y `game_monitor.cpp` a `catch (const std::exception&)` + `catch (...)` con el helper; verificar `test_lobby`, `test_game_loop`, `test_game_monitor` y `test_server*` en verde
-- [ ] 3.3 Hacer lo mismo en `server/receiver.cpp`, `sender.cpp`, `acceptor.cpp`, `server.cpp` y `client/receiver.cpp`; verificar que `grep -rn "EXCEPTION_IN_DESTRUCTOR" server client` solo queda en el helper o en sus llamadas, `make run-tests` en verde, y commitear
+- [x] 3.1 Crear `common/destructor_log.h` con `log_stopping(component)` y `log_destructor_error(component, what)`, ambas `noexcept`, según D2 y agregarlo a `common/CMakeLists.txt`; verificar que `nfs_common` compila sin warnings
+- [x] 3.2 Pasar los destructores de `server/lobby.cpp`, `game.cpp`, `client_handler.cpp`, `game_loop.cpp` y `game_monitor.cpp` a `log_stopping` + `catch (const std::exception&)` + `catch (...)` con `log_destructor_error`; verificar `test_lobby`, `test_game_loop`, `test_game_monitor` y `test_server*` en verde
+- [x] 3.3 Hacer lo mismo en `server/receiver.cpp`, `sender.cpp`, `acceptor.cpp`, `server.cpp` y `client/receiver.cpp`; verificar que `grep -rn "EXCEPTION_IN_DESTRUCTOR" server client` solo queda en el helper o en sus llamadas, `make run-tests` en verde, y commitear
 
 ## 4. cpp:S5018 y cpp:S998 – `noexcept` en los move y renombrar `Thread::main()`
 

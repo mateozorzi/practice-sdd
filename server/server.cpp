@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "../common/destructor_log.h"
+
 
 Server::Server(const std::string& port, const ServerConfig& server_config):
         server_config(server_config),
@@ -38,13 +40,12 @@ void Server::stop() {
 
 
 Server::~Server() {
-
-    std::cerr << "[" << SERVER << "] Stopping." << std::endl;
+    log_stopping(SERVER);
     try {
-
         Server::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << SERVER << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(SERVER, e.what());
+    } catch (...) {
+        log_destructor_error(SERVER, "<unknown>");
     }
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <utility>
 
+#include "../common/destructor_log.h"
 #include "../common/liberror.h"
 
 
@@ -74,13 +75,12 @@ void Acceptor::stop() {
 
 
 Acceptor::~Acceptor() {
-
-    std::cerr << "[" << ACCEPTOR << "] Stopping." << std::endl;
+    log_stopping(ACCEPTOR);
     try {
-
         Acceptor::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << ACCEPTOR << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(ACCEPTOR, e.what());
+    } catch (...) {
+        log_destructor_error(ACCEPTOR, "<unknown>");
     }
 }

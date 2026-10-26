@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "../common/constants.h"
+#include "../common/destructor_log.h"
 #include "../common/leaderboard_dto.h"
 
 
@@ -99,14 +100,13 @@ void GameMonitor::stop() {
 
 
 GameMonitor::~GameMonitor() {
-
-    std::cerr << "[" << GAME_MONITOR << "] Stopping." << std::endl;
+    log_stopping(GAME_MONITOR);
     try {
-
         unregister_all_players();
         GameMonitor::stop();
     } catch (const std::exception& e) {
-
-        std::cerr << "[" << GAME_MONITOR << "] " << EXCEPTION_IN_DESTRUCTOR << ": " << e.what();
+        log_destructor_error(GAME_MONITOR, e.what());
+    } catch (...) {
+        log_destructor_error(GAME_MONITOR, "<unknown>");
     }
 }
