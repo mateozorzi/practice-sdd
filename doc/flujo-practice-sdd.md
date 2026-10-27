@@ -198,29 +198,27 @@ Los hitos agregaron unas 1.200 líneas de código sin sumar ninguna issue, y la 
 ### 5.2 Complejidad por archivo
 Para ver si los cambios del flujo SDD influyeron mucho en la complejidad, comparé por archivo los dos análisis. En total el proyecto sumó 217 de complejidad cognitiva (1.033 → 1.250), 294 de ciclomática (1.554 → 1.848) y 1.245 líneas de código. Estos son los archivos que más complejidad sumaron:
 
-| Archivo | Cognitiva pre → post | Ciclomática pre → post | Líneas pre → post | Métodos pre → post |
-|---|---|---|---|---|
-| `server/streets_grid.cpp` (nuevo, hito 5) | — → 115 | — → 133 | — → 363 | — → 29 |
-| `server/tools/streets/streets_grid_generator.cpp` (nuevo, hito 5) | — → 15 | — → 15 | — → 49 | — → 3 |
-| `server/power_up.cpp` (nuevo, hitos 2 a 6) | — → 14 | — → 37 | — → 132 | — → 23 |
-| `client/power_up_view.cpp` (nuevo, hito 4) | — → 12 | — → 16 | — → 55 | — → 5 |
-| `server/player.cpp` (hitos 1 y 3) | 38 → 49 | 61 → 84 | 181 → 242 | 33 → 41 |
-| `server/game_loop.cpp` (hitos 3 a 6) | 77 → 86 | 111 → 120 | 455 → 490 | 43 → 46 |
-| `client/game_logic.cpp` (hito 4) | 113 → 120 | 81 → 90 | 276 → 299 | 15 → 17 |
-| **Proyecto completo** | **1.033 → 1.250** | **1.554 → 1.848** | **9.392 → 10.637** | **754 → 854** |
+| Archivo | Cognitiva pre → post | Ciclomática pre → post | Métodos pre → post |
+|---|---|---|---|
+| `server/streets_grid.cpp` (hito 5) | — → 115 | — → 133 | — → 29 |
+| `server/tools/streets/streets_grid_generator.cpp` (hito 5) | — → 15 | — → 15 | — → 3 |
+| `server/power_up.cpp` (hitos 2 a 6) | — → 14 | — → 37 | — → 23 |
+| `client/power_up_view.cpp` (hito 4) | — → 12 | — → 16 | — → 5 |
+| `server/game_loop.cpp` (hitos 3 a 6) | 77 → 86 | 111 → 120 | 43 → 46 |
+| `client/game_logic.cpp` (hito 4) | 113 → 120 | 81 → 90 | 15 → 17 |
+| **Proyecto completo** | **1.033 → 1.250** | **1.554 → 1.848** | **754 → 854** |
 
 Para comparar archivos de distinto tamaño, calculé las dos complejidades por línea y por método:
 
-| Archivo | Cognitiva x línea pre → post | Cognitiva x método pre → post | Ciclomática x línea pre → post | Ciclomática x método pre → post |
-|---|---|---|---|---|
-| `server/streets_grid.cpp` (nuevo, hito 5) | — → 0,32 | — → 3,97 | — → 0,37 | — → 4,59 |
-| `server/tools/streets/streets_grid_generator.cpp` (nuevo, hito 5) | — → 0,31 | — → 5,00 | — → 0,31 | — → 5,00 |
-| `server/power_up.cpp` (nuevo, hitos 2 a 6) | — → 0,11 | — → 0,61 | — → 0,28 | — → 1,61 |
-| `client/power_up_view.cpp` (nuevo, hito 4) | — → 0,22 | — → 2,40 | — → 0,29 | — → 3,20 |
-| `server/player.cpp` (hitos 1 y 3) | 0,21 → 0,20 | 1,15 → 1,20 | 0,34 → 0,35 | 1,85 → 2,05 |
-| `server/game_loop.cpp` (hitos 3 a 6) | 0,17 → 0,18 | 1,79 → 1,87 | 0,24 → 0,24 | 2,58 → 2,61 |
-| `client/game_logic.cpp` (hito 4) | 0,41 → 0,40 | 7,53 → **7,06** | 0,29 → 0,30 | 5,40 → **5,29** |
+| Archivo | Cognitiva x método pre → post | Ciclomática x método pre → post |
+|---|---|---|
+| `server/streets_grid.cpp` (hito 5) | — → 3,97 | — → 4,59 |
+| `server/tools/streets/streets_grid_generator.cpp` (hito 5) | — → 5,00 | — → 5,00 |
+| `server/power_up.cpp` (hitos 2 a 6) | — → 0,61 | — → 1,61 |
+| `client/power_up_view.cpp` (hito 4) | — → 2,40 | — → 3,20 |
+| `server/game_loop.cpp` (hitos 3 a 6) | 1,79 → 1,87 | 2,58 → 2,61 |
+| `client/game_logic.cpp` (hito 4) | 7,53 → **7,06** | 5,40 → **5,29** |
 | **Proyecto completo** | **0,110 → 0,118** | **1,37 → 1,46** | **0,165 → 0,174** | **2,06 → 2,16** |
 
-- **Escala de SonarQube:** según la herramienta de análisis, ninguno de los archivos tiene un nivel de complejidad ciclomática o cognitiva por método que necesite intervención. Para la complejidad cognitiva, el rango de riesgo bajo es 1-15, y el valor máximo del proyecto es 7,06. Para la complejidad ciclomática, el rango de riesgo bajo es de 1-10, y el valor máximo del proyecto es 5,29.
+- **Escala de SonarQube:** según la herramienta de análisis, ninguno de los archivos tiene un nivel de complejidad ciclomática o cognitiva por método que necesite intervención. Para la complejidad cognitiva, el rango de riesgo bajo es 1-15, y el valor máximo del proyecto es **7,06**. Para la complejidad ciclomática, el rango de riesgo bajo es de 1-10, y el valor máximo del proyecto es **5,29**.
 - **El promedio del proyecto sube poco:** por línea, la complejidad cognitiva pasa de 0,110 a 0,118 y la ciclomática de 0,165 a 0,174; por método, de 1,37 a 1,46 y de 2,06 a 2,16.
