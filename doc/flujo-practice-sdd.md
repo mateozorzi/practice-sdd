@@ -1,3 +1,22 @@
+<style>
+/* --- Configuración de Títulos --- */
+h1 { font-size: 28px; font-weight: bold; color: #1a1a1a !important; border-bottom: 2px solid #333; padding-bottom: 5px; }
+h2 { font-size: 22px; font-weight: bold; color: #2c3e50 !important; margin-top: 20px; }
+h3 { font-size: 18px; font-weight: bold; color: #34495e !important; }
+h4 { font-size: 16px; font-weight: bold; color: #7f8c8d !important; }
+
+/* --- Forzar código de una sola línea a Celeste y Azul --- */
+code {
+    background-color: #e6f2ff !important; /* Fondo celeste claro */
+    color: #0066cc !important;            /* Texto azul fuerte legible */
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: Consolas, Monaco, monospace !important;
+    font-weight: bold !important;          /* Un toque extra de grosor para que resalte */
+}
+</style>
+
+
 # Flujo de la práctica: experimento SDD
 
 Esta práctica fue realizada sobre un trabajo práctico de la materia Taller de Programación, en el que se realizó un juego arcade de carreras en 2D, basado en una arquitectura cliente-servidor y con partidas multijugador. Para este experimento, se planteó agregar a la pista Power-Ups que otorguen al jugador un efecto de velocidad, regeneración de vida o de inmunidad ante choques.
@@ -200,7 +219,7 @@ Para comparar archivos de distinto tamaño, calculé las dos complejidades por l
 | `client/power_up_view.cpp` (nuevo, hito 4) | — → 0,22 | — → 2,40 | — → 0,29 | — → 3,20 |
 | `server/player.cpp` (hitos 1 y 3) | 0,21 → 0,20 | 1,15 → 1,20 | 0,34 → 0,35 | 1,85 → 2,05 |
 | `server/game_loop.cpp` (hitos 3 a 6) | 0,17 → 0,18 | 1,79 → 1,87 | 0,24 → 0,24 | 2,58 → 2,61 |
-| `client/game_logic.cpp` (hito 4) | 0,41 → 0,40 | 7,53 → 7,06 | 0,29 → 0,30 | 5,40 → 5,29 |
+| `client/game_logic.cpp` (hito 4) | 0,41 → 0,40 | 7,53 → **7,06** | 0,29 → 0,30 | 5,40 → **5,29** |
 | **Proyecto completo** | **0,110 → 0,118** | **1,37 → 1,46** | **0,165 → 0,174** | **2,06 → 2,16** |
 
 - **Escala de SonarQube:** según la herramienta de análisis, ninguno de los archivos tiene un nivel de complejidad ciclomática o cognitiva por método que necesite intervención. Para la complejidad cognitiva, el rango de riesgo bajo es 1-15, y el valor máximo del proyecto es 7,06. Para la complejidad ciclomática, el rango de riesgo bajo es de 1-10, y el valor máximo del proyecto es 5,29.
