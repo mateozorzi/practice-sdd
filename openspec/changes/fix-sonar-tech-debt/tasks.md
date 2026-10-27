@@ -34,7 +34,7 @@
 ## 7. Verificación integral
 
 - [x] 7.1 Correr `make run-tests` en verde sin regresiones respecto de la línea base de 1.1, y los hooks (formato, cpplint, cppcheck) sin errores
-- [ ] 7.2 Correr `make test` y verificar que se generan `build/coverage.xml` y `build/report/index.html`, con cobertura total no menor que la del análisis post-SDD (90,2 % en Sonar; comparar el resumen de gcovr antes y después)
+- [x] 7.2 Correr `make test` y verificar que se generan `build/coverage.xml` y `build/report/index.html`, con cobertura total no menor que la del análisis post-SDD (90,2 % en Sonar; comparar el resumen de gcovr antes y después)
 - [x] 7.3 Correr `/opsx:verify` sobre el change y verificar que no hay issues CRITICAL
 
 ## 8. Tercer informe de Sonar y comparación de los tres análisis
