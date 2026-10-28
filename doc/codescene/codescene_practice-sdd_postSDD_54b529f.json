@@ -1,0 +1,2623 @@
+{
+ "commit": "54b529f403e1cfd2fa8d9c8df3b8380657ff00c7",
+ "branch": "codescene-post-sdd",
+ "job": "8172157",
+ "code_health": 9.131725141006704,
+ "hotspot_code_health": 9.3177674131028,
+ "average_code_health": 9.131725141006704,
+ "worst_performer": 5.719267559844407,
+ "loc": 10428,
+ "files": [
+  {
+   "path": "client/Lobby/connectioninfo.cpp",
+   "loc": 13,
+   "revs": 3,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/connectioninfo.h",
+   "loc": 21,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/creategame.cpp",
+   "loc": 16,
+   "revs": 3,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/creategame.h",
+   "loc": 23,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/createlobby.cpp",
+   "loc": 28,
+   "revs": 5,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/createlobby.h",
+   "loc": 26,
+   "revs": 4,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/joinlobby.cpp",
+   "loc": 57,
+   "revs": 10,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/joinlobby.h",
+   "loc": 26,
+   "revs": 7,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/lobby.cpp",
+   "loc": 19,
+   "revs": 3,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/lobby.h",
+   "loc": 24,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/main.cpp",
+   "loc": 17,
+   "revs": 14,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/raceselector.cpp",
+   "loc": 114,
+   "revs": 5,
+   "s": 9.1,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0033,
+   "findings": [
+    {
+     "file": "client/Lobby/raceselector.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "RaceSelector::config_available_races",
+     "metric": "",
+     "lines": "62-73"
+    },
+    {
+     "file": "client/Lobby/raceselector.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "RaceSelector::config_select_races",
+     "metric": "",
+     "lines": "49-60"
+    },
+    {
+     "file": "client/Lobby/raceselector.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "RaceSelector::fill_available_races",
+     "metric": "",
+     "lines": "23-47"
+    },
+    {
+     "file": "client/Lobby/raceselector.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "RaceSelector::refresh_available_table",
+     "metric": "",
+     "lines": "99-121"
+    },
+    {
+     "file": "client/Lobby/raceselector.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "RaceSelector::refresh_selected_table",
+     "metric": "",
+     "lines": "123-144"
+    }
+   ]
+  },
+  {
+   "path": "client/Lobby/raceselector.h",
+   "loc": 34,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/selectcars.cpp",
+   "loc": 226,
+   "revs": 9,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/selectcars.h",
+   "loc": 34,
+   "revs": 7,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/selectcircuits.cpp",
+   "loc": 6,
+   "revs": 1,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/selectcircuits.h",
+   "loc": 15,
+   "revs": 1,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/waitingroom.cpp",
+   "loc": 17,
+   "revs": 4,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/waitingroom.h",
+   "loc": 24,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/animations.cpp",
+   "loc": 80,
+   "revs": 11,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/animations.h",
+   "loc": 40,
+   "revs": 7,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/camera.cpp",
+   "loc": 28,
+   "revs": 5,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/camera.h",
+   "loc": 19,
+   "revs": 4,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/client.cpp",
+   "loc": 29,
+   "revs": 60,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": true,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/client.h",
+   "loc": 25,
+   "revs": 19,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/client_constants.h",
+   "loc": 126,
+   "revs": 17,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/client_protocol.cpp",
+   "loc": 310,
+   "revs": 71,
+   "s": 9.69,
+   "own": "mateozorzi",
+   "hot": true,
+   "fr": 0.0165,
+   "findings": [
+    {
+     "file": "client/client_protocol.cpp",
+     "smell": "Complex Method",
+     "fn": "ClientProtocol::receive_update",
+     "metric": "cc = 9",
+     "lines": "261-287"
+    }
+   ]
+  },
+  {
+   "path": "client/client_protocol.h",
+   "loc": 61,
+   "revs": 38,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/game.cpp",
+   "loc": 112,
+   "revs": 56,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/game.h",
+   "loc": 60,
+   "revs": 16,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/game_logic.cpp",
+   "loc": 299,
+   "revs": 2,
+   "s": 6.36,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0053,
+   "findings": [
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Bumpy Road",
+     "fn": "GameLogic::update_countdown",
+     "metric": "bumps = 3",
+     "lines": "230-268"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Bumpy Road",
+     "fn": "GameLogic::update_game_finished",
+     "metric": "bumps = 2",
+     "lines": "363-385"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Bumpy Road",
+     "fn": "GameLogic::update_leaderboard",
+     "metric": "bumps = 2",
+     "lines": "328-361"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Bumpy Road",
+     "fn": "GameLogic::update_race",
+     "metric": "bumps = 6",
+     "lines": "270-326"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Bumpy Road",
+     "fn": "GameLogic::update_upgrade",
+     "metric": "bumps = 6",
+     "lines": "166-228"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Bumpy Road",
+     "fn": "GameLogic::update_waiting",
+     "metric": "bumps = 2",
+     "lines": "138-164"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Complex Conditional",
+     "fn": "GameLogic::detect_events_for_player",
+     "metric": "2 complex conditional expressions",
+     "lines": "31-31"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Complex Method",
+     "fn": "GameLogic::update_countdown",
+     "metric": "cc = 10",
+     "lines": "230-268"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Complex Method",
+     "fn": "GameLogic::update_race",
+     "metric": "cc = 15",
+     "lines": "270-326"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Complex Method",
+     "fn": "GameLogic::update_upgrade",
+     "metric": "cc = 16",
+     "lines": "166-228"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Deep, Nested Complexity",
+     "fn": "GameLogic::update_upgrade",
+     "metric": "Nesting depth = 4 conditionals",
+     "lines": "166-228"
+    },
+    {
+     "file": "client/game_logic.cpp",
+     "smell": "Many Conditionals",
+     "fn": "(archivo)",
+     "metric": "Mean cyclomatic complexity per function = 5.50. Total cyclomatic complexity = 88 across 16 functions. Most complex functions: GameLogic::update_upgrade (cc = 16), GameLogic::update_race (cc = 15), GameLogic::update_countdown (cc = 10)",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "client/game_logic.h",
+   "loc": 52,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/game_phase.cpp",
+   "loc": 63,
+   "revs": 18,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/game_phase.h",
+   "loc": 59,
+   "revs": 8,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/game_state.h",
+   "loc": 45,
+   "revs": 13,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/input_manager.cpp",
+   "loc": 207,
+   "revs": 20,
+   "s": 6.9,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0448,
+   "findings": [
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "InputManager::handle_buy_events",
+     "metric": "bumps = 2",
+     "lines": "148-169"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "InputManager::handle_countdown",
+     "metric": "bumps = 2",
+     "lines": "171-190"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "InputManager::handle_game_finished",
+     "metric": "bumps = 2",
+     "lines": "239-258"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "InputManager::handle_leaderboard",
+     "metric": "bumps = 2",
+     "lines": "218-237"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "InputManager::handle_movement",
+     "metric": "bumps = 2",
+     "lines": "192-216"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "InputManager::handle_waiting",
+     "metric": "bumps = 2",
+     "lines": "126-146"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Complex Conditional",
+     "fn": "InputManager::handle_click",
+     "metric": "2 complex conditional expressions",
+     "lines": "110-110"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Complex Conditional",
+     "fn": "InputManager::handle_click",
+     "metric": "2 complex conditional expressions",
+     "lines": "78-78"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Complex Method",
+     "fn": "InputManager::handle_click",
+     "metric": "cc = 13",
+     "lines": "76-112"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_buy_events",
+     "metric": "",
+     "lines": "148-169"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_countdown",
+     "metric": "",
+     "lines": "171-190"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_game_finished",
+     "metric": "",
+     "lines": "239-258"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_keydown",
+     "metric": "",
+     "lines": "28-50"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_keyup",
+     "metric": "",
+     "lines": "52-74"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_leaderboard",
+     "metric": "",
+     "lines": "218-237"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_movement",
+     "metric": "",
+     "lines": "192-216"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Duplicated Function Blocks",
+     "fn": "InputManager::handle_waiting",
+     "metric": "",
+     "lines": "126-146"
+    },
+    {
+     "file": "client/input_manager.cpp",
+     "smell": "Many Conditionals",
+     "fn": "(archivo)",
+     "metric": "Mean cyclomatic complexity per function = 4.60. Total cyclomatic complexity = 92 across 20 functions. Most complex functions: InputManager::handle_click (cc = 13)",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "client/input_manager.h",
+   "loc": 38,
+   "revs": 12,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/leaderboard_info.cpp",
+   "loc": 135,
+   "revs": 9,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/leaderboard_info.h",
+   "loc": 33,
+   "revs": 5,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/main.cpp",
+   "loc": 21,
+   "revs": 4,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/menu_connection.cpp",
+   "loc": 56,
+   "revs": 3,
+   "s": 9.1,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.002,
+   "findings": [
+    {
+     "file": "client/menu_connection.cpp",
+     "smell": "Complex Conditional",
+     "fn": "MenuConnection::run",
+     "metric": "2 complex conditional expressions",
+     "lines": "40-40"
+    },
+    {
+     "file": "client/menu_connection.cpp",
+     "smell": "Complex Conditional",
+     "fn": "MenuConnection::run",
+     "metric": "2 complex conditional expressions",
+     "lines": "56-56"
+    },
+    {
+     "file": "client/menu_connection.cpp",
+     "smell": "Complex Method",
+     "fn": "MenuConnection::run",
+     "metric": "cc = 11",
+     "lines": "14-79"
+    }
+   ]
+  },
+  {
+   "path": "client/menu_connection.h",
+   "loc": 11,
+   "revs": 3,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/menu_interface.cpp",
+   "loc": 224,
+   "revs": 63,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": true,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/menu_interface.h",
+   "loc": 26,
+   "revs": 14,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/power_up_view.cpp",
+   "loc": 55,
+   "revs": 3,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/power_up_view.h",
+   "loc": 31,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/receiver.cpp",
+   "loc": 44,
+   "revs": 19,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/receiver.h",
+   "loc": 23,
+   "revs": 14,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/resource_manager.cpp",
+   "loc": 43,
+   "revs": 4,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/resource_manager.h",
+   "loc": 20,
+   "revs": 3,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/sdl_manager.cpp",
+   "loc": 544,
+   "revs": 92,
+   "s": 8.43,
+   "own": "MKSLedesma",
+   "hot": true,
+   "fr": 0.1089,
+   "findings": [
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "SDLManager::render_players",
+     "metric": "bumps = 3",
+     "lines": "265-342"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Bumpy Road",
+     "fn": "SDLManager::render",
+     "metric": "bumps = 2",
+     "lines": "354-453"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Complex Method",
+     "fn": "SDLManager::render_players",
+     "metric": "cc = 11",
+     "lines": "265-342"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Complex Method",
+     "fn": "SDLManager::render",
+     "metric": "cc = 16",
+     "lines": "354-453"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::draw_row",
+     "metric": "Arguments = 5",
+     "lines": "559-566"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::render_hint",
+     "metric": "Arguments = 5",
+     "lines": "696-707"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::render_layer",
+     "metric": "Arguments = 5",
+     "lines": "238-253"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::render_npc",
+     "metric": "Arguments = 5",
+     "lines": "121-135"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::render_players",
+     "metric": "Arguments = 9",
+     "lines": "265-342"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::render_player",
+     "metric": "Arguments = 7",
+     "lines": "106-119"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "SDLManager::render_power_ups",
+     "metric": "Arguments = 5",
+     "lines": "138-156"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Large Method",
+     "fn": "SDLManager::render",
+     "metric": "LoC = 73 lines",
+     "lines": "354-453"
+    },
+    {
+     "file": "client/sdl_manager.cpp",
+     "smell": "Primitive Obsession",
+     "fn": "(archivo)",
+     "metric": "All functions in the file",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "client/sdl_manager.h",
+   "loc": 115,
+   "revs": 57,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/sender.cpp",
+   "loc": 22,
+   "revs": 9,
+   "s": 10.0,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/sender.h",
+   "loc": 17,
+   "revs": 7,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/sounds.cpp",
+   "loc": 107,
+   "revs": 20,
+   "s": 9.39,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0089,
+   "findings": [
+    {
+     "file": "client/sounds.cpp",
+     "smell": "High Degree of Code Duplication",
+     "fn": "Sounds::play_crash_sound",
+     "metric": "",
+     "lines": "68-88"
+    },
+    {
+     "file": "client/sounds.cpp",
+     "smell": "High Degree of Code Duplication",
+     "fn": "Sounds::play_explosion_sound",
+     "metric": "",
+     "lines": "90-110"
+    }
+   ]
+  },
+  {
+   "path": "client/sounds.h",
+   "loc": 40,
+   "revs": 15,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "client/upgrade_shop.cpp",
+   "loc": 173,
+   "revs": 19,
+   "s": 9.01,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0136,
+   "findings": [
+    {
+     "file": "client/upgrade_shop.cpp",
+     "smell": "Bumpy Road",
+     "fn": "UpgradeShop::render",
+     "metric": "bumps = 2",
+     "lines": "68-205"
+    },
+    {
+     "file": "client/upgrade_shop.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "UpgradeShop::render",
+     "metric": "Arguments = 7",
+     "lines": "68-205"
+    },
+    {
+     "file": "client/upgrade_shop.cpp",
+     "smell": "Large Method",
+     "fn": "UpgradeShop::render",
+     "metric": "LoC = 101 lines",
+     "lines": "68-205"
+    }
+   ]
+  },
+  {
+   "path": "client/upgrade_shop.h",
+   "loc": 50,
+   "revs": 13,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/car_catalogue_dto.cpp",
+   "loc": 4,
+   "revs": 3,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/car_catalogue_dto.h",
+   "loc": 10,
+   "revs": 2,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/car_dto.cpp",
+   "loc": 4,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/car_dto.h",
+   "loc": 14,
+   "revs": 7,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/car_position_dto.cpp",
+   "loc": 13,
+   "revs": 8,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/car_position_dto.h",
+   "loc": 25,
+   "revs": 8,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/checkpoint_dto.cpp",
+   "loc": 11,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/checkpoint_dto.h",
+   "loc": 15,
+   "revs": 5,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/client_event_dto.cpp",
+   "loc": 2,
+   "revs": 1,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/client_event_dto.h",
+   "loc": 15,
+   "revs": 7,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/common_protocol.cpp",
+   "loc": 69,
+   "revs": 6,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/common_protocol.h",
+   "loc": 30,
+   "revs": 5,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/constants.h",
+   "loc": 49,
+   "revs": 54,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/game_command_dto.cpp",
+   "loc": 6,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/game_command_dto.h",
+   "loc": 32,
+   "revs": 8,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/game_update_dto.cpp",
+   "loc": 5,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/game_update_dto.h",
+   "loc": 17,
+   "revs": 7,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/isocket.h",
+   "loc": 15,
+   "revs": 1,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/leaderboard_dto.cpp",
+   "loc": 4,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/leaderboard_dto.h",
+   "loc": 14,
+   "revs": 4,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/liberror.cpp",
+   "loc": 24,
+   "revs": 0,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/liberror.h",
+   "loc": 11,
+   "revs": 0,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/lobby_catalogue_dto.cpp",
+   "loc": 3,
+   "revs": 1,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/lobby_catalogue_dto.h",
+   "loc": 11,
+   "revs": 1,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/lobby_dto.cpp",
+   "loc": 10,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/lobby_dto.h",
+   "loc": 33,
+   "revs": 16,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/movement_dto.cpp",
+   "loc": 3,
+   "revs": 1,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/movement_dto.h",
+   "loc": 9,
+   "revs": 3,
+   "s": null,
+   "own": "MKSLedesma",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/npc_dto.cpp",
+   "loc": 4,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/npc_dto.h",
+   "loc": 12,
+   "revs": 3,
+   "s": null,
+   "own": "NestorPala",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/phase.h",
+   "loc": 11,
+   "revs": 5,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/player_dto.cpp",
+   "loc": 11,
+   "revs": 11,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/player_dto.h",
+   "loc": 18,
+   "revs": 9,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/player_race_stats_dto.cpp",
+   "loc": 9,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/player_race_stats_dto.h",
+   "loc": 14,
+   "revs": 4,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/power_up_dto.cpp",
+   "loc": 14,
+   "revs": 3,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/power_up_dto.h",
+   "loc": 27,
+   "revs": 3,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/power_up_type.h",
+   "loc": 5,
+   "revs": 1,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/queue.h",
+   "loc": 186,
+   "revs": 1,
+   "s": 8.82,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0009,
+   "findings": [
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "pop",
+     "metric": "",
+     "lines": "101-119"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "pop",
+     "metric": "",
+     "lines": "210-228"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "push",
+     "metric": "",
+     "lines": "192-208"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "push",
+     "metric": "",
+     "lines": "82-98"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "try_pop",
+     "metric": "",
+     "lines": "173-190"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "try_pop",
+     "metric": "",
+     "lines": "63-80"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "try_push",
+     "metric": "",
+     "lines": "154-171"
+    },
+    {
+     "file": "common/queue.h",
+     "smell": "Duplicated Function Blocks",
+     "fn": "try_push",
+     "metric": "",
+     "lines": "44-61"
+    }
+   ]
+  },
+  {
+   "path": "common/race_catalogue_dto.cpp",
+   "loc": 3,
+   "revs": 1,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/race_catalogue_dto.h",
+   "loc": 11,
+   "revs": 4,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/race_dto.cpp",
+   "loc": 11,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/race_dto.h",
+   "loc": 20,
+   "revs": 4,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/resolver.cpp",
+   "loc": 68,
+   "revs": 0,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/resolver.h",
+   "loc": 21,
+   "revs": 0,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/resolvererror.cpp",
+   "loc": 7,
+   "revs": 0,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/resolvererror.h",
+   "loc": 12,
+   "revs": 0,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/socket.cpp",
+   "loc": 219,
+   "revs": 0,
+   "s": 8.75,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": [
+    {
+     "file": "common/socket.cpp",
+     "smell": "Complex Method",
+     "fn": "Socket::Socket",
+     "metric": "cc = 11",
+     "lines": "23-97"
+    },
+    {
+     "file": "common/socket.cpp",
+     "smell": "Complex Method",
+     "fn": "Socket::Socket",
+     "metric": "cc = 14",
+     "lines": "99-196"
+    },
+    {
+     "file": "common/socket.cpp",
+     "smell": "Many Conditionals",
+     "fn": "(archivo)",
+     "metric": "Mean cyclomatic complexity per function = 4.38. Total cyclomatic complexity = 70 across 16 functions. Most complex functions: Socket::Socket (cc = 14), Socket::Socket (cc = 11)",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "common/socket.h",
+   "loc": 29,
+   "revs": 2,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/thread.h",
+   "loc": 48,
+   "revs": 1,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/upgrade_dto.cpp",
+   "loc": 7,
+   "revs": 2,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/upgrade_dto.h",
+   "loc": 12,
+   "revs": 3,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/world_snapshot_dto.cpp",
+   "loc": 15,
+   "revs": 7,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "common/world_snapshot_dto.h",
+   "loc": 23,
+   "revs": 8,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/Constants.h",
+   "loc": 12,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/checkpoint.cpp",
+   "loc": 9,
+   "revs": 4,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/checkpoint.h",
+   "loc": 18,
+   "revs": 5,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/coordinates.cpp",
+   "loc": 116,
+   "revs": 15,
+   "s": 9.69,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0034,
+   "findings": [
+    {
+     "file": "editor/EditorMapas/coordinates.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "Coordinates::export_checkpoints",
+     "metric": "Arguments = 6",
+     "lines": "89-149"
+    }
+   ]
+  },
+  {
+   "path": "editor/EditorMapas/coordinates.h",
+   "loc": 28,
+   "revs": 11,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/creador.cpp",
+   "loc": 266,
+   "revs": 19,
+   "s": 9.07,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0127,
+   "findings": [
+    {
+     "file": "editor/EditorMapas/creador.cpp",
+     "smell": "Complex Method",
+     "fn": "Creador::calculate_checkpoint",
+     "metric": "cc = 12",
+     "lines": "108-142"
+    },
+    {
+     "file": "editor/EditorMapas/creador.cpp",
+     "smell": "Deep, Nested Complexity",
+     "fn": "Creador::update_map_delete",
+     "metric": "Nesting depth = 6 conditionals",
+     "lines": "177-204"
+    }
+   ]
+  },
+  {
+   "path": "editor/EditorMapas/creador.h",
+   "loc": 58,
+   "revs": 9,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/editor.cpp",
+   "loc": 49,
+   "revs": 8,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/editor.h",
+   "loc": 24,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/editormenu.cpp",
+   "loc": 27,
+   "revs": 9,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/editormenu.h",
+   "loc": 19,
+   "revs": 4,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/main.cpp",
+   "loc": 8,
+   "revs": 3,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/messages.cpp",
+   "loc": 13,
+   "revs": 2,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/messages.h",
+   "loc": 13,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/race.cpp",
+   "loc": 14,
+   "revs": 5,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/race.h",
+   "loc": 22,
+   "revs": 5,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/races_folder.h",
+   "loc": 5,
+   "revs": 1,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/selectcircuit.cpp",
+   "loc": 126,
+   "revs": 15,
+   "s": 9.54,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.005,
+   "findings": [
+    {
+     "file": "editor/EditorMapas/selectcircuit.cpp",
+     "smell": "Bumpy Road",
+     "fn": "SelectCircuit::read_info_races",
+     "metric": "bumps = 2",
+     "lines": "73-142"
+    },
+    {
+     "file": "editor/EditorMapas/selectcircuit.cpp",
+     "smell": "Complex Method",
+     "fn": "SelectCircuit::read_info_races",
+     "metric": "cc = 10",
+     "lines": "73-142"
+    }
+   ]
+  },
+  {
+   "path": "editor/EditorMapas/selectcircuit.h",
+   "loc": 28,
+   "revs": 6,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "editor/main.cpp",
+   "loc": 2,
+   "revs": 1,
+   "s": 10.0,
+   "own": "Martin Di Paola",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/acceptor.cpp",
+   "loc": 56,
+   "revs": 27,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/acceptor.h",
+   "loc": 26,
+   "revs": 14,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/car.cpp",
+   "loc": 216,
+   "revs": 54,
+   "s": 9.84,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0061,
+   "findings": [
+    {
+     "file": "server/car.cpp",
+     "smell": "Bumpy Road",
+     "fn": "Car::set_position_for_race",
+     "metric": "bumps = 4",
+     "lines": "72-117"
+    }
+   ]
+  },
+  {
+   "path": "server/car.h",
+   "loc": 51,
+   "revs": 43,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/city_loader.cpp",
+   "loc": 111,
+   "revs": 18,
+   "s": 8.55,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0189,
+   "findings": [
+    {
+     "file": "server/city_loader.cpp",
+     "smell": "Complex Method",
+     "fn": "CityLoader::load_npcs",
+     "metric": "cc = 11",
+     "lines": "52-93"
+    },
+    {
+     "file": "server/city_loader.cpp",
+     "smell": "Deep, Nested Complexity",
+     "fn": "CityLoader::load_npcs",
+     "metric": "Nesting depth = 4 conditionals",
+     "lines": "52-93"
+    },
+    {
+     "file": "server/city_loader.cpp",
+     "smell": "High Degree of Code Duplication",
+     "fn": "CityLoader::load_collidables",
+     "metric": "",
+     "lines": "18-33"
+    },
+    {
+     "file": "server/city_loader.cpp",
+     "smell": "High Degree of Code Duplication",
+     "fn": "CityLoader::load_sensors",
+     "metric": "",
+     "lines": "35-50"
+    }
+   ]
+  },
+  {
+   "path": "server/city_loader.h",
+   "loc": 36,
+   "revs": 14,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/city_utils.cpp",
+   "loc": 116,
+   "revs": 13,
+   "s": 9.1,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0085,
+   "findings": [
+    {
+     "file": "server/city_utils.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "CityUtils::add_sensor",
+     "metric": "Arguments = 5",
+     "lines": "115-138"
+    },
+    {
+     "file": "server/city_utils.cpp",
+     "smell": "High Degree of Code Duplication",
+     "fn": "CityUtils::add_collidable",
+     "metric": "",
+     "lines": "95-113"
+    },
+    {
+     "file": "server/city_utils.cpp",
+     "smell": "High Degree of Code Duplication",
+     "fn": "CityUtils::add_sensor",
+     "metric": "",
+     "lines": "115-138"
+    }
+   ]
+  },
+  {
+   "path": "server/city_utils.h",
+   "loc": 37,
+   "revs": 20,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/client_handler.cpp",
+   "loc": 172,
+   "revs": 57,
+   "s": 9.69,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0128,
+   "findings": [
+    {
+     "file": "server/client_handler.cpp",
+     "smell": "Complex Method",
+     "fn": "ClientHandler::launch_lobby",
+     "metric": "cc = 11",
+     "lines": "23-61"
+    }
+   ]
+  },
+  {
+   "path": "server/client_handler.h",
+   "loc": 40,
+   "revs": 34,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/collision_listener.cpp",
+   "loc": 148,
+   "revs": 20,
+   "s": 8.28,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0249,
+   "findings": [
+    {
+     "file": "server/collision_listener.cpp",
+     "smell": "Bumpy Road",
+     "fn": "CollisionListener::handle_sensor_contact",
+     "metric": "bumps = 2",
+     "lines": "67-129"
+    },
+    {
+     "file": "server/collision_listener.cpp",
+     "smell": "Complex Conditional",
+     "fn": "CollisionListener::PreSolve",
+     "metric": "2 complex conditional expressions",
+     "lines": "213-213"
+    },
+    {
+     "file": "server/collision_listener.cpp",
+     "smell": "Complex Method",
+     "fn": "CollisionListener::handle_sensor_contact",
+     "metric": "cc = 17",
+     "lines": "67-129"
+    },
+    {
+     "file": "server/collision_listener.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "CollisionListener::handle_two_car_collision",
+     "metric": "Arguments = 5",
+     "lines": "132-146"
+    },
+    {
+     "file": "server/collision_listener.cpp",
+     "smell": "Many Conditionals",
+     "fn": "(archivo)",
+     "metric": "Mean cyclomatic complexity per function = 4.08. Total cyclomatic complexity = 49 across 12 functions. Most complex functions: CollisionListener::handle_sensor_contact (cc = 17)",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "server/collision_listener.h",
+   "loc": 30,
+   "revs": 9,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game.cpp",
+   "loc": 46,
+   "revs": 29,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game.h",
+   "loc": 39,
+   "revs": 24,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game_command.cpp",
+   "loc": 10,
+   "revs": 9,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game_command.h",
+   "loc": 33,
+   "revs": 15,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game_loop.cpp",
+   "loc": 487,
+   "revs": 140,
+   "s": 9.64,
+   "own": "bcespedes",
+   "hot": true,
+   "fr": 0.0377,
+   "findings": [
+    {
+     "file": "server/game_loop.cpp",
+     "smell": "Complex Method",
+     "fn": "GameLoop::process_commands",
+     "metric": "cc = 13",
+     "lines": "57-102"
+    }
+   ]
+  },
+  {
+   "path": "server/game_loop.h",
+   "loc": 111,
+   "revs": 80,
+   "s": null,
+   "own": "bcespedes",
+   "hot": true,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game_monitor.cpp",
+   "loc": 67,
+   "revs": 19,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/game_monitor.h",
+   "loc": 33,
+   "revs": 19,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/lobby.cpp",
+   "loc": 95,
+   "revs": 33,
+   "s": 9.69,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0074,
+   "findings": [
+    {
+     "file": "server/lobby.cpp",
+     "smell": "Excess Number of Function Arguments",
+     "fn": "Lobby::create_new_game",
+     "metric": "Arguments = 5",
+     "lines": "19-38"
+    }
+   ]
+  },
+  {
+   "path": "server/lobby.h",
+   "loc": 41,
+   "revs": 28,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/main.cpp",
+   "loc": 24,
+   "revs": 9,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/npc.cpp",
+   "loc": 97,
+   "revs": 6,
+   "s": 10.0,
+   "own": "NestorPala",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/npc.h",
+   "loc": 35,
+   "revs": 5,
+   "s": 10.0,
+   "own": "NestorPala",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/player.cpp",
+   "loc": 242,
+   "revs": 57,
+   "s": 9.69,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0128,
+   "findings": [
+    {
+     "file": "server/player.cpp",
+     "smell": "Bumpy Road",
+     "fn": "Player::update_car_position",
+     "metric": "bumps = 2",
+     "lines": "214-236"
+    },
+    {
+     "file": "server/player.cpp",
+     "smell": "Bumpy Road",
+     "fn": "Player::update_next_checkpoint",
+     "metric": "bumps = 2",
+     "lines": "175-204"
+    }
+   ]
+  },
+  {
+   "path": "server/player.h",
+   "loc": 84,
+   "revs": 40,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/power_up.cpp",
+   "loc": 132,
+   "revs": 4,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/power_up.h",
+   "loc": 58,
+   "revs": 5,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/race_loader.cpp",
+   "loc": 58,
+   "revs": 5,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/race_loader.h",
+   "loc": 20,
+   "revs": 5,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/receiver.cpp",
+   "loc": 39,
+   "revs": 35,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/receiver.h",
+   "loc": 23,
+   "revs": 24,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/sender.cpp",
+   "loc": 40,
+   "revs": 34,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/sender.h",
+   "loc": 24,
+   "revs": 19,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/server.cpp",
+   "loc": 29,
+   "revs": 12,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/server.h",
+   "loc": 21,
+   "revs": 18,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/server_config.h",
+   "loc": 111,
+   "revs": 14,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/server_config_loader.cpp",
+   "loc": 168,
+   "revs": 18,
+   "s": 9.05,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0124,
+   "findings": [
+    {
+     "file": "server/server_config_loader.cpp",
+     "smell": "Complex Method",
+     "fn": "ServerConfigLoader::load_physics_config",
+     "metric": "cc = 13",
+     "lines": "120-162"
+    },
+    {
+     "file": "server/server_config_loader.cpp",
+     "smell": "Many Conditionals",
+     "fn": "(archivo)",
+     "metric": "Mean cyclomatic complexity per function = 5.38. Total cyclomatic complexity = 43 across 8 functions. Most complex functions: ServerConfigLoader::load_physics_config (cc = 13)",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "server/server_config_loader.h",
+   "loc": 16,
+   "revs": 5,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/server_constants.h",
+   "loc": 56,
+   "revs": 5,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/server_protocol.cpp",
+   "loc": 253,
+   "revs": 73,
+   "s": 9.47,
+   "own": "bcespedes",
+   "hot": true,
+   "fr": 0.0285,
+   "findings": [
+    {
+     "file": "server/server_protocol.cpp",
+     "smell": "Complex Method",
+     "fn": "ServerProtocol::receive_game_command",
+     "metric": "cc = 9",
+     "lines": "160-184"
+    },
+    {
+     "file": "server/server_protocol.cpp",
+     "smell": "Complex Method",
+     "fn": "ServerProtocol::send_game_update",
+     "metric": "cc = 10",
+     "lines": "321-350"
+    }
+   ]
+  },
+  {
+   "path": "server/server_protocol.h",
+   "loc": 47,
+   "revs": 37,
+   "s": null,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/streets_grid.cpp",
+   "loc": 363,
+   "revs": 2,
+   "s": 5.72,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0062,
+   "findings": [
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Bumpy Road",
+     "fn": "find_street_path",
+     "metric": "bumps = 2",
+     "lines": "359-448"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "StreetsGrid::cell_at",
+     "metric": "3 complex conditional expressions",
+     "lines": "261-261"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "StreetsGrid::is_street",
+     "metric": "3 complex conditional expressions",
+     "lines": "245-245"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "find_street_path",
+     "metric": "2 complex conditional expressions",
+     "lines": "427-428"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "find_street_path",
+     "metric": "2 complex conditional expressions",
+     "lines": "435-435"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "next_layer",
+     "metric": "5 complex conditional expressions",
+     "lines": "126-127"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "path_layer_at",
+     "metric": "3 complex conditional expressions",
+     "lines": "218-218"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Conditional",
+     "fn": "place_on_path",
+     "metric": "3 complex conditional expressions",
+     "lines": "498-498"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Method",
+     "fn": "find_street_path",
+     "metric": "cc = 24",
+     "lines": "359-448"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Method",
+     "fn": "inside_a_bridge",
+     "metric": "cc = 11",
+     "lines": "188-207"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Method",
+     "fn": "load_streets_grid",
+     "metric": "cc = 15",
+     "lines": "295-339"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Method",
+     "fn": "next_layer",
+     "metric": "cc = 12",
+     "lines": "124-140"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Method",
+     "fn": "place_on_path",
+     "metric": "cc = 12",
+     "lines": "483-514"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Complex Method",
+     "fn": "validate_rows",
+     "metric": "cc = 9",
+     "lines": "21-40"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Deep, Nested Complexity",
+     "fn": "find_street_path",
+     "metric": "Nesting depth = 4 conditionals",
+     "lines": "359-448"
+    },
+    {
+     "file": "server/streets_grid.cpp",
+     "smell": "Many Conditionals",
+     "fn": "(archivo)",
+     "metric": "Mean cyclomatic complexity per function = 5.14. Total cyclomatic complexity = 144 across 28 functions. Most complex functions: find_street_path (cc = 24), load_streets_grid (cc = 15), place_on_path (cc = 12), next_layer (cc = 12), inside_a_bridge (cc = 11) and 1 more functions.",
+     "lines": "-"
+    }
+   ]
+  },
+  {
+   "path": "server/streets_grid.h",
+   "loc": 68,
+   "revs": 2,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/tools/streets/generate_streets_grid.cpp",
+   "loc": 35,
+   "revs": 1,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/tools/streets/streets_grid_generator.cpp",
+   "loc": 49,
+   "revs": 1,
+   "s": 10.0,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/tools/streets/streets_grid_generator.h",
+   "loc": 9,
+   "revs": 1,
+   "s": null,
+   "own": "mateozorzi",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  },
+  {
+   "path": "server/world_creation_exception.h",
+   "loc": 11,
+   "revs": 4,
+   "s": 10.0,
+   "own": "bcespedes",
+   "hot": false,
+   "fr": 0.0,
+   "findings": []
+  }
+ ]
+}

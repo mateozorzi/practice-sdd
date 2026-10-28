@@ -222,3 +222,56 @@ Para comparar archivos de distinto tamaño, calculé las dos complejidades por l
 
 - **Escala de SonarQube:** según la herramienta de análisis, ninguno de los archivos tiene un nivel de complejidad ciclomática o cognitiva por método que necesite intervención. Para la complejidad cognitiva, el rango de riesgo bajo es 1-15, y el valor máximo del proyecto es **7,06**. Para la complejidad ciclomática, el rango de riesgo bajo es de 1-10, y el valor máximo del proyecto es **5,29**.
 - **El promedio del proyecto sube poco:** por línea, la complejidad cognitiva pasa de 0,110 a 0,118 y la ciclomática de 0,165 a 0,174; por método, de 1,37 a 1,46 y de 2,06 a 2,16.
+
+## 6. Analisis con CodeScene
+CodeScene apunta a: **qué tan fácil es entender y modificar el código**. Calcula un **Code Health** de 1 a 10 por archivo, a partir de factores que se asocian con mayor costo de mantenimiento y defectos: funciones complejas, condicionales anidados, código duplicado, funciones con muchos argumentos, etc.
+
+Según el puntaje, cada archivo cae en una de tres calificaciones:
+- **Sano (verde, 9 a 10):** código fácil de leer y de cambiar.
+- **Atención (amarillo, 4 a 8,99):** tiene code smells que conviene revisar.
+- **Problemático (rojo, 1 a 3,99):** código caro de mantener y con más riesgo de defectos.
+
+La comparación, igual que con sonar, estuvo dada por:
+- **Pre-SDD**: el mismo de SonarCloud, antes de comenzar el flujo SDD.
+- **Post-SDD**: al terminar los 6 hitos.
+
+### 6.1 Métricas generales
+| Métrica | Pre-SDD | Post-SDD | Qué mide |
+|---|---|---|---|
+| Code Health del proyecto | 9,28 | 9,14 | Promedio del Code Health de los archivos|
+| Hotspot Code Health | 9,29 | 9,41 | Muestra la salud del código que más se modifica. |
+| Peor archivo | 6,36 (`client/game_logic.cpp`) | 5,72 (`server/streets_grid.cpp`) | El archivo con el Code Health más bajo. |
+| Código verde / amarillo / rojo | 75,8 % / 24,2 % / 0 % | 73,1 % / 26,9 % / 0 % | Porcentaje de líneas que cae en cada banda. |
+| Archivos con 10,00 | 63 de 86 | 69 de 93 | Archivos sin ningún code smell |
+| Hallazgos | 94 | 111 | Cantidad total de code smells |
+| Funciones complejas | 20 | 25 | Funciones con complejidad ciclomática alta (9 o más). |
+
+El Code Health bajó de 9,28 a 9,14, y casi todo se explica por un archivo nuevo: `server/streets_grid.cpp`, del hito 5 (5,72). Concentra 16 de los 18 hallazgos nuevos.
+
+De los 94 hallazgos que había antes del SDD, 88 siguen iguales, 5 cambian de valor y solo 1 se resolvió (`GameLoop::run` dejó de ser compleja). Es decir, el flujo SDD no empeoró el código que ya existía, pero tampoco corrigió su deuda. Los hotspots mejoran un poco (9,29 → 9,41). Esto se puede deber que el flujo de SDD solo trabaja en el alcance de las especificaciones, si estos issues no son tratados como parte de un hito el agente no los va a arreglar. 
+
+### 6.2 Code Health por carpeta
+| Carpeta | Archivos pre → post | Líneas pre → post | Code Health pre → post |
+|---|---|---|---|
+| `client` | 56 → 58 | 3.994 → 4.189 | 9,01 → 9,01 |
+| `server` | 42 → 49 | 3.183 → 4.140 | 9,53 → **9,13** |
+| `common` | 51 → 55 | 1.222 → 1.283 | 9,36 → 9,39 |
+| `editor` | 19 → 20 | 832 → 857 | 9,47 → 9,46 |
+
+- **Code Health:** promedio de los archivos de la carpeta, ponderado por líneas, para que un archivo grande pese más que uno chico.
+
+La caída se concentra en `server`, que es donde el SDD sumó más código, ya que es la que presenta el archivo mas comeplejo, el mapeo de las calles de cada mapa. Las otras tres carpetas quedan prácticamente iguales. En `client`, `game_logic.cpp` sigue siendo el archivo con más deuda del proyecto, pero conserva su puntaje aunque el hito 4 le agregó código, igual que en SonarCloud, donde su complejidad por método bajó un poco.
+
+Se debe aclarar que este segundo analisis se realizo luego de terminar los 6 hitos, por lo que estos resultados no se tuvieron en cuenta en el flujo de SDD, si no que fue realizado para familiarizarse con la herramienta de CodeScene.
+
+## 7. Conclusiones de las herramientas de analsis
+Los analisis sirven mucho para observar como trabaja el agente a partir de la metodlogía de SDD. Si en las especificaciones no se indican estos errores encontrados por la herramienta, al estar fuera de alcance, no serán tratados.
+Las dos herramientas tampoco miden lo mismo. Después del arreglo, SonarCloud queda con 0 issues, mientras que CodeScene mantiene sus 111 hallazgos sin cambios. Que Sonar no marque issues no significa que el código sea fácil de mantener, por eso puede ser conveniente utilizar las dos.
+Una buena forma de trabajar con estas herramientas sería incluirlas en el flujo para que el agente construya un código mantenible y escalable:
+
+- Hacer un primer análisis antes de comenzar, para conocer la deuda existente y decidir si se trata en un hito propio.
+- Agregar criterios de calidad a las especificaciones o a `openspec/config.yaml`, por ejemplo: “0 issues nuevas en SonarCloud” o “ningún archivo nuevo por debajo de 9 de Code Health de CodeScene”. Así se tratarían como un criterio de aceptación más, igual que hoy se exige que cada scenario tenga su test.
+- Volver a analizar en el `/opsx:verify` de cada hito, para corregir los problemas que agregue el agente antes de archivarlo.
+
+De esta manera, el código crecería de la mejor manera posible a medida que avanzan los hitos. Como el experimento se hizo sobre una sola feature y los análisis se realizaron al final, estas conclusiones son una observación de este caso y no algo general; se deberia de probar el flujo con las herramientas integradas desde el principio para confirmar que sea el mejor uso.
+

@@ -1,0 +1,1276 @@
+{
+ "commit": "76847e2",
+ "job": 8171140,
+ "code_health": 9.1,
+ "hotspot_code_health": 8.87,
+ "average_code_health": 9.1,
+ "worst_performer": 6.33,
+ "files": [
+  {
+   "path": "client/animations.cpp",
+   "loc": 80,
+   "commits": 11,
+   "code_health": 10.0,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/camera.cpp",
+   "loc": 28,
+   "commits": 5,
+   "code_health": 10.0,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/client.cpp",
+   "loc": 29,
+   "commits": 61,
+   "code_health": 10.0,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/client_protocol.cpp",
+   "loc": 288,
+   "commits": 69,
+   "code_health": 9.69,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "ClientProtocol::receive_update",
+     "metric": "cc = 9",
+     "lines": "235–261"
+    }
+   ]
+  },
+  {
+   "path": "client/game.cpp",
+   "loc": 365,
+   "commits": 54,
+   "code_health": 6.33,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "Game::update_upgrade",
+     "metric": "bumps = 6",
+     "lines": "189–254"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "Game::update_race",
+     "metric": "bumps = 6",
+     "lines": "314–371"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "Game::update_countdown",
+     "metric": "bumps = 3",
+     "lines": "267–306"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "Game::update_waiting",
+     "metric": "bumps = 2",
+     "lines": "150–178"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "Game::update_leaderboard",
+     "metric": "bumps = 2",
+     "lines": "377–411"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "Game::update_game_finished",
+     "metric": "bumps = 2",
+     "lines": "422–445"
+    },
+    {
+     "smell": "Deep, Nested Complexity",
+     "function": "Game::update_upgrade",
+     "metric": "anidamiento = 4",
+     "lines": "189–254"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "Game::update_upgrade",
+     "metric": "cc = 18",
+     "lines": "189–254"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "Game::update_race",
+     "metric": "cc = 15",
+     "lines": "314–371"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "Game::update_countdown",
+     "metric": "cc = 10",
+     "lines": "267–306"
+    },
+    {
+     "smell": "Complex Conditional",
+     "function": "Game::detect_events_for_player",
+     "metric": "2 expresiones",
+     "lines": "71"
+    },
+    {
+     "smell": "Many Conditionals",
+     "function": "(archivo)",
+     "metric": "cc media 4,21 · cc total 101 en 24 funciones",
+     "lines": "–"
+    }
+   ]
+  },
+  {
+   "path": "client/game_phase.cpp",
+   "loc": 63,
+   "commits": 17,
+   "code_health": 10.0,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/input_manager.cpp",
+   "loc": 208,
+   "commits": 19,
+   "code_health": 6.9,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "InputManager::handle_waiting",
+     "metric": "bumps = 2",
+     "lines": "126–146"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "InputManager::handle_buy_events",
+     "metric": "bumps = 2",
+     "lines": "148–169"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "InputManager::handle_countdown",
+     "metric": "bumps = 2",
+     "lines": "171–190"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "InputManager::handle_movement",
+     "metric": "bumps = 2",
+     "lines": "192–216"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "InputManager::handle_leaderboard",
+     "metric": "bumps = 2",
+     "lines": "218–237"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "InputManager::handle_game_finished",
+     "metric": "bumps = 2",
+     "lines": "239–258"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "InputManager::handle_click",
+     "metric": "cc = 13",
+     "lines": "76–112"
+    },
+    {
+     "smell": "Complex Conditional",
+     "function": "InputManager::handle_click",
+     "metric": "2 expresiones",
+     "lines": "78"
+    },
+    {
+     "smell": "Complex Conditional",
+     "function": "InputManager::handle_click",
+     "metric": "2 expresiones",
+     "lines": "110"
+    },
+    {
+     "smell": "Duplicated Function Blocks",
+     "function": "handle_keydown, handle_keyup, handle_waiting, handle_buy_events, handle_countdown, handle_movement, handle_leaderboard, handle_game_finished",
+     "metric": "8 funciones similares",
+     "lines": "28–258"
+    },
+    {
+     "smell": "Many Conditionals",
+     "function": "(archivo)",
+     "metric": "cc media 4,60 · cc total 92 en 20 funciones",
+     "lines": "–"
+    },
+    {
+     "smell": "Complexity Trend Growth",
+     "function": "(archivo)",
+     "metric": "complejidad en aumento",
+     "lines": "–"
+    }
+   ]
+  },
+  {
+   "path": "client/leaderboard_info.cpp",
+   "loc": 135,
+   "commits": 9,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/connectioninfo.cpp",
+   "loc": 13,
+   "commits": 3,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/creategame.cpp",
+   "loc": 16,
+   "commits": 3,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/createlobby.cpp",
+   "loc": 28,
+   "commits": 5,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/joinlobby.cpp",
+   "loc": 57,
+   "commits": 10,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/lobby.cpp",
+   "loc": 19,
+   "commits": 3,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/main.cpp",
+   "loc": 17,
+   "commits": 14,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/raceselector.cpp",
+   "loc": 114,
+   "commits": 5,
+   "code_health": 9.1,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Duplicated Function Blocks",
+     "function": "fill_available_races, config_select_races, config_available_races, refresh_available_table, refresh_selected_table",
+     "metric": "5 funciones similares",
+     "lines": "23–144"
+    }
+   ]
+  },
+  {
+   "path": "client/Lobby/selectcars.cpp",
+   "loc": 226,
+   "commits": 9,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/selectcircuits.cpp",
+   "loc": 6,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/Lobby/waitingroom.cpp",
+   "loc": 17,
+   "commits": 4,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/main.cpp",
+   "loc": 21,
+   "commits": 11,
+   "code_health": null,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/menu_connection.cpp",
+   "loc": 56,
+   "commits": 3,
+   "code_health": 9.1,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "MenuConnection::run",
+     "metric": "cc = 11",
+     "lines": "14–79"
+    },
+    {
+     "smell": "Complex Conditional",
+     "function": "MenuConnection::run",
+     "metric": "2 expresiones",
+     "lines": "40"
+    },
+    {
+     "smell": "Complex Conditional",
+     "function": "MenuConnection::run",
+     "metric": "2 expresiones",
+     "lines": "56"
+    }
+   ]
+  },
+  {
+   "path": "client/menu_interface.cpp",
+   "loc": 224,
+   "commits": 62,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/receiver.cpp",
+   "loc": 44,
+   "commits": 19,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/resource_manager.cpp",
+   "loc": 43,
+   "commits": 4,
+   "code_health": 10.0,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/sdl_manager.cpp",
+   "loc": 511,
+   "commits": 89,
+   "code_health": 8.43,
+   "owner": "MKSLedesma",
+   "hotspot": true,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "SDLManager::render_players",
+     "metric": "bumps = 3",
+     "lines": "224–295"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "SDLManager::render",
+     "metric": "bumps = 2",
+     "lines": "307–405"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "SDLManager::render",
+     "metric": "cc = 16",
+     "lines": "307–405"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "SDLManager::render_players",
+     "metric": "cc = 11",
+     "lines": "224–295"
+    },
+    {
+     "smell": "Large Method",
+     "function": "SDLManager::render",
+     "metric": "72 LoC",
+     "lines": "307–405"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "SDLManager::render_players",
+     "metric": "9 argumentos",
+     "lines": "224–295"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "SDLManager::render_player",
+     "metric": "7 argumentos",
+     "lines": "105–118"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "SDLManager::render_npc",
+     "metric": "5 argumentos",
+     "lines": "120–134"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "SDLManager::render_layer",
+     "metric": "5 argumentos",
+     "lines": "197–212"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "SDLManager::draw_row",
+     "metric": "5 argumentos",
+     "lines": "511–518"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "SDLManager::render_hint",
+     "metric": "5 argumentos",
+     "lines": "648–659"
+    },
+    {
+     "smell": "Primitive Obsession",
+     "function": "(archivo)",
+     "metric": "todo el archivo",
+     "lines": "–"
+    }
+   ]
+  },
+  {
+   "path": "client/sender.cpp",
+   "loc": 22,
+   "commits": 9,
+   "code_health": 10.0,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "client/sounds.cpp",
+   "loc": 107,
+   "commits": 20,
+   "code_health": 9.39,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "High Degree of Code Duplication",
+     "function": "play_crash_sound, play_explosion_sound",
+     "metric": "2 funciones similares",
+     "lines": "68–110"
+    }
+   ]
+  },
+  {
+   "path": "client/upgrade_shop.cpp",
+   "loc": 173,
+   "commits": 19,
+   "code_health": 9.01,
+   "owner": "MKSLedesma",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "UpgradeShop::render",
+     "metric": "bumps = 2",
+     "lines": "68–205"
+    },
+    {
+     "smell": "Large Method",
+     "function": "UpgradeShop::render",
+     "metric": "101 LoC",
+     "lines": "68–205"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "UpgradeShop::render",
+     "metric": "7 argumentos",
+     "lines": "68–205"
+    }
+   ]
+  },
+  {
+   "path": "common/car_catalogue_dto.cpp",
+   "loc": 4,
+   "commits": 3,
+   "code_health": null,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/car_dto.cpp",
+   "loc": 4,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/car_position_dto.cpp",
+   "loc": 13,
+   "commits": 8,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/checkpoint_dto.cpp",
+   "loc": 11,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/client_event_dto.cpp",
+   "loc": 2,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/common_protocol.cpp",
+   "loc": 59,
+   "commits": 6,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/game_command_dto.cpp",
+   "loc": 6,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/game_update_dto.cpp",
+   "loc": 5,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/leaderboard_dto.cpp",
+   "loc": 4,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/liberror.cpp",
+   "loc": 24,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/lobby_catalogue_dto.cpp",
+   "loc": 3,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/lobby_dto.cpp",
+   "loc": 10,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/movement_dto.cpp",
+   "loc": 3,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/npc_dto.cpp",
+   "loc": 4,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/player_dto.cpp",
+   "loc": 11,
+   "commits": 11,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/player_race_stats_dto.cpp",
+   "loc": 9,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/race_catalogue_dto.cpp",
+   "loc": 3,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/race_dto.cpp",
+   "loc": 11,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/resolver.cpp",
+   "loc": 68,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/resolvererror.cpp",
+   "loc": 7,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/socket.cpp",
+   "loc": 219,
+   "commits": 1,
+   "code_health": 8.75,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "Socket::Socket",
+     "metric": "cc = 14",
+     "lines": "99–196"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "Socket::Socket",
+     "metric": "cc = 11",
+     "lines": "23–97"
+    },
+    {
+     "smell": "Many Conditionals",
+     "function": "(archivo)",
+     "metric": "cc media 4,38 · cc total 70 en 16 funciones",
+     "lines": "–"
+    }
+   ]
+  },
+  {
+   "path": "common/upgrade_dto.cpp",
+   "loc": 7,
+   "commits": 2,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "common/world_snapshot_dto.cpp",
+   "loc": 13,
+   "commits": 6,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/checkpoint.cpp",
+   "loc": 9,
+   "commits": 4,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/coordinates.cpp",
+   "loc": 118,
+   "commits": 17,
+   "code_health": 9.69,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "Coordinates::export_checkpoints",
+     "metric": "5 argumentos",
+     "lines": "89–151"
+    }
+   ]
+  },
+  {
+   "path": "editor/EditorMapas/creador.cpp",
+   "loc": 254,
+   "commits": 22,
+   "code_health": 9.07,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Deep, Nested Complexity",
+     "function": "Creador::update_map_delete",
+     "metric": "anidamiento = 6",
+     "lines": "173–200"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "Creador::calculate_checkpoint",
+     "metric": "cc = 12",
+     "lines": "104–138"
+    }
+   ]
+  },
+  {
+   "path": "editor/EditorMapas/editor.cpp",
+   "loc": 48,
+   "commits": 11,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/editormenu.cpp",
+   "loc": 27,
+   "commits": 8,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/main.cpp",
+   "loc": 8,
+   "commits": 4,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/messages.cpp",
+   "loc": 13,
+   "commits": 4,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/race.cpp",
+   "loc": 14,
+   "commits": 5,
+   "code_health": 10.0,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "editor/EditorMapas/selectcircuit.cpp",
+   "loc": 126,
+   "commits": 14,
+   "code_health": 9.54,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "SelectCircuit::read_info_races",
+     "metric": "bumps = 2",
+     "lines": "73–142"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "SelectCircuit::read_info_races",
+     "metric": "cc = 10",
+     "lines": "73–142"
+    }
+   ]
+  },
+  {
+   "path": "editor/main.cpp",
+   "loc": 2,
+   "commits": 1,
+   "code_health": 10.0,
+   "owner": "Martin Di Paola",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/acceptor.cpp",
+   "loc": 56,
+   "commits": 29,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/car.cpp",
+   "loc": 212,
+   "commits": 53,
+   "code_health": 9.84,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "Car::set_position_for_race",
+     "metric": "bumps = 4",
+     "lines": "72–117"
+    }
+   ]
+  },
+  {
+   "path": "server/city_loader.cpp",
+   "loc": 95,
+   "commits": 17,
+   "code_health": 8.55,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Deep, Nested Complexity",
+     "function": "CityLoader::load_npcs",
+     "metric": "anidamiento = 4",
+     "lines": "51–92"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "CityLoader::load_npcs",
+     "metric": "cc = 11",
+     "lines": "51–92"
+    },
+    {
+     "smell": "High Degree of Code Duplication",
+     "function": "load_collidables, load_sensors",
+     "metric": "2 funciones similares",
+     "lines": "17–49"
+    }
+   ]
+  },
+  {
+   "path": "server/city_utils.cpp",
+   "loc": 116,
+   "commits": 13,
+   "code_health": 9.1,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "High Degree of Code Duplication",
+     "function": "add_collidable, add_sensor",
+     "metric": "2 funciones similares",
+     "lines": "95–138"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "CityUtils::add_sensor",
+     "metric": "5 argumentos",
+     "lines": "115–138"
+    }
+   ]
+  },
+  {
+   "path": "server/client_handler.cpp",
+   "loc": 172,
+   "commits": 60,
+   "code_health": 9.69,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "ClientHandler::launch_lobby",
+     "metric": "cc = 11",
+     "lines": "23–61"
+    }
+   ]
+  },
+  {
+   "path": "server/collision_listener.cpp",
+   "loc": 140,
+   "commits": 19,
+   "code_health": 8.32,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "CollisionListener::handle_sensor_contact",
+     "metric": "bumps = 2",
+     "lines": "63–116"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "CollisionListener::handle_sensor_contact",
+     "metric": "cc = 15",
+     "lines": "63–116"
+    },
+    {
+     "smell": "Complex Conditional",
+     "function": "CollisionListener::PreSolve",
+     "metric": "2 expresiones",
+     "lines": "200"
+    },
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "CollisionListener::handle_two_car_collision",
+     "metric": "5 argumentos",
+     "lines": "119–133"
+    },
+    {
+     "smell": "Many Conditionals",
+     "function": "(archivo)",
+     "metric": "cc media 4,18 · cc total 46 en 11 funciones",
+     "lines": "–"
+    },
+    {
+     "smell": "Complexity Trend Growth",
+     "function": "(archivo)",
+     "metric": "complejidad en aumento",
+     "lines": "–"
+    }
+   ]
+  },
+  {
+   "path": "server/game.cpp",
+   "loc": 45,
+   "commits": 27,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/game_command.cpp",
+   "loc": 10,
+   "commits": 9,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/game_loop.cpp",
+   "loc": 456,
+   "commits": 135,
+   "code_health": 9.37,
+   "owner": "bcespedes",
+   "hotspot": true,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "GameLoop::process_commands",
+     "metric": "cc = 13",
+     "lines": "52–97"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "GameLoop::run",
+     "metric": "cc = 10",
+     "lines": "615–647"
+    }
+   ]
+  },
+  {
+   "path": "server/game_monitor.cpp",
+   "loc": 67,
+   "commits": 19,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/lobby.cpp",
+   "loc": 92,
+   "commits": 32,
+   "code_health": 9.69,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Excess Number of Function Arguments",
+     "function": "Lobby::create_new_game",
+     "metric": "5 argumentos",
+     "lines": "17–35"
+    }
+   ]
+  },
+  {
+   "path": "server/main.cpp",
+   "loc": 24,
+   "commits": 11,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/npc.cpp",
+   "loc": 97,
+   "commits": 6,
+   "code_health": 10.0,
+   "owner": "NestorPala",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/player.cpp",
+   "loc": 181,
+   "commits": 55,
+   "code_health": 9.69,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Bumpy Road",
+     "function": "Player::update_next_checkpoint",
+     "metric": "bumps = 2",
+     "lines": "147–176"
+    },
+    {
+     "smell": "Bumpy Road",
+     "function": "Player::update_car_position",
+     "metric": "bumps = 2",
+     "lines": "186–208"
+    }
+   ]
+  },
+  {
+   "path": "server/race_loader.cpp",
+   "loc": 58,
+   "commits": 5,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/receiver.cpp",
+   "loc": 39,
+   "commits": 36,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/sender.cpp",
+   "loc": 40,
+   "commits": 36,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/server.cpp",
+   "loc": 29,
+   "commits": 14,
+   "code_health": 10.0,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": []
+  },
+  {
+   "path": "server/server_config_loader.cpp",
+   "loc": 143,
+   "commits": 16,
+   "code_health": 9.64,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "ServerConfigLoader::load_physics_config",
+     "metric": "cc = 13",
+     "lines": "83–125"
+    }
+   ]
+  },
+  {
+   "path": "server/server_protocol.cpp",
+   "loc": 237,
+   "commits": 70,
+   "code_health": 9.47,
+   "owner": "bcespedes",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "Complex Method",
+     "function": "ServerProtocol::send_game_update",
+     "metric": "cc = 10",
+     "lines": "299–328"
+    },
+    {
+     "smell": "Complex Method",
+     "function": "ServerProtocol::receive_game_command",
+     "metric": "cc = 9",
+     "lines": "160–184"
+    }
+   ]
+  },
+  {
+   "path": "tests/test_client.cpp",
+   "loc": 518,
+   "commits": 9,
+   "code_health": 8.28,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "High Degree of Code Duplication",
+     "function": "HandleMove_WithMock, HandleBuy_WithMock, AskForLobbies_WithMock, SendExit_WithMock",
+     "metric": "4 tests similares",
+     "lines": "61–293"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "HandleMove_WithMock",
+     "metric": "1 bloque",
+     "lines": "61–80"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "ReceiveCarPosition_WithMock",
+     "metric": "1 bloque",
+     "lines": "326–378"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "ReceiveCarCatalogue_WithMock",
+     "metric": "1 bloque",
+     "lines": "380–430"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "ReceiveLobbyCatalogue_WithMock",
+     "metric": "1 bloque",
+     "lines": "432–484"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "ReceiveRace_WithMock",
+     "metric": "1 bloque",
+     "lines": "511–575"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "ReceiveUpdatePositions_WithMock",
+     "metric": "1 bloque",
+     "lines": "577–649"
+    },
+    {
+     "smell": "Large Assertion Blocks",
+     "function": "ReceiveLeaderBoard_WithMock",
+     "metric": "1 bloque",
+     "lines": "651–689"
+    }
+   ]
+  },
+  {
+   "path": "tests/test_server.cpp",
+   "loc": 606,
+   "commits": 12,
+   "code_health": 8.71,
+   "owner": "mateozorzi",
+   "hotspot": false,
+   "findings": [
+    {
+     "smell": "High Degree of Code Duplication",
+     "function": "ReceiveMovment, ReceiveCarSelection, ReceiveUpgrade, ReceiveDisconnect",
+     "metric": "4 tests similares",
+     "lines": "681–791"
+    },
+    {
+     "smell": "Large Method",
+     "function": "ServerProtocolTest::SendWorldSnapshot",
+     "metric": "132 LoC",
+     "lines": "153–318"
+    }
+   ]
+  }
+ ]
+}
